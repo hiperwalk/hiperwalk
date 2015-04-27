@@ -1,0 +1,15 @@
+WALK CUSTOM
+
+DIRECTORY DIR_CUSTOM
+
+STEPS 10
+
+INITIALSTATE psi0.dat
+
+UNITARY u0.dat u1.dat
+
+#LABELS label_x.dat label_y.dat
+
+HARDWAREID 0
+
+ALLSTATES 1
