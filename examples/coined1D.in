@@ -23,6 +23,7 @@ PLOTS TRUE
 
 ANIMATION TRUE
 
-HARDWAREID 0
-
+# saves files after every 10 steps
 ALLSTATES 10
+
+HARDWAREID 0
