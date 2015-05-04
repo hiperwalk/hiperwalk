@@ -4,29 +4,30 @@ DIRECTORY DIR_DTQW2D
 
 STEPS 30
 
-GRAPH LATTICE  
 # GRAPH TORUS 20 20
-
-LATTYPE DIAGONAL  
+GRAPH LATTICE  
+ 
 # LATTYPE NATURAL
+LATTYPE DIAGONAL 
 
-# GROVER 4 
-# FOURIER 4
-
+# GROVER 4 (for Grover coin) and FOURIER 4 (for Fourier coin)
 BEGINCOIN
 GROVER 4 
 ENDCOIN
 
 # a (real) b (im) coinstate x y
 BEGINSTATE
- 0.5 0 0 0 0  
- -0.5 0 1 0 0
- -0.5 0 2 0 0
+0.5 0 0 0 0  
+-0.5 0 1 0 0
+-0.5 0 2 0 0
 0.5 0 3 0 0
 ENDSTATE
 
-HARDWAREID 0
-
 PLOTS TRUE
 
+ANIMATION FALSE
+
+# saves files after every 2 steps
 ALLSTATES 2
+
+HARDWAREID 0
