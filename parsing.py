@@ -102,9 +102,9 @@ def preParsing(inputFile):
                     cfg.GRAPHDIMENSION=int(line[1])
                 
                 
-            elif line[0]=="TESSELLATIONPOLYGONS":
+            elif line[0]=="POLYGONS":
                 if line.__len__()==1:
-                    print("[HIPERWALK] Syntax error at  TESSELLATIONPOLYGONS BLOCK, missing values.")
+                    print("[HIPERWALK] Syntax error at POLYGONS BLOCK, missing values.")
                     exit(-1)
                 elif cfg.WALK=="COINLESS1D" and len(line)==2:
                     cfg.TESSELLATIONPOLYGONS=[int(line[1])]
@@ -260,9 +260,9 @@ def parsingLines(line,f):
 
 
 
-        elif line[0]=="TESSELLATIONDISPLACEMENT":
+        elif line[0]=="DISPLACEMENT":
             if line.__len__()==1:
-                print("[HIPERWALK] Syntax error at  TESSELLATIONDISPLACEMENT BLOCK, missing values.")
+                print("[HIPERWALK] Syntax error at  DISPLACEMENT BLOCK, missing values.")
                 exit(-1)
             elif cfg.WALK=="COINLESS1D":
                 cfg.TESSELLATIONDISPLACEMENT=[int(line[1])]
@@ -344,6 +344,20 @@ def parsingLines(line,f):
             else:
                 print("[HIPERWALK] Syntax error at  PLOTS BLOCK, unknown value, %s."%line[1])
                 exit(-1)
+
+
+        elif line[0]=="VARIANCE":
+            if line.__len__()==1:
+                print("[HIPERWALK] Syntax error at  VARIANCE BLOCK, missing value.")            
+                exit(-1)
+            if line[1]=="TRUE":
+                cfg.VARIANCE=1
+            elif line[1]=="FALSE":
+                cfg.VARIANCE=0
+            else:
+                print("[HIPERWALK] Syntax error at  VARIANCE BLOCK, unknown value, %s."%line[1])
+                exit(-1)
+       
        
         elif line[0]=="ALLSTATES":
             if line.__len__()==1:

@@ -201,14 +201,15 @@ def plotStatistics2d():
     print("[HIPERWALK] Mean(y): ............................... meanY.eps")    
 
 
-    generatingStatisticsPlotFile2D("HIPERWALK_TEMP_VARIANCE_X")
-    os.system( "gnuplot HIPERWALK_TEMP_VARIANCE_X.plt 2> /dev/null > /dev/null")
-    print("[HIPERWALK] Variance(x): ........................... varianceX.eps")    
-    
-    
-    generatingStatisticsPlotFile2D("HIPERWALK_TEMP_VARIANCE_Y")
-    os.system( "gnuplot HIPERWALK_TEMP_VARIANCE_Y.plt 2> /dev/null > /dev/null")
-    print("[HIPERWALK] Variance(y): ........................... varianceY.eps")    
+    if cfg.VARIANCE:
+        generatingStatisticsPlotFile2D("HIPERWALK_TEMP_VARIANCE_X")
+        os.system( "gnuplot HIPERWALK_TEMP_VARIANCE_X.plt 2> /dev/null > /dev/null")
+        print("[HIPERWALK] Variance(x): ........................... varianceX.eps")    
+        
+        
+        generatingStatisticsPlotFile2D("HIPERWALK_TEMP_VARIANCE_Y")
+        os.system( "gnuplot HIPERWALK_TEMP_VARIANCE_Y.plt 2> /dev/null > /dev/null")
+        print("[HIPERWALK] Variance(y): ........................... varianceY.eps")    
     
     
 def generatingStatisticsPlotFile2D(statisticData):
@@ -245,11 +246,11 @@ def generatingStatisticsPlotFile2D(statisticData):
         output.write("set output \"varianceX.eps\"\n")    
         output.write("plot \"./statistics.dat\" u 1:4 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
 
-        output.write("set title \"Quantum Walk Moment X\"\n")
-        output.write("set ylabel \"Moment\"\n")
-        output.write("fit g(x) \"./statistics.dat\" u 1:7 via a, b,c\n")
-        output.write("set output \"momentX.eps\"\n")    
-        output.write("plot \"./statistics.dat\" u 1:7 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
+#        output.write("set title \"Quantum Walk Moment X\"\n")
+#        output.write("set ylabel \"Moment\"\n")
+#        output.write("fit g(x) \"./statistics.dat\" u 1:7 via a, b,c\n")
+#        output.write("set output \"momentX.eps\"\n")    
+#        output.write("plot \"./statistics.dat\" u 1:7 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
 
 
 
@@ -260,11 +261,11 @@ def generatingStatisticsPlotFile2D(statisticData):
         output.write("set output \"varianceY.eps\"\n")    
         output.write("plot \"./statistics.dat\" u 1:5 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
 
-        output.write("set title \"Quantum Walk Moment Y\"\n")
-        output.write("set ylabel \"Moment\"\n")
-        output.write("fit g(x) \"./statistics.dat\" u 1:8 via a, b,c\n")
-        output.write("set output \"momentY.eps\"\n")    
-        output.write("plot \"./statistics.dat\" u 1:8 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
+#        output.write("set title \"Quantum Walk Moment Y\"\n")
+#        output.write("set ylabel \"Moment\"\n")
+#        output.write("fit g(x) \"./statistics.dat\" u 1:8 via a, b,c\n")
+#        output.write("set output \"momentY.eps\"\n")    
+#        output.write("plot \"./statistics.dat\" u 1:8 t \"\", g(x) t sprintf(\"a=%.5f b=%.f c=%.5f\", a, b,c)\n")
     
     elif(statisticData == "HIPERWALK_TEMP_STANDARD_DEVIATION"):
         output.write("set title \"Quantum Walk Standard Deviation\"\n")

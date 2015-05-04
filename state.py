@@ -155,40 +155,12 @@ def generateState_COINLESS1D():
         auxX3=auxX3*cfg.TESSELLATIONPOLYGONS[0]
         
         cfg.RANGEX=[int(auxX0) ,int(auxX0+auxX3-1)]    
-        cfg.SIZEX=cfg.RANGEX[1]-cfg.RANGEX[0]+1
+        cfg.GRAPHSIZE=cfg.RANGEX[1]-cfg.RANGEX[0]+1
 
-
-
-
-
-
-
-#        lowerBoundX=return_MIN_Position(cfg.STATE_COMPONENTS,2)
-#        auxMin=lowerBoundX-cfg.TESSELLATIONPATCHES[0]*cfg.STEPS
-#        auxMin=np.ceil(auxMin/cfg.TESSELLATIONPATCHES[0])*cfg.TESSELLATIONPATCHES[0]### Roof of the division.
-#
-#
-#        upperBoundX=return_MAX_Position(cfg.STATE_COMPONENTS,2)
-#        auxMax=upperBoundX+cfg.TESSELLATIONPATCHES[0]*cfg.STEPS
-#        auxMax=np.ceil(auxMax/cfg.TESSELLATIONPATCHES[0])*cfg.TESSELLATIONPATCHES[0]-1### Roof of the division.
-#        
-#        cfg.RANGEX=[auxMin,auxMax]    
-#        cfg.SIZEX=int(cfg.RANGEX[1]-cfg.RANGEX[0]+1)
-#        cfg.TOTAL_PATCHES_IN_X=int(cfg.SIZEX/cfg.TESSELLATIONPATCHES[0])
-
-
-
-
-
-#        if (lowerBound%2==1 and upperBound%2==0) or (lowerBound%2==0 and upperBound%2==1):
-#            cfg.GRAPHSIZE=( ( (upperBound-lowerBound) + 51) + 2*cfg.STEPS)
-##            print("IMPAR lb=%d ub=%d GRAPHSIZE=%d"%(lowerBound,upperBound,cfg.GRAPHSIZE))
-#        else:
-#            cfg.GRAPHSIZE=( ( (upperBound-lowerBound) + 52) + 2*cfg.STEPS)
-##            print("PAR lb=%d ub=%d GRAPHSIZE=%d"%(lowerBound,upperBound,cfg.GRAPHSIZE))                
+    
 
             
-        cfg.STATESIZE=cfg.SIZEX
+        cfg.STATESIZE=cfg.GRAPHSIZE
         cfg.STATE=np.zeros((cfg.STATESIZE,1),dtype=complex)
 
         for i in range(cfg.STATE_COMPONENTS.shape[0]):

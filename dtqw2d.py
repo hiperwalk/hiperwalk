@@ -5,7 +5,7 @@ import neblina as nb
 import operators as op
 import gnuplot as gnuplot
 import standardDeviation as sd
-import test
+import testmode
 import os
 #from qwalk import test_qwalk as tq
 
@@ -62,7 +62,7 @@ def run():
 
 
     if cfg.TEST_MODE:
-        modelVector=test.create_DTQW2D_test_vector()
+        modelVector=testmode.create_DTQW2D_test_vector()
         returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
         if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
             return 1

@@ -10,14 +10,17 @@ import config as cfg
 import ioFunctions as io 
 import neblina as nb
 import gnuplot as gnuplot
-import standardDeviation as sd
-import test
+import testmode
 import numpy as np
 def run():
     
     if not cfg.OVERLAP:
         cfg.OVERLAPX=int(cfg.TESSELLATIONPOLYGONS[0])
         cfg.OVERLAPY=int(cfg.TESSELLATIONPOLYGONS[1])
+
+    print cfg.STATE
+    print cfg.STATESIZE
+    print cfg.GRAPHSIZE
 
     op.COINLESS2D()
 
@@ -73,14 +76,12 @@ def run():
             gnuplot.plotAnimation2D()
 
 
-
     if cfg.TEST_MODE:
-#        modelVector=test.create_DTQW2D_test_vector()
-#        returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
-#        if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
-#            return 1
-#        else:
-#            return 0
-#        
-        return 1    
+        modelVector=testmode.create_COINLESS2D_test_vector()
+        returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
+        if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
+            return 1
+        else:
+            return 0
+                
     return 1

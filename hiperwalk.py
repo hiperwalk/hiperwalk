@@ -9,7 +9,7 @@ Created on Sat Jan 24 14:29:17 2015
 import sys
 import os
 import walks
-import test
+import testmode
 
 tam = len(sys.argv)
 
@@ -17,7 +17,7 @@ tam = len(sys.argv)
 if tam>=2:
     string=(str(sys.argv[1]))
     if string =="-test":
-        test.run()
+        testmode.run()
     
     
     

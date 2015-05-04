@@ -11,7 +11,7 @@ import gnuplot as gnuplot
 import neblina as nb
 import operators as op
 import standardDeviation as sd
-import test
+import testmode
 import numpy as np
 
 def run():
@@ -62,7 +62,7 @@ def run():
 
 
     if cfg.TEST_MODE:
-        modelVector=test.create_DTQW1D_test_vector()
+        modelVector=testmode.create_DTQW1D_test_vector()
         returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
         if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
             return 1

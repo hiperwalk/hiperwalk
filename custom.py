@@ -6,7 +6,7 @@ Created on Mon Oct 27 04:06:41 2014
 @author: aaron
 """
 import neblina as nb
-import test
+import testmode
 import config as cfg
 import numpy as np
 
@@ -16,8 +16,8 @@ def run():
 
     
     if cfg.TEST_MODE:
-        modelVector=test.create_CUSTOM_test_vector()
-        returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_final_distribution.dat")
+        modelVector=testmode.create_CUSTOM_test_vector()
+        returnNeblina=nb.neblina_distribution_to_vector("final_distribution.dat")
         if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
             return 1
         else:

@@ -12,6 +12,7 @@ import gnuplot as gnuplot  ### Module for Gnuplot functions.
 import config as cfg                ### Module for global variables for Quantum Walk.
 import standardDeviation as sd      ### Module for Standard Deviation functions.
 import numpy as np
+import testmode
 
 def run():
     probabilities=[]
@@ -20,7 +21,6 @@ def run():
     
     if not cfg.OVERLAP:
         cfg.OVERLAPX=int(cfg.TESSELLATIONPOLYGONS[0])
-
 
         
     io.savetxt("HIPERWALK_TEMP_PSI.dat",cfg.STATE,float,'%1.16f')
@@ -60,5 +60,16 @@ def run():
             gnuplot.plotStatistics1D()
         if cfg.ANIMATION == 1:
             gnuplot.plotAnimation1D()
+
+
+
+    if cfg.TEST_MODE:
+        modelVector=testmode.create_COINLESS1D_test_vector()
+        returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
+        if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
+            return 1
+        else:
+            return 0
             
+
     return 1

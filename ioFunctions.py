@@ -102,7 +102,7 @@ def test_mode():
 #    a=str(os.getcwd())
 #    print("Teste %s"%a)
 
-    os.chdir(os.environ['$HOME'])
+    os.chdir(os.environ['HOME'])
     if not os.path.exists("HIPERWALK_TEST_DIRECTORY"):
         os.mkdir("HIPERWALK_TEST_DIRECTORY")
 #    os.system("cp *.in HIPERWALK_TEMP_DIRECTORY")
