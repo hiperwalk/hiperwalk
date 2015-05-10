@@ -50,8 +50,8 @@ def walk(inputFile):
     elif cfg.WALK=="STAGGERED2D":
         cfg.RETURN_SIMULATION_FLAG=staggered2d.run()
     
-#    elif cfg.WALK=="SZEGEDY":
-#        cfg.RETURN_SIMULATION_FLAG=szegedy.run()    
+    elif cfg.WALK=="SZEGEDY":
+        cfg.RETURN_SIMULATION_FLAG=szegedy.run()    
     
     elif cfg.WALK=="CUSTOM":
         cfg.RETURN_SIMULATION_FLAG=custom.run()
