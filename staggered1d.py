@@ -24,14 +24,14 @@ def run():
 
         
     io.savetxt("HIPERWALK_TEMP_PSI.dat",cfg.STATE,float,'%1.16f')
-    op.COINLESS1D()
+    op.STAGGERED1D()
 
 
     sd.distances_vector_1D(cfg.RANGEX[0],cfg.RANGEX[1])  
     cfg.DISTANCE_VECTOR_SIZE=cfg.GRAPHSIZE
         
-#    nb.generating_COINLESS1D_NBL()
-    nb.runCore_COINLESS1D()
+#    nb.generating_STAGGERED1D_NBL()
+    nb.runCore_STAGGERED1D()
     
     cfg.STATE=nb.neblina_state_to_vector("NEBLINA_TEMP_final_state.dat")
     probabilities=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
@@ -55,7 +55,7 @@ def run():
     if cfg.GNUPLOT:
         io.savetxt("HIPERWALK_TEMP_PROBABILITIES.dat",probabilities,float,'%1.16f')
 
-        gnuplot.template_COINLESS1D("HIPERWALK_TEMP_PROBABILITIES.dat","final_distribution.eps","EPS")
+        gnuplot.template_STAGGERED1D("HIPERWALK_TEMP_PROBABILITIES.dat","final_distribution.eps","EPS")
         if cfg.STEPS>1:
             gnuplot.plotStatistics1D()
         if cfg.ANIMATION == 1:
@@ -64,7 +64,7 @@ def run():
 
 
     if cfg.TEST_MODE:
-        modelVector=testmode.create_COINLESS1D_test_vector()
+        modelVector=testmode.create_STAGGERED1D_test_vector()
         returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
         if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
             return 1

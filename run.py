@@ -13,9 +13,9 @@ import subprocess
     #
 #subprocess.call([sys.executable, 'hiperwalk.py', 'teste/coined2D.in'])
 #
-subprocess.call([sys.executable, 'hiperwalk.py', 'teste/coinless1D.in'])
+subprocess.call([sys.executable, 'hiperwalk.py', 'teste/staggered1D.in'])
 #
-#subprocess.call([sys.executable, 'hiperwalk.py', 'teste/coinless2D.in'])
+#subprocess.call([sys.executable, 'hiperwalk.py', 'teste/staggered2D.in'])
 #
 #subprocess.call([sys.executable, 'hiperwalk.py', 'teste/custom.in'])
 

@@ -44,10 +44,10 @@
    ANIMATION = toint( args[7] )
 
 
-    file_CtI = open( "HIPERWALK_TEMP_COINLESS_EVEN_OPERATOR_2D.dat", "r" ) 
+    file_CtI = open( "HIPERWALK_TEMP_STAGGERED_EVEN_OPERATOR_2D.dat", "r" ) 
     CtI = sparse complex[STATESIZE,STATESIZE] 
     read( file_CtI, CtI ) 
-    file_S = open( "HIPERWALK_TEMP_COINLESS_ODD_OPERATOR_2D.dat", "r" ) 
+    file_S = open( "HIPERWALK_TEMP_STAGGERED_ODD_OPERATOR_2D.dat", "r" ) 
     S = sparse complex[STATESIZE,STATESIZE] 
     read( file_S, S ) 
     file_psi = open( "HIPERWALK_TEMP_PSI.dat", "r" ) 
@@ -82,11 +82,11 @@
             end 
     end   
     PROBABILITY_VECTOR = vec_conj( PSI ) 
-    println( "[Neblina] Statistics file: .............. statistics.dat" ) 
+    println( "[NEBLINA] Statistics file: .............. statistics.dat" ) 
     final_state_neblina = open("NEBLINA_TEMP_final_state.dat", "w") 
     println( final_state_neblina, PSI ) 
     final_distribution_neblina = open("NEBLINA_TEMP_final_distribution.dat", "w") 
     println( final_distribution_neblina, PROBABILITY_VECTOR ) 
-    println( "[Neblina] Wave Function final : .............. final_state.dat" ) 
-    println("[Neblina] Done!") 
+    println( "[NEBLINA] Wave Function final : .............. final_state.dat" ) 
+    println("[NEBLINA] Done!") 
  end 

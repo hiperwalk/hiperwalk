@@ -333,24 +333,24 @@ def COIN_TENSOR_IDENTITY_OPERATOR_2D():
     
     
 ##
-##  COINLESS
+##  STAGGERED
 ## 
-def COINLESS1D():
-#    COINLESS_EVEN_OPERATOR_1D()
-#    COINLESS_ODD_OPERATOR_1D()
-    teste_COINLESS_EVEN_OPERATOR_1D()
-    teste_COINLESS_ODD_OPERATOR_1D()
+def STAGGERED1D():
+#    STAGGERED_EVEN_OPERATOR_1D()
+#    STAGGERED_ODD_OPERATOR_1D()
+    teste_STAGGERED_EVEN_OPERATOR_1D()
+    teste_STAGGERED_ODD_OPERATOR_1D()
 
-def COINLESS_EVEN_OPERATOR_1D():
+def STAGGERED_EVEN_OPERATOR_1D():
     try:
-        f = open("HIPERWALK_TEMP_COINLESS_EVEN_OPERATOR_1D.dat",'w')
+        f = open("HIPERWALK_TEMP_STAGGERED_EVEN_OPERATOR_1D.dat",'w')
     except IOError:
         print("[HIPERWALK] Could not open file in directory.")
 
 
 
-    alpha=float(cfg.COINLESS_COEFICIENTS[0][0])
-    phi=float(cfg.COINLESS_COEFICIENTS[0][1])
+    alpha=float(cfg.STAGGERED_COEFICIENTS[0][0])
+    phi=float(cfg.STAGGERED_COEFICIENTS[0][1])
     aux=np.zeros([2,2],dtype=complex)
 #    aux[0][0]=np.cos(alpha)
 #    aux[0][1]=np.sin(alpha)*(np.cos(phi)+1J*np.sin(phi))
@@ -370,15 +370,15 @@ def COINLESS_EVEN_OPERATOR_1D():
         f.write("%d %d %1.16f %1.16f\n"%(i+2,i+2,aux[1][1].real,aux[1][1].imag))
     f.close()
     
-def COINLESS_ODD_OPERATOR_1D():
+def STAGGERED_ODD_OPERATOR_1D():
     try:
-        f = open("HIPERWALK_TEMP_COINLESS_ODD_OPERATOR_1D.dat",'w')
+        f = open("HIPERWALK_TEMP_STAGGERED_ODD_OPERATOR_1D.dat",'w')
     except IOError:
         print("[HIPERWALK] Could not open file in directory.")
 
 
-    beta=float(cfg.COINLESS_COEFICIENTS[1][0])
-    phi=float(cfg.COINLESS_COEFICIENTS[1][1])
+    beta=float(cfg.STAGGERED_COEFICIENTS[1][0])
+    phi=float(cfg.STAGGERED_COEFICIENTS[1][1])
     aux=np.zeros([2,2],dtype=complex)
 #    aux[0][0]=np.cos(beta)
 #    aux[0][1]=np.sin(beta)*(np.cos(phi)+1J*np.sin(phi))
@@ -404,9 +404,9 @@ def COINLESS_ODD_OPERATOR_1D():
     
 
 
-def teste_COINLESS_EVEN_OPERATOR_1D():
+def teste_STAGGERED_EVEN_OPERATOR_1D():
     try:
-        f = open("HIPERWALK_TEMP_COINLESS_EVEN_OPERATOR_1D.dat",'w')
+        f = open("HIPERWALK_TEMP_STAGGERED_EVEN_OPERATOR_1D.dat",'w')
     except IOError:
         print("[HIPERWALK] Could not open file in directory.")
 
@@ -436,8 +436,8 @@ def teste_COINLESS_EVEN_OPERATOR_1D():
                 counter=counter+1                    
 
         counter=0        
-        for k in range(0,cfg.COINLESS_COEFICIENTS.shape[1],2):
-            array_Values[counter]=cfg.COINLESS_COEFICIENTS[0][k]+1J*cfg.COINLESS_COEFICIENTS[0][k+1]
+        for k in range(0,cfg.STAGGERED_COEFICIENTS.shape[1],2):
+            array_Values[counter]=cfg.STAGGERED_COEFICIENTS[0][k]+1J*cfg.STAGGERED_COEFICIENTS[0][k+1]
             counter=counter+1                    
 
 
@@ -454,9 +454,9 @@ def teste_COINLESS_EVEN_OPERATOR_1D():
     f.close()
     
     
-def teste_COINLESS_ODD_OPERATOR_1D():
+def teste_STAGGERED_ODD_OPERATOR_1D():
     try:
-         f = open("HIPERWALK_TEMP_COINLESS_ODD_OPERATOR_1D.dat",'w')
+         f = open("HIPERWALK_TEMP_STAGGERED_ODD_OPERATOR_1D.dat",'w')
     except IOError:
         print("[HIPERWALK] Could not open file in directory.")
     
@@ -488,8 +488,8 @@ def teste_COINLESS_ODD_OPERATOR_1D():
                     array_Index[counter]=index
                     counter=counter+1                    
             counter=0        
-            for k in range(0,cfg.COINLESS_COEFICIENTS.shape[1],2):
-                array_Values[counter]=cfg.COINLESS_COEFICIENTS[1][k]+1J*cfg.COINLESS_COEFICIENTS[1][k+1]
+            for k in range(0,cfg.STAGGERED_COEFICIENTS.shape[1],2):
+                array_Values[counter]=cfg.STAGGERED_COEFICIENTS[1][k]+1J*cfg.STAGGERED_COEFICIENTS[1][k+1]
                 counter=counter+1                    
 
             for i1 in range(totalVerticesPerPatch):
@@ -509,15 +509,15 @@ def teste_COINLESS_ODD_OPERATOR_1D():
 ###
 ### 2D
 ###
-def COINLESS2D():
+def STAGGERED2D():
 
-    COINLESS_EVEN_OPERATOR_2D()
-    COINLESS_ODD_OPERATOR_2D()
+    STAGGERED_EVEN_OPERATOR_2D()
+    STAGGERED_ODD_OPERATOR_2D()
 
 
 
-def COINLESS_EVEN_OPERATOR_2D():
-    f = open("HIPERWALK_TEMP_COINLESS_EVEN_OPERATOR_2D.dat",'w')
+def STAGGERED_EVEN_OPERATOR_2D():
+    f = open("HIPERWALK_TEMP_STAGGERED_EVEN_OPERATOR_2D.dat",'w')
 
     
 
@@ -552,8 +552,8 @@ def COINLESS_EVEN_OPERATOR_2D():
                     counter=counter+1                    
 
             counter=0        
-            for k in range(0,cfg.COINLESS_COEFICIENTS.shape[1],2):
-                array_Values[counter]=cfg.COINLESS_COEFICIENTS[0][k]+1J*cfg.COINLESS_COEFICIENTS[0][k+1]
+            for k in range(0,cfg.STAGGERED_COEFICIENTS.shape[1],2):
+                array_Values[counter]=cfg.STAGGERED_COEFICIENTS[0][k]+1J*cfg.STAGGERED_COEFICIENTS[0][k+1]
                 counter=counter+1                    
 
 
@@ -571,8 +571,8 @@ def COINLESS_EVEN_OPERATOR_2D():
     
     
     
-def COINLESS_ODD_OPERATOR_2D():
-    f = open("HIPERWALK_TEMP_COINLESS_ODD_OPERATOR_2D.dat",'w')
+def STAGGERED_ODD_OPERATOR_2D():
+    f = open("HIPERWALK_TEMP_STAGGERED_ODD_OPERATOR_2D.dat",'w')
 
 
     totalVerticesPerPatch=cfg.TESSELLATIONPOLYGONS[0]*cfg.TESSELLATIONPOLYGONS[1]
@@ -608,8 +608,8 @@ def COINLESS_ODD_OPERATOR_2D():
                     array_Index[counter]=index
                     counter=counter+1                    
             counter=0        
-            for k in range(0,cfg.COINLESS_COEFICIENTS.shape[1],2):
-                array_Values[counter]=cfg.COINLESS_COEFICIENTS[1][k]+1J*cfg.COINLESS_COEFICIENTS[1][k+1]
+            for k in range(0,cfg.STAGGERED_COEFICIENTS.shape[1],2):
+                array_Values[counter]=cfg.STAGGERED_COEFICIENTS[1][k]+1J*cfg.STAGGERED_COEFICIENTS[1][k+1]
                 counter=counter+1                    
 
             for i1 in range(totalVerticesPerPatch):

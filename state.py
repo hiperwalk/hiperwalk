@@ -16,11 +16,11 @@ def generateState():
     elif cfg.WALK=="DTQW2D":
         return generateState_DTQW2D()
 
-    elif cfg.WALK=="COINLESS1D":
-        return generateState_COINLESS1D()
+    elif cfg.WALK=="STAGGERED1D":
+        return generateState_STAGGERED1D()
 
-    elif cfg.WALK=="COINLESS2D":
-        return generateState_COINLESS2D()
+    elif cfg.WALK=="STAGGERED2D":
+        return generateState_STAGGERED2D()
         
     elif cfg.WALK=="CUSTOM":
         return generateState_CUSTOM()
@@ -119,11 +119,11 @@ def generateState_DTQW2D():
 
 #def index():
 #    (cfg.RANGEX[1]-cfg.RANGEX[0]+1)*(cfg.STATE_COMPONENTS[i][3]-cfg.RANGEX[0])+(cfg.STATE_COMPONENTS[i][4]-cfg.RANGEY[0])
-def generateState_COINLESS1D():
+def generateState_STAGGERED1D():
     
     if cfg.GRAPHTYPE=="CYCLE":
 #        if cfg.GRAPHSIZE%2==1:
-#            print("COINLESS Quantum Walk allows only cycles with even sites.")
+#            print("STAGGERED Quantum Walk allows only cycles with even sites.")
 #            exit(-1)
 
         aux=cfg.GRAPHSIZE
@@ -171,7 +171,7 @@ def generateState_COINLESS1D():
         
 
 
-def generateState_COINLESS2D():
+def generateState_STAGGERED2D():
 
     if cfg.GRAPHTYPE=="TORUS":
         
@@ -304,7 +304,7 @@ def checkTorusBoundaries():
     if cfg.WALK=="DTQW2D":
         auxX=cfg.STATE_COMPONENTS[:,3]
         auxY=cfg.STATE_COMPONENTS[:,4]
-    elif cfg.WALK=="COINLESS2D":
+    elif cfg.WALK=="STAGGERED2D":
 
         
 
@@ -318,7 +318,7 @@ def checkTorusBoundaries():
 
     if len(cfg.TORUSSIZE)==1:
 
-        if cfg.WALK=="COINLESS2D":
+        if cfg.WALK=="STAGGERED2D":
             if cfg.TORUSSIZE[0] % cfg.TESSELLATIONPOLYGONS[0] !=0 or cfg.TORUSSIZE[0] % cfg.TESSELLATIONPOLYGONS[1] !=0:
                 print("[HIPERWALK] TORUS size must be multiple of number of patches")
                 exit(-1)
@@ -335,7 +335,7 @@ def checkTorusBoundaries():
 
     if len(cfg.TORUSSIZE)==2:
 
-        if cfg.WALK=="COINLESS2D":
+        if cfg.WALK=="STAGGERED2D":
             if cfg.TORUSSIZE[0] % cfg.TESSELLATIONPOLYGONS[0] !=0 or cfg.TORUSSIZE[1] % cfg.TESSELLATIONPOLYGONS[1] !=0:
                 print("[HIPERWALK] TORUS size must be multiple of number of patches")
                 exit(-1)        

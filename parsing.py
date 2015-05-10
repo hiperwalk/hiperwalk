@@ -28,7 +28,7 @@ def preParsing(inputFile):
                     print("[HIPERWALK] Syntax error at  WALK BLOCK, missing type.")
                     exit(-1)
     
-                elif (line[1] != "DTQW") and (line[1] != "COINLESS") and (line[1] != "CUSTOM"):
+                elif (line[1] != "DTQW") and (line[1] != "STAGGERED") and (line[1] != "SZEGEDY") and (line[1] != "CUSTOM"):
                     print("[HIPERWALK] Syntax error at  WALK BLOCK, unknown walk type, %s."%line[1])
                     exit(-1)
                 line[1]=str.upper(line[1])
@@ -56,16 +56,16 @@ def preParsing(inputFile):
                     cfg.GRAPHSIZE=int(line[2])
                     if cfg.WALK=="DTQW":                
                         cfg.WALK="DTQW1D"
-                    elif cfg.WALK=="COINLESS":
-                        cfg.WALK="COINLESS1D"
+                    elif cfg.WALK=="STAGGERED":
+                        cfg.WALK="STAGGERED1D"
     
                 elif line[1]=="LINE":
                     cfg.GRAPHSIZE=int(2*cfg.STEPS+1)
                     cfg.GRAPHTYPE="LINE"                
                     if cfg.WALK=="DTQW":                
                         cfg.WALK="DTQW1D"
-                    elif cfg.WALK=="COINLESS":
-                        cfg.WALK="COINLESS1D"
+                    elif cfg.WALK=="STAGGERED":
+                        cfg.WALK="STAGGERED1D"
                 
                 elif line[1]=="TORUS":
                     if line.__len__()==2:
@@ -75,16 +75,16 @@ def preParsing(inputFile):
                     cfg.GRAPHTYPE="TORUS"
                     if cfg.WALK=="DTQW":                
                         cfg.WALK="DTQW2D"
-                    elif cfg.WALK=="COINLESS":
-                        cfg.WALK="COINLESS2D"
+                    elif cfg.WALK=="STAGGERED":
+                        cfg.WALK="STAGGERED2D"
     
                 elif line[1]=="LATTICE":
                     cfg.TORUSSIZE = [int(row)  for row in line[2:]]
                     cfg.GRAPHTYPE="LATTICE"
                     if cfg.WALK=="DTQW":                
                         cfg.WALK="DTQW2D"
-                    elif cfg.WALK=="COINLESS":
-                        cfg.WALK="COINLESS2D"
+                    elif cfg.WALK=="STAGGERED":
+                        cfg.WALK="STAGGERED2D"
     
                 else:
                     print("[HIPERWALK] Syntax ERROR on GRAPH BLOCK, unknown type.")
@@ -106,11 +106,11 @@ def preParsing(inputFile):
                 if line.__len__()==1:
                     print("[HIPERWALK] Syntax error at POLYGONS BLOCK, missing values.")
                     exit(-1)
-                elif cfg.WALK=="COINLESS1D" and len(line)==2:
+                elif cfg.WALK=="STAGGERED1D" and len(line)==2:
                     cfg.TESSELLATIONPOLYGONS=[int(line[1])]
                     cfg.NUMBER_OF_COEFICIENTS=int(line[1])
                 
-                elif cfg.WALK=="COINLESS2D" and len(line)==3:
+                elif cfg.WALK=="STAGGERED2D" and len(line)==3:
                     cfg.TESSELLATIONPOLYGONS=[int(line[1]),int(line[2])]
                     cfg.NUMBER_OF_COEFICIENTS=int(line[1])*int(line[2])
                 else:
@@ -165,9 +165,9 @@ def parsingLines(line,f):
                         cfg.STATE_COMPONENTS=np.append(cfg.STATE_COMPONENTS,[float(line[0]),float(line[1]),int(line[2]),int(line[3])],0)
                     elif cfg.WALK=="DTQW2D":                        
                         cfg.STATE_COMPONENTS=np.append(cfg.STATE_COMPONENTS,[float(line[0]),float(line[1]),int(line[2]),int(line[3]),int(line[4])],0)                            
-                    elif cfg.WALK=="COINLESS1D": 
+                    elif cfg.WALK=="STAGGERED1D": 
                         cfg.STATE_COMPONENTS=np.append(cfg.STATE_COMPONENTS,[float(line[0]),float(line[1]),int(line[2])],0)                            
-                    elif cfg.WALK=="COINLESS2D": 
+                    elif cfg.WALK=="STAGGERED2D": 
                         cfg.STATE_COMPONENTS=np.append(cfg.STATE_COMPONENTS,[float(line[0]),float(line[1]),int(line[2]),int(line[3])],0)                        
         
             if cfg.WALK=="DTQW1D":
@@ -183,10 +183,10 @@ def parsingLines(line,f):
                 cfg.STATE_COMPONENTS.shape=totalComponents,5
                 cfg.COINVECTORDIMENSION=4
 
-            if cfg.WALK=="COINLESS1D":
+            if cfg.WALK=="STAGGERED1D":
                 cfg.STATE_COMPONENTS.shape=totalComponents,3
 
-            if cfg.WALK=="COINLESS2D":
+            if cfg.WALK=="STAGGERED2D":
                 cfg.STATE_COMPONENTS.shape=totalComponents,4
             st.generateState()
 
@@ -239,18 +239,18 @@ def parsingLines(line,f):
 
                 if line[0]!="ENDTESSELLATION":
                     if len(line)==2*cfg.NUMBER_OF_COEFICIENTS:
-                        cfg.COINLESS_COEFICIENTS=np.append(cfg.COINLESS_COEFICIENTS,[float(row)  for row in line],1)
+                        cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
 
                         line=f.readline()
                         line=str.upper(line)
                         line=line.split()
                         if len(line)==2*cfg.NUMBER_OF_COEFICIENTS:
-                            cfg.COINLESS_COEFICIENTS=np.append(cfg.COINLESS_COEFICIENTS,[float(row)  for row in line],1)
+                            cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
                         else:
                             print("[HIPERWALK] Syntax error at BEGINTESSELLATION BLOCK, invalid line.")
                             exit(-1)
                             
-                        cfg.COINLESS_COEFICIENTS.shape=2,cfg.NUMBER_OF_COEFICIENTS*2
+                        cfg.STAGGERED_COEFICIENTS.shape=2,cfg.NUMBER_OF_COEFICIENTS*2
 
 
                     else:
@@ -264,9 +264,9 @@ def parsingLines(line,f):
             if line.__len__()==1:
                 print("[HIPERWALK] Syntax error at  DISPLACEMENT BLOCK, missing values.")
                 exit(-1)
-            elif cfg.WALK=="COINLESS1D":
+            elif cfg.WALK=="STAGGERED1D":
                 cfg.TESSELLATIONDISPLACEMENT=[int(line[1])]
-            elif cfg.WALK=="COINLESS2D":
+            elif cfg.WALK=="STAGGERED2D":
                 cfg.TESSELLATIONDISPLACEMENT=[int(line[1]),int(line[2])]
 
 
@@ -446,15 +446,15 @@ def parsingLines(line,f):
 #                line=line.split()
 #
 #                if line[0]!="ENDTESSELLATION":
-#                    cfg.COINLESS_COEFICIENTS=np.append(cfg.COINLESS_COEFICIENTS,[float(row)  for row in line],1)
+#                    cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
 #
 #                    line=f.readline()
 #                    line=str.upper(line)
 #                    line=line.split()
-#                    cfg.COINLESS_COEFICIENTS=np.append(cfg.COINLESS_COEFICIENTS,[float(row)  for row in line],1)
+#                    cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
 #
-#                    if cfg.WALK=="COINLESS1D":
-#                        cfg.COINLESS_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*2
-#                    elif cfg.WALK=="COINLESS2D":
-#                        cfg.COINLESS_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*cfg.TESSELLATIONPATCHES[1]*2
+#                    if cfg.WALK=="STAGGERED1D":
+#                        cfg.STAGGERED_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*2
+#                    elif cfg.WALK=="STAGGERED2D":
+#                        cfg.STAGGERED_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*cfg.TESSELLATIONPATCHES[1]*2
     

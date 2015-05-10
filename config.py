@@ -56,11 +56,11 @@ def reset():
     cfg.LATTYPE="DIAGONAL"
     cfg.TORUSSIZE=np.array([],dtype=int)
     
-    ###  Coinless Walk
+    ###  STAGGERED Walk
     ###
     cfg.Ueven=[]
     cfg.Uodd=[]
-    cfg.COINLESS_COEFICIENTS=[]
+    cfg.STAGGERED_COEFICIENTS=[]
     cfg.TESSELLATIONPOLYGONS=[]
     cfg.TOTAL_PATCHES_IN_X=0
     cfg.TOTAL_PATCHES_IN_Y=0
@@ -165,7 +165,7 @@ TORUSSIZE=np.array([],dtype=int)
 ###
 Ueven=[]
 Uodd=[]
-COINLESS_COEFICIENTS=[]
+STAGGERED_COEFICIENTS=[]
 TESSELLATIONPOLYGONS=[]
 TOTAL_PATCHES_IN_X=0
 TOTAL_PATCHES_IN_Y=0

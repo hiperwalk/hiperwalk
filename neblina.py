@@ -23,17 +23,17 @@ def runCore_DTQW2D():
     else:
         os.system("neblina -id %d HIPERWALK_TEMP_DTQW2D.nbl %d %d %d %d %d %d %d"%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION,cfg.STATESIZE/4))
 
-def runCore_COINLESS1D():
+def runCore_STAGGERED1D():
     if cfg.TEST_MODE:
-        os.system("neblina -id %d HIPERWALK_TEMP_COINLESS1D.nbl %d %d %d %d %d %d >> /dev/null "%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
+        os.system("neblina -id %d HIPERWALK_TEMP_STAGGERED1D.nbl %d %d %d %d %d %d >> /dev/null "%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
     else:
-        os.system("neblina -id %d HIPERWALK_TEMP_COINLESS1D.nbl %d %d %d %d %d %d"%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
+        os.system("neblina -id %d HIPERWALK_TEMP_STAGGERED1D.nbl %d %d %d %d %d %d"%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
 
-def runCore_COINLESS2D():
+def runCore_STAGGERED2D():
     if cfg.TEST_MODE:
-        os.system("neblina -id %d HIPERWALK_TEMP_COINLESS2D.nbl %d %d %d %d %d %d >> /dev/null "%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
+        os.system("neblina -id %d HIPERWALK_TEMP_STAGGERED2D.nbl %d %d %d %d %d %d >> /dev/null "%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
     else:
-        os.system("neblina -id %d HIPERWALK_TEMP_COINLESS2D.nbl %d %d %d %d %d %d"%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
+        os.system("neblina -id %d HIPERWALK_TEMP_STAGGERED2D.nbl %d %d %d %d %d %d"%(cfg.HARDWAREID,cfg.STEPS,cfg.STATESIZE,cfg.GRAPHSIZE,cfg.DISTANCE_VECTOR_SIZE,cfg.SAVE_STATES_MULTIPLE_OF_N,cfg.ANIMATION))
 
 
 def runCore_CUSTOM():   
@@ -283,7 +283,7 @@ def generating_DTQW2D_NBL():
 
 
     
-def generating_COINLESS1D_NBL():
+def generating_STAGGERED1D_NBL():
     
     output = open("HIPERWALK_TEMP_WALK.nbl",'w')    
     
@@ -330,10 +330,10 @@ def generating_COINLESS1D_NBL():
 
     output.write("   SAVE_STATES_MULTIPLE_OF_N=%d\n"%cfg.SAVE_STATES_MULTIPLE_OF_N)
 
-    output.write("   file_Ue = open( \"HIPERWALK_TEMP_COINLESS_EVEN_OPERATOR_1D.dat\", \"r\" )\n")
+    output.write("   file_Ue = open( \"HIPERWALK_TEMP_STAGGERED_EVEN_OPERATOR_1D.dat\", \"r\" )\n")
     output.write("   Ue = sparse complex[STATESIZE,STATESIZE]\n")
     output.write("   read( file_Ue, Ue )\n")
-    output.write("   file_Uo = open( \"HIPERWALK_TEMP_COINLESS_ODD_OPERATOR_1D.dat\", \"r\" )\n")
+    output.write("   file_Uo = open( \"HIPERWALK_TEMP_STAGGERED_ODD_OPERATOR_1D.dat\", \"r\" )\n")
     output.write("   Uo = sparse complex[STATESIZE,STATESIZE]\n")
     output.write("   read( file_Uo, Uo )\n")
     output.write("   file_psi = open( \"HIPERWALK_TEMP_PSI.dat\", \"r\" )\n")

@@ -19,10 +19,10 @@ def savetxt(string,array,arrayType,formatFloat):
         
 
 def initializeFiles():
-    if cfg.WALK=="DTQW1D" or cfg.WALK=="COINLESS1D":
+    if cfg.WALK=="DTQW1D" or cfg.WALK=="STAGGERED1D":
         range1D()
         
-    elif cfg.WALK=="DTQW2D" or cfg.WALK=="COINLESS2D":
+    elif cfg.WALK=="DTQW2D" or cfg.WALK=="STAGGERED2D":
         range2D()
         distancesVector_2D()
         
@@ -72,10 +72,10 @@ def directory_Creation():
             os.system("cp /usr/local/hiperwalk/dtqw1d.nbl %s/HIPERWALK_TEMP_DTQW1D.nbl"%(cfg.DIRECTORY))
         elif cfg.WALK=="DTQW2D":
             os.system("cp /usr/local/hiperwalk/dtqw2d.nbl %s/HIPERWALK_TEMP_DTQW2D.nbl"%(cfg.DIRECTORY))
-        elif cfg.WALK=="COINLESS1D":
-            os.system("cp /usr/local/hiperwalk/coinless1d.nbl %s/HIPERWALK_TEMP_COINLESS1D.nbl"%(cfg.DIRECTORY))
-        elif cfg.WALK=="COINLESS2D":
-            os.system("cp /usr/local/hiperwalk/coinless2d.nbl %s/HIPERWALK_TEMP_COINLESS2D.nbl"%(cfg.DIRECTORY))
+        elif cfg.WALK=="STAGGERED1D":
+            os.system("cp /usr/local/hiperwalk/staggered1d.nbl %s/HIPERWALK_TEMP_STAGGERED1D.nbl"%(cfg.DIRECTORY))
+        elif cfg.WALK=="STAGGERED2D":
+            os.system("cp /usr/local/hiperwalk/staggered2d.nbl %s/HIPERWALK_TEMP_STAGGERED2D.nbl"%(cfg.DIRECTORY))
         elif cfg.WALK=="CUSTOM":
             os.system("cp /usr/local/hiperwalk/custom.nbl %s/HIPERWALK_TEMP_CUSTOM.nbl"%(cfg.DIRECTORY))
         os.chdir("%s"%cfg.DIRECTORY)
@@ -112,3 +112,6 @@ def test_mode():
     os.chdir("HIPERWALK_TEST_DIRECTORY")
 
 
+def remnove_test_mode_folder():
+    os.chdir(os.environ['HOME'])
+    os.system("rm -rf HIPERWALK_TEST_DIRECTORY")

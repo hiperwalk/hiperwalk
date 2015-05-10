@@ -94,7 +94,7 @@ def template_DTQW2D(inputNAME,outputNAME,extension):
 
     os.system("gnuplot HIPERWALK_TEMP_PLOT.plt 2> /dev/null > /dev/null")
 
-def template_COINLESS1D(inputNAME,outputNAME,extension):
+def template_STAGGERED1D(inputNAME,outputNAME,extension):
     plt_FILE_NAME="HIPERWALK_TEMP_PLOT.plt"
     output = open(plt_FILE_NAME,'w')    
 

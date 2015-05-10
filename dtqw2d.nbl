@@ -84,11 +84,11 @@
     end   
     PROBABILITY_VECTOR = vec_conj( PSI ) 
     final_prob = vec_add_off( PROBABILITY_VECTOR , OFFSET ) 
-    println( "[Neblina] Statistics file: .............. statistics.dat" ) 
+    println( "[NEBLINA] Statistics file: .............. statistics.dat" ) 
     final_state_neblina = open("NEBLINA_TEMP_final_state.dat", "w") 
     println( final_state_neblina, PSI ) 
     final_distribution_neblina = open("NEBLINA_TEMP_final_distribution.dat", "w") 
     println( final_distribution_neblina, final_prob ) 
-    println( "[Neblina] Wave Function final : .............. final_state.dat" ) 
-    println("[Neblina] Done!") 
+    println( "[NEBLINA] Wave Function final : .............. final_state.dat" ) 
+    println("[NEBLINA] Done!") 
  end 

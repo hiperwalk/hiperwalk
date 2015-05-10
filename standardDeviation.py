@@ -49,7 +49,7 @@ def calculateProbabilities():
 #    print cfg.COINVECTORDIMENSION
     for i in range(int(cfg.GRAPHSIZE)):
         a=0
-        if cfg.WALK=="COINLESS1D":
+        if cfg.WALK=="STAGGERED1D":
             a=cfg.STATE[i]*np.conjugate(cfg.STATE[i])
 
         else:
@@ -62,7 +62,7 @@ def calculateProbabilities():
     
     
     
-def calculateProbabilities_COINLESS():
+def calculateProbabilities_STAGGERED():
     
     PROBABILITIES=np.zeros((cfg.GRAPHSIZE,1),dtype=float)
     for i in range(int(cfg.GRAPHSIZE)):

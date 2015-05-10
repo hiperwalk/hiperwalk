@@ -18,11 +18,8 @@ def run():
         cfg.OVERLAPX=int(cfg.TESSELLATIONPOLYGONS[0])
         cfg.OVERLAPY=int(cfg.TESSELLATIONPOLYGONS[1])
 
-    print cfg.STATE
-    print cfg.STATESIZE
-    print cfg.GRAPHSIZE
 
-    op.COINLESS2D()
+    op.STAGGERED2D()
 
 
 #    i1=np.dot(cfg.Ueven,np.conjugate(cfg.Ueven))
@@ -34,7 +31,7 @@ def run():
     
     io.savetxt("HIPERWALK_TEMP_PSI.dat",cfg.STATE,float,'%1.16f')
 
-    nb.runCore_COINLESS2D()
+    nb.runCore_STAGGERED2D()
     
     cfg.STATE=nb.neblina_state_to_vector("NEBLINA_TEMP_final_state.dat")
     probabilities=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
@@ -77,7 +74,7 @@ def run():
 
 
     if cfg.TEST_MODE:
-        modelVector=testmode.create_COINLESS2D_test_vector()
+        modelVector=testmode.create_STAGGERED2D_test_vector()
         returnNeblina=nb.neblina_distribution_to_vector("NEBLINA_TEMP_final_distribution.dat")
         if np.linalg.norm(modelVector-returnNeblina,np.inf) == float(0):
             return 1

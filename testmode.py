@@ -508,7 +508,7 @@ def create_DTQW2D_test_vector():
 
 
 
-def create_COINLESS1D_test_vector():
+def create_STAGGERED1D_test_vector():
     returnVector=np.array([ 
 (0.0000000000000000),
 (0.0000549936666276),
@@ -556,7 +556,7 @@ def create_COINLESS1D_test_vector():
     returnVector.shape=(42,1)
     return returnVector
 
-def create_COINLESS2D_test_vector():
+def create_STAGGERED2D_test_vector():
     returnVector=np.array([ 
 ( 0.0000000000000000),
 ( 0.0000000000000000),
@@ -927,9 +927,9 @@ def writeInputs_TEST():
     f.close()
 
 
-    f=open("coinless1D_test.in","w")
-    f.write("WALK COINLESS\n")
-    f.write("DIRECTORY DIR_COINLESS1D\n")
+    f=open("staggered1D_test.in","w")
+    f.write("WALK STAGGERED\n")
+    f.write("DIRECTORY DIR_STAGGERED1D\n")
     f.write("STEPS 10\n")
     f.write("GRAPH LINE\n")
     f.write("POLYGONS 2\n")
@@ -947,9 +947,9 @@ def writeInputs_TEST():
     f.close()
 
 
-    f=open("coinless2D_test.in","w")
-    f.write("WALK COINLESS\n")
-    f.write("DIRECTORY DIR_COINLESS2D\n")
+    f=open("staggered2D_test.in","w")
+    f.write("WALK STAGGERED\n")
+    f.write("DIRECTORY DIR_STAGGERED2D\n")
     f.write("STEPS 4\n")
     f.write("GRAPH LATTICE\n")
     f.write("POLYGONS 2 2\n")
@@ -1039,31 +1039,31 @@ def run():
 
 
     cfg.reset()
-    inputFile=str(os.path.abspath("coinless1D_test.in"))
+    inputFile=str(os.path.abspath("staggered1D_test.in"))
     sys.stdout = devnull
     returnValue=walks.walk(inputFile)        
     sys.stdout = orig_out
     if returnValue:
-        print("[Hiperwalk] COINLESS on the line OK.")
+        print("[Hiperwalk] STAGGERED on the line OK.")
     else:
-        print("[Hiperwalk] COINLESS on the line failed.")
+        print("[Hiperwalk] STAGGERED on the line failed.")
         
     cfg.reset()
-    inputFile=str(os.path.abspath("coinless2D_test.in"))
+    inputFile=str(os.path.abspath("staggered2D_test.in"))
     sys.stdout = devnull
     returnValue=walks.walk(inputFile)        
     sys.stdout = orig_out
     if returnValue:
-        print("[Hiperwalk] COINLESS on the lattice OK.")
+        print("[Hiperwalk] STAGGERED on the lattice OK.")
     else:
-        print("[Hiperwalk] COINLESS on the lattice failed.")
+        print("[Hiperwalk] STAGGERED on the lattice failed.")
 
 
     
     cfg.reset()    
     inputFile=str(os.path.abspath("custom_test.in"))
     sys.stdout = devnull
-    returnValue=walks.walk(inputFile)        
+    returnValue=walks.walk(inputFile)   
     sys.stdout = orig_out
     if returnValue:
         print("[Hiperwalk] CUSTOM WALK OK.")
@@ -1071,4 +1071,5 @@ def run():
         print("[Hiperwalk] CUSTOM WALK failed.")    
     
     
-    print("[Hiperwalk] Files stored at %s/HIPERWALK_TEST_DIRECTORY"%(os.environ['HOME']))
+    io.remnove_test_mode_folder()
+#    print("[Hiperwalk] Files stored at %s/HIPERWALK_TEST_DIRECTORY"%(os.environ['HOME']))
