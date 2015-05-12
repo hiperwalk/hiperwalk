@@ -338,7 +338,7 @@ def checkTorusBoundaries():
         if cfg.WALK=="STAGGERED2D":
             if cfg.TORUSSIZE[0] % cfg.TESSELLATIONPOLYGONS[0] !=0 or cfg.TORUSSIZE[1] % cfg.TESSELLATIONPOLYGONS[1] !=0:
                 print("[HIPERWALK] TORUS size must be multiple of number of patches")
-                exit(-1)        
+                exit(-1)
         
         for i in auxX:
             if i >= int(cfg.TORUSSIZE[0]):
@@ -352,3 +352,13 @@ def checkTorusBoundaries():
                 
                 
                 
+def checkUnitarity(array):
+    i=0
+    a=0
+    while i < len(array):
+        a=a+float(array[i])**2+float(array[i+1])**2
+        i=i+2
+
+    if abs(a-1.0) > 0.000001:
+            print("[HIPERWALK] Error at BEGINTESSELLATION block, superposition is not unitary.")
+            exit(-1)

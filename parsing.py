@@ -239,22 +239,24 @@ def parsingLines(line,f):
 
                 if line[0]!="ENDTESSELLATION":
                     if len(line)==2*cfg.NUMBER_OF_COEFICIENTS:
+                        st.checkUnitarity(line)
                         cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
 
                         line=f.readline()
                         line=str.upper(line)
                         line=line.split()
+                        st.checkUnitarity(line)
                         if len(line)==2*cfg.NUMBER_OF_COEFICIENTS:
                             cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
                         else:
-                            print("[HIPERWALK] Syntax error at BEGINTESSELLATION BLOCK, invalid line.")
+                            print("[HIPERWALK] Syntax error at BEGINTESSELLATION BLOCK, invalid number of values.")
                             exit(-1)
                             
                         cfg.STAGGERED_COEFICIENTS.shape=2,cfg.NUMBER_OF_COEFICIENTS*2
 
 
                     else:
-                        print("[HIPERWALK] Syntax error at BEGINTESSELLATION BLOCK, invalid line.")
+                        print("[HIPERWALK] Syntax error at BEGINTESSELLATION BLOCK, invalid number of values.")
                         exit(-1)
 
 
@@ -435,26 +437,3 @@ def parsingLines(line,f):
 
 
 
-#        elif line[0]=="BEGINTESSELLATIONS":
-#            totalComponents=0
-#            while line[0]!="ENDTESSELLATION":
-#
-#                line=f.readline()
-#                while line=="\n":     ### Parsing \n
-#                    line=f.readline()
-#                line=str.upper(line)
-#                line=line.split()
-#
-#                if line[0]!="ENDTESSELLATION":
-#                    cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
-#
-#                    line=f.readline()
-#                    line=str.upper(line)
-#                    line=line.split()
-#                    cfg.STAGGERED_COEFICIENTS=np.append(cfg.STAGGERED_COEFICIENTS,[float(row)  for row in line],1)
-#
-#                    if cfg.WALK=="STAGGERED1D":
-#                        cfg.STAGGERED_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*2
-#                    elif cfg.WALK=="STAGGERED2D":
-#                        cfg.STAGGERED_COEFICIENTS.shape=2,cfg.TESSELLATIONPATCHES[0]*cfg.TESSELLATIONPATCHES[1]*2
-    
