@@ -7,6 +7,7 @@ fi
 
 rm -rf /usr/local/hiperwalk/*.py
 rm -rf /usr/local/hiperwalk/*.nbl
+rm -rf /usr/local/hiperwalk/hiperwalk
 
 echo "[Hiperwalk installer] Creating /usr/local/hiperwalk."
 mkdir -p /usr/local/hiperwalk
