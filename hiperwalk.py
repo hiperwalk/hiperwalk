@@ -13,16 +13,13 @@ import testmode
 
 tam = len(sys.argv)
 
-
 if tam>=2:
     string=(str(sys.argv[1]))
     if string =="-test":
         testmode.run()
     
-    
-    
     elif not os.path.isfile( string ):
-            print("[HIPERWALK] File '%s' not found."%(string))
+            print("[Hiperwalk] File '%s' not found."%(string))
             exit(-1)
     else:
         returnValue=walks.walk(string)
