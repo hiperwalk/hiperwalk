@@ -23,6 +23,7 @@ def stdv( outFile, psi, lstDis, lstDis2, anime, t )
     if anime == 1 
       f = open( "prob" + tostr(t, 5) + ".dat", "w" ) 
       print( f, vec_conj( psi )  )     
+      close( f )
     end
     
     print( outFile, t + " " )
@@ -56,10 +57,12 @@ def main()
     fPsi = open(args[9], "r" )
     psi = complex[ssize] 
     read( fPsi , psi )
+    close( fPsi )
     for i = 1 : nOps
         fOp = open( args[i+9], "r" )
         lstOps = append( lstOps, sparse complex[ssize, ssize] )
         read( fOp, get(lstOps, i) )
+        close( fOp )
     end
 
     stdv_file=open("statistics.dat","w")
@@ -72,6 +75,7 @@ def main()
             lstDis = append( lstDis, float[dsize] )
             read( fDis, get(lstDis, i) )
             lstDis2 = append( lstDis2, vec_prod(  get(lstDis, i),get(lstDis, i)) )
+            close( fDis )
         end
         stdv_file = open("statistics.dat", "w" )  
         print_sta_head( stdv_file, nDis )
@@ -87,6 +91,7 @@ def main()
             end
             f = open( "wavefunction-" + tostr(t) + ".dat", "w" )
             print( f, psi )
+            close( f )
         end
     end
 
