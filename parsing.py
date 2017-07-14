@@ -370,8 +370,16 @@ def parsingLines(line,f):
             else:
                 cfg.ALLSTATES=1
                 cfg.SAVE_STATES_MULTIPLE_OF_N=int(line[1])
-
-
+        
+        elif line[0]=="ALLPROBS":
+            if line.__len__()==1:
+                print("[HIPERWALK] Syntax error at  ALLPROBS BLOCK, missing value.")            
+            if int(line[1])<= 0:
+                print("[HIPERWALK] Syntax error at  ALLPROBS BLOCK, value must be positive integer.")
+                exit(-1)
+            else:
+                cfg.ALLPROBS=1
+                cfg.SAVE_PROBS_MULTIPLE_OF_N=int(line[1])
 
         elif line[0]=="INITIALSTATE":
             
@@ -433,7 +441,3 @@ def parsingLines(line,f):
 
         elif line[0]=="DEBUG":
             cfg.DEBUG=1               
-            
-
-
-
