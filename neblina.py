@@ -42,9 +42,9 @@ def runCore_CUSTOM():
     
 
     if cfg.TEST_MODE:
-        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %s %s %s >> /dev/null"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
+        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %s %s %s >> /dev/null"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
     else:
-        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %s %s %s"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
+        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %s %s %s"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
     
     
     
@@ -511,5 +511,4 @@ def generating_CUSTOM_NBL():
     output.write("   println(\"[Neblina] Done!\")\n")
     output.write("end\n")
     output.close()
-
 
