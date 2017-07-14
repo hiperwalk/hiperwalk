@@ -26,8 +26,6 @@ def stdv( outFile, psi, lstDis, lstDis2, anime, t )
       close( f )
     end
     
-    print( outFile, t + " " )
-    
     for i = 1 : lstDisSize 
         vMean = vec_prod( get(lstDis,i),  prob ) 
         vMom  = vec_prod( get(lstDis2,i), prob ) 
@@ -44,21 +42,22 @@ end
 def main()
     fmtdouble( 16 )
     T = toint( args[2] )
-    mod = toint( args[3] )
-    anime = toint( args[4] )
-    ssize = toint( args[5] )
-    dsize = toint( args[6] )
-    nOps = toint( args[7] )
-    nDis = toint( args[8] )
+    mod = toint( args[3] ) -- SAVE_STATES_MULTIPLE_OF_N
+    modprobs = toint( args[4] ) -- SAVE_PROBS_MULTIPLE_OF_N
+    anime = toint( args[5] )
+    ssize = toint( args[6] )
+    dsize = toint( args[7] )
+    nOps = toint( args[8] )
+    nDis = toint( args[9] )
 
 
     lstOps = list()
     --println( args )
-    fPsi = open(args[9], "r" )
+    fPsi = open(args[10], "r" )
     psi = complex[ssize] 
     read( fPsi , psi )
     for i = 1 : nOps
-        fOp = open( args[i+9], "r" )
+        fOp = open( args[i+10], "r" )
         lstOps = append( lstOps, sparse complex[ssize, ssize] )
         read( fOp, get(lstOps, i) )
     end
@@ -69,7 +68,7 @@ def main()
     if dsize != 0
   
         for i = 1 : nDis
-            fDis = open( args[i+9+nOps], "r" )
+            fDis = open( args[i+10+nOps], "r" )
             lstDis = append( lstDis, float[dsize] )
             read( fDis, get(lstDis, i) )
             lstDis2 = append( lstDis2, vec_prod(  get(lstDis, i),get(lstDis, i)) )
@@ -90,12 +89,19 @@ def main()
             print( f, psi )
             close( f )
         end
+        
+        if modprobs != 0 and ((t % modprobs) == 0)
+            prob = vec_conj( psi )
+            f = open( "probdistribution-" + tostr(t) + ".dat", "w" )
+            print( f, prob )
+            close( f )
+        end
     end
 
     final_state_neblina = open("final_state.dat", "w") 
     println( final_state_neblina, psi ) 
     final_distribution_neblina = open("final_distribution.dat", "w") 
-    prob = vec_conj( psi ) 
+    prob = vec_conj( psi )
     if dsize != 0
         if( dsize != ssize )
             prob = vec_add_off( prob, dsize ) 
