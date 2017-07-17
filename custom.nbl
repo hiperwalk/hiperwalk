@@ -9,11 +9,16 @@ def print_sta_head( outFile, lenDis )
     println( outFile, "")
 end
 
+
+def print_stdev_head( outFile )
+    println( outFile, "#t     mean                 2nd moment             variance                std. deviation")
+end
+
+
 def stdv( outFile, psi, lstDis, lstDis2, anime, t )
     lstDisSize = len(lstDis)
     ssize = len( psi )
     dsize = len( get( lstDis, 1 ) )
-    
     prob = vec_conj( psi ) 
     
     if( dsize != ssize )
@@ -34,30 +39,41 @@ def stdv( outFile, psi, lstDis, lstDis2, anime, t )
         var = mom - mean*mean 
         print( outFile,  mean + "     " + mom + "     " + var + "     " + sqrt( var ) + "      " )
     end
-    println( outFile, "" )
-    
+    println( outFile, "" )    
 end
 
+
+def stdv_custom( outFile, psi, dist, dist_sqr, t )
+    prob = vec_conj( psi )
+    vecMean = vec_prod( prob, dist )
+    vMom    = vec_prod( prob, dist_sqr )
+    mean    = vec_sum( vecMean )
+    mom     = vec_sum( vMom )
+    var     = mom - mean*mean
+    println( outFile, t + "	   " +  mean + "	" + mom + "	   " + var + "	   " + sqrt( var ))    
+end
 
 def main()
     fmtdouble( 16 )
     T = toint( args[2] )
     mod = toint( args[3] ) -- SAVE_STATES_MULTIPLE_OF_N
     modprobs = toint( args[4] ) -- SAVE_PROBS_MULTIPLE_OF_N
-    anime = toint( args[5] )
-    ssize = toint( args[6] )
-    dsize = toint( args[7] )
-    nOps = toint( args[8] )
-    nDis = toint( args[9] )
+    computeStats = toint( args[5] ) -- 1 or 0
+    
+    anime = toint( args[6] )
+    ssize = toint( args[7] )
+    dsize = toint( args[8] )
+    nOps = toint( args[9] )
+    nDis = toint( args[10] )
 
 
     lstOps = list()
     --println( args )
-    fPsi = open(args[10], "r" )
+    fPsi = open(args[11], "r" )
     psi = complex[ssize] 
     read( fPsi , psi )
     for i = 1 : nOps
-        fOp = open( args[i+10], "r" )
+        fOp = open( args[i+11], "r" )
         lstOps = append( lstOps, sparse complex[ssize, ssize] )
         read( fOp, get(lstOps, i) )
     end
@@ -66,16 +82,24 @@ def main()
     lstDis = list()
     lstDis2 = list()  
     if dsize != 0
-  
         for i = 1 : nDis
-            fDis = open( args[i+10+nOps], "r" )
+            fDis = open( args[i+11+nOps], "r" )
             lstDis = append( lstDis, float[dsize] )
             read( fDis, get(lstDis, i) )
             lstDis2 = append( lstDis2, vec_prod(  get(lstDis, i),get(lstDis, i)) )
         end
-        stdv_file = open("statistics.dat", "w" )  
         print_sta_head( stdv_file, nDis )
     end
+    dist_sqr = float[1]
+    dist     = float[1]
+    if computeStats == 1
+        print_stdev_head( stdv_file )
+        fileDistance = open( "distance_custom.dat", "r" )
+        dist = float[ssize]
+        read( fileDistance, dist )
+        dist_sqr = vec_prod( dist, dist )
+    end
+    
 
     for t = 1 : T
         for i = 1 : nOps
@@ -95,6 +119,9 @@ def main()
             f = open( "probdistribution-" + tostr(t) + ".dat", "w" )
             print( f, prob )
             close( f )
+        end
+        if computeStats == 1 
+            stdv_custom( stdv_file, psi, dist, dist_sqr, t )
         end
     end
 

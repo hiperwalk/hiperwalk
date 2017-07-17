@@ -16,7 +16,7 @@ import staggered1d
 import staggered2d
 import custom
 import os
-
+import distance as dist
 
 
 ### Checking existing file or TEST_MODE
@@ -38,6 +38,10 @@ def walk(inputFile):
     ### Generating some files for Quantum Walk
     io.initializeFiles()
     
+    if cfg.ADJMATRIX_PATH != "@NON_INICIALIZED@":
+        dist.generateDistance()
+        
+        
     if cfg.WALK=="DTQW1D":
         cfg.RETURN_SIMULATION_FLAG=dtqw1d.run()
     

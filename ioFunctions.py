@@ -79,7 +79,8 @@ def directory_Creation():
         elif cfg.WALK=="CUSTOM":
             os.system("cp /usr/local/hiperwalk/custom.nbl %s/HIPERWALK_TEMP_CUSTOM.nbl"%(cfg.DIRECTORY))
         os.chdir("%s"%cfg.DIRECTORY)
-
+        
+        
     else:
         print("[HIPERWALK] Error at DIRECTORY BLOCK, missing value!")
         exit(-1)

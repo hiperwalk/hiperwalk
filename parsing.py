@@ -5,6 +5,7 @@ Created on Wed Jul 30 00:44:17 2014
 @author: aaron
 """
 import config as cfg
+import distance as dist
 import numpy as np
 import state as st
 import operators as op
@@ -380,7 +381,6 @@ def parsingLines(line,f):
             else:
                 cfg.ALLPROBS=1
                 cfg.SAVE_PROBS_MULTIPLE_OF_N=int(line[1])
-
         elif line[0]=="INITIALSTATE":
             
             if line.__len__()==1:
@@ -394,8 +394,19 @@ def parsingLines(line,f):
             a=str(os.path.abspath(str(line[1])))
             cfg.CUSTOM_INITIALSTATE_NAME=a
             st.generateState_CUSTOM()
+            
+        elif line[0]=="ADJMATRIX":
+            if line.__len__()==1:
+                print("[HIPERWALK] Syntax error at  ADJMATRIX, missing filename.")
+                exit(-1)
 
-
+            if not os.path.isfile( line[1] ) :
+                print("[HIPERWALK] Error at  ADJMATRIX, file '%s' not found."%(line[1]))
+                exit(-1)
+                
+            a=str(os.path.abspath(str(line[1])))
+            cfg.ADJMATRIX_PATH=a
+        
 
         elif line[0]=="OVERLAP":
             if line.__len__()==1:

@@ -39,12 +39,16 @@ def runCore_STAGGERED2D():
 def runCore_CUSTOM():   
     a=" ".join([str(x) for x in cfg.CUSTON_OPERATORS_NAME])
     b=" ".join([str(x) for x in cfg.CUSTOM_LABELS_NAME])
+    computeStates = 0
+    
+    if cfg.ADJMATRIX_PATH != "@NON_INICIALIZED@":
+         computeStates = 1    
     
 
     if cfg.TEST_MODE:
-        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %s %s %s >> /dev/null"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
+        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %d %s %s %s >> /dev/null"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N), computeStates, int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
     else:
-        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %s %s %s"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N),int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
+        os.system("neblina -id %d HIPERWALK_TEMP_CUSTOM.nbl %d %d %d %d %d %d %d %d %d %s %s %s"%(int(cfg.HARDWAREID),int(cfg.STEPS),int(cfg.SAVE_STATES_MULTIPLE_OF_N),int(cfg.SAVE_PROBS_MULTIPLE_OF_N), computeStates, int(cfg.ANIMATION),int(cfg.STATESIZE),int(cfg.GRAPHSIZE),int(cfg.CUSTOM_UNITARY_COUNTER),int(cfg.GRAPHDIMENSION),cfg.CUSTOM_INITIALSTATE_NAME,a,b))
     
     
     
