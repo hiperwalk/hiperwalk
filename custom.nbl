@@ -114,11 +114,14 @@ def main()
             close( f )
         end
         
-        if modprobs != 0 and ((t % modprobs) == 0)
-            prob = vec_conj( psi )
-            f = open( "probdistribution-" + tostr(t) + ".dat", "w" )
-            print( f, prob )
-            close( f )
+        if modprobs != 0  
+        
+            if ((t % modprobs) == 0)
+                prob = vec_conj( psi )
+                f = open( "probdistribution-" + tostr(t) + ".dat", "w" )
+                print( f, prob )
+                close( f )
+            end
         end
         if computeStats == 1 
             stdv_custom( stdv_file, psi, dist, dist_sqr, t )
