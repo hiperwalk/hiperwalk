@@ -120,7 +120,7 @@ def reset():
 ##
 ##  General Variables
 ##
-
+INSTALL_DIR="/usr/local"
 WALK=""
 DIRECTORY="HIPERWALK_DEFAULT_FOLDER"
 STEPS=0
