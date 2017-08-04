@@ -69,15 +69,15 @@ def directory_Creation():
 #            os.mkdir("%s"%cfg.DIRECTORY)
 
         if cfg.WALK=="DTQW1D":
-            os.system("cp /usr/local/hiperwalk/dtqw1d.nbl %s/HIPERWALK_TEMP_DTQW1D.nbl"%(cfg.DIRECTORY))
+            os.system("cp %s/hiperwalk/dtqw1d.nbl %s/HIPERWALK_TEMP_DTQW1D.nbl"%(cfg.INSTALL_DIR, cfg.DIRECTORY))
         elif cfg.WALK=="DTQW2D":
-            os.system("cp /usr/local/hiperwalk/dtqw2d.nbl %s/HIPERWALK_TEMP_DTQW2D.nbl"%(cfg.DIRECTORY))
+            os.system("cp %s/hiperwalk/dtqw2d.nbl %s/HIPERWALK_TEMP_DTQW2D.nbl"%(cfg.INSTALL_DIR, cfg.DIRECTORY))
         elif cfg.WALK=="STAGGERED1D":
-            os.system("cp /usr/local/hiperwalk/staggered1d.nbl %s/HIPERWALK_TEMP_STAGGERED1D.nbl"%(cfg.DIRECTORY))
+            os.system("cp %s/hiperwalk/staggered1d.nbl %s/HIPERWALK_TEMP_STAGGERED1D.nbl"%(cfg.INSTALL_DIR, cfg.DIRECTORY))
         elif cfg.WALK=="STAGGERED2D":
-            os.system("cp /usr/local/hiperwalk/staggered2d.nbl %s/HIPERWALK_TEMP_STAGGERED2D.nbl"%(cfg.DIRECTORY))
+            os.system("cp %s/hiperwalk/staggered2d.nbl %s/HIPERWALK_TEMP_STAGGERED2D.nbl"%(cfg.INSTALL_DIR, cfg.DIRECTORY))
         elif cfg.WALK=="CUSTOM":
-            os.system("cp /usr/local/hiperwalk/custom.nbl %s/HIPERWALK_TEMP_CUSTOM.nbl"%(cfg.DIRECTORY))
+            os.system("cp %s/hiperwalk/custom.nbl %s/HIPERWALK_TEMP_CUSTOM.nbl"%(cfg.INSTALL_DIR, cfg.DIRECTORY))
         os.chdir("%s"%cfg.DIRECTORY)
         
         
