@@ -72,7 +72,7 @@ def walk(inputFile):
     ### End runtime
     t1=time.time()
 
-    print "[HIPERWALK] Runtime: ",t1-t0
+    print("[HIPERWALK] Runtime: ",t1-t0)
 
     return cfg.RETURN_SIMULATION_FLAG
     
