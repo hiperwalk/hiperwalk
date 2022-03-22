@@ -29,3 +29,7 @@ Paulo Motta described on his blog the
 - [ ] Create documentation
 	- [ ] pdf (with LaTeX)
 	- [ ] webpage
+- [ ] PyneblinaInterface.py
+	- [ ] Rename functions
+	- [ ] Remove definition from examples
+	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?
