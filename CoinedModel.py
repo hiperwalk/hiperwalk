@@ -4,7 +4,6 @@
 import numpy
 import scipy
 import networkx
-import time #TODO: DELETE ME
 
 def UniformInitialCondition(AdjMatrix):
     G = networkx.from_numpy_matrix(AdjMatrix)
@@ -15,21 +14,14 @@ def UniformInitialCondition(AdjMatrix):
 def ShiftOperator(AdjMatrix):
     n = AdjMatrix.shape[0]
 
-    print(1)
     start = time.time()
     CB = [[j,i] for j in range(n) for i in range(n) if AdjMatrix[j,i]==1]
-    end = time.time()
-    print(end - start)
 
     n = len(CB)
     S = scipy.sparse.csr_matrix((n, n))
 
-    print(2)
-    start = time.time()
     for i in range(n):
         S[i,CB.index([CB[i][1],CB[i][0]])] = 1
-    end = time.time()
-    print(end - start)
     return S
 
 def CoinOperator(AdjMatrix, coin='grover'):
