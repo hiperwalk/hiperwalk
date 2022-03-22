@@ -10,7 +10,7 @@ Paulo Motta described on his blog the
 
 # TODO List
 - [ ] Update installation instructions
-- [ ] Refactor Coined\_QW\_Adjacency\_Matrix-v2.ipynb
+- [X] Refactor Coined\_QW\_Adjacency\_Matrix-v2.ipynb
 - [ ] Create separated file for plotting
 	- [ ] General plotting based on networkx
 - [ ] Specific functions for widely used walks?
@@ -24,3 +24,8 @@ Paulo Motta described on his blog the
 	- [ ] Line walk
 	- [ ] Mesh walk
 	- [ ] Tests for plotting graphs?
+- [ ] Clean examples
+- [ ] Add commentaries to CoinedModel
+- [ ] Create documentation
+	- [ ] pdf (with LaTeX)
+	- [ ] webpage
