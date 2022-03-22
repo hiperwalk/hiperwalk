@@ -14,7 +14,6 @@ def UniformInitialCondition(AdjMatrix):
 def ShiftOperator(AdjMatrix):
     n = AdjMatrix.shape[0]
 
-    start = time.time()
     CB = [[j,i] for j in range(n) for i in range(n) if AdjMatrix[j,i]==1]
 
     n = len(CB)
