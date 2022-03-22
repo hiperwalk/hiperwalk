@@ -55,3 +55,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
+
+# Text Editors / IDE extra files
+*.swp
+
