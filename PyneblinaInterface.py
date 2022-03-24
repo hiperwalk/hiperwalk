@@ -5,16 +5,27 @@ from neblina import *
 NEBLINA_FLOAT = 2
 NEBLINA_COMPLEX = 13 
 
-def vec_f_(V):
+# Transfers a vector (v) to Neblina-core.
+# by default, a vector with complex entries is expected.
+# If the matrix has only real entries, invoke this function by
+# TransferVector(v, False); this saves half the memory that would be used.
+def TransferVector(v, isComplex=True):
     n = V.shape[0]
-    vec_f = vector_new(n, complex_)
+    vec = vector_new(n, NEBLINA_COMPLEX) if is Complex else vector_new(n, NEBLINA_FLOAT)
+
+    if isComplex:
+        for i in range(n):
+            vector_set(vec, i, V[i].real, V[i].imag)
+        return vec
+
+    # else is real
     for i in range(n):
-        vector_set(vec_f, i, V[i].real, V[i].imag)
-    return vec_f
+        vector_set(vec, i, V[i])
+    return vec
         
-# Transfers a sparse Matrix (M) stored in csr format to Neblina-core
-# by default, a matrix with complex elements is expected.
-# If the matrix has only real elements, invoke it by using
+# Transfers a sparse Matrix (M) stored in csr format to Neblina-core.
+# By default, a matrix with complex elements is expected.
+# If the matrix has only real elements, invoke this function by
 # TransferSparseMatrix(M, False); this saves half the memory that would be used.
 #TODO: Add tests
 #   - Transfer and check real Matrix
