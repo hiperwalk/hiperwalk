@@ -5,23 +5,38 @@ import numpy
 import scipy
 import networkx
 
+
 def UniformInitialCondition(AdjMatrix):
     G = networkx.from_numpy_matrix(AdjMatrix)
     N = sum([G.degree(i) for i in range(AdjMatrix.shape[0])])
     return numpy.matrix([[1]]*N)/numpy.sqrt(N)
     #TODO: USE np.ones
 
-def ShiftOperator(AdjMatrix):
+# Creates flip-flop shift operator based on adjacency matrix.
+# For more information about the general flip-flop shift operator,
+# check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
+# TODO: explain resulting matrix (edges labeled similarly to position-coin notation)
+# Parameter: expects adjacency matrix of an unweighted undirected graph
+def FlipFlopShiftOperator(AdjMatrix):
     n = AdjMatrix.shape[0]
 
-    CB = [[j,i] for j in range(n) for i in range(n) if AdjMatrix[j,i]==1]
+    #creates array with edges. For example, if vertices 0 and 1 are adjacent, 
+    #then both [0, 1] and [1, 0] are inside the array, i.e. edges = [[0,1], ..., [1, 0], ...]
+    #TODO: this uses |E| extra memory, optimize it
+    edges = [[i,j] for i in range(n) for j in range(n) if AdjMatrix[i,j] == 1]
 
-    n = len(CB)
-    S = scipy.sparse.csr_matrix((n, n))
+    n = len(edges)
+    #dtype int8 to use less memory
+    S = scipy.sparse.coo_matrix((n, n), dtype=numpy.int8)
 
+    #TODO: notes about complexity
+    #O(|E|^2) since index is O(|E|)
+    #TODO: to optimize: implement binary search and use adjacency matrix indices?
     for i in range(n):
-        S[i,CB.index([CB[i][1],CB[i][0]])] = 1
-    return S
+        e = edges[i]
+        j = edges.index([e[1], e[0]]) #find the index of the same edge with the opposite direction
+        S[i, j] = 1
+    return S.tocsr()
 
 def CoinOperator(AdjMatrix, coin='grover'):
     n = AdjMatrix.shape[0]
@@ -46,7 +61,7 @@ def OracleR(N):
     return numpy.matrix(R)
 
 def EvolutionOperator_CoinedModel(AdjMatrix, CoinOp=None):
-    #return ShiftOperator(AdjMatrix)*CoinOperator(AdjMatrix)
+    #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
         return ShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
     return ShiftOperator(AdjMatrix) @ CoinOp
@@ -55,5 +70,5 @@ def EvolutionOperator_SearchCoinedModel(AdjMatrix):
     S = ShiftOperator(AdjMatrix)
     C = CoinOperator(AdjMatrix)
     N = S.shape[0]
+    #TODO: should this matrix multiplication be performed by neblina?
     return S*C*OracleR(N)
-
