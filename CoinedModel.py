@@ -121,3 +121,20 @@ def EvolutionOperator_SearchCoinedModel(AdjMatrix):
     N = S.shape[0]
     #TODO: should this matrix multiplication be performed by neblina?
     return S*C*OracleR(N)
+
+#TODO: check numpy vectorize documentation
+#TODO: move to auxiliary functions?
+#TODO: test with complex state
+def UnvectorizedElementwiseProbability(elem):
+    return numpy.conj(elem) * elem
+
+#vectorized
+ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
+
+#TODO: documentation
+def ProbabilityDistribution(AdjMatrix, state):
+    #TODO: check if dimensions match and throw exception if necessary
+    degrees = [AdjMatrix[i].sum() for i in range(AdjMatrix.shape[0])]
+    prob = ElementwiseProbability(state)
+    print(degrees)
+    return prob
