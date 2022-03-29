@@ -1,9 +1,14 @@
 # Coined Quantum Walk Model
 
-
 import numpy
 import scipy
 import networkx
+from AuxiliaryFunctions import *
+from time import time as now
+
+DEBUG = True
+if DEBUG:
+    from guppy import hpy #used to check memory usage
 
 
 def UniformInitialCondition(AdjMatrix):
@@ -18,6 +23,7 @@ def UniformInitialCondition(AdjMatrix):
 # TODO: explain resulting matrix (edges labeled similarly to position-coin notation)
 # Parameter: expects adjacency matrix of an unweighted undirected graph
 def FlipFlopShiftOperator(AdjMatrix):
+    start_time = now()
     n = AdjMatrix.shape[0]
 
     #creates array with edges. For example, if vertices 0 and 1 are adjacent, 
@@ -27,7 +33,7 @@ def FlipFlopShiftOperator(AdjMatrix):
 
     n = len(edges)
     #dtype int8 to use less memory
-    S = scipy.sparse.coo_matrix((n, n), dtype=numpy.int8)
+    S = scipy.sparse.lil_matrix((n, n), dtype=numpy.int8)
 
     #TODO: notes about complexity
     #O(|E|^2) since index is O(|E|)
@@ -36,7 +42,50 @@ def FlipFlopShiftOperator(AdjMatrix):
         e = edges[i]
         j = edges.index([e[1], e[0]]) #find the index of the same edge with the opposite direction
         S[i, j] = 1
+
+    if DEBUG:
+        print("OldFlipFlopShiftOperator Memory: " + str(hpy().heap().size))
+        print("OldFlipFlopShiftOperator Time: " + str(now() - start_time))
+
     return S.tocsr()
+
+#Expects sparse matrix #TODO: throw exception
+def NewFlipFlopShiftOperator(AdjMatrix):
+    if DEBUG:
+        start_time = now()
+
+    num_edges = AdjMatrix.sum() #expects weights to be 1 if adjacent
+
+    #storing indexes edges in data.
+    #obs.: for some reason this does not throw exception,
+    #   so technically it is a sparse matrix that stores zero
+    AdjMatrix.data = numpy.arange(num_edges)
+
+    #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
+    row = 0
+    S_cols = numpy.zeros(num_edges)
+    for edge in range(num_edges):
+        if edge >= AdjMatrix.indptr[row + 1]:
+            row += 1
+        col_index = BinarySearch(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
+                end = AdjMatrix.indptr[row+1])
+        S_cols[edge] = AdjMatrix[AdjMatrix.indices[col_index], row]
+
+    # using csr_matrix((data, indices, indptr), shape)
+    S = scipy.sparse.csr_matrix(
+            (numpy.ones(num_edges, dtype=numpy.int8), S_cols, numpy.arange(num_edges+1)),
+            shape=(num_edges, num_edges))
+
+    #restores original data to AdjMatrix
+    AdjMatrix.data = numpy.ones(num_edges)
+
+    #TODO: compare with old approach for creating S
+
+    if DEBUG:
+        print("NewFlipFlopShiftOperator Memory: " + str(hpy().heap().size))
+        print("NewFlipFlopShiftOperator Time: " + str(now() - start_time))
+
+    return S
 
 def CoinOperator(AdjMatrix, coin='grover'):
     n = AdjMatrix.shape[0]
