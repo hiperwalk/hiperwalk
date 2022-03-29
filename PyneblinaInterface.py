@@ -10,17 +10,19 @@ NEBLINA_COMPLEX = 13
 # If the matrix has only real entries, invoke this function by
 # TransferVector(v, False); this saves half the memory that would be used.
 def TransferVector(v, isComplex=True):
-    n = V.shape[0]
-    vec = vector_new(n, NEBLINA_COMPLEX) if is Complex else vector_new(n, NEBLINA_FLOAT)
+    n = v.shape[0]
+    vec = vector_new(n, NEBLINA_COMPLEX) if isComplex else vector_new(n, NEBLINA_FLOAT)
 
     if isComplex:
         for i in range(n):
-            vector_set(vec, i, V[i].real, V[i].imag)
+            vector_set(vec, i, v[i].real, v[i].imag)
         return vec
 
     # else is real
     for i in range(n):
-        vector_set(vec, i, V[i])
+        #TODO: Pyneblina needs to accept 3 arguments only instead of 4?
+        #TODO: check if vector_set is idetifying the vector type right (i.e. real and not complex)
+        vector_set(vec, i, v[i], 0)
     return vec
         
 # Transfers a sparse Matrix (M) stored in csr format to Neblina-core.
@@ -36,8 +38,8 @@ def TransferSparseMatrix(M, isComplex=True):
     n = M.shape[0]
 
     #creates neblina sparse matrix structure
-    smat = sparse_matrix_new(n, n, NEBLINA_COMPLEX) if isComplex else
-        sparse_matrix_new(n, n, NEBLINA_FLOAT)
+    smat = sparse_matrix_new(n, n, NEBLINA_COMPLEX) if isComplex else sparse_matrix_new(
+            n, n, NEBLINA_FLOAT)
     
     #inserts elements into neblina sparse matrix
     row = 0
@@ -53,6 +55,8 @@ def TransferSparseMatrix(M, isComplex=True):
         if isComplex:
             sparse_matrix_set(smat, row, col, M[row, col].real, M[row, col].imag)
         else:
-            sparse_matrix_set(smat, row, col, M[row, col])
+            #TODO: Pynebliena needs to accept 4 arguments instead of 5?
+            #TODO: check if smatrix_set_real_value is beign called instead of smatrix_set_complex_value
+            sparse_matrix_set(smat, row, col, M[row, col], 0) 
 
     return smat
