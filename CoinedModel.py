@@ -112,8 +112,8 @@ def OracleR(N):
 def EvolutionOperator_CoinedModel(AdjMatrix, CoinOp=None):
     #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
-        return ShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
-    return ShiftOperator(AdjMatrix) @ CoinOp
+        return NewFlipFlopShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
+    return NewFlipFlopShiftOperator(AdjMatrix) @ CoinOp
 
 def EvolutionOperator_SearchCoinedModel(AdjMatrix):
     S = ShiftOperator(AdjMatrix)
@@ -142,7 +142,7 @@ def ProbabilityDistribution(AdjMatrix, state):
     #aux_prob = ElementwiseProbability(state) 
     #first splits state per vertex, then calculates probability of each vertex direction,
     #then sums the probabilities resulting in the vertix final probability
-    prob = np.array([
+    prob = numpy.array([
             ElementwiseProbability(state[edges_indices[i]:edges_indices[i+1]]).sum()
             for i in range(len(edges_indices)-1)
         ])
