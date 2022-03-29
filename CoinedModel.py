@@ -132,9 +132,20 @@ def UnvectorizedElementwiseProbability(elem):
 ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
 
 #TODO: documentation
+#TODO: test with nonregular graph
+#TODO: test with nonuniform condition
 def ProbabilityDistribution(AdjMatrix, state):
     #TODO: check if dimensions match and throw exception if necessary
-    degrees = [AdjMatrix[i].sum() for i in range(AdjMatrix.shape[0])]
-    prob = ElementwiseProbability(state)
-    print(degrees)
+    edges_indices = AdjMatrix.indptr #TODO: check if just creates reference (no hard copy)
+
+    #TODO: check it is more efficient on demand or using extra memory (aux_prob)
+    #aux_prob = ElementwiseProbability(state) 
+    #first splits state per vertex, then calculates probability of each vertex direction,
+    #then sums the probabilities resulting in the vertix final probability
+    prob = np.array([
+            ElementwiseProbability(state[edges_indices[i]:edges_indices[i+1]]).sum()
+            for i in range(len(edges_indices)-1)
+        ])
+
+    #TODO: benchmark (time and memory usage)
     return prob
