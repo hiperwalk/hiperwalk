@@ -8,7 +8,7 @@ from numpy import linspace
 #Proper graph visualization is hard, and we highly recommend that
 #people visualize their graphs with tools dedicated to that task. 
 #https://networkx.org/documentation/stable/reference/drawing.html
-def PlotDistributionProbabilityOnGraph(AdjMatrix, probabilities):
+def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities):
     
     G = nx.from_numpy_matrix(AdjMatrix)
     
