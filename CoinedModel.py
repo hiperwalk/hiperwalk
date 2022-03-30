@@ -126,7 +126,10 @@ def EvolutionOperator_SearchCoinedModel(AdjMatrix):
 #TODO: move to auxiliary functions?
 #TODO: test with complex state
 def UnvectorizedElementwiseProbability(elem):
-    return (numpy.conj(elem) * elem).real
+    #this is more efficient than:
+    #(numpy.conj(elem) * elem).real
+    #elem.real**2 + elem.imag**2
+    return elem.real*elem.real + elem.imag*elem.imag
 
 #vectorized
 ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
