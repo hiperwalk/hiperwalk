@@ -10,8 +10,15 @@ NEBLINA_COMPLEX = 13
 # If the matrix has only real entries, invoke this function by
 # TransferVector(v, False); this saves half the memory that would be used.
 def TransferVector(v, isComplex=True):
+    #TODO: check if isComplex automatically?
     n = v.shape[0]
-    vec = vector_new(n, NEBLINA_COMPLEX) if isComplex else vector_new(n, NEBLINA_FLOAT)
+    #TODO: needs better support from pyneblina to use next instruction (commented).
+    #   For example: vector_set works, but in the real case, it should not be needed to
+    #   pass the imaginary part as argument.
+    #   In addition, there should be a way to return a vector and automatically
+    #   convert to an array of float or of complex numbers accordingly.
+    #vec = vector_new(n, NEBLINA_COMPLEX) if isComplex else vector_new(n, NEBLINA_FLOAT)
+    vec = vector_new(n, NEBLINA_COMPLEX)
 
     if isComplex:
         for i in range(n):
@@ -35,11 +42,18 @@ def TransferVector(v, isComplex=True):
 #TODO: isn't there a way for neblina-core to use the csr matrix directly?
 #   In order to avoid double memory usage
 def TransferSparseMatrix(M, isComplex=True):
+    #TODO: check if isComplex automatically?
     n = M.shape[0]
 
     #creates neblina sparse matrix structure
-    smat = sparse_matrix_new(n, n, NEBLINA_COMPLEX) if isComplex else sparse_matrix_new(
-            n, n, NEBLINA_FLOAT)
+    #TODO: needs better support from pyneblina to use next instruction (commented).
+    #   For example: sparse_matrix_set works, but in the real case, it should not be needed to
+    #   pass the imaginary part as argument.
+    #   In addition, there should be a way to return the matrix and automatically
+    #   convert to a matrix of float or of complex numbers accordingly.
+    #smat = sparse_matrix_new(n, n, NEBLINA_COMPLEX) if isComplex else sparse_matrix_new(
+    #        n, n, NEBLINA_FLOAT)
+    smat = sparse_matrix_new(n, n, NEBLINA_COMPLEX)
     
     #inserts elements into neblina sparse matrix
     row = 0
