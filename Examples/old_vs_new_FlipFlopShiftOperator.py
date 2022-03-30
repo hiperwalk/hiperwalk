@@ -5,9 +5,7 @@ sys.path.append('..')
 from AuxiliaryFunctions import *
 from CoinedModel import *
 
-BinarySearch([1, 3, 3, 3, 5], 3)
-
-num_vert = 5
+num_vert = 20
 G = nx.grid_graph(dim=(num_vert, num_vert), periodic=True)
 adj_matrix = nx.adjacency_matrix(G)
 
