@@ -6,7 +6,8 @@ import networkx
 from AuxiliaryFunctions import *
 from time import time as now
 
-DEBUG = True
+#TODO: create module with global constants?
+DEBUG = False
 if DEBUG:
     from guppy import hpy #used to check memory usage
 
@@ -22,35 +23,8 @@ def UniformInitialCondition(AdjMatrix):
 # check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
 # TODO: explain resulting matrix (edges labeled similarly to position-coin notation)
 # Parameter: expects adjacency matrix of an unweighted undirected graph
+#Expects sparse matrix #TODO: throw exception or convert
 def FlipFlopShiftOperator(AdjMatrix):
-    start_time = now()
-    n = AdjMatrix.shape[0]
-
-    #creates array with edges. For example, if vertices 0 and 1 are adjacent, 
-    #then both [0, 1] and [1, 0] are inside the array, i.e. edges = [[0,1], ..., [1, 0], ...]
-    #TODO: this uses |E| extra memory, optimize it
-    edges = [[i,j] for i in range(n) for j in range(n) if AdjMatrix[i,j] == 1]
-
-    n = len(edges)
-    #dtype int8 to use less memory
-    S = scipy.sparse.lil_matrix((n, n), dtype=numpy.int8)
-
-    #TODO: notes about complexity
-    #O(|E|^2) since index is O(|E|)
-    #TODO: to optimize: implement binary search and use adjacency matrix indices?
-    for i in range(n):
-        e = edges[i]
-        j = edges.index([e[1], e[0]]) #find the index of the same edge with the opposite direction
-        S[i, j] = 1
-
-    if DEBUG:
-        print("OldFlipFlopShiftOperator Memory: " + str(hpy().heap().size))
-        print("OldFlipFlopShiftOperator Time: " + str(now() - start_time))
-
-    return S.tocsr()
-
-#Expects sparse matrix #TODO: throw exception
-def NewFlipFlopShiftOperator(AdjMatrix):
     if DEBUG:
         start_time = now()
 
@@ -82,8 +56,8 @@ def NewFlipFlopShiftOperator(AdjMatrix):
     #TODO: compare with old approach for creating S
 
     if DEBUG:
-        print("NewFlipFlopShiftOperator Memory: " + str(hpy().heap().size))
-        print("NewFlipFlopShiftOperator Time: " + str(now() - start_time))
+        print("FlipFlopShiftOperator Memory: " + str(hpy().heap().size))
+        print("FlipFlopShiftOperator Time: " + str(now() - start_time))
 
     return S
 
@@ -112,8 +86,8 @@ def OracleR(N):
 def EvolutionOperator_CoinedModel(AdjMatrix, CoinOp=None):
     #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
-        return NewFlipFlopShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
-    return NewFlipFlopShiftOperator(AdjMatrix) @ CoinOp
+        return FlipFlopShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
+    return FlipFlopShiftOperator(AdjMatrix) @ CoinOp
 
 def EvolutionOperator_SearchCoinedModel(AdjMatrix):
     S = ShiftOperator(AdjMatrix)
