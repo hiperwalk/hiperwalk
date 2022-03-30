@@ -125,8 +125,9 @@ def EvolutionOperator_SearchCoinedModel(AdjMatrix):
 #TODO: check numpy vectorize documentation
 #TODO: move to auxiliary functions?
 #TODO: test with complex state
+#TODO: check type (use float or double?)
 def UnvectorizedElementwiseProbability(elem):
-    return numpy.conj(elem) * elem
+    return numpy.float(numpy.conj(elem) * elem)
 
 #vectorized
 ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
