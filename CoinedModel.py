@@ -1,14 +1,17 @@
-# Coined Quantum Walk Model
-
+###################################################################
+#################### Coined Quantum Walk Model ####################
+###################################################################
 import numpy
 import scipy
+from scipy.linalg import block_diag as scipy_block_diag
 import networkx
 from AuxiliaryFunctions import *
-from time import time as now
+from PyneblinaInterface import *
 
 #TODO: create module with global constants?
 DEBUG = False
 if DEBUG:
+    from time import time as now
     from guppy import hpy #used to check memory usage
 
 
@@ -70,7 +73,7 @@ def CoinOperator(AdjMatrix, coin='grover'):
         L = [HadamardOperator() for i in range(n)]
     else:
         return None
-    return scipy.sparse.csr_matrix(scipy.linalg.block_diag(*L))
+    return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
 def GroverOperator(N):
     return numpy.matrix(2/N*numpy.ones(N)-numpy.identity(N))
@@ -126,3 +129,20 @@ def ProbabilityDistribution(AdjMatrix, state):
 
     #TODO: benchmark (time and memory usage)
     return prob
+
+
+#Simulating walk. Needed: U, state, num_steps
+def SimulateWalk(U, initial_state, num_steps):
+    #preparing walk
+    nbl_matrix = NeblinaSendSparseMatrix(U)
+    nbl_vec = NeblinaSendVector(initial_state)
+
+    #simulating walk
+    #TODO: request multiple multiplications at once to neblina-core
+    #TODO: check if intermediate states are being freed from memory
+    for i in range(num_steps):
+        #TODO: request to change parameter order
+        nbl_vec = sparse_matvec_mul(nbl_vec, nbl_matrix)
+    
+    res = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0], deleteVector=True)
+    return res
