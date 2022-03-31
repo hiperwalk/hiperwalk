@@ -38,14 +38,14 @@ prob = ProbabilityDistribution(adj_matrix, psi0)
 PlotProbabilityDistributionOnGraph(adj_matrix, prob)
 #plots the state probability after #num_steps applications of the evolution operator
 prob = ProbabilityDistribution(adj_matrix, halfway_state)
-PlotProbabilityDistributionOnGraph(adj_matrix, prob)
+PlotProbabilityDistributionOnGraph(adj_matrix, prob, False, cmap='default', node_size=1500)
 #plots the state probability after #2*num_steps applications of the evolution operator
 prob = ProbabilityDistribution(adj_matrix, final_state)
-PlotProbabilityDistributionOnGraph(adj_matrix, prob)
+PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='default')
 
 num_steps = int((grid_dim - 1))
 states = SimulateWalk(U, psi0, num_steps, save_interval=1)
-print(states)
+#print(states)
 
 #stops neblina-core
 stop_engine()
