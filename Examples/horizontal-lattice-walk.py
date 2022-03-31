@@ -29,10 +29,9 @@ psi0 = psi0 / 2
 
 #simulating walk
 U = EvolutionOperator_CoinedModel(adj_matrix)
-#num_steps = int((grid_dim - 1)/2)
 num_steps = 1
-halfway_state = SimulateWalk(U, psi0, num_steps)
-final_state = SimulateWalk(U, halfway_state, num_steps)
+halfway_state = SimulateWalk(U, psi0, num_steps)[0]
+final_state = SimulateWalk(U, halfway_state, num_steps)[0]
 
 #plots initial state probability
 prob = ProbabilityDistribution(adj_matrix, psi0)
@@ -43,6 +42,10 @@ PlotProbabilityDistributionOnGraph(adj_matrix, prob)
 #plots the state probability after #2*num_steps applications of the evolution operator
 prob = ProbabilityDistribution(adj_matrix, final_state)
 PlotProbabilityDistributionOnGraph(adj_matrix, prob)
+
+num_steps = int((grid_dim - 1))
+states = SimulateWalk(U, psi0, num_steps, save_interval=1)
+print(states)
 
 #stops neblina-core
 stop_engine()
