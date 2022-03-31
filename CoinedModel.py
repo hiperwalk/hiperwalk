@@ -131,18 +131,46 @@ def ProbabilityDistribution(AdjMatrix, state):
     return prob
 
 
-#Simulating walk. Needed: U, state, num_steps
-def SimulateWalk(U, initial_state, num_steps):
+#Simulating walk. Needed: U, state, stop_steps
+#num_steps: int. Number of iterations to be simulated, i.e. U^num_steps |initial_state>
+#save_interval: int. Number of steps to execute before saving the state.
+#   For example if num_steps = 10 and save_interval = 5, the states at iterations
+#   5 and 10 will be saved and case save_interval = 3, the states at iterations
+#   3, 6, 9, and 10 will be saved.
+#   Default: None, i.e. saves only the final state
+#save_initial_condition: boolean. If True, adds the initial condition into the saved states.
+#returns array with saved states
+def SimulateWalk(U, initial_state, num_steps, save_interval=None, save_initial_state=False):
     #preparing walk
     nbl_matrix = NeblinaSendSparseMatrix(U)
     nbl_vec = NeblinaSendVector(initial_state)
 
+    #number of states to save
+    num_states = int(numpy.ceil(num_steps/save_interval)) if save_interval is not None else 1
+    if save_initial_state:
+        num_states += 1
+    save_final_state = save_interval is None or num_steps % save_interval != 0
+
+    saved_states = numpy.zeros((num_states, initial_state.shape[0]))
+    state_index = 0 #index of the state to be saved
+    if save_initial_state:
+        saved_states[0] = initial_state
+        state_index += 1
+
     #simulating walk
     #TODO: request multiple multiplications at once to neblina-core
     #TODO: check if intermediate states are being freed from memory
-    for i in range(num_steps):
+    for i in range(1, num_steps + 1):
         #TODO: request to change parameter order
         nbl_vec = sparse_matvec_mul(nbl_vec, nbl_matrix)
-    
-    res = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0], deleteVector=True)
-    return res
+
+        if save_interval is not None and i % save_interval == 0:
+            saved_states[state_index] = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0],
+                    deleteVector=True)
+            state_index += 1
+
+    if save_final_state:
+        saved_states[state_index] = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0],
+                deleteVector=True)
+
+    return saved_states
