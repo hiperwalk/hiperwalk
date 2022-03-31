@@ -151,7 +151,8 @@ def SimulateWalk(U, initial_state, num_steps, save_interval=None, save_initial_s
         num_states += 1
     save_final_state = save_interval is None or num_steps % save_interval != 0
 
-    saved_states = numpy.zeros((num_states, initial_state.shape[0]))
+    #TODO: change dtype accordingly
+    saved_states = numpy.zeros((num_states, initial_state.shape[0]), dtype=complex)
     state_index = 0 #index of the state to be saved
     if save_initial_state:
         saved_states[0] = initial_state
