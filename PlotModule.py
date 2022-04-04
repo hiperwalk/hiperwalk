@@ -6,15 +6,13 @@ from numpy import linspace
 #exepcts kwargs as a reference to the dictionary **kwargs
 #min_prob and max_prob send separately to give the possibility
 #of min_prob and max_prob of the whole walk (instead of a single step)
-def ConfigureNodes(G, probabilities, min_prob, max_prob, prob_node_size, kwargs):
+#Expects kwargs['vmin'] = min_prob and kwargs['vmax'] = max_prob
+def ConfigureNodes(G, probabilities, prob_node_size, kwargs):
     #setting colormap related attributes
     if 'cmap' in kwargs:
         if kwargs['cmap'] == 'default':
             kwargs['cmap'] = 'YlOrRd_r'
-
         kwargs['node_color'] = probabilities
-        kwargs['vmin'] = min_prob
-        kwargs['vmax'] = max_prob
 
     #setting node attributes
     if 'edgecolors' not in kwargs:
@@ -35,14 +33,20 @@ def ConfigureNodes(G, probabilities, min_prob, max_prob, prob_node_size, kwargs)
 
         #calculating size of each node acording to probability 
         #as a function f(x) = ax + b where b = min_size and
-        #max_size = a*max_prob + min_size
-        a = (kwargs['node_size'][1] - kwargs['node_size'][0]) / max_prob
+        #max_size = a*(max_prob-min_prob) + min_size
+        a = (kwargs['node_size'][1] - kwargs['node_size'][0]) / (kwargs['vmax'] - kwargs['vmin'])
         b = kwargs['node_size'][0]
         kwargs['node_size'] = list(map( lambda x: a*x + b, probabilities))
 
     elif 'node_size' not in kwargs:
         #standard size times number of largest label's characters
         kwargs['node_size'] = 300 * len(str(G.number_of_nodes())) 
+
+    #calculates vertices positions.
+    #needed to do beforehand in order to fix position for multiple steps
+    #TODO: check position calculation method
+    #TODO: give the user the option to choose the position calculation method
+    kwargs['pos'] = nx.kamada_kawai_layout(G)
 
 #TODO: probabilities expects numpy array or matrix
 #TODO: use graphviz to draw as noted by networkx's documentation:
@@ -69,41 +73,43 @@ def ConfigureNodes(G, probabilities, min_prob, max_prob, prob_node_size, kwargs)
 #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
 def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, prob_node_size=True, **kwargs):
 
-    min_prob = probabilities.min()
-    max_prob = probabilities.max()
+    #vmin and vmax are default keywords used by networkx_draw.
+    #if an invalid keyword is passed to nx.draw(), it does not execute
+    kwargs['vmin'] = probabilities.min() #min_prob
+    kwargs['vmax'] = probabilities.max() #max_prob
 
     G = nx.from_numpy_matrix(AdjMatrix)
 
+    #TODO: set figure size according to graphdimension
+    fig, ax = ConfigureFigure()
+
     #setting kwargs for plotting
     #kwargs dict is updated by reference
-    ConfigureNodes(G, probabilities, min_prob, max_prob, prob_node_size, kwargs)
-    
-    #TODO: set figure size according to graphdimension
-    fig_width = 10
-    fig_height = 8
-    fig = plt.figure(figsize=(fig_width, fig_height))
-    ax = plt.gca()
-    
-    #calculates vertices positions.
-    #needed to do beforehand in order to fix position for multiple steps
-    #TODO: check position calculation method
-    #TODO: give the user the option to choose the position calculation method
-    kwargs['pos'] = nx.kamada_kawai_layout(G)
-    
+    ConfigureNodes(G, probabilities, prob_node_size, kwargs)
     nx.draw(G, **kwargs)
 
     ##setting colorbar
     if 'cmap' in kwargs:
-        sm = plt.cm.ScalarMappable(cmap=kwargs['cmap'],
-                norm=plt.Normalize(vmin=min_prob, vmax=max_prob))
-
-        divider = make_axes_locatable(ax)
-        cax = divider.append_axes('right', size='2.5%', pad=0.01)
-        cbar = plt.colorbar(sm, ticks=linspace(min_prob, max_prob, num=5), cax=cax)
-
-        cbar.ax.tick_params(labelsize=14, length=7)
+        ConfigureColorbar(ax, kwargs)
 
     #showing img
     #TODO: add saving option
     plt.tight_layout()
     plt.show()
+
+#TODO: set figure size according to graphdimension
+def ConfigureFigure(fig_width=10, fig_height=8):
+    fig = plt.figure(figsize=(fig_width, fig_height))
+    ax = plt.gca()
+    return fig, ax
+
+def ConfigureColorbar(ax, kwargs):
+    sm = plt.cm.ScalarMappable(cmap=kwargs['cmap'],
+            norm=plt.Normalize(vmin=kwargs['vmin'], vmax=kwargs['vmax']))
+
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('right', size='2.5%', pad=0.01)
+    cbar = plt.colorbar(sm, ticks=linspace(kwargs['vmin'], kwargs['vmax'], num=5), cax=cax)
+
+    cbar.ax.tick_params(labelsize=14, length=7)
+
