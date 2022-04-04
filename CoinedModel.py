@@ -114,7 +114,10 @@ ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
 #TODO: documentation
 #TODO: test with nonregular graph
 #TODO: test with nonuniform condition
-def ProbabilityDistribution(AdjMatrix, state):
+def ProbabilityDistribution(AdjMatrix, states):
+    if len(states.shape) == 1:
+        states = [states]
+
     #TODO: check if dimensions match and throw exception if necessary
     edges_indices = AdjMatrix.indptr #TODO: check if just creates reference (no hard copy)
 
@@ -122,10 +125,10 @@ def ProbabilityDistribution(AdjMatrix, state):
     #aux_prob = ElementwiseProbability(state) 
     #first splits state per vertex, then calculates probability of each vertex direction,
     #then sums the probabilities resulting in the vertix final probability
-    prob = numpy.array([
-            ElementwiseProbability(state[edges_indices[i]:edges_indices[i+1]]).sum()
-            for i in range(len(edges_indices)-1)
-        ])
+    prob = numpy.array([[
+            ElementwiseProbability(states[i][edges_indices[j]:edges_indices[j+1]]).sum()
+            for j in range(len(edges_indices)-1)
+        ] for i in range(len(states)) ])
 
     #TODO: benchmark (time and memory usage)
     return prob
