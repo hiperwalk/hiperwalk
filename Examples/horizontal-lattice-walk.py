@@ -41,7 +41,7 @@ prob = ProbabilityDistribution(adj_matrix, halfway_state)
 PlotProbabilityDistributionOnGraph(adj_matrix, prob, False, cmap='default', node_size=1500)
 #plots the state probability after #2*num_steps applications of the evolution operator
 prob = ProbabilityDistribution(adj_matrix, final_state)
-PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='default')
+PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='viridis')
 
 num_steps = int((grid_dim - 1))
 states = SimulateWalk(U, psi0, num_steps, save_interval=1)
