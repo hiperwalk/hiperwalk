@@ -82,7 +82,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, prob_node_size=
     fig_width = 10
     fig_height = 8
     fig = plt.figure(figsize=(fig_width, fig_height))
-    ax = plt.axes()
+    ax = plt.gca()
     
     #calculates vertices positions.
     #needed to do beforehand in order to fix position for multiple steps
@@ -92,15 +92,18 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, prob_node_size=
     
     nx.draw(G, **kwargs)
 
-    #setting colorbar
+    ##setting colorbar
     if 'cmap' in kwargs:
         sm = plt.cm.ScalarMappable(cmap=kwargs['cmap'],
                 norm=plt.Normalize(vmin=min_prob, vmax=max_prob))
 
-        cax = fig.add_axes([ax.get_position().x1+0.01, ax.get_position().y0,
-            0.02, ax.get_position().height])
-
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='2.5%', pad=0.01)
         cbar = plt.colorbar(sm, ticks=linspace(min_prob, max_prob, num=5), cax=cax)
+
         cbar.ax.tick_params(labelsize=14, length=7)
 
+    #showing img
+    #TODO: add saving option
+    plt.tight_layout()
     plt.show()
