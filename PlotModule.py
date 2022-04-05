@@ -1,5 +1,6 @@
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 
@@ -69,7 +70,7 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
 #   if ommited and plot_node_size is true, uses default size.
 #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
 #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
-def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, **kwargs):
+def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False, **kwargs):
 
     #vmin and vmax are default keywords used by networkx_draw.
     #if an invalid keyword is passed to nx.draw(), it does not execute
@@ -81,22 +82,28 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, **kwargs):
     if len(probabilities.shape) == 1:
         probabilities = [probabilities]
 
-    animate = True
     if not animate:
         for i in range(len(probabilities)):
-            DrawFigure(G, probabilities[i], **kwargs)
+            #TODO: set figure size according to graphdimension
+            fig, ax = ConfigureFigure()
+            DrawFigure(G, probabilities[i], ax=ax, **kwargs)
 
             #showing img
             #TODO: add saving option
-            plt.tight_layout()
             plt.show()
 
     else:
-        #TODO
+        fig, ax = ConfigureFigure()
+        anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+                fargs=(G, ax, kwargs))
 
-def DrawFigure(G, probabilities, **kwargs):
-    #TODO: set figure size according to graphdimension
-    fig, ax = ConfigureFigure()
+        plt.show()
+
+def AnimateFigure(probabilities, G, ax, kwargs):
+    ax.clear()
+    DrawFigure(G, probabilities, ax, **kwargs)
+
+def DrawFigure(G, probabilities, ax, **kwargs):
 
     #setting kwargs for plotting
     #removes invalid keys for networkx draw
@@ -111,6 +118,8 @@ def DrawFigure(G, probabilities, **kwargs):
     ##setting and drawing colorbar
     if 'cmap' in kwargs:
         ConfigureColorbar(ax, kwargs)
+
+    plt.tight_layout()
 
 
 #TODO: set figure size according to graphdimension
