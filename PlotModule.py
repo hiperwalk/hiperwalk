@@ -27,7 +27,7 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
     if kwargs['with_labels'] and 'font_color' not in kwargs:
         kwargs['font_color'] = 'black'
 
-    if kwargs['node_size'] is None:
+    if 'node_size' not in kwargs:
         if min_node_size is None:
             min_node_size = 300
         if max_node_size is None:
@@ -54,9 +54,9 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
 #to fix node size, set "node_size" to a constant or an array, as described in networx documentation.
 #parameters.
 #min_node_size, max_node_size: node size representing minimum/maximum probability.
-#   default: None. If optional argument node_size is not set,
+#   If min_node_size or max_node_size are not set and optional argument node_size is not set,
 #   min_node_size and max_node_size will assume default values (check configure nodes).
-#   If optional argument node_size is set and either min_node_size or max_node_size is None,
+#   If optional argument node_size is set and either min_node_size or max_node_size is not set,
 #   all nodes will have the size as described by node_size.
 #   If min_node_size, max_node_size and node_size are set, node_size is disregarded.
 #For detailed info about **kwargs check networkx's documentation for
@@ -69,8 +69,7 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
 #   if ommited and plot_node_size is true, uses default size.
 #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
 #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
-def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, min_node_size=None,
-        max_node_size=None, **kwargs):
+def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, **kwargs):
 
     #vmin and vmax are default keywords used by networkx_draw.
     #if an invalid keyword is passed to nx.draw(), it does not execute
@@ -81,26 +80,38 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, min_node_size=N
 
     if len(probabilities.shape) == 1:
         probabilities = [probabilities]
-    restoreNodeSize = None if 'node_size' not in kwargs else kwargs['node_size']
 
-    for i in range(len(probabilities)):
-        #TODO: set figure size according to graphdimension
-        fig, ax = ConfigureFigure()
+    animate = True
+    if not animate:
+        for i in range(len(probabilities)):
+            DrawFigure(G, probabilities[i], **kwargs)
 
-        #setting kwargs for plotting
-        #kwargs dict is updated by reference
-        kwargs['node_size'] = restoreNodeSize
-        ConfigureNodes(G, probabilities[i], min_node_size, max_node_size, kwargs)
-        nx.draw(G, **kwargs)
+            #showing img
+            #TODO: add saving option
+            plt.tight_layout()
+            plt.show()
 
-        ##setting colorbar
-        if 'cmap' in kwargs:
-            ConfigureColorbar(ax, kwargs)
+    else:
+        #TODO
 
-        #showing img
-        #TODO: add saving option
-        plt.tight_layout()
-        plt.show()
+def DrawFigure(G, probabilities, **kwargs):
+    #TODO: set figure size according to graphdimension
+    fig, ax = ConfigureFigure()
+
+    #setting kwargs for plotting
+    #removes invalid keys for networkx draw
+    #kwargs dictionary is updated by reference
+    ConfigureNodes(G, probabilities,
+            kwargs.pop['min_node_size'] if 'min_node_size' in kwargs else None,
+            kwargs.pop['max_node_size'] if 'max_node_size' in kwargs else None,
+            kwargs)
+
+    nx.draw(G, ax=ax, **kwargs)
+
+    ##setting and drawing colorbar
+    if 'cmap' in kwargs:
+        ConfigureColorbar(ax, kwargs)
+
 
 #TODO: set figure size according to graphdimension
 def ConfigureFigure(fig_width=10, fig_height=8):
