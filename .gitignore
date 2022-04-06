@@ -53,9 +53,10 @@ docs/_build/
 # PyBuilder
 target/
 
-# Jupyter Notebook
-.ipynb_checkpoints/
-
 # Text Editors / IDE extra files
+.ipynb_checkpoints/
 *.swp
 
+# Output files
+*.gif
+*.mp4
