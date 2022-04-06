@@ -95,13 +95,17 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False, 
     else:
         fig, ax = ConfigureFigure()
         anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
-                fargs=(G, ax, kwargs))
+                fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=True)
+
+        #anim.save('animation_1.gif', writer='imagemagick')
 
         plt.show()
 
 def AnimateFigure(probabilities, G, ax, kwargs):
     ax.clear()
     DrawFigure(G, probabilities, ax, **kwargs)
+
+    return ax,
 
 def DrawFigure(G, probabilities, ax, **kwargs):
 
@@ -115,11 +119,12 @@ def DrawFigure(G, probabilities, ax, **kwargs):
 
     nx.draw(G, ax=ax, **kwargs)
 
-    ##setting and drawing colorbar
+    #setting and drawing colorbar
     if 'cmap' in kwargs:
         ConfigureColorbar(ax, kwargs)
 
-    plt.tight_layout()
+    #does not call plt.tight_layout() because it dramatically interferes
+    #with animation time between frames
 
 
 #TODO: set figure size according to graphdimension
