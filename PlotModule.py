@@ -105,7 +105,9 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
 
             #show or save image (or both)
             if filename_prefix is not None:
-                plt.savefig(filename_prefix)
+                filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
+                        if len(probabilities) > 1 else '' )
+                plt.savefig(filename_prefix + filename_suffix)
                 if not show_plot:
                     plt.close()
             if show_plot:

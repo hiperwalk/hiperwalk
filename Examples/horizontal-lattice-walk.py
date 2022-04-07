@@ -45,10 +45,11 @@ prob = ProbabilityDistribution(adj_matrix, final_state)
 PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='default',
         filename_prefix='dont_show_and_save', show_plot=False)
 
-num_steps = int((grid_dim - 1))
+#num_steps = int((grid_dim - 1))
+num_steps = 9
 states = SimulateWalk(U, psi0, num_steps, save_interval=1, save_initial_state=True)
 prob = ProbabilityDistribution(adj_matrix, states)
-PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='viridis', animate=True,
+PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='viridis',
         filename_prefix='animation', show_plot=False)
 print([(U**i @ psi0 == states[i]).all() for i in range(len(states))])
 
