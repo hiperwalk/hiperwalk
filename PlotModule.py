@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
+from ModifiedNetworkXFunctions import *
 
 #exepcts kwargs as a reference to the dictionary **kwargs
 #min_prob and max_prob send separately to give the possibility
@@ -101,7 +102,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
         for i in range(len(probabilities)):
             #TODO: set figure size according to graphdimension
             fig, ax = ConfigureFigure()
-            DrawFigure(G, probabilities[i], ax=ax, **kwargs)
+            DrawFigure(probabilities[i], G, ax=ax, **kwargs)
 
             #show or save image (or both)
             if filename_prefix is not None:
@@ -116,7 +117,9 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
     else:
         fig, ax = ConfigureFigure()
         blit = filename_prefix is None #because optimization
-        anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+        #anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+        #        fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit)
+        anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
                 fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit)
 
         if filename_prefix is not None:
@@ -130,7 +133,7 @@ def AnimateFigure(probabilities, G, ax, kwargs):
 
     return ax,
 
-def DrawFigure(G, probabilities, ax, **kwargs):
+def DrawFigure(probabilities, G, ax, kwargs):
 
     #setting kwargs for plotting
     #removes invalid keys for networkx draw
@@ -140,14 +143,14 @@ def DrawFigure(G, probabilities, ax, **kwargs):
             kwargs.pop['max_node_size'] if 'max_node_size' in kwargs else None,
             kwargs)
 
-    nx.draw(G, ax=ax, **kwargs)
+    node_collection, edge_collection, _ = nx_draw(G, ax=ax, **kwargs)
 
     #setting and drawing colorbar
     if 'cmap' in kwargs:
         ConfigureColorbar(ax, kwargs)
 
-    #does not call plt.tight_layout() because it dramatically interferes
-    #with animation time between frames
+    #plt.tight_layout()
+    return node_collection, edge_collection,
 
 
 #TODO: set figure size according to graphdimension
