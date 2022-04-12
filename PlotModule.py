@@ -3,7 +3,11 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
+from ModifiedNetworkXFunctions import *
+from time import time
 
+#Configures static characteristics of nodes, i.e. attributes that will not change
+#during sequential plots or an animation.
 #exepcts kwargs as a reference to the dictionary **kwargs
 #min_prob and max_prob send separately to give the possibility
 #of min_prob and max_prob of the whole walk (instead of a single step)
@@ -13,7 +17,6 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
     if 'cmap' in kwargs:
         if kwargs['cmap'] == 'default':
             kwargs['cmap'] = 'YlOrRd_r'
-        kwargs['node_color'] = probabilities
 
     #setting node attributes
     if 'edgecolors' not in kwargs:
@@ -28,6 +31,21 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
     if kwargs['with_labels'] and 'font_color' not in kwargs:
         kwargs['font_color'] = 'black'
 
+    #calculates vertices positions.
+    #needed to do beforehand in order to fix position for multiple steps
+    #TODO: check position calculation method
+    #TODO: give the user the option to choose the position calculation method
+    if 'pos' not in kwargs:
+        kwargs['pos'] = nx.kamada_kawai_layout(G)
+
+#Configures volatile attributes of nodes,
+#i.e. attributes that may change depending on the probability.
+#The separation between UpdateNodes and ConfigureNodes optimizes animations and
+#plotting multiple images
+def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
+    if 'cmap' in kwargs:
+        kwargs['node_color'] = probabilities
+
     if 'node_size' not in kwargs:
         if min_node_size is None:
             min_node_size = 300
@@ -38,13 +56,10 @@ def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
         #as a function f(x) = ax + b where b = min_size and
         #max_size = a*(max_prob-min_prob) + min_size
         a = (max_node_size - min_node_size) / (kwargs['vmax'] - kwargs['vmin'])
-        kwargs['node_size'] = list(map( lambda x: a*x + min_node_size, probabilities ))
+        kwargs['node_size'] = list(map(
+                lambda x: a*x + min_node_size, probabilities
+            ))
 
-    #calculates vertices positions.
-    #needed to do beforehand in order to fix position for multiple steps
-    #TODO: check position calculation method
-    #TODO: give the user the option to choose the position calculation method
-    kwargs['pos'] = nx.kamada_kawai_layout(G)
 
 #TODO: probabilities expects numpy array or matrix
 #TODO: use graphviz to draw as noted by networkx's documentation:
@@ -94,6 +109,13 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
 
     G = nx.from_numpy_matrix(AdjMatrix)
 
+    #removes invalid keys for networkx draw
+    min_node_size = kwargs.pop['min_node_size'] if 'min_node_size' in kwargs else None
+    max_node_size = kwargs.pop['max_node_size'] if 'max_node_size' in kwargs else None
+    #setting static kwargs for plotting
+    #kwargs dictionary is updated by reference
+    ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs)
+
     if len(probabilities.shape) == 1:
         probabilities = [probabilities]
 
@@ -101,10 +123,11 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
         for i in range(len(probabilities)):
             #TODO: set figure size according to graphdimension
             fig, ax = ConfigureFigure()
-            DrawFigure(G, probabilities[i], ax=ax, **kwargs)
+            DrawFigure(G, probabilities[i], ax, min_node_size, max_node_size, **kwargs)
 
             #show or save image (or both)
             if filename_prefix is not None:
+                #enumarating the plot
                 filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
                         if len(probabilities) > 1 else '' )
                 plt.savefig(filename_prefix + filename_suffix)
@@ -115,32 +138,48 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
 
     else:
         fig, ax = ConfigureFigure()
-        blit = filename_prefix is None #because optimization
+        #blit = filename_prefix is None #because optimization
+        blit = True
         anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
-                fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit)
+                fargs=(G, ax, min_node_size, max_node_size, kwargs),
+                interval=200, repeat_delay=200, blit=blit)
+        #anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+        #        fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit,
+        #            init_func=DrawFigure(G, probabilities[0], ax, **kwargs))
 
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
         if show_plot:
             plt.show()
 
-def AnimateFigure(probabilities, G, ax, kwargs):
-    ax.clear()
-    DrawFigure(G, probabilities, ax, **kwargs)
 
-    return ax,
+#TODO: DELETE THIS
+start = time()
 
-def DrawFigure(G, probabilities, ax, **kwargs):
+def AnimateFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
+    #ax.clear()
+    nodes, edges, labels = DrawFigure(G, probabilities, ax,
+            min_node_size, max_node_size, **kwargs)
+    #DrawFigure(G, probabilities, ax, **kwargs)
 
-    #setting kwargs for plotting
-    #removes invalid keys for networkx draw
-    #kwargs dictionary is updated by reference
-    ConfigureNodes(G, probabilities,
-            kwargs.pop['min_node_size'] if 'min_node_size' in kwargs else None,
-            kwargs.pop['max_node_size'] if 'max_node_size' in kwargs else None,
-            kwargs)
+    global start
+    end = time()
+    print(end - start)
+    start = end
+    #print(nodes)
+    #print(edges)
+    #print(labels[0].get_animated())
+    #return nodes, edges, (labels[0],),
+    return nodes, edges #(labels[0], labels[1])
+    #return ax,
 
-    nx.draw(G, ax=ax, **kwargs)
+
+def DrawFigure(G, probabilities, ax, min_node_size, max_node_size, **kwargs):
+
+    UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
+
+    #nx.draw(G, ax=ax, **kwargs)
+    ret = nx_draw(G, ax=ax, **kwargs)
 
     #setting and drawing colorbar
     if 'cmap' in kwargs:
@@ -148,6 +187,9 @@ def DrawFigure(G, probabilities, ax, **kwargs):
 
     #does not call plt.tight_layout() because it dramatically interferes
     #with animation time between frames
+    #plt.tight_layout()
+
+    return ret
 
 
 #TODO: set figure size according to graphdimension

@@ -3,7 +3,7 @@
 #This module includes the return type of some NetworkX's functions.
 #The returned values are particularly useful for animations using matplotlib's FuncAnimation.
 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import networkx as nx
 
 #this is a redefinition of networkx's draw method
@@ -26,10 +26,10 @@ def nx_draw(G, pos=None, ax=None, **kwds):
     if "with_labels" not in kwds:
         kwds["with_labels"] = "labels" in kwds
 
-    nx_draw_networkx(G, pos=pos, ax=ax, **kwds)
+    ret = nx_draw_networkx(G, pos=pos, ax=ax, **kwds)
     ax.set_axis_off()
     plt.draw_if_interactive()
-    return
+    return ret
 
 
 #this is a redefinition of networkx's draw_networkx method
@@ -104,8 +104,11 @@ def nx_draw_networkx(G, pos=None, arrows=None, with_labels=True, **kwds):
         #imported in the beginning of the networkx.drawing.nx_pylab file
         pos = nx.drawing.spring_layout(G)  # default to spring layout
 
-    draw_networkx_nodes(G, pos, **node_kwds)
-    draw_networkx_edges(G, pos, arrows=arrows, **edge_kwds)
+    nodes = nx.draw_networkx_nodes(G, pos, **node_kwds)
+    edges = nx.draw_networkx_edges(G, pos, arrows=arrows, **edge_kwds)
+    labels = None
     if with_labels:
-        draw_networkx_labels(G, pos, **label_kwds)
+        labels = nx.draw_networkx_labels(G, pos, **label_kwds)
     plt.draw_if_interactive()
+
+    return nodes, edges, labels
