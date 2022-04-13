@@ -5,8 +5,9 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from ModifiedNetworkXFunctions import *
 
-#TODO deleteme
-from time import time
+DEBUG = True
+if DEBUG:
+    from time import time
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
 #during sequential plots or an animation.
@@ -88,9 +89,7 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 #   if animate is False, saves a .png file for each of the probabilities,
 #   e.g. filename_prefix-1.png, filename_prefix-2.png, etc.
 #   IMPORTANT: we do NOT recommend to use animate=True, show_plot=True and filename_prefix as a str
-#   because the show process will not be optimized (blit = False, check matplotlib documentation);
-#   hence, the time between frames may not be the one expected.
-#
+#   because the show process will not show the labels and part of the animation may not be shown.
 #For detailed info about **kwargs check networkx's documentation for
 #draw_networkx, draw_networkx_nodes, drawnetworkx_edges, etc.
 #Here, a few useful optional keywords are listed
@@ -125,7 +124,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
         for i in range(len(probabilities)):
             #TODO: set figure size according to graphdimension
             fig, ax = ConfigureFigure()
-            DrawFigure(G, probabilities[i], ax, min_node_size, max_node_size, **kwargs)
+            DrawFigure(probabilities[i], G, ax, min_node_size, max_node_size, kwargs)
 
             #show or save image (or both)
             if filename_prefix is not None:
@@ -140,81 +139,26 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
 
     else:
         fig, ax = ConfigureFigure()
-        #blit = filename_prefix is None #because optimization
-        blit = True
-        anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
-                fargs=(G, ax, kwargs.pop('pos'), min_node_size, max_node_size, kwargs),
-                interval=200, repeat_delay=200, blit=blit)
-        #anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
-        #        fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit,
-        #            init_func=DrawFigure(G, probabilities[0], ax, **kwargs))
-
-        if filename_prefix is not None:
-            anim.save(filename_prefix + '.gif')
-        if show_plot:
-            plt.show()
-        #################################################################
-        """NEW
-        fig, ax = ConfigureFigure()
-        blit = True
-        anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+        anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
                 fargs=(G, ax, min_node_size, max_node_size, kwargs),
-                interval=200, repeat_delay=200, blit=blit)
+                interval=200, repeat_delay=200, blit=True)
 
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
         if show_plot:
             plt.show()
-        """
 
+def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
 
-#TODO: DELETE THIS
-start = time()
-
-def AnimateFigure(probabilities, G, ax, pos, min_node_size, max_node_size, kwargs):
-    #ax.clear()
-
-    kwargs['pos'] = pos
-    kwargs['with_labels'] = False
-    nodes, edges, labels = DrawFigure(G, probabilities, ax,
-            min_node_size, max_node_size, **kwargs)
-
-    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
-    #pos = kwargs['pos']
-    #nodes = nx.draw_networkx_nodes(G, pos, node_color=kwargs['node_color'],
-    #        node_size=kwargs['node_size'], cmap=kwargs['cmap'])
-    #edges = nx.draw_networkx_edges(G, pos)
-
-    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
-    #pos = kwargs.pop('pos')
-    #nodes, edges, _ = nx_draw(G, pos=pos, ax=ax, **kwargs)
-    ##nodes, edges, _ = nx_draw_networkx(G, pos=pos, **kwargs)
-    #kwargs['pos'] = pos
-
-    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
-    #nodes, edges, _ = nx_draw(G, pos=pos, node_color=probabilities,
-    #        node_size=kwargs.pop('node_size'), alpha=0.7, with_labels=True)
-    #        #node_size=probabilities*1000 + [300]*len(probabilities))
-    print([key for key, _ in kwargs.items()])
-
-    global start
-    end = time()
-    print(end - start)
-    start = end
-    #print(nodes)
-    #print(edges)
-    #print(labels[0].get_animated())
-    #return nodes, edges, (labels[0],),
-    return nodes, edges #(labels[0], labels[1])
-    #return ax,
-
-
-def DrawFigure(G, probabilities, ax, min_node_size, max_node_size, **kwargs):
-
+    ax.clear()
+    static_node_size = 'node_size' in kwargs
+    #UpdateNodes may create kwargs['node_size']
     UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
 
-    #nx.draw(G, ax=ax, **kwargs)
-    ret = nx_draw(G, ax=ax, **kwargs)
+    nodes, _, _ = nx_draw(G, ax=ax,
+            node_size = kwargs['node_size'] if static_node_size else kwargs.pop('node_size'),
+            **kwargs)
+    #note: nx.draw_networkx_labels dramatically increases plotting time
 
     #setting and drawing colorbar
     if 'cmap' in kwargs:
@@ -224,11 +168,17 @@ def DrawFigure(G, probabilities, ax, min_node_size, max_node_size, **kwargs):
     #with animation time between frames
     #plt.tight_layout()
 
-    return ret
+    if DEBUG:
+        global start
+        end = time()
+        print("DrawFigure: " + str(end - start) +'s')
+        start = end
+
+    return nodes, #edges #(labels[0], labels[1])
 
 
 #TODO: set figure size according to graphdimension
-def ConfigureFigure(fig_width=10, fig_height=8):
+def ConfigureFigure(fig_width=16, fig_height=9):
     fig = plt.figure(figsize=(fig_width, fig_height))
     ax = plt.gca()
     return fig, ax
@@ -242,4 +192,8 @@ def ConfigureColorbar(ax, kwargs):
     cbar = plt.colorbar(sm, ticks=linspace(kwargs['vmin'], kwargs['vmax'], num=5), cax=cax)
 
     cbar.ax.tick_params(labelsize=14, length=7)
+
+
+if DEBUG:
+    start = time()
 
