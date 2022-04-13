@@ -66,6 +66,7 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 
 #TODO: probabilities expects numpy array or matrix
 #TODO: use graphviz to draw as noted by networkx's documentation:
+#TODO: if that's the case, try to optimize plot and animations before changing to use graphviz
 #Proper graph visualization is hard, and we highly recommend that
 #people visualize their graphs with tools dedicated to that task. 
 #https://networkx.org/documentation/stable/reference/drawing.html
@@ -88,8 +89,6 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 #   if animate is True, the animation will be saved in a gif file, e.g. filename_prefix.gif;
 #   if animate is False, saves a .png file for each of the probabilities,
 #   e.g. filename_prefix-1.png, filename_prefix-2.png, etc.
-#   IMPORTANT: we do NOT recommend to use animate=True, show_plot=True and filename_prefix as a str
-#   because the show process will not show the labels and part of the animation may not be shown.
 #For detailed info about **kwargs check networkx's documentation for
 #draw_networkx, draw_networkx_nodes, drawnetworkx_edges, etc.
 #Here, a few useful optional keywords are listed
