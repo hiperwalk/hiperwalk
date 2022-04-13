@@ -174,7 +174,8 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
         print("DrawFigure: " + str(end - start) +'s')
         start = end
 
-    return nodes, #edges #(labels[0], labels[1])
+    return nodes,
+    #return nodes, #edges #(labels[0], labels[1])
 
 
 #TODO: set figure size according to graphdimension
