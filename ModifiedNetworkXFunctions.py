@@ -2,6 +2,7 @@
 
 #This module includes the return type of some NetworkX's functions.
 #The returned values are particularly useful for animations using matplotlib's FuncAnimation.
+
 import matplotlib.pyplot as plt
 import networkx as nx
 
@@ -26,10 +27,10 @@ def nx_draw(G, pos=None, ax=None, **kwds):
     if "with_labels" not in kwds:
         kwds["with_labels"] = "labels" in kwds
 
-    drawn_info = nx_draw_networkx(G, pos=pos, ax=ax, **kwds)
+    ret = nx_draw_networkx(G, pos=pos, ax=ax, **kwds)
     ax.set_axis_off()
     plt.draw_if_interactive()
-    return drawn_info
+    return ret
 
 
 #this is a redefinition of networkx's draw_networkx method
@@ -104,11 +105,11 @@ def nx_draw_networkx(G, pos=None, arrows=None, with_labels=True, **kwds):
         #imported in the beginning of the networkx.drawing.nx_pylab file
         pos = nx.drawing.spring_layout(G)  # default to spring layout
 
-    node_collection = nx.draw_networkx_nodes(G, pos, **node_kwds)
-    edge_viz_obj = nx.draw_networkx_edges(G, pos, arrows=arrows, **edge_kwds)
-    text_items = None
+    nodes = nx.draw_networkx_nodes(G, pos, **node_kwds)
+    edges = nx.draw_networkx_edges(G, pos, arrows=arrows, **edge_kwds)
+    labels = None
     if with_labels:
-        text_items = nx.draw_networkx_labels(G, pos, **label_kwds)
+        labels = nx.draw_networkx_labels(G, pos, **label_kwds)
     plt.draw_if_interactive()
 
-    return node_collection, edge_viz_obj, text_items
+    return nodes, edges, labels
