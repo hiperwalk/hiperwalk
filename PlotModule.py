@@ -4,10 +4,9 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from ModifiedNetworkXFunctions import *
-<<<<<<< HEAD
-=======
+
+#TODO deleteme
 from time import time
->>>>>>> 21792fb28904a823ec85e413beb8438befa6c74a
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
 #during sequential plots or an animation.
