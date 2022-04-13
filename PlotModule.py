@@ -110,8 +110,8 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
     G = nx.from_numpy_matrix(AdjMatrix)
 
     #removes invalid keys for networkx draw
-    min_node_size = kwargs.pop['min_node_size'] if 'min_node_size' in kwargs else None
-    max_node_size = kwargs.pop['max_node_size'] if 'max_node_size' in kwargs else None
+    min_node_size = kwargs.pop('min_node_size') if 'min_node_size' in kwargs else None
+    max_node_size = kwargs.pop('max_node_size') if 'max_node_size' in kwargs else None
     #setting static kwargs for plotting
     #kwargs dictionary is updated by reference
     ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs)
@@ -141,7 +141,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
         #blit = filename_prefix is None #because optimization
         blit = True
         anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
-                fargs=(G, ax, min_node_size, max_node_size, kwargs),
+                fargs=(G, ax, kwargs.pop('pos'), min_node_size, max_node_size, kwargs),
                 interval=200, repeat_delay=200, blit=blit)
         #anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
         #        fargs=(G, ax, kwargs), interval=200, repeat_delay=200, blit=blit,
@@ -151,16 +151,49 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
             anim.save(filename_prefix + '.gif')
         if show_plot:
             plt.show()
+        #################################################################
+        """NEW
+        fig, ax = ConfigureFigure()
+        blit = True
+        anim  = FuncAnimation(fig, AnimateFigure, frames=probabilities,
+                fargs=(G, ax, min_node_size, max_node_size, kwargs),
+                interval=200, repeat_delay=200, blit=blit)
+
+        if filename_prefix is not None:
+            anim.save(filename_prefix + '.gif')
+        if show_plot:
+            plt.show()
+        """
 
 
 #TODO: DELETE THIS
 start = time()
 
-def AnimateFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
+def AnimateFigure(probabilities, G, ax, pos, min_node_size, max_node_size, kwargs):
     #ax.clear()
+
+    kwargs['pos'] = pos
+    kwargs['with_labels'] = False
     nodes, edges, labels = DrawFigure(G, probabilities, ax,
             min_node_size, max_node_size, **kwargs)
-    #DrawFigure(G, probabilities, ax, **kwargs)
+
+    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
+    #pos = kwargs['pos']
+    #nodes = nx.draw_networkx_nodes(G, pos, node_color=kwargs['node_color'],
+    #        node_size=kwargs['node_size'], cmap=kwargs['cmap'])
+    #edges = nx.draw_networkx_edges(G, pos)
+
+    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
+    #pos = kwargs.pop('pos')
+    #nodes, edges, _ = nx_draw(G, pos=pos, ax=ax, **kwargs)
+    ##nodes, edges, _ = nx_draw_networkx(G, pos=pos, **kwargs)
+    #kwargs['pos'] = pos
+
+    #UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
+    #nodes, edges, _ = nx_draw(G, pos=pos, node_color=probabilities,
+    #        node_size=kwargs.pop('node_size'), alpha=0.7, with_labels=True)
+    #        #node_size=probabilities*1000 + [300]*len(probabilities))
+    print([key for key, _ in kwargs.items()])
 
     global start
     end = time()

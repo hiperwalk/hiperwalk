@@ -116,23 +116,43 @@ def update2(n):
 def update3(probabilities, G, ax):
     #nodes, edges, labels = nx_draw(G, ax=ax)]
     #nc = np.random.random(num_vert)
-    pos = nx.spring_layout(G)
     nc = probabilities
-    nodes = nx.draw_networkx_nodes(G, pos, node_color=nc)
-    cmap = plt.get_cmap('YlOrRd')
-    edges = nx.draw_networkx_edges(G, pos, edge_color=cmap(nc),
-            edge_cmap=cmap, width=np.random.random(num_vert)*3)
+    #nodes = nx.draw_networkx_nodes(G, pos, node_color=nc)
+    #cmap = plt.get_cmap('YlOrRd')
+    #edges = nx.draw_networkx_edges(G, pos, edge_color=cmap(nc),
+    #        edge_cmap=cmap, width=np.random.random(num_vert)*3)
+
+    nodes, edges, _ = nx_draw(G, pos, node_color=nc)
 
     time_info()
     return nodes, edges,
 
+def update4(probabilities):
+    nc = probabilities
+    nodes.set_array(nc)
+    nodes.set_sizes(np.random.random(num_vert) * 1500)
+
+    #cmap = plt.get_cmap('YlOrRd')
+    #edges.set_color(cmap(nc))
+    #edges.set_linewidth(np.random.random(num_vert)*50)
+
+    time_info()
+
+    return nodes, edges,
+
+def init_func():
+    nc = prob[0]
+    nodes, edges, _ = nx_draw(G, pos, node_color=nc)
+    return nodes, edges,
 #print(prob)
 
 #PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='viridis', animate=True)
 
 #anim = FuncAnimation(fig, update2, frames=num_frames, interval=200, blit=True)
-anim = FuncAnimation(fig, update3, frames=prob, interval=200, repeat_delay=200, blit=True,
-        fargs=(G, ax))
+#anim = FuncAnimation(fig, update3, frames=prob, interval=200, repeat_delay=200, blit=True,
+#        fargs=(G, ax))
+anim = FuncAnimation(fig, update4, frames=prob, interval=200, repeat_delay=200, blit=True,
+        init_func=init_func)
 
 plt.tight_layout()
 anim.save('anim.gif')
