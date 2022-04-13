@@ -136,6 +136,9 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
             if show_plot:
                 plt.show()
 
+            #TODO: add return
+            return None
+
     else:
         fig, ax = ConfigureFigure()
         anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
@@ -146,6 +149,8 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
             anim.save(filename_prefix + '.gif')
         if show_plot:
             plt.show()
+
+        return anim
 
 def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
 
@@ -179,7 +184,7 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
 
 
 #TODO: set figure size according to graphdimension
-def ConfigureFigure(fig_width=16, fig_height=9):
+def ConfigureFigure(fig_width=10, fig_height=8):
     fig = plt.figure(figsize=(fig_width, fig_height))
     ax = plt.gca()
     return fig, ax
