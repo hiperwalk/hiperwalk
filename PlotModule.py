@@ -143,6 +143,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
                 fargs=(G, ax, min_node_size, max_node_size, kwargs),
                 interval=200, repeat_delay=200, blit=True)
 
+        plt.tight_layout()
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
         if show_plot:
@@ -155,7 +156,7 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
     #UpdateNodes may create kwargs['node_size']
     UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
 
-    nodes, _, _ = nx_draw(G, ax=ax,
+    nodes, _, labels = nx_draw(G, ax=ax,
             node_size = kwargs['node_size'] if static_node_size else kwargs.pop('node_size'),
             **kwargs)
     #note: nx.draw_networkx_labels dramatically increases plotting time
@@ -174,7 +175,8 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
         print("DrawFigure: " + str(end - start) +'s')
         start = end
 
-    return nodes,
+    labels = list(labels.values())
+    return [nodes] + labels
     #return nodes, #edges #(labels[0], labels[1])
 
 
