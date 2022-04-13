@@ -143,7 +143,6 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
                 fargs=(G, ax, min_node_size, max_node_size, kwargs),
                 interval=200, repeat_delay=200, blit=True)
 
-        plt.tight_layout()
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
         if show_plot:
