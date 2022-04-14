@@ -89,6 +89,12 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 #   if animate is True, the animation will be saved in a gif file, e.g. filename_prefix.gif;
 #   if animate is False, saves a .png file for each of the probabilities,
 #   e.g. filename_prefix-1.png, filename_prefix-2.png, etc.
+#interval: int (kwargs). Interval between frames case animate=True,
+#   check matplotlib.animation.FuncAnimation for more details.
+#   If interval is set and animate=False, an exception will be thrown
+#repeat_delay: int (kwargs). Delay before repeating the animation from the start
+#   (the duration is summed up with interval). Check matplotlib.animation.FuncAnimation for details.
+#   If repeat_delay is set and animate=False, an exception will be thrown
 #For detailed info about **kwargs check networkx's documentation for
 #draw_networkx, draw_networkx_nodes, drawnetworkx_edges, etc.
 #Here, a few useful optional keywords are listed
@@ -140,10 +146,12 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
             return None
 
     else:
+        interval = kwargs.pop('interval') if 'interval' in kwargs else 200
+        repeat_delay = kwargs.pop('repeat_delay') if 'repeat_delay' in kwargs else 0
         fig, ax = ConfigureFigure()
         anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
                 fargs=(G, ax, min_node_size, max_node_size, kwargs),
-                interval=200, repeat_delay=200, blit=True)
+                interval=interval, repeat_delay=repeat_delay, blit=True)
 
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
