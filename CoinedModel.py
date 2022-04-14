@@ -7,9 +7,8 @@ from scipy.linalg import block_diag as scipy_block_diag
 import networkx
 from AuxiliaryFunctions import *
 from PyneblinaInterface import *
+from Constants import DEBUG
 
-#TODO: create module with global constants?
-DEBUG = False
 if DEBUG:
     from time import time as now
     from guppy import hpy #used to check memory usage

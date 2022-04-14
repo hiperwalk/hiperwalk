@@ -1,10 +1,6 @@
 from neblina import *
 from numpy import array as np_array
-
-#Declares data types according to neblina-core
-#TODO: make it so it is not hardcoded
-NEBLINA_FLOAT = 2
-NEBLINA_COMPLEX = 13 
+from Constants import NEBLINA_FLOAT, NEBLINA_COMPLEX
 
 # Transfers a vector (v) to Neblina-core, and moves it to the device to be used.
 # Returns a pointer to this vector (needed to call other pyneblina functions).
