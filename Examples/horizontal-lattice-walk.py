@@ -10,7 +10,7 @@ from neblina import init_engine, stop_engine
 init_engine(0) #TODO: transfer this to inferface (check if it is already initialised)
 
 #generating adjacency matrix of a 5x5 2d-horizontal-latiice
-grid_dim = 25
+grid_dim = 5
 G = nx.grid_graph(dim=(grid_dim, grid_dim), periodic=True)
 adj_matrix = nx.adjacency_matrix(G)
 del G #only the adjacency matrix is going to be used
@@ -50,7 +50,7 @@ num_steps = 9
 states = SimulateWalk(U, psi0, num_steps, save_interval=1, save_initial_state=True)
 prob = ProbabilityDistribution(adj_matrix, states)
 PlotProbabilityDistributionOnGraph(adj_matrix, prob, cmap='viridis', animate=True,
-        filename_prefix='animation')
+        filename_prefix='animation', interval=1000, repeat_delay=2000)
 print([(U**i @ psi0 == states[i]).all() for i in range(len(states))])
 
 #stops neblina-core
