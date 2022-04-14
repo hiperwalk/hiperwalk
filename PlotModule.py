@@ -4,8 +4,8 @@ from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from ModifiedNetworkXFunctions import *
+from Constants import DEBUG
 
-DEBUG = True
 if DEBUG:
     from time import time
 
@@ -200,6 +200,8 @@ def ConfigureColorbar(ax, kwargs):
     cbar.ax.tick_params(labelsize=14, length=7)
 
 
+
+#########################################################################################
+
 if DEBUG:
     start = time()
-
