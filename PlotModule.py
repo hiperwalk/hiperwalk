@@ -21,9 +21,9 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
     print(plot_type)
     print(kwargs.keys())
     if plot_type == 'graph':
-        valid_plots[plot_type](probabilities, **kwargs)
-    else:
         valid_plots[plot_type](kwargs.pop('adj_matrix'), probabilities, **kwargs)
+    else:
+        valid_plots[plot_type](probabilities, **kwargs)
 
 def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
     print("Bar")
