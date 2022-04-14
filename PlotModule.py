@@ -165,8 +165,8 @@ def PlotProbabilityDistributionOnGraph(adj_matrix, probabilities, animate=False,
             if show_plot:
                 plt.show()
 
-            #TODO: add return
-            return None
+        #TODO: add return
+        return None
 
     else:
         interval = kwargs.pop('interval') if 'interval' in kwargs else 200
