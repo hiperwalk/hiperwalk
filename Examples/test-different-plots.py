@@ -94,9 +94,10 @@ PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
 
 try:
     PlotProbabilityDistribution(probs, plot_type='graph')
-except:
-    pass
-    #print('Error: expecting adj_matrix in kwargs')
+except KeyError as err:
+    print("It was expected an " + str(err) + " entry in kwargs")
+
+print()
 
 try:
     PlotProbabilityDistribution(probs, plot_type='hist')
