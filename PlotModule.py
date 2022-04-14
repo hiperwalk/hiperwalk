@@ -9,6 +9,29 @@ from Constants import DEBUG
 if DEBUG:
     from time import time
 
+def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
+    valid_plots = {'bar': PlotProbabilityDistributionOnBars,
+            'line': PlotProbabilityDistributionOnLine,
+            'graph': PlotProbabilityDistributionOnGraph}
+
+    if plot_type not in valid_plots.keys():
+        raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
+                '. One of the following was expected: ' + str(valid_plots.keys()))
+
+    if plot_type == 'graph':
+        valid_plots[plot_type](probabilities, **kwargs)
+    else:
+        valid_plots[plot_type](kwargs['AdjMatrix'], probabilities, **kwargs)
+
+def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
+    print("Bar")
+    return None
+
+def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
+    print("Line")
+    return None
+
+
 #Configures static characteristics of nodes, i.e. attributes that will not change
 #during sequential plots or an animation.
 #exepcts kwargs as a reference to the dictionary **kwargs
