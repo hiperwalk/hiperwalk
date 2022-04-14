@@ -3,13 +3,17 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
+from numpy import arange
 from ModifiedNetworkXFunctions import *
 from Constants import DEBUG
 
 if DEBUG:
     from time import time
 
+plt.rcParams["figure.figsize"] = (10, 8)
+
 def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
+    #valid plots and the respective function pointers
     valid_plots = {'bar': PlotProbabilityDistributionOnBars,
             'line': PlotProbabilityDistributionOnLine,
             'graph': PlotProbabilityDistributionOnGraph}
@@ -18,18 +22,50 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
         raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
                 '. One of the following was expected: ' + str(list(valid_plots.keys())))
 
+    #preparing probabiliting to shape requested by called functions
+    if len(probabilities.shape) == 1:
+        probabilities = [probabilities]
+
     if plot_type == 'graph':
         valid_plots[plot_type](kwargs.pop('adj_matrix'), probabilities, **kwargs)
     else:
-        valid_plots[plot_type](probabilities, **kwargs)
+        #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
+        if not 'animate' in kwargs:
+            for i in range(len(probabilities)):
+                #TODO: set figure size according to graphdimension
+                ConfigurePlotFigure(probabilities.shape[1])
+                valid_plots[plot_type](probabilities[i], **kwargs)
+
+                ##TODO: show or save image (or both)
+                #if filename_prefix is not None:
+                #    #enumarating the plot
+                #    filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
+                #            if len(probabilities) > 1 else '' )
+                #    plt.savefig(filename_prefix + filename_suffix)
+                #    if not show_plot:
+                #        plt.close()
+                #if show_plot:
+                #    plt.show()
+                plt.tight_layout()
+                plt.show()
+
+            #TODO: add proper return
+            return None
 
 def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
-    print("Bar")
-    return None
+    plt.bar(arange(len(probabilities)), probabilities)
 
 def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
-    print("Line")
-    return None
+    plt.plot(arange(len(probabilities)), probabilities, marker='o')
+
+def ConfigurePlotFigure(num_vert):
+    from matplotlib.ticker import MaxNLocator
+    plt.xlabel("Vertex ID", size=18)
+    plt.ylabel("Probability", size=18)
+
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
+    plt.tick_params(length=7, labelsize=14)
 
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
@@ -145,13 +181,10 @@ def PlotProbabilityDistributionOnGraph(adj_matrix, probabilities, animate=False,
     #kwargs dictionary is updated by reference
     ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs)
 
-    if len(probabilities.shape) == 1:
-        probabilities = [probabilities]
-
     if not animate:
         for i in range(len(probabilities)):
             #TODO: set figure size according to graphdimension
-            fig, ax = ConfigureFigure()
+            fig, ax = ConfigureGraphFigure()
             DrawFigure(probabilities[i], G, ax, min_node_size, max_node_size, kwargs)
 
             #show or save image (or both)
@@ -171,7 +204,7 @@ def PlotProbabilityDistributionOnGraph(adj_matrix, probabilities, animate=False,
     else:
         interval = kwargs.pop('interval') if 'interval' in kwargs else 200
         repeat_delay = kwargs.pop('repeat_delay') if 'repeat_delay' in kwargs else 0
-        fig, ax = ConfigureFigure()
+        fig, ax = ConfigureGraphFigure()
         anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
                 fargs=(G, ax, min_node_size, max_node_size, kwargs),
                 interval=interval, repeat_delay=repeat_delay, blit=True)
@@ -215,7 +248,9 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
 
 
 #TODO: set figure size according to graphdimension
-def ConfigureFigure(fig_width=10, fig_height=8):
+def ConfigureGraphFigure(fig_width=plt.rcParams["figure.figsize"][0],
+        fig_height=plt.rcParams["figure.figsize"][1]):
+
     fig = plt.figure(figsize=(fig_width, fig_height))
     ax = plt.gca()
     return fig, ax
