@@ -16,10 +16,8 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
 
     if plot_type not in valid_plots.keys():
         raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
-                '. One of the following was expected: ' + str(valid_plots.keys()))
+                '. One of the following was expected: ' + str(list(valid_plots.keys())))
 
-    print(plot_type)
-    print(kwargs.keys())
     if plot_type == 'graph':
         valid_plots[plot_type](kwargs.pop('adj_matrix'), probabilities, **kwargs)
     else:
