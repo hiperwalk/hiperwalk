@@ -18,10 +18,12 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
         raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
                 '. One of the following was expected: ' + str(valid_plots.keys()))
 
+    print(plot_type)
+    print(kwargs.keys())
     if plot_type == 'graph':
         valid_plots[plot_type](probabilities, **kwargs)
     else:
-        valid_plots[plot_type](kwargs['AdjMatrix'], probabilities, **kwargs)
+        valid_plots[plot_type](kwargs.pop('adj_matrix'), probabilities, **kwargs)
 
 def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
     print("Bar")
@@ -128,7 +130,7 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 #   if ommited and plot_node_size is true, uses default size.
 #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
 #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
-def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
+def PlotProbabilityDistributionOnGraph(adj_matrix, probabilities, animate=False,
         show_plot=True, filename_prefix=None, **kwargs):
 
     #vmin and vmax are default keywords used by networkx_draw.
@@ -136,7 +138,7 @@ def PlotProbabilityDistributionOnGraph(AdjMatrix, probabilities, animate=False,
     kwargs['vmin'] = probabilities.min() #min_prob
     kwargs['vmax'] = probabilities.max() #max_prob
 
-    G = nx.from_numpy_matrix(AdjMatrix)
+    G = nx.from_numpy_matrix(adj_matrix)
 
     #removes invalid keys for networkx draw
     min_node_size = kwargs.pop('min_node_size') if 'min_node_size' in kwargs else None
