@@ -10,62 +10,94 @@ from Constants import DEBUG
 if DEBUG:
     from time import time
 
+#TODO: move to constants
 plt.rcParams["figure.figsize"] = (10, 8)
 
-def PlotProbabilityDistribution(probabilities, plot_type='bar', **kwargs):
-    #valid plots and the respective function pointers
-    valid_plots = {'bar': PlotProbabilityDistributionOnBars,
-            'line': PlotProbabilityDistributionOnLine,
-            'graph': PlotProbabilityDistributionOnGraph}
+def PlotProbabilityDistribution(probabilities, plot_type='bar',
+        animate=False, show_plot=True, filename_prefix=None,
+        **kwargs):
 
-    if plot_type not in valid_plots.keys():
+    valid_plot_types = ['bar', 'line', 'graph']
+
+    if plot_type not in valid_plot_types:
         raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
-                '. One of the following was expected: ' + str(list(valid_plots.keys())))
+                '. One of the following was expected: ' + str(valid_plot_types))
 
-    #preparing probabiliting to shape requested by called functions
+    #dictionaries for function pointers
+    #preconfiguration: executed once before the loop starts
+    preconfigs = {valid_plot_types[0]: lambda : None,
+            valid_plot_types[1]: lambda : None,
+            valid_plot_types[2]: lambda : None}
+    #configuration: executed every iteration before plotting
+    #expects return of fig, ax to be used for animations
+    configs = {valid_plot_types[0]: ConfigurePlotFigure,
+            valid_plot_types[1]: ConfigurePlotFigure,
+            valid_plot_types[2]: ConfigureGraphFigure}
+    #plot functions: code for plotting the graph accordingly
+    plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
+            valid_plot_types[1]: PlotProbabilityDistributionOnLine,
+            valid_plot_types[2]: DrawFigure} #change this function name
+
+    #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
         probabilities = [probabilities]
 
-    if plot_type == 'graph':
-        valid_plots[plot_type](kwargs.pop('adj_matrix'), probabilities, **kwargs)
-    else:
-        #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
-        if not 'animate' in kwargs:
-            for i in range(len(probabilities)):
-                #TODO: set figure size according to graphdimension
-                ConfigurePlotFigure(probabilities.shape[1])
-                valid_plots[plot_type](probabilities[i], **kwargs)
+    preconfigs[plot_type]()
 
-                ##TODO: show or save image (or both)
-                #if filename_prefix is not None:
-                #    #enumarating the plot
-                #    filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
-                #            if len(probabilities) > 1 else '' )
-                #    plt.savefig(filename_prefix + filename_suffix)
-                #    if not show_plot:
-                #        plt.close()
-                #if show_plot:
-                #    plt.show()
-                plt.tight_layout()
+    #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
+    if not 'animate' in kwargs:
+        for i in range(len(probabilities)):
+            #TODO: set figure size according to graph dimension
+            _, ax = configs[plot_type](probabilities.shape[1]) #TODO: check for kwargs
+            plot_funcs[plot_type](probabilities[i], **kwargs)
+
+            #saves or shows image (or both)
+            if filename_prefix is not None:
+                #enumarating the plot
+                filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
+                        if len(probabilities) > 1 else '' )
+                plt.savefig(filename_prefix + filename_suffix)
+                if not show_plot:
+                    plt.close()
+            if show_plot:
+                if 'cmap' not in kwargs:
+                    #adding cmap to ax messes up with tight_layout
+                    plt.tight_layout()
                 plt.show()
 
-            #TODO: add proper return
-            return None
+
+        #TODO: add proper return
+        return None
+
+    #else, animate:
+    #TODO: animation
+    print('TODO: animation')
+    return None
+
+
+def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
+        fig_height=plt.rcParams["figure.figsize"][1]):
+
+    from matplotlib.ticker import MaxNLocator
+    
+    fig = plt.figure(figsize=(fig_width, fig_height))
+    ax = plt.gca()
+
+    plt.xlabel("Vertex ID", size=18)
+    plt.ylabel("Probability", size=18)
+
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
+    plt.tick_params(length=7, labelsize=14)
+
+    return fig, ax
+
 
 def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
     plt.bar(arange(len(probabilities)), probabilities)
 
+
 def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
     plt.plot(arange(len(probabilities)), probabilities, marker='o')
-
-def ConfigurePlotFigure(num_vert):
-    from matplotlib.ticker import MaxNLocator
-    plt.xlabel("Vertex ID", size=18)
-    plt.ylabel("Probability", size=18)
-
-    ax = plt.gca()
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
-    plt.tick_params(length=7, labelsize=14)
 
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
@@ -247,8 +279,8 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
     #return nodes, #edges #(labels[0], labels[1])
 
 
-#TODO: set figure size according to graphdimension
-def ConfigureGraphFigure(fig_width=plt.rcParams["figure.figsize"][0],
+#TODO: set figure size according to graph dimension
+def ConfigureGraphFigure(num_vert=None, fig_width=plt.rcParams["figure.figsize"][0],
         fig_height=plt.rcParams["figure.figsize"][1]):
 
     fig = plt.figure(figsize=(fig_width, fig_height))
