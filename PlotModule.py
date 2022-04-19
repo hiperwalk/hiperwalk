@@ -25,9 +25,9 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
     #dictionaries for function pointers
     #preconfiguration: executed once before the loop starts
-    preconfigs = {valid_plot_types[0]: lambda : None,
-            valid_plot_types[1]: lambda : None,
-            valid_plot_types[2]: lambda : None}
+    preconfigs = {valid_plot_types[0]: lambda *args : None,
+            valid_plot_types[1]: lambda *args : None,
+            valid_plot_types[2]: PreconfigureGraphPlot}
     #configuration: executed every iteration before plotting
     #expects return of fig, ax to be used for animations
     configs = {valid_plot_types[0]: ConfigurePlotFigure,
@@ -36,13 +36,14 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     #plot functions: code for plotting the graph accordingly
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
-            valid_plot_types[2]: DrawFigure} #change this function name
+            valid_plot_types[2]: DrawFigure} #TODO: change this function name
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
         probabilities = [probabilities]
 
-    preconfigs[plot_type]()
+    #passes kwargs by reference to be updated accordingly
+    preconfigs[plot_type](probabilities, kwargs)
 
     #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
     if not 'animate' in kwargs:
@@ -74,6 +75,25 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     print('TODO: animation')
     return None
 
+
+#kwargs passed by reference
+def PreconfigureGraphPlot(probabilities, kwargs):
+    #TODO: nonstatic vmin and vmax
+    #vmin and vmax are default keywords used by networkx_draw.
+    #if an invalid keyword is passed to nx.draw(), it does not execute
+    kwargs['vmin'] = probabilities.min() #min_prob
+    kwargs['vmax'] = probabilities.max() #max_prob
+
+    if 'graph' not in kwargs:
+        kwargs['graph'] = nx.from_numpy_matrix( kwargs.pop('adj_matrix') )
+
+    #removes invalid keys for networkx draw
+    min_node_size = kwargs.pop('min_node_size') if 'min_node_size' in kwargs else None
+    max_node_size = kwargs.pop('max_node_size') if 'max_node_size' in kwargs else None
+    #setting static kwargs for plotting
+    #kwargs dictionary is updated by reference
+    #TODO: change ConfigureNodes parameters (remove G and use information from kwargs)
+    ConfigureNodes(kwargs['graph'], probabilities, min_node_size, max_node_size, kwargs)
 
 def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
         fig_height=plt.rcParams["figure.figsize"][1]):
