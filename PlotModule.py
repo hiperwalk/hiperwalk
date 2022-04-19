@@ -113,11 +113,13 @@ def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
 
 
 def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
-    plt.bar(arange(len(probabilities)), probabilities)
+    plt.bar(arange(len(probabilities)), probabilities, **kwargs)
 
 
 def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
-    plt.plot(arange(len(probabilities)), probabilities, marker='o')
+    if 'marker' not in kwargs:
+        kwargs['marker'] = 'o'
+    plt.plot(arange(len(probabilities)), probabilities, **kwargs)
 
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
