@@ -8,7 +8,6 @@ from PlotModule import *
 grid_dim = 5
 G = nx.grid_graph(dim=(grid_dim, grid_dim), periodic=True)
 adj_matrix = nx.adjacency_matrix(G)
-del G #only the adjacency matrix is going to be used
 
 #pre-computed probabilities
 probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+00,
@@ -84,15 +83,24 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 
 
 probs = probs[0:3]
-#bar plot
-PlotProbabilityDistribution(probs)
+##bar plot
+#PlotProbabilityDistribution(probs)
+#
+##line plot
+#PlotProbabilityDistribution(probs, plot_type='line')
+#
+##graph plot
+#PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
 
-#line plot
-PlotProbabilityDistribution(probs, plot_type='line')
+#graph plot with colors and fixed node size
+PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix,
+        node_size=500, cmap='viridis')
 
-#graph plot
-PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
+#graph plot with colors and changing node size
+PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix, cmap='viridis',
+        graph=G)
 
+#testing if error is raised
 try:
     PlotProbabilityDistribution(probs, plot_type='graph')
 except KeyError as err:
@@ -100,10 +108,10 @@ except KeyError as err:
 
 print()
 
+#testing if error is raised
 try:
     PlotProbabilityDistribution(probs, plot_type='hist')
 except ValueError as err:
     print(err)
 else:
     print('Unexpected exception raised')
-
