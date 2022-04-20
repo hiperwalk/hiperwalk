@@ -46,10 +46,13 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     preconfigs[plot_type](probabilities, kwargs)
 
     #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
-    if not 'animate' in kwargs:
+    if not animate:
+
         for i in range(len(probabilities)):
             #TODO: set figure size according to graph dimension
-            _, ax = configs[plot_type](probabilities.shape[1]) #TODO: check for kwargs
+            #TODO: check for kwargs
+            _, ax = configs[plot_type](probabilities.shape[1]) 
+
             plot_funcs[plot_type](probabilities[i], ax, **kwargs)
 
             #saves or shows image (or both)
@@ -101,8 +104,6 @@ def PreconfigureGraphPlot(probabilities, kwargs):
 
 def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
         fig_height=plt.rcParams["figure.figsize"][1]):
-
-    from matplotlib.ticker import MaxNLocator
     
     fig = plt.figure(figsize=(fig_width, fig_height))
     ax = plt.gca()
@@ -110,7 +111,6 @@ def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
     plt.xlabel("Vertex ID", size=18)
     plt.ylabel("Probability", size=18)
 
-    ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
     plt.tick_params(length=7, labelsize=14)
 
     return fig, ax
@@ -119,6 +119,23 @@ def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
 def PlotProbabilityDistributionOnBars(probabilities, ax, **kwargs):
     #ax is not being used, but it may be needed in future versions
     plt.bar(arange(len(probabilities)), probabilities, **kwargs)
+    #ax.set_xticks(arange(len(probabilities)), labels=arange(1, len(probabilities) + 1))
+    #ax.set_xticks([0, 1, 2], labels=['a', 'b', 'c'])
+
+    if 'nodes_labels' in kwargs:
+        labels = kwargs['node_labels']
+        ax.set_xticks(list(labels.keys()), list(labels.values()))
+    else:
+        from matplotlib.ticker import MaxNLocator
+
+        num_vert = len(probabilities)
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
+        if 'graph' in kwargs:
+            loc = ax.xaxis.get_major_locator()
+            ind = loc()
+            print(ind)
+            nodes = list(kwargs['graph'].nodes())
+            ax.set_xticks(ind, [nodes[i] for i in ind if i >=0 and i < num_vert])
 
 
 def PlotProbabilityDistributionOnLine(probabilities, ax, **kwargs):
@@ -334,7 +351,7 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
 
 #TODO: set figure size according to graph dimension
 def ConfigureGraphFigure(num_vert=None, fig_width=plt.rcParams["figure.figsize"][0],
-        fig_height=plt.rcParams["figure.figsize"][1]):
+        fig_height=plt.rcParams["figure.figsize"][1], **kwargs):
 
     fig = plt.figure(figsize=(fig_width, fig_height))
     ax = plt.gca()

@@ -82,15 +82,17 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
     5.98144531e-03]])
 
 
-probs = probs[0:3]
-##bar plot
-#PlotProbabilityDistribution(probs)
-#
-##line plot
-#PlotProbabilityDistribution(probs, plot_type='line')
-#
-##graph plot
-#PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
+probs = probs[0:1]
+#bar plot
+PlotProbabilityDistribution(probs)
+PlotProbabilityDistribution(probs, graph=G)
+PlotProbabilityDistribution(probs, graph=G)
+
+#line plot
+PlotProbabilityDistribution(probs, plot_type='line')
+
+#graph plot
+PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
 
 #graph plot with colors and fixed node size
 PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix,
