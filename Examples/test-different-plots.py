@@ -2,7 +2,6 @@ import numpy as np
 import networkx as nx
 import sys
 sys.path.append('..')
-from CoinedModel import *
 from PlotModule import *
 
 #generating adjacency matrix of a 5x5 2d-horizontal-latiice
@@ -83,6 +82,8 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
     5.98144531e-03, 5.28335571e-03, 3.21388245e-02, 5.28335571e-03,
     5.98144531e-03]])
 
+
+probs = probs[0:3]
 #bar plot
 PlotProbabilityDistribution(probs)
 

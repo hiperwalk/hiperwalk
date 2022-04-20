@@ -36,7 +36,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     #plot functions: code for plotting the graph accordingly
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
-            valid_plot_types[2]: DrawFigure} #TODO: change this function name
+            valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph}
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -50,7 +50,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
         for i in range(len(probabilities)):
             #TODO: set figure size according to graph dimension
             _, ax = configs[plot_type](probabilities.shape[1]) #TODO: check for kwargs
-            plot_funcs[plot_type](probabilities[i], **kwargs)
+            plot_funcs[plot_type](probabilities[i], ax, **kwargs)
 
             #saves or shows image (or both)
             if filename_prefix is not None:
@@ -87,13 +87,15 @@ def PreconfigureGraphPlot(probabilities, kwargs):
     if 'graph' not in kwargs:
         kwargs['graph'] = nx.from_numpy_matrix( kwargs.pop('adj_matrix') )
 
-    #removes invalid keys for networkx draw
-    min_node_size = kwargs.pop('min_node_size') if 'min_node_size' in kwargs else None
-    max_node_size = kwargs.pop('max_node_size') if 'max_node_size' in kwargs else None
+    if 'min_node_size' not in kwargs:
+        kwargs['min_node_size'] = None
+    if 'max_node_size' not in kwargs:
+        kwargs['max_node_size'] = None
+
     #setting static kwargs for plotting
     #kwargs dictionary is updated by reference
     #TODO: change ConfigureNodes parameters (remove G and use information from kwargs)
-    ConfigureNodes(kwargs['graph'], probabilities, min_node_size, max_node_size, kwargs)
+    ConfigureNodes(kwargs['graph'], probabilities, kwargs)
 
 def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
         fig_height=plt.rcParams["figure.figsize"][1]):
@@ -112,15 +114,42 @@ def ConfigurePlotFigure(num_vert, fig_width=plt.rcParams["figure.figsize"][0],
     return fig, ax
 
 
-def PlotProbabilityDistributionOnBars(probabilities, **kwargs):
+def PlotProbabilityDistributionOnBars(probabilities, ax, **kwargs):
+    #ax is not being used, but it may be needed in future versions
     plt.bar(arange(len(probabilities)), probabilities, **kwargs)
 
 
-def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
+def PlotProbabilityDistributionOnLine(probabilities, ax, **kwargs):
+    #ax is not being used, but it may be needed in future versions
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
     plt.plot(arange(len(probabilities)), probabilities, **kwargs)
 
+
+def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
+    ax.clear()
+
+    #UpdateNodes may create kwargs['node_size']
+    #min_node_size and max_node_size are not valid keys for nx_draw kwargs
+    UpdateNodes(probabilities, kwargs.pop('min_node_size'), kwargs.pop('max_node_size'), kwargs)
+
+    nodes, _, labels = nx_draw(kwargs.pop('graph'), ax=ax,
+            node_size = kwargs.pop('node_size'),
+            **kwargs)
+    #note: nx.draw_networkx_labels dramatically increases plotting time
+
+    #setting and drawing colorbar
+    if 'cmap' in kwargs:
+        ConfigureColorbar(ax, kwargs)
+
+    if DEBUG:
+        global start
+        end = time()
+        print("DrawFigure: " + str(end - start) +'s')
+        start = end
+
+    labels = list(labels.values())
+    return [nodes] + labels
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
 #during sequential plots or an animation.
@@ -128,7 +157,7 @@ def PlotProbabilityDistributionOnLine(probabilities, **kwargs):
 #min_prob and max_prob send separately to give the possibility
 #of min_prob and max_prob of the whole walk (instead of a single step)
 #Expects kwargs['vmin'] = min_prob and kwargs['vmax'] = max_prob
-def ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs):
+def ConfigureNodes(G, probabilities, kwargs):
     #setting colormap related attributes
     if 'cmap' in kwargs:
         if kwargs['cmap'] == 'default':
@@ -176,7 +205,7 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
                 lambda x: a*x + min_node_size, probabilities
             ))
 
-
+"""
 #TODO: probabilities expects numpy array or matrix
 #TODO: use graphviz to draw as noted by networkx's documentation:
 #TODO: if that's the case, try to optimize plot and animations before changing to use graphviz
@@ -299,7 +328,7 @@ def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
     labels = list(labels.values())
     return [nodes] + labels
     #return nodes, #edges #(labels[0], labels[1])
-
+"""
 
 #TODO: set figure size according to graph dimension
 def ConfigureGraphFigure(num_vert=None, fig_width=plt.rcParams["figure.figsize"][0],
