@@ -86,6 +86,8 @@ def PreconfigureGraphPlot(probabilities, kwargs):
 
     if 'graph' not in kwargs:
         kwargs['graph'] = nx.from_numpy_matrix( kwargs.pop('adj_matrix') )
+    if 'adj_matrix' in kwargs: #then kwargs['graph'] is set and the adj_matrix can be disregarded
+        kwargs.pop('adj_matrix')
 
     if 'min_node_size' not in kwargs:
         kwargs['min_node_size'] = None
