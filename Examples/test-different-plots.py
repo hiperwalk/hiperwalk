@@ -84,9 +84,11 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 
 probs = probs[0:1]
 #bar plot
-PlotProbabilityDistribution(probs)
-PlotProbabilityDistribution(probs, graph=G)
-PlotProbabilityDistribution(probs, graph=G)
+#PlotProbabilityDistribution(probs)
+#PlotProbabilityDistribution(probs, graph=G)
+#PlotProbabilityDistribution(probs, nodes_labels={0: 'a', 5: 'b'})
+PlotProbabilityDistribution(probs, graph=G, nodes_labels=
+        {(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
 
 #line plot
 PlotProbabilityDistribution(probs, plot_type='line')
