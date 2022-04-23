@@ -83,26 +83,26 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 
 
 probs = probs[0:1]
-#bar plot
+##bar plot
 #PlotProbabilityDistribution(probs)
 #PlotProbabilityDistribution(probs, graph=G)
-#PlotProbabilityDistribution(probs, nodes_labels={0: 'a', 5: 'b'})
-PlotProbabilityDistribution(probs, graph=G, nodes_labels=
-        {(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
-
-#line plot
-PlotProbabilityDistribution(probs, plot_type='line')
-
-#graph plot
-PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
-
-#graph plot with colors and fixed node size
-PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix,
-        node_size=500, cmap='viridis')
+#PlotProbabilityDistribution(probs, labels={0: 'a', 5: 'b'})
+#PlotProbabilityDistribution(probs, graph=G, labels=
+#        {(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
+#
+##line plot
+#PlotProbabilityDistribution(probs, plot_type='line')
+#
+##graph plot
+#PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
+#
+##graph plot with colors and fixed node size
+#PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix,
+#        node_size=500, cmap='viridis')
 
 #graph plot with colors and changing node size
-PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix, cmap='viridis',
-        graph=G)
+PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix, cmap='default',
+        graph=G, labels={(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
 
 #testing if error is raised
 try:

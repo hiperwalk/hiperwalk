@@ -132,34 +132,34 @@ def ConfigureGraphFigure(num_vert=None, fig_width=None, fig_height=None):
     return ConfigureFigure(num_vert, fig_width, fig_height)
 
 
-def PlotProbabilityDistributionOnBars(probabilities, ax, nodes_labels=None,
+def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
         graph=None, **kwargs):
     #ax is not being used, but it may be needed in future versions
     plt.bar(arange(len(probabilities)), probabilities, **kwargs)
     #ax.set_xticks(arange(len(probabilities)), labels=arange(1, len(probabilities) + 1))
     #ax.set_xticks([0, 1, 2], labels=['a', 'b', 'c'])
-    PosconfigurePlotFigure(ax, len(probabilities), nodes_labels, graph)
+    PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
 
 
-def PlotProbabilityDistributionOnLine(probabilities, ax, nodes_labels=None,
+def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
         graph=None, **kwargs):
     #ax is not being used, but it may be needed in future versions
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
     plt.plot(arange(len(probabilities)), probabilities, **kwargs)
 
-    PosconfigurePlotFigure(ax, len(probabilities), nodes_labels, graph)
+    PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
 
 
-def PosconfigurePlotFigure(ax, num_vert, nodes_labels=None, graph=None):
-    if nodes_labels is not None:
+def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None):
+    if labels is not None:
         if graph is None:
-            ax.set_xticks( list(nodes_labels.keys()), list(nodes_labels.values()) )
+            ax.set_xticks( list(labels.keys()), list(labels.values()) )
         else:
 
             nodes = list(graph.nodes())
-            nodes = {i : nodes_labels[ nodes[i] ] for i in range(num_vert)
-                        if nodes[i] in nodes_labels}
+            nodes = {i : labels[ nodes[i] ] for i in range(num_vert)
+                        if nodes[i] in labels}
 
             ax.set_xticks( list(nodes.keys()), list(nodes.values()) )
 
