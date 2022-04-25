@@ -134,16 +134,14 @@ def ConfigureGraphFigure(num_vert=None, fig_width=None, fig_height=None):
 
 def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
         graph=None, **kwargs):
-    #ax is not being used, but it may be needed in future versions
+
     plt.bar(arange(len(probabilities)), probabilities, **kwargs)
-    #ax.set_xticks(arange(len(probabilities)), labels=arange(1, len(probabilities) + 1))
-    #ax.set_xticks([0, 1, 2], labels=['a', 'b', 'c'])
     PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
 
 
 def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
         graph=None, **kwargs):
-    #ax is not being used, but it may be needed in future versions
+
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
     plt.plot(arange(len(probabilities)), probabilities, **kwargs)
