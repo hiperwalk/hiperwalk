@@ -37,6 +37,10 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
             valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph}
+    #animate functions: code for invoking update funcanimation
+    anim_funcs = {valid_plot_types[0]: UpdateBarsAnimation,
+            valid_plot_types[1]: UpdateLineAnimation,
+            valid_plot_types[2]: None}
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -79,10 +83,11 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     fig, ax = configs[plot_type](probabilities.shape[1]) 
     artists = plot_funcs[plot_type](probabilities[0], ax, **kwargs)
 
-
-    anim  = FuncAnimation(fig, UpdateLineAnimation, frames=probabilities,
+    anim  = FuncAnimation(fig, anim_funcs[plot_type], frames=probabilities,
             fargs=( [artists[i] for i in range(len(artists))] ),
             blit = True) #interval=interval, repeat_delay=repeat_delay)
+
+    plt.tight_layout()
 
     if filename_prefix is not None:
         anim.save(filename_prefix + '.gif')
@@ -162,8 +167,10 @@ def ConfigureGraphFigure(num_vert=None, fig_width=None, fig_height=None):
 def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
         graph=None, **kwargs):
 
-    plt.bar(arange(len(probabilities)), probabilities, **kwargs)
+    bars = plt.bar(arange(len(probabilities)), probabilities, **kwargs)
     PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
+
+    return bars, #used for animation
 
 
 def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
@@ -177,6 +184,12 @@ def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
 
     #used for animation
     return line,
+
+def UpdateBarsAnimation(probabilities, bars):
+    for i in range(len(probabilities)):
+        bars[i].set_height(probabilities[i])
+
+    return bars
 
 def UpdateLineAnimation(probabilities, line):
     line.set_ydata(probabilities)
