@@ -90,7 +90,8 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 #        {(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
 
 #line plot
-PlotProbabilityDistribution(probs, plot_type='line', animate=True)
+#PlotProbabilityDistribution(probs, plot_type='line', animate=True)
+PlotProbabilityDistribution(probs, plot_type='bar', animate=True)
 
 ##graph plot
 #PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
