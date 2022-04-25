@@ -75,9 +75,36 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
         return None
 
     #else, animate:
-    #TODO: animation
-    print('TODO: animation')
-    return None
+    #initial plot
+    fig, ax = configs[plot_type](probabilities.shape[1]) 
+    artists = plot_funcs[plot_type](probabilities[0], ax, **kwargs)
+
+
+    anim  = FuncAnimation(fig, UpdateLineAnimation, frames=probabilities,
+            fargs=( [artists[i] for i in range(len(artists))] ),
+            blit = True) #interval=interval, repeat_delay=repeat_delay)
+
+    if filename_prefix is not None:
+        anim.save(filename_prefix + '.gif')
+    if show_plot:
+        plt.show()
+
+    #if 'cmap' not in kwargs:
+    #    #adding cmap to ax messes up with tight_layout
+    #    plt.tight_layout()
+
+    ##saves or shows image (or both)
+    #if filename_prefix is not None:
+    #    #enumarating the plot
+    #    filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
+    #            if len(probabilities) > 1 else '' )
+    #    plt.savefig(filename_prefix + filename_suffix)
+    #    if not show_plot:
+    #        plt.close()
+    #if show_plot:
+    #    plt.show()
+
+    return anim
 
 
 #kwargs passed by reference
@@ -144,9 +171,16 @@ def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
 
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
-    plt.plot(arange(len(probabilities)), probabilities, **kwargs)
+    line, = plt.plot(arange(len(probabilities)), probabilities, **kwargs)
 
     PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
+
+    #used for animation
+    return line,
+
+def UpdateLineAnimation(probabilities, line):
+    line.set_ydata(probabilities)
+    return line,
 
 
 def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None):
