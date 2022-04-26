@@ -121,5 +121,6 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 #    print('Unexpected exception raised')
 
 #testing non-fixed probabilities
-#PlotProbabilityDistribution(probs, plot_type='bar')
-PlotProbabilityDistribution(probs, plot_type='bar', fixed_probabilities=False)
+#PlotProbabilityDistribution(probs, plot_type='bar', fixed_probabilities=False)
+PlotProbabilityDistribution(probs, plot_type='graph', graph=G, cmap='default',
+        fixed_probabilities=False)

@@ -106,7 +106,7 @@ def PreconfigureGraphPlot(probabilities, kwargs):
     #vmin and vmax are default keywords used by networkx_draw.
     #if an invalid keyword is passed to nx.draw(), it does not execute
     if 'fixed_probabilities' not in kwargs or kwargs['fixed_probabilities']:
-        kwargs['vmin'] = probabilities.min() #min_prob
+        kwargs['vmin'] = 0 #min_prob
         kwargs['vmax'] = probabilities.max() #max_prob
 
     if 'graph' not in kwargs:
@@ -301,7 +301,12 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
             min_node_size = 300
         if max_node_size is None:
             max_node_size = 3000
+
     if min_node_size is not None and max_node_size is not None:
+        if 'fixed_probabilities' in kwargs and not kwargs.pop('fixed_probabilities'):
+            kwargs['vmin'] = 0
+            kwargs['vmax'] = probabilities.max()
+
         #calculating size of each node acording to probability 
         #as a function f(x) = ax + b where b = min_size and
         #max_size = a*(max_prob-min_prob) + min_size
