@@ -58,5 +58,6 @@ target/
 *.swp
 
 # Output files
+*.png
 *.gif
 *.mp4
