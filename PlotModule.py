@@ -95,21 +95,6 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     if show_plot:
         plt.show()
 
-    #if 'cmap' not in kwargs:
-    #    #adding cmap to ax messes up with tight_layout
-    #    plt.tight_layout()
-
-    ##saves or shows image (or both)
-    #if filename_prefix is not None:
-    #    #enumarating the plot
-    #    filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
-    #            if len(probabilities) > 1 else '' )
-    #    plt.savefig(filename_prefix + filename_suffix)
-    #    if not show_plot:
-    #        plt.close()
-    #if show_plot:
-    #    plt.show()
-
     return anim
 
 
@@ -174,7 +159,8 @@ def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     return bars, #used for animation
 
 
-def UpdateBarsAnimation(probabilities, bars):
+def UpdateBarsAnimation(probabilities, artists, kwargs):
+    bars = artists[0]
     for i in range(len(probabilities)):
         bars[i].set_height(probabilities[i])
 
@@ -192,7 +178,8 @@ def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
     #used for animation
     return line,
 
-def UpdateLineAnimation(probabilities, line):
+def UpdateLineAnimation(probabilities, artists, kwargs):
+    line = artists[0]
     line.set_ydata(probabilities)
     return line,
 
@@ -224,8 +211,6 @@ def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None):
 
 
 def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
-    ax.clear()
-
     #UpdateNodes may create kwargs['node_size']
     #min_node_size and max_node_size are not valid keys for nx_draw kwargs
     UpdateNodes(probabilities, kwargs.pop('min_node_size'), kwargs.pop('max_node_size'), kwargs)
@@ -257,7 +242,7 @@ def UpdateGraphAnimation(probabilities, artists, kwargs):
     nodes.set_sizes(kwargs['node_size'] if fixed_size else kwargs.pop('node_size'))
 
     if 'cmap' in kwargs:
-        nodes.set_array(probabilities)
+        nodes.set_array(kwargs['node_color'])
 
     #TODO: add transparency
     #nodes.set_alpha(probabilities)
