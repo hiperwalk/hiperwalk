@@ -82,7 +82,7 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
     5.98144531e-03]])
 
 
-probs = probs[0:1]
+#probs = probs[0:3]
 ##bar plot
 #PlotProbabilityDistribution(probs)
 #PlotProbabilityDistribution(probs, graph=G)
@@ -100,22 +100,26 @@ probs = probs[0:1]
 #PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix,
 #        node_size=500, cmap='viridis')
 
-#graph plot with colors and changing node size
-PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix, cmap='default',
-        graph=G, labels={(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
+##graph plot with colors and changing node size
+#PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix, cmap='default',
+#        graph=G, labels={(0, 0): 'bottom left', (2, 2): 'middle', (0, 4): 'bottom right'})
 
-#testing if error is raised
-try:
-    PlotProbabilityDistribution(probs, plot_type='graph')
-except KeyError as err:
-    print("It was expected an " + str(err) + " entry in kwargs")
+##testing if error is raised
+#try:
+#    PlotProbabilityDistribution(probs, plot_type='graph')
+#except KeyError as err:
+#    print("It was expected an " + str(err) + " entry in kwargs")
+#
+#print()
+#
+##testing if error is raised
+#try:
+#    PlotProbabilityDistribution(probs, plot_type='hist')
+#except ValueError as err:
+#    print(err)
+#else:
+#    print('Unexpected exception raised')
 
-print()
-
-#testing if error is raised
-try:
-    PlotProbabilityDistribution(probs, plot_type='hist')
-except ValueError as err:
-    print(err)
-else:
-    print('Unexpected exception raised')
+#testing non-fixed probabilities
+#PlotProbabilityDistribution(probs, plot_type='bar')
+PlotProbabilityDistribution(probs, plot_type='bar', fixed_probabilities=False)

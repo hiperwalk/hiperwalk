@@ -13,6 +13,7 @@ if DEBUG:
 #TODO: move to constants
 plt.rcParams["figure.figsize"] = (10, 8)
 
+#TODO: add documentation for 'fixed_probabilities' kwarg
 def PlotProbabilityDistribution(probabilities, plot_type='bar',
         animate=False, show_plot=True, filename_prefix=None,
         interval=250, repeat_delay=250, **kwargs):
@@ -25,8 +26,8 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
     #dictionaries for function pointers
     #preconfiguration: executed once before the loop starts
-    preconfigs = {valid_plot_types[0]: lambda *args : None,
-            valid_plot_types[1]: lambda *args : None,
+    preconfigs = {valid_plot_types[0]: PreconfigurePlot,
+            valid_plot_types[1]: PreconfigurePlot,
             valid_plot_types[2]: PreconfigureGraphPlot}
     #configuration: executed every iteration before plotting
     #expects return of fig, ax to be used for animations
@@ -94,14 +95,19 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
     return anim
 
+def PreconfigurePlot(probabilities, kwargs):
+
+    if 'fixed_probabilities' not in kwargs or kwargs.pop('fixed_probabilities'):
+        kwargs['min_prob'] = 0
+        kwargs['max_prob'] = probabilities.max()
 
 #kwargs passed by reference
 def PreconfigureGraphPlot(probabilities, kwargs):
-    #TODO: nonstatic vmin and vmax
     #vmin and vmax are default keywords used by networkx_draw.
     #if an invalid keyword is passed to nx.draw(), it does not execute
-    kwargs['vmin'] = probabilities.min() #min_prob
-    kwargs['vmax'] = probabilities.max() #max_prob
+    if 'fixed_probabilities' not in kwargs or kwargs['fixed_probabilities']:
+        kwargs['vmin'] = probabilities.min() #min_prob
+        kwargs['vmax'] = probabilities.max() #max_prob
 
     if 'graph' not in kwargs:
         kwargs['graph'] = nx.from_numpy_matrix( kwargs.pop('adj_matrix') )
@@ -148,10 +154,10 @@ def ConfigureGraphFigure(num_vert=None, fig_width=None, fig_height=None):
 
 
 def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
-        graph=None, **kwargs):
+        graph=None, min_prob=None, max_prob=None, **kwargs):
 
     bars = plt.bar(arange(len(probabilities)), probabilities, **kwargs)
-    PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
+    PosconfigurePlotFigure(ax, len(probabilities), labels, graph, min_prob, max_prob)
 
     return bars, #used for animation
 
@@ -164,13 +170,13 @@ def UpdateBarsAnimation(probabilities, artists, kwargs):
     return bars
 
 def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
-        graph=None, **kwargs):
+        graph=None, min_prob=None, max_prob=None, **kwargs):
 
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
     line, = plt.plot(arange(len(probabilities)), probabilities, **kwargs)
 
-    PosconfigurePlotFigure(ax, len(probabilities), labels, graph)
+    PosconfigurePlotFigure(ax, len(probabilities), labels, graph, min_prob, max_prob)
 
     #used for animation
     return line,
@@ -181,7 +187,7 @@ def UpdateLineAnimation(probabilities, artists, kwargs):
     return line,
 
 
-def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None):
+def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None, min_prob=None, max_prob=None):
     if labels is not None:
         if graph is None:
             ax.set_xticks( list(labels.keys()), list(labels.values()) )
@@ -205,6 +211,9 @@ def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None):
             nodes = list(graph.nodes())
 
             ax.set_xticks(ind, [nodes[i] for i in ind])
+
+    if min_prob is not None and max_prob is not None:
+        plt.ylim((min_prob, max_prob))
 
 
 def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
