@@ -40,7 +40,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     #animate functions: code for invoking update funcanimation
     anim_funcs = {valid_plot_types[0]: UpdateBarsAnimation,
             valid_plot_types[1]: UpdateLineAnimation,
-            valid_plot_types[2]: None}
+            valid_plot_types[2]: UpdateGraphAnimation}
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -84,8 +84,9 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     artists = plot_funcs[plot_type](probabilities[0], ax, **kwargs)
 
     anim  = FuncAnimation(fig, anim_funcs[plot_type], frames=probabilities,
-            fargs=( [artists[i] for i in range(len(artists))] ),
+            fargs=(artists, kwargs),
             blit = True) #interval=interval, repeat_delay=repeat_delay)
+            #fargs=( [artists[i] for i in range(len(artists))] ),
 
     plt.tight_layout()
 
@@ -173,6 +174,12 @@ def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     return bars, #used for animation
 
 
+def UpdateBarsAnimation(probabilities, bars):
+    for i in range(len(probabilities)):
+        bars[i].set_height(probabilities[i])
+
+    return bars
+
 def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
         graph=None, **kwargs):
 
@@ -184,12 +191,6 @@ def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
 
     #used for animation
     return line,
-
-def UpdateBarsAnimation(probabilities, bars):
-    for i in range(len(probabilities)):
-        bars[i].set_height(probabilities[i])
-
-    return bars
 
 def UpdateLineAnimation(probabilities, line):
     line.set_ydata(probabilities)
@@ -243,6 +244,23 @@ def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
         end = time()
         print("DrawFigure: " + str(end - start) +'s')
         start = end
+
+    return nodes, labels
+
+def UpdateGraphAnimation(probabilities, artists, kwargs):
+    nodes = artists[0]
+    labels = artists[1]
+
+    fixed_size = 'node_size' in kwargs
+    UpdateNodes(probabilities, kwargs['min_node_size'], kwargs['max_node_size'], kwargs)
+
+    nodes.set_sizes(kwargs['node_size'] if fixed_size else kwargs.pop('node_size'))
+
+    if 'cmap' in kwargs:
+        nodes.set_array(probabilities)
+
+    #TODO: add transparency
+    #nodes.set_alpha(probabilities)
 
     labels = list(labels.values())
     return [nodes] + labels
