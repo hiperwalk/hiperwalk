@@ -59,9 +59,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
             plot_funcs[plot_type](probabilities[i], ax, **kwargs)
 
-            if 'cmap' not in kwargs:
-                #adding cmap to ax messes up with tight_layout
-                plt.tight_layout()
+            plt.tight_layout()
 
             #saves or shows image (or both)
             if filename_prefix is not None:
