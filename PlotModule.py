@@ -15,7 +15,7 @@ plt.rcParams["figure.figsize"] = (10, 8)
 
 def PlotProbabilityDistribution(probabilities, plot_type='bar',
         animate=False, show_plot=True, filename_prefix=None,
-        **kwargs):
+        interval=250, repeat_delay=250, **kwargs):
 
     valid_plot_types = ['bar', 'line', 'graph']
 
@@ -84,9 +84,8 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     artists = plot_funcs[plot_type](probabilities[0], ax, **kwargs)
 
     anim  = FuncAnimation(fig, anim_funcs[plot_type], frames=probabilities,
-            fargs=(artists, kwargs),
-            blit = True) #interval=interval, repeat_delay=repeat_delay)
-            #fargs=( [artists[i] for i in range(len(artists))] ),
+            fargs=(artists, kwargs), blit=True,
+            interval=interval, repeat_delay=repeat_delay)
 
     plt.tight_layout()
 
