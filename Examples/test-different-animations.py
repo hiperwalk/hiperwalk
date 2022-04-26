@@ -91,10 +91,10 @@ probs = np.array([[0.00000000e+00, 0.00000000e+00, 0.00000000e+00, 0.00000000e+0
 
 #line plot
 PlotProbabilityDistribution(probs, plot_type='bar', animate=True, filename_prefix='bar_test',
-        graph=G)
+        graph=G, interval=500, repeat_delay=1000)
 PlotProbabilityDistribution(probs, plot_type='line', animate=True, filename_prefix="line_test")
 PlotProbabilityDistribution(probs, plot_type='graph', animate=True, graph=G,
-        cmap='viridis', filename_prefix="graph_test")
+        cmap='viridis', filename_prefix="graph_test", interval=1000, repeat_delay=0)
 
 ##graph plot
 #PlotProbabilityDistribution(probs, plot_type='graph', adj_matrix=adj_matrix)
