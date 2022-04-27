@@ -1,11 +1,13 @@
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+#from matplotlib.animation import FuncAnimation
+from matplotlib.animation import ArtistAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from numpy import arange
 from ModifiedNetworkXFunctions import *
 from Constants import DEBUG
+from PIL import Image
 
 if DEBUG:
     from time import time
@@ -14,6 +16,7 @@ if DEBUG:
 plt.rcParams["figure.figsize"] = (10, 8)
 
 #TODO: add documentation for 'fixed_probabilities' kwarg
+#TODO: add option for changing figsize and dpi
 def PlotProbabilityDistribution(probabilities, plot_type='bar',
         animate=False, show_plot=True, filename_prefix=None,
         interval=250, repeat_delay=250, **kwargs):
@@ -38,10 +41,6 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
             valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph}
-    #animate functions: code for invoking update funcanimation
-    anim_funcs = {valid_plot_types[0]: UpdateBarsAnimation,
-            valid_plot_types[1]: UpdateLineAnimation,
-            valid_plot_types[2]: UpdateGraphAnimation}
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -51,18 +50,20 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     preconfigs[plot_type](probabilities, kwargs)
 
     #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
-    if not animate:
 
-        for i in range(len(probabilities)):
-            #TODO: set figure size according to graph dimension
-            #TODO: check for kwargs
-            _, ax = configs[plot_type](probabilities.shape[1]) 
+    plots_as_imgs = []
 
-            plot_funcs[plot_type](probabilities[i], ax, **kwargs)
+    for i in range(len(probabilities)):
+        #TODO: set figure size according to graph dimension
+        #TODO: check for kwargs
+        fig, ax = configs[plot_type](probabilities.shape[1]) 
 
-            plt.tight_layout()
+        plot_funcs[plot_type](probabilities[i], ax, **kwargs)
 
-            #saves or shows image (or both)
+        plt.tight_layout()
+
+        #saves or shows image (or both)
+        if not animate:
             if filename_prefix is not None:
                 #enumarating the plot
                 filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
@@ -73,27 +74,44 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
             if show_plot:
                 plt.show()
 
+        else:
+            fig.canvas.draw()
+            img = Image.frombytes('RGB', fig.canvas.get_width_height(),
+                fig.canvas.tostring_rgb())
+            plots_as_imgs.append(img)
 
-        #TODO: add proper return
-        return None
+            plt.close()
 
-    #else, animate:
-    #initial plot
-    fig, ax = configs[plot_type](probabilities.shape[1]) 
-    artists = plot_funcs[plot_type](probabilities[0], ax, **kwargs)
+    if animate:
+        fig = plt.figure( figsize=(plt.rcParams["figure.figsize"][0],
+            plt.rcParams["figure.figsize"][1]) )
+        ax = plt.gca()
+        imgs_for_anim = []
 
-    anim  = FuncAnimation(fig, anim_funcs[plot_type], frames=probabilities,
-            fargs=(artists, kwargs), blit=True,
-            interval=interval, repeat_delay=repeat_delay)
+        while  plots_as_imgs!= []:
+            img = ax.imshow(plots_as_imgs.pop(0), animated=True)
+            imgs_for_anim.append([img])
 
-    plt.tight_layout()
+        #using ArtistAnimation to reuse the code from plot
+        #it would be more efficient to use FuncAnimation (as a previous version)
+        #but workarounds for updating colorbar ticks and y-axes were not found
+        #TODO: documentation: recommend saving gif and not showing for any animations
+        anim = ArtistAnimation(fig, imgs_for_anim,
+                interval=interval, repeat_delay=repeat_delay)
 
-    if filename_prefix is not None:
-        anim.save(filename_prefix + '.gif')
-    if show_plot:
-        plt.show()
+        plt.axis('off')
+        plt.tight_layout(pad=0)
+        if DEBUG:
+            #to check if no extra padding is being added
+            fig.patch.set_facecolor('red')
+        
+        if filename_prefix is not None:
+            anim.save(filename_prefix + '.gif')
+        if show_plot:
+            plt.show()
 
-    return anim
+    #TODO: add proper return
+    return None
 
 def PreconfigurePlot(probabilities, kwargs):
 
@@ -233,7 +251,7 @@ def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
     if DEBUG:
         global start
         end = time()
-        print("DrawFigure: " + str(end - start) +'s')
+        print("NewPlotProbabilityDistributionOnGraph: " + str(end - start) +'s')
         start = end
 
     return nodes, labels
