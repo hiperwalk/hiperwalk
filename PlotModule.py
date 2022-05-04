@@ -114,8 +114,10 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
         
         if filename_prefix is not None:
             anim.save(filename_prefix + '.gif')
+            plt.close()
         if show_plot:
-            plt.show()
+            from AnimationModule import ShowAnimation
+            ShowAnimation(None)
 
     #TODO: add proper return
     return None
