@@ -8,6 +8,18 @@ Currently, it is necessary to have
 Paulo Motta described on his blog the
 [installation steps for both neblina-core and pyneblina](https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/).
 
+# Python Libraries Dependencies
+- Matplotlib;
+- NetworkX;
+	- PIL;
+- NumPy;
+- Scipy;
+
+## Optional Libraries For Animations
+- PyGObject: backend for showing animations;
+- ImageMagick: for saving animated gifs;
+- ffmpeg: for saving movies.
+
 # TODO List
 - [ ] Update installation instructions
 - [X] Refactor Coined\_QW\_Adjacency\_Matrix-v2.ipynb
@@ -33,3 +45,5 @@ Paulo Motta described on his blog the
 	- [ ] Rename functions
 	- [ ] Remove definition from examples
 	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?
+- [ ] Give support for more backends to show animations
+- [ ] Matplotlib animation (show and save may be slow)
