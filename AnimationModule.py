@@ -31,10 +31,12 @@ def ShowAnimation(anim):
     window.connect("destroy", gtk.main_quit)
 
     #exhibits animation in gtk window
-    print('TODO: ShowAnimation')
+    img = gtk.Image.new()
+    img.set_from_file('bar_test.gif')
+    window.add(img)
 
     #showing window and starting gtk main loop
-    window.show()
+    window.show_all()
     gtk.main()
 
     return None
