@@ -16,11 +16,12 @@ def ShowAnimation(anim):
     from gi.repository import Gtk as gtk
     from gi.repository.Gdk import KEY_q
     from gi.repository.Gdk import KEY_Q
+    from gi.repository.Gdk import RGBA
     
     #creating window
     window = gtk.Window(title="Animation")
-    window.set_border_width(20)
-    window.set_default_size(400, 200)
+    state = window.get_state()
+    window.override_background_color(state, RGBA(1, 1, 1, 1))
 
     #assign closing events
     def on_key_press(self, event):
