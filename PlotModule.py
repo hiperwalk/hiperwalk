@@ -2,6 +2,7 @@ import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 #from matplotlib.animation import FuncAnimation
 from matplotlib.animation import ArtistAnimation
+from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from numpy import arange
@@ -51,7 +52,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
     #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
 
-    plots_as_imgs = []
+    imgs = []
 
     for i in range(len(probabilities)):
         #TODO: set figure size according to graph dimension
@@ -75,34 +76,40 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
                 plt.show()
 
         else:
+            #storing images on RAM
             fig.canvas.draw()
             img = Image.frombytes('RGB', fig.canvas.get_width_height(),
                 fig.canvas.tostring_rgb())
-            plots_as_imgs.append(img)
+            imgs.append(img)
 
             plt.close()
 
     if animate:
-        fig = plt.figure( figsize=(plt.rcParams["figure.figsize"][0],
-            plt.rcParams["figure.figsize"][1]) )
-        ax = plt.gca()
-        imgs_for_anim = []
+        fig, ax = ConfigureFigure(len(probabilities[0])) #TODO: kwarg add_params?
 
-        while  plots_as_imgs!= []:
-            img = ax.imshow(plots_as_imgs.pop(0), animated=True)
-            imgs_for_anim.append([img])
-
-        #using ArtistAnimation to reuse the code from plot
-        #it would be more efficient to use FuncAnimation (as a previous version)
-        #but workarounds for updating colorbar ticks and y-axes were not found
+        #it would be more efficient to use FuncAnimation as a previous version;
+        #i.e. to return only the artist that need to be redrawn.
+        #But workarounds for updating colorbar ticks and y-axes were not found
         #TODO: documentation: recommend saving gif and not showing for any animations
-        anim = ArtistAnimation(fig, imgs_for_anim,
+        def updateFigure(img):
+            ax.imshow(img, animated=True)
+
+            if DEBUG:
+                global start
+                end = time()
+                print('updateFigure: ' + str(end - start) + 's')
+                start = end
+
+        #TODO: repeat_delay not implemented in animation.save
+        anim = FuncAnimation(fig, updateFigure, frames=imgs,
                 interval=interval, repeat_delay=repeat_delay)
 
+        #removing axes and pads introduced by imshow,
+        #i.e. shows only the original axes and pads (from plots_as_imgs)
         plt.axis('off')
         plt.tight_layout(pad=0)
         if DEBUG:
-            #to check if no extra padding is being added
+            #used to check if no extra padding is being added
             fig.patch.set_facecolor('red')
         
         if filename_prefix is not None:
