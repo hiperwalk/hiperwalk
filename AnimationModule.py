@@ -38,17 +38,18 @@ class Animation:
         #But workarounds for updating colorbar ticks and y-axes were not found
         #TODO: documentation: recommend saving gif and not showing for any animations
         def updateFigure(img):
-            ax.imshow(img, animated=True)
+            ax.imshow(img)
 
             if DEBUG:
                 global start
                 end = time()
                 print('updateFigure: ' + str(end - start) + 's')
+                print('\t' + str(img))
                 start = end
 
         #TODO: repeat_delay not implemented in animation.save
         self.plt_anim = FuncAnimation(fig, updateFigure, frames=self.frames,
-                interval=interval, repeat_delay=repeat_delay)
+                interval=interval, repeat=False)
 
         #removing axes and pads introduced by imshow,
         #i.e. shows only the original axes and pads (from plots_as_imgs)
@@ -62,9 +63,19 @@ class Animation:
     def SaveAnimation(self, filename_prefix):
         self.save_path = filename_prefix + '.gif'
         self.plt_anim.save(self.save_path)
-        plt.clf()
+        plt.close()
+
+        if DEBUG:
+            print('finished saving')
+
+        del self.plt_anim
+        self.plt_anim = None
+        del self.frames
+        self.frames = []
 
     def ShowAnimation(self):
+        #TODO: if animation was not saved, create and read from buffer
+
         from gi.repository import Gtk as gtk
         from gi.repository.Gdk import KEY_q
         from gi.repository.Gdk import KEY_Q
