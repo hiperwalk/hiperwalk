@@ -1,14 +1,12 @@
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
-#from matplotlib.animation import FuncAnimation
-from matplotlib.animation import ArtistAnimation
-from matplotlib.animation import FuncAnimation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from numpy import arange
 from ModifiedNetworkXFunctions import *
 from Constants import DEBUG
 from PIL import Image
+from AnimationModule import *
 
 if DEBUG:
     from time import time
@@ -52,7 +50,8 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
 
     #TODO: duplicated code with PlotProbabilityDistributionOnGraph... refactor
 
-    imgs = []
+    if animate:
+        anim = Animation()
 
     for i in range(len(probabilities)):
         #TODO: set figure size according to graph dimension
@@ -76,48 +75,15 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
                 plt.show()
 
         else:
-            #storing images on RAM
-            fig.canvas.draw()
-            img = Image.frombytes('RGB', fig.canvas.get_width_height(),
-                fig.canvas.tostring_rgb())
-            imgs.append(img)
-
-            plt.close()
+            anim.AddFrame(fig)
 
     if animate:
-        fig, ax = ConfigureFigure(len(probabilities[0])) #TODO: kwarg add_params?
+        anim.CreateAnimation(interval, repeat_delay)
 
-        #it would be more efficient to use FuncAnimation as a previous version;
-        #i.e. to return only the artist that need to be redrawn.
-        #But workarounds for updating colorbar ticks and y-axes were not found
-        #TODO: documentation: recommend saving gif and not showing for any animations
-        def updateFigure(img):
-            ax.imshow(img, animated=True)
-
-            if DEBUG:
-                global start
-                end = time()
-                print('updateFigure: ' + str(end - start) + 's')
-                start = end
-
-        #TODO: repeat_delay not implemented in animation.save
-        anim = FuncAnimation(fig, updateFigure, frames=imgs,
-                interval=interval, repeat_delay=repeat_delay)
-
-        #removing axes and pads introduced by imshow,
-        #i.e. shows only the original axes and pads (from plots_as_imgs)
-        plt.axis('off')
-        plt.tight_layout(pad=0)
-        if DEBUG:
-            #used to check if no extra padding is being added
-            fig.patch.set_facecolor('red')
-        
         if filename_prefix is not None:
-            anim.save(filename_prefix + '.gif')
-            plt.close()
+            anim.SaveAnimation(filename_prefix)
         if show_plot:
-            from AnimationModule import ShowAnimation
-            ShowAnimation(None)
+            anim.ShowAnimation()
 
     #TODO: add proper return
     return None
