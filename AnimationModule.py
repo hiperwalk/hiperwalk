@@ -62,7 +62,7 @@ class Animation:
     def SaveAnimation(self, filename_prefix):
         self.save_path = filename_prefix + '.gif'
         self.plt_anim.save(self.save_path)
-        plt.close()
+        plt.clf()
 
     def ShowAnimation(self):
         from gi.repository import Gtk as gtk
