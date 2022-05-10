@@ -46,7 +46,7 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     #plot functions: code for plotting the graph accordingly
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
-            valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph,
+            valid_plot_types[2]: PlotProbabilityDistributionOnGraph,
             valid_plot_types[3]: PlotProbabilityDistributionOnHistogram}
 
     #preparing probabilities to shape requested by called functions
@@ -163,13 +163,6 @@ def PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     return bars, #used for animation
 
 
-def UpdateBarsAnimation(probabilities, artists, kwargs):
-    bars = artists[0]
-    for i in range(len(probabilities)):
-        bars[i].set_height(probabilities[i])
-
-    return bars
-
 def PlotProbabilityDistributionOnHistogram(probabilities, ax, labels=None,
         graph=None, min_prob=None, max_prob=None, **kwargs):
     
@@ -188,11 +181,6 @@ def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
     PosconfigurePlotFigure(ax, len(probabilities), labels, graph, min_prob, max_prob)
 
     #used for animation
-    return line,
-
-def UpdateLineAnimation(probabilities, artists, kwargs):
-    line = artists[0]
-    line.set_ydata(probabilities)
     return line,
 
 
@@ -225,7 +213,7 @@ def PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None, min_prob=None,
         plt.ylim((min_prob, max_prob))
 
 
-def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
+def PlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
     #UpdateNodes may create kwargs['node_size']
     #min_node_size and max_node_size are not valid keys for nx_draw kwargs
     UpdateNodes(probabilities, kwargs.pop('min_node_size'), kwargs.pop('max_node_size'), kwargs)
@@ -242,28 +230,10 @@ def NewPlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
     if DEBUG:
         global start
         end = time()
-        print("NewPlotProbabilityDistributionOnGraph: " + str(end - start) +'s')
+        print("PlotProbabilityDistributionOnGraph: " + str(end - start) +'s')
         start = end
 
     return nodes, labels
-
-def UpdateGraphAnimation(probabilities, artists, kwargs):
-    nodes = artists[0]
-    labels = artists[1]
-
-    fixed_size = 'node_size' in kwargs
-    UpdateNodes(probabilities, kwargs['min_node_size'], kwargs['max_node_size'], kwargs)
-
-    nodes.set_sizes(kwargs['node_size'] if fixed_size else kwargs.pop('node_size'))
-
-    if 'cmap' in kwargs:
-        nodes.set_array(kwargs['node_color'])
-
-    #TODO: add transparency
-    #nodes.set_alpha(probabilities)
-
-    labels = list(labels.values())
-    return [nodes] + labels
 
 #Configures static characteristics of nodes, i.e. attributes that will not change
 #during sequential plots or an animation.
@@ -366,87 +336,6 @@ def UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 #   if ommited and plot_node_size is true, uses default size.
 #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
 #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
-def PlotProbabilityDistributionOnGraph(adj_matrix, probabilities, animate=False,
-        show_plot=True, filename_prefix=None, **kwargs):
-
-    #vmin and vmax are default keywords used by networkx_draw.
-    #if an invalid keyword is passed to nx.draw(), it does not execute
-    kwargs['vmin'] = probabilities.min() #min_prob
-    kwargs['vmax'] = probabilities.max() #max_prob
-
-    G = nx.from_numpy_matrix(adj_matrix)
-
-    #removes invalid keys for networkx draw
-    min_node_size = kwargs.pop('min_node_size') if 'min_node_size' in kwargs else None
-    max_node_size = kwargs.pop('max_node_size') if 'max_node_size' in kwargs else None
-    #setting static kwargs for plotting
-    #kwargs dictionary is updated by reference
-    ConfigureNodes(G, probabilities, min_node_size, max_node_size, kwargs)
-
-    if not animate:
-        for i in range(len(probabilities)):
-            #TODO: set figure size according to graphdimension
-            fig, ax = ConfigureGraphFigure()
-            DrawFigure(probabilities[i], G, ax, min_node_size, max_node_size, kwargs)
-
-            #show or save image (or both)
-            if filename_prefix is not None:
-                #enumarating the plot
-                filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
-                        if len(probabilities) > 1 else '' )
-                plt.savefig(filename_prefix + filename_suffix)
-                if not show_plot:
-                    plt.close()
-            if show_plot:
-                plt.show()
-
-        #TODO: add return
-        return None
-
-    else:
-        interval = kwargs.pop('interval') if 'interval' in kwargs else 200
-        repeat_delay = kwargs.pop('repeat_delay') if 'repeat_delay' in kwargs else 0
-        fig, ax = ConfigureGraphFigure()
-        anim  = FuncAnimation(fig, DrawFigure, frames=probabilities,
-                fargs=(G, ax, min_node_size, max_node_size, kwargs),
-                interval=interval, repeat_delay=repeat_delay, blit=True)
-
-        if filename_prefix is not None:
-            anim.save(filename_prefix + '.gif')
-        if show_plot:
-            plt.show()
-
-        return anim
-
-def DrawFigure(probabilities, G, ax, min_node_size, max_node_size, kwargs):
-
-    ax.clear()
-    static_node_size = 'node_size' in kwargs
-    #UpdateNodes may create kwargs['node_size']
-    UpdateNodes(probabilities, min_node_size, max_node_size, kwargs)
-
-    nodes, _, labels = nx_draw(G, ax=ax,
-            node_size = kwargs['node_size'] if static_node_size else kwargs.pop('node_size'),
-            **kwargs)
-    #note: nx.draw_networkx_labels dramatically increases plotting time
-
-    #setting and drawing colorbar
-    if 'cmap' in kwargs:
-        ConfigureColorbar(ax, kwargs)
-
-    #does not call plt.tight_layout() because it dramatically interferes
-    #with animation time between frames
-    #plt.tight_layout()
-
-    if DEBUG:
-        global start
-        end = time()
-        print("DrawFigure: " + str(end - start) +'s')
-        start = end
-
-    labels = list(labels.values())
-    return [nodes] + labels
-    #return nodes, #edges #(labels[0], labels[1])
 """
 
 
