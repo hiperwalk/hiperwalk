@@ -13,6 +13,7 @@ if DEBUG:
 
 #TODO: move to constants
 plt.rcParams["figure.figsize"] = (10, 8)
+plt.rcParams["figure.dpi"] = 100
 
 #TODO: add documentation for 'fixed_probabilities' kwarg
 #TODO: add option for changing figsize and dpi
