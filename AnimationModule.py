@@ -83,8 +83,20 @@ class Animation:
         del self.frames
         self.frames = []
 
+
+    #returns None if animation is already saved.
+    #Otherwise returns the temporary filename
+    def _SaveAnimationInTempFile(self):
+        if self.save_path == None or self.save_path == '':
+            import tempfile
+            temp = tempfile.NamedTemporaryFile(suffix='.gif')
+            self.SaveAnimation(temp.name)
+            return temp.name
+
+        return None
+
     def ShowAnimation(self):
-        #TODO: if animation was not saved, create and read from buffer
+        temp = self._SaveAnimationInTempFile()
 
         from gi.repository import Gtk as gtk
         from gi.repository.Gdk import KEY_q
