@@ -99,7 +99,25 @@ class Animation:
         return None
 
     def ShowAnimation(self):
+        def _IsNotebook():
+            try:
+                shell = get_ipython().__class__.__name__
+                if shell == 'ZMQInteractiveShell':
+                    return True
+                return False
+            except:
+                return False
+
+        if _IsNotebook():
+            self._ShowAnimationNotebook()
+        else:
+            self._ShowAnimationTerminal()
+
+    def _ShowAnimationTerminal(self):
         temp = self._SaveAnimationInTempFile()
+
+        from gi import require_version
+        require_version('Gtk', '3.0')
 
         from gi.repository import Gtk as gtk
         from gi.repository.Gdk import KEY_q
@@ -141,3 +159,6 @@ class Animation:
         if temp is not None:
             self.save_path = None
             temp.close()
+
+    def _ShowAnimationNotebook(self):
+        print('TODO')
