@@ -13,6 +13,15 @@ class Animation:
         self.plt_anim = None
         self.save_path = None
 
+    def __del__(self):
+        def _delete(obj):
+            if obj is not None:
+                del obj
+
+        _delete(self.plt_anim)
+        _delete(self.frames)
+        _delete(self.save_path)
+
     #expects matplotlib fig
     #storing images on RAM and clearing matplotlib image
     def AddFrame(self, fig):
@@ -23,8 +32,6 @@ class Animation:
         self.frames.append(img)
 
         plt.close()
-
-
 
     #TODO: repeat_delay not being used
     def CreateAnimation(self, interval, repeat_delay):
@@ -49,7 +56,9 @@ class Animation:
 
         #TODO: repeat_delay not implemented in animation.save
         self.plt_anim = FuncAnimation(fig, updateFigure, frames=self.frames,
-                interval=interval, repeat=False)
+                interval=interval, repeat=self.__IsInNotebook())
+        #repeat=True causes updateFigure to be called even when it is not needed.
+        #However, it is necessary for creating a looping video in jupyter notebook
 
         #removing axes and pads introduced by imshow,
         #i.e. shows only the original axes and pads (from plots_as_imgs)
@@ -78,19 +87,23 @@ class Animation:
         if DEBUG:
             print('finished saving')
 
-        del self.plt_anim
-        self.plt_anim = None
-        del self.frames
-        self.frames = []
+        #by ignoring this condition while using the terminal,
+        #a non-aborting exception is thrown:
+        #AttributeError: 'NoneType' object has no attribute 'add_callback'.
+        #The attributes deleted are needed for saving html5 video in jupyter notebooks
+        if not self.__IsInNotebook():
+            del self.plt_anim
+            self.plt_anim = None
+            del self.frames
+            self.frames = None
 
-
-    def _IsSaved(self):
+    def __IsSaved(self):
         return self.save_path != None
 
     #returns None if animation is already saved.
     #Otherwise returns the temporary file
-    def _SaveAnimationInTempFile(self):
-        if not self._IsSaved():
+    def __SaveAnimationInTempFile(self):
+        if not self.__IsSaved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
             self.SaveAnimation(temp.name)
@@ -98,23 +111,23 @@ class Animation:
 
         return None
 
+    def __IsInNotebook(self):
+        try:
+            shell = get_ipython().__class__.__name__
+            if shell == 'ZMQInteractiveShell':
+                return True
+            return False
+        except:
+            return False
+
     def ShowAnimation(self):
-        def _IsNotebook():
-            try:
-                shell = get_ipython().__class__.__name__
-                if shell == 'ZMQInteractiveShell':
-                    return True
-                return False
-            except:
-                return False
-
-        if _IsNotebook():
-            self._ShowAnimationNotebook()
+        if self.__IsInNotebook():
+            self.__ShowAnimationNotebook()
         else:
-            self._ShowAnimationTerminal()
+            self.__ShowAnimationTerminal()
 
-    def _ShowAnimationTerminal(self):
-        temp = self._SaveAnimationInTempFile()
+    def __ShowAnimationTerminal(self):
+        temp = self.__SaveAnimationInTempFile()
 
         from gi import require_version
         require_version('Gtk', '3.0')
@@ -129,7 +142,7 @@ class Animation:
         state = window.get_state()
         window.override_background_color(state, RGBA(1, 1, 1, 1))
 
-        def _ConfigureGifWindow(self):
+        def ConfigureGifWindow(self):
             #assign closing events
             def on_key_press(self, event):
                 if event.keyval == KEY_q or event.keyval == KEY_Q :
@@ -143,13 +156,13 @@ class Animation:
             img.set_from_file(self.save_path)
             window.add(img)
 
-        def _ConfigureVideoWindow(self):
+        def ConfigureVideoWindow(self):
             print('Warning: show video not supported.')
 
         if self.save_path[-4:] == '.gif':
-            _ConfigureGifWindow(self)
+            ConfigureGifWindow(self)
         else:
-            _ConfigureVideoWindow(self)
+            ConfigureVideoWindow(self)
 
 
         #showing window and starting gtk main loop
@@ -160,5 +173,13 @@ class Animation:
             self.save_path = None
             temp.close()
 
-    def _ShowAnimationNotebook(self):
-        print('TODO')
+    def __ShowAnimationNotebook(self):
+        from IPython import display
+
+        #embedding animation in jupyter notebook
+        video = self.plt_anim.to_html5_video()
+        html = display.HTML(video)
+        display.display(html)
+
+        plt.close()
+
