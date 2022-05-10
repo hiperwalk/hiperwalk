@@ -17,11 +17,15 @@ plt.rcParams["figure.dpi"] = 100
 
 #TODO: add documentation for 'fixed_probabilities' kwarg
 #TODO: add option for changing figsize and dpi
+#histogram is alias for bar width=1
 def PlotProbabilityDistribution(probabilities, plot_type='bar',
         animate=False, show_plot=True, filename_prefix=None,
         interval=250, repeat_delay=250, **kwargs):
 
-    valid_plot_types = ['bar', 'line', 'graph']
+    plot_type = plot_type.lower()
+    if plot_type == 'hist':
+        plot_type = 'histogram'
+    valid_plot_types = ['bar', 'line', 'graph', 'histogram']
 
     if plot_type not in valid_plot_types:
         raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
@@ -31,16 +35,19 @@ def PlotProbabilityDistribution(probabilities, plot_type='bar',
     #preconfiguration: executed once before the loop starts
     preconfigs = {valid_plot_types[0]: PreconfigurePlot,
             valid_plot_types[1]: PreconfigurePlot,
-            valid_plot_types[2]: PreconfigureGraphPlot}
+            valid_plot_types[2]: PreconfigureGraphPlot,
+            valid_plot_types[3]: PreconfigurePlot}
     #configuration: executed every iteration before plotting
     #expects return of fig, ax to be used for animations
     configs = {valid_plot_types[0]: ConfigurePlotFigure,
             valid_plot_types[1]: ConfigurePlotFigure,
-            valid_plot_types[2]: ConfigureGraphFigure}
+            valid_plot_types[2]: ConfigureGraphFigure,
+            valid_plot_types[3]: ConfigurePlotFigure}
     #plot functions: code for plotting the graph accordingly
     plot_funcs = {valid_plot_types[0]: PlotProbabilityDistributionOnBars,
             valid_plot_types[1]: PlotProbabilityDistributionOnLine,
-            valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph}
+            valid_plot_types[2]: NewPlotProbabilityDistributionOnGraph,
+            valid_plot_types[3]: PlotProbabilityDistributionOnHistogram}
 
     #preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -162,6 +169,14 @@ def UpdateBarsAnimation(probabilities, artists, kwargs):
         bars[i].set_height(probabilities[i])
 
     return bars
+
+def PlotProbabilityDistributionOnHistogram(probabilities, ax, labels=None,
+        graph=None, min_prob=None, max_prob=None, **kwargs):
+    
+    kwargs['width'] = 1
+    PlotProbabilityDistributionOnBars(probabilities, ax, labels, graph,
+            min_prob, max_prob, **kwargs)
+
 
 def PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
         graph=None, min_prob=None, max_prob=None, **kwargs):
