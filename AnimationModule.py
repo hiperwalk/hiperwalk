@@ -60,8 +60,18 @@ class Animation:
             fig.patch.set_facecolor('red')
             print("Fig dpi " + str(fig.dpi))
 
+    #TODO: saving video is supported but not recommended because
+    #   fps may not be respected.
+    #ffmpeg is necessary for saving video and better quality gifs.
+    #Pillow is sufficient for saving gifs, although colorbar may be discretized.
     def SaveAnimation(self, filename_prefix):
-        self.save_path = filename_prefix + '.gif'
+        valid_extensions = ['.gif', '.mp4'] #TODO: add other valid matplotlib formats
+
+        extension = filename_prefix[:-4]
+        if extension not in valid_extensions:
+            filename_prefix += '.gif'
+        self.save_path = filename_prefix
+
         self.plt_anim.save(self.save_path)
         plt.close()
 
