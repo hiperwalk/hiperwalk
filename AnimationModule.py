@@ -92,23 +92,34 @@ class Animation:
         from gi.repository.Gdk import RGBA
         
         #creating window
-        window = gtk.Window(title="Animation")
+        window = gtk.ApplicationWindow(title="Animation")
         state = window.get_state()
         window.override_background_color(state, RGBA(1, 1, 1, 1))
 
-        #assign closing events
-        def on_key_press(self, event):
-            if event.keyval == KEY_q or event.keyval == KEY_Q :
-                window.close()
+        def _ConfigureGifWindow(self):
+            #assign closing events
+            def on_key_press(self, event):
+                if event.keyval == KEY_q or event.keyval == KEY_Q :
+                    window.close()
 
-        window.connect("key-press-event", on_key_press)
-        window.connect("destroy", gtk.main_quit)
+            window.connect("key-press-event", on_key_press)
+            window.connect("destroy", gtk.main_quit)
 
-        #exhibits animation in gtk window
-        img = gtk.Image.new()
-        img.set_from_file(self.save_path)
-        window.add(img)
+            #exhibits animation in gtk window
+            img = gtk.Image.new()
+            img.set_from_file(self.save_path)
+            window.add(img)
+
+        def _ConfigureVideoWindow(self):
+            print('Warning: show video not supported.')
+
+        if self.save_path[-4:] == '.gif':
+            _ConfigureGifWindow(self)
+        else:
+            _ConfigureVideoWindow(self)
+
 
         #showing window and starting gtk main loop
         window.show_all()
         gtk.main()
+
