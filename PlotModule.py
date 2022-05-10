@@ -292,10 +292,17 @@ def ConfigureNodes(G, probabilities, kwargs):
 
     #calculates vertices positions.
     #needed to do beforehand in order to fix position for multiple steps
-    #TODO: check position calculation method
-    #TODO: give the user the option to choose the position calculation method
+    #the user may choose any networkx graph_layout function as long as only the graph is
+    #the required parameter. Check
+    #https://networkx.org/documentation/stable/reference/drawing.html#module-networkx.drawing.layout
+    #For further customisation, the user may call any networkx graph layout function
+    #BEFORE calling PlotProbabilityDistribution and using its return as the 'pos' kwarg.
     if 'pos' not in kwargs:
-        kwargs['pos'] = nx.kamada_kawai_layout(G)
+        if 'graph_layout' in kwargs:
+            func = kwargs.pop('graph_layout')
+            kwargs['pos'] = func(G)
+        else:
+            kwargs['pos'] = nx.kamada_kawai_layout(G)
 
 #Configures volatile attributes of nodes,
 #i.e. attributes that may change depending on the probability.
