@@ -88,13 +88,13 @@ class Animation:
         return self.save_path != None
 
     #returns None if animation is already saved.
-    #Otherwise returns the temporary filename
+    #Otherwise returns the temporary file
     def _SaveAnimationInTempFile(self):
         if not self._IsSaved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
             self.SaveAnimation(temp.name)
-            return temp.name
+            return temp
 
         return None
 
@@ -137,4 +137,7 @@ class Animation:
         #showing window and starting gtk main loop
         window.show_all()
         gtk.main()
-
+        
+        if temp is not None:
+            self.save_path = None
+            temp.close()
