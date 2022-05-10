@@ -84,10 +84,13 @@ class Animation:
         self.frames = []
 
 
+    def _IsSaved(self):
+        return self.save_path != None
+
     #returns None if animation is already saved.
     #Otherwise returns the temporary filename
     def _SaveAnimationInTempFile(self):
-        if self.save_path == None or self.save_path == '':
+        if not self._IsSaved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
             self.SaveAnimation(temp.name)
