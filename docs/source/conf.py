@@ -13,7 +13,6 @@
 import os
 import sys
 sys.path.append(os.path.abspath('../../'))
-print(sys.path)
 
 
 # -- Project information -----------------------------------------------------
@@ -34,6 +33,7 @@ release = '2.0'
 extensions = [
     'sphinx.ext.duration',
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
 ]
 
 # Add any paths that contain templates here, relative to this directory.

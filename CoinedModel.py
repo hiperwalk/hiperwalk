@@ -1,6 +1,7 @@
-###################################################################
-#################### Coined Quantum Walk Model ####################
-###################################################################
+"""
+Coined Quantum Walk Model
+"""
+
 import numpy
 import scipy
 from scipy.linalg import block_diag as scipy_block_diag
@@ -20,13 +21,18 @@ def UniformInitialCondition(AdjMatrix):
     return numpy.matrix([[1]]*N)/numpy.sqrt(N)
     #TODO: USE np.ones
 
-# Creates flip-flop shift operator based on adjacency matrix.
-# For more information about the general flip-flop shift operator,
-# check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
-# TODO: explain resulting matrix (edges labeled similarly to position-coin notation)
-# Parameter: expects adjacency matrix of an unweighted undirected graph
-#Expects sparse matrix #TODO: throw exception or convert
 def FlipFlopShiftOperator(AdjMatrix):
+    """
+    Creates flip-flop shift operator based on adjacency matrix.
+    For more information about the general flip-flop shift operator,
+    check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
+    TODO: explain resulting matrix (edges labeled similarly to position-coin notation)
+    Parameter: expects adjacency matrix of an unweighted undirected graph
+    Expects sparse matrix #TODO: throw exception or convert
+
+    :param AdjMatrix: Adjacency Matrix.
+    """
+
     if DEBUG:
         start_time = now()
 
