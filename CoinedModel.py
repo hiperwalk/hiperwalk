@@ -92,6 +92,15 @@ def EvolutionOperator_CoinedModel(AdjMatrix, CoinOp=None):
     return FlipFlopShiftOperator(AdjMatrix) @ CoinOp
 
 def EvolutionOperator_SearchCoinedModel(AdjMatrix):
+    """
+    Return The search evolution operator for the coined model given the
+    adjacency matrix of a graph.
+
+    :param AdjMatrix: Adjacency Matrix.
+    :type AdjMatrix: scipy.csr_matrix.
+    :return: Search evolution operator.
+    :rtype: scipy.csr_matrix???
+    """
     S = ShiftOperator(AdjMatrix)
     C = CoinOperator(AdjMatrix)
     N = S.shape[0]
