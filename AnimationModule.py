@@ -22,9 +22,11 @@ class Animation:
         _delete(self.frames)
         _delete(self.save_path)
 
-    #expects matplotlib fig
-    #storing images on RAM and clearing matplotlib image
     def AddFrame(self, fig):
+        """
+        expects matplotlib fig
+        storing images on RAM and clearing matplotlib image
+        """
         fig.canvas.draw()
 
         img = Image.frombytes('RGB', fig.canvas.get_width_height(),
