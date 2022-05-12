@@ -8,12 +8,18 @@ Currently, it is necessary to have
 Paulo Motta described on his blog the
 [installation steps for both neblina-core and pyneblina](https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/).
 
+# Style Guide for Python Code
+The code must be written accordingly [PEP 8](https://peps.python.org/pep-0008/).
+Some code may need to be updated to match PEP 8's requirements.
+
 # Python Libraries Dependencies
 - Matplotlib;
 - NetworkX;
 	- PIL;
 - NumPy;
 - Scipy;
+- Sphinx;
+- numpydoc;
 
 ## Optional Libraries For Animations
 - PyGObject: backend for showing animations;
