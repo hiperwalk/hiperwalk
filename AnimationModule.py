@@ -35,8 +35,10 @@ class Animation:
 
         plt.close()
 
-    #TODO: repeat_delay not being used
     def CreateAnimation(self, interval, repeat_delay):
+        """
+        TODO: repeat_delay not being used
+        """
         from PlotModule import ConfigureFigure
         from matplotlib.animation import FuncAnimation
 
