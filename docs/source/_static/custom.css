@@ -19,3 +19,7 @@ div.highlight {
 div.highlight pre {
 	padding: 7px 10px;
 }
+
+dl.method {
+	margin: 20px 0px;
+}
