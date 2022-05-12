@@ -32,10 +32,11 @@ release = '2.0'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
     'sphinx.ext.todo',
+    'sphinx.ext.mathjax',
+    'numpydoc', #imports 'sphinx.ext.autosummary',
 ]
 
 intersphinx_mapping = {
