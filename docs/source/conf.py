@@ -35,6 +35,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
+    'sphinx.ext.todo',
 ]
 
 intersphinx_mapping = {
@@ -44,6 +45,7 @@ intersphinx_mapping = {
 autosummary_generate = True
 autoclass_content = "both"
 set_type_checking_flag = True
+todo_include_todos = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
