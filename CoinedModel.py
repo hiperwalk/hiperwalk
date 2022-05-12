@@ -24,6 +24,23 @@ def UniformInitialCondition(AdjMatrix):
 def FlipFlopShiftOperator(AdjMatrix):
     r"""
     Creates flip-flop shift operator (:math:`S`) based on adjacency matrix.
+
+    Parameters
+    ----------
+    AdjMatrix: scipy.sparse.csr_matrix
+        Adjacency Matrix of an unweighted undirected graph.
+
+    Returns
+    -------
+    scipy.sparse.csr_matrix
+        Flip-flop shift operator.
+
+    Notes
+    -----
+
+    .. todo::
+        if `AdjMatrix` parameter is not sparse, throw exception of convert to sparse.
+
     For more information about the general flip-flop shift operator,
     check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
 
@@ -73,15 +90,14 @@ def FlipFlopShiftOperator(AdjMatrix):
     given that :math:`(v, u)` is the :math:`i`-th edge
     for :math:`i \in [0, 1, \ldots, 2|E| - 1]`.
 
-    .. note::
-        Labelling and sorting edges is done for computational purposes only.
-        We could simply use the `arc notation`:
-        
-        .. math::
-            \ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i} =
-            \sum_{(v, u) \in E} \psi_{(v, u)} \ket{(v, u)}
+    Note that labelling and sorting edges is done for computational purposes only.
+    We could simply use the `arc notation`:
+    
+    .. math::
+        \ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i} =
+        \sum_{(v, u) \in E} \psi_{(v, u)} \ket{(v, u)}
 
-        for appropriate choices of :math:`\psi_{(v, u)}`.
+    for appropriate choices of :math:`\psi_{(v, u)}`.
 
     In our example,
 
@@ -123,18 +139,6 @@ def FlipFlopShiftOperator(AdjMatrix):
     :math:`S \ket 0 = \ket 1`, :math:`\ket 1 = \ket 0`,
     :math:`S \ket 2 = \ket 4`, :math:`S \ket 4 = \ket 2`, etc.
 
-
-    Parameters
-    ----------
-    AdjMatrix: scipy.sparse.csr_matrix
-        Adjacency Matrix of an unweighted undirected graph.
-    .. todo::
-        if not sparse, throw exception of convert to sparse.
-
-    Returns
-    -------
-    scipy.sparse.csr_matrix
-        Flip-flop shift operator.
 
     Examples
     --------
