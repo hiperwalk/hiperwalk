@@ -1,3 +1,7 @@
+..
+    [comment] Adapted from Sphinx-Autosummary-Recursion.
+    https://github.com/JamesALeedham/Sphinx-Autosummary-Recursion/tree/master/docs/_templates
+
 {{ fullname | escape | underline}}
 
 .. currentmodule:: {{ module }}
