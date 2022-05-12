@@ -12,6 +12,20 @@ Paulo Motta described on his blog the
 The code must be written accordingly [PEP 8](https://peps.python.org/pep-0008/).
 Some code may need to be updated to match PEP 8's requirements.
 
+# Python Libraries Dependencies
+- Matplotlib;
+- NetworkX;
+	- PIL;
+- NumPy;
+- Scipy;
+- Sphinx;
+- numpydoc;
+
+## Optional Libraries For Animations
+- PyGObject: backend for showing animations;
+- ImageMagick: for saving animated gifs;
+- ffmpeg: for saving movies.
+
 # TODO List
 - [ ] Update installation instructions
 - [X] Refactor Coined\_QW\_Adjacency\_Matrix-v2.ipynb
@@ -37,3 +51,5 @@ Some code may need to be updated to match PEP 8's requirements.
 	- [ ] Rename functions
 	- [ ] Remove definition from examples
 	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?
+- [ ] Give support for more backends to show animations
+- [ ] Matplotlib animation (show and save may be slow)
