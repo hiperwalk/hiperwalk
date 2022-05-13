@@ -7,8 +7,21 @@ if DEBUG:
     start = time()
 
 class Animation:
+    """
+    Some class description
+    
+    Attributes
+    ----------
+    frames : list
+        List of frames.
+    plt_anim : matplotlib.pyplot.Animation
+        Animation object of matplotlib.
+    save_path : str
+        Filepath for saving an animation.
+    """
 
     def __init__(self):
+        # assigning default values
         self.frames = []
         self.plt_anim = None
         self.save_path = None
@@ -26,6 +39,11 @@ class Animation:
         """
         expects matplotlib fig
         storing images on RAM and clearing matplotlib image
+
+        Parameters
+        ----------
+        fig
+            matplotlib figure
         """
         fig.canvas.draw()
 
@@ -125,6 +143,13 @@ class Animation:
             return False
 
     def ShowAnimation(self):
+        """
+        Shows animation as long as it has been created.
+
+        See Also
+        --------
+        CreateAnimation
+        """
         if self.__IsInNotebook():
             self.__ShowAnimationNotebook()
         else:
