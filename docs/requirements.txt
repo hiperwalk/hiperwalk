@@ -1,3 +1,4 @@
-python3-sphinx
+sphinx
 numpydoc
 sphinx-autodoc-typehints
+pydata-sphinx-theme
