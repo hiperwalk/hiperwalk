@@ -37,6 +37,7 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.mathjax',
     'numpydoc', #imports 'sphinx.ext.autosummary',
+    'sphinx.ext.graphviz',
 ]
 
 intersphinx_mapping = {
