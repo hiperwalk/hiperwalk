@@ -64,6 +64,17 @@ def FlipFlopShiftOperator(AdjMatrix):
                 0 & 1 & 1 & 0
             \end{bmatrix} .
 
+    .. graphviz:: ../../graphviz/coined-model-sample.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1
+
+    .. graphviz:: ../../graphviz/coined-model-edges-labels.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 2
+
+
     The edges are labelled according to sorted order;
     i.e. labelled in a left-to-right and top-to-bottom fashion.
     For example, :math:`A_\text{labels}` has the appropriated labels for :math:`A`
