@@ -164,13 +164,13 @@ def OracleR(N):
     R[0,0] = -1
     return numpy.matrix(R)
 
-def EvolutionOperator_CoinedModel(AdjMatrix, CoinOp=None):
+def EvolutionOperator(AdjMatrix, CoinOp=None):
     #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
         return FlipFlopShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
     return FlipFlopShiftOperator(AdjMatrix) @ CoinOp
 
-def EvolutionOperator_SearchCoinedModel(AdjMatrix):
+def SearchEvolutionOperator(AdjMatrix):
     """
     Return The search evolution operator for the coined model given the
     adjacency matrix of a graph.
@@ -189,14 +189,14 @@ def EvolutionOperator_SearchCoinedModel(AdjMatrix):
 #TODO: check numpy vectorize documentation
 #TODO: move to auxiliary functions?
 #TODO: test with complex state
-def UnvectorizedElementwiseProbability(elem):
+def __UnvectorizedElementwiseProbability(elem):
     #this is more efficient than:
     #(numpy.conj(elem) * elem).real
     #elem.real**2 + elem.imag**2
     return elem.real*elem.real + elem.imag*elem.imag
 
 #vectorized
-ElementwiseProbability = numpy.vectorize(UnvectorizedElementwiseProbability)
+ElementwiseProbability = numpy.vectorize(__UnvectorizedElementwiseProbability)
 
 #TODO: documentation
 #TODO: test with nonregular graph

@@ -20,14 +20,13 @@ Functions
     :nosignatures:
 
     CoinOperator
-    EvolutionOperator_CoinedModel
-    EvolutionOperator_SearchCoinedModel
+    EvolutionOperator
     FlipFlopShiftOperator
     GroverOperator
     HadamardOperator
     OracleR
+    SearchEvolutionOperator
     UniformInitialCondition
-    UnvectorizedElementwiseProbability
 
 .. _CoinedModel Notes:
 
