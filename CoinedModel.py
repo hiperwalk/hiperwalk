@@ -21,7 +21,6 @@ def FlipFlopShiftOperator(AdjMatrix):
     r"""
     Creates flip-flop shift operator (:math:`S`) based on
     an adjacency matrix.
-    :class:`scipy.sparse.csr_matrix`
 
     Parameters
     ----------
@@ -160,6 +159,9 @@ def HadamardOperator():
     return 1/numpy.sqrt(2) * numpy.matrix([[1, 1], [1, -1]])
 
 def OracleR(N):
+    """
+    Create the oracle that marks the first element (vertex 0)
+    """
     R = numpy.identity(N)
     R[0,0] = -1
     return numpy.matrix(R)
@@ -172,13 +174,39 @@ def EvolutionOperator(AdjMatrix, CoinOp=None):
 
 def SearchEvolutionOperator(AdjMatrix):
     """
-    Return The search evolution operator for the coined model given the
-    adjacency matrix of a graph.
+    Creates the search evolution operator for the graph described by a
+    given adjacency matrix.
 
-    :param AdjMatrix: Adjacency Matrix.
-    :type AdjMatrix: scipy.csr_matrix.
-    :return: Search evolution operator.
-    :rtype: scipy.csr_matrix???
+    Parameters
+    ----------
+    AdjMatrix : :class:`scipy.sparse.csr_matrix`
+        Adjacency matrix of the graph where the walk is performed.
+
+    Returns
+    -------
+    :class:`scipy.sparse.csr_matrix`
+        Search evolution operator
+
+    See Also
+    --------
+    EvolutionOperator
+    OracleR
+
+
+    Notes
+    -----
+    The search evolution operator is
+
+    .. math::
+        U = U_w R
+
+    where :math:`U_w` is the coined quantum walk evolution operator
+    and :math:`R` is the oracle [1]_.
+
+    References
+    ----------
+    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+        Vol. 19. New York: Springer, 2013.
     """
     S = ShiftOperator(AdjMatrix)
     C = CoinOperator(AdjMatrix)
