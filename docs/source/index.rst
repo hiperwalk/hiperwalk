@@ -14,7 +14,7 @@ speedup the overall process without knowing parallel programming.
 It is under development and employs C, Python, and OpenCL.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    tutorial/index
