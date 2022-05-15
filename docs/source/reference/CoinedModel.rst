@@ -29,6 +29,8 @@ Functions
     UniformInitialCondition
     UnvectorizedElementwiseProbability
 
+.. _CoinedModel Notes:
+
 Notes
 -----
 For more information about the general general Coined Quantum Walk Model,
@@ -67,9 +69,9 @@ the `edges` of :math:`G` are
 
 Note that `edges` is already sorted, hence the labels are
 
->>> edges_labels = {edges[i]: i+1 for i in range(len(edges))}
+>>> edges_labels = {edges[i]: i for i in range(len(edges))}
 >>> edges_labels
-{(0, 1): 1, (1, 0): 2, (1, 2): 3, (1, 3): 4, (2, 1): 5, (2, 3): 6, (3, 1): 7, (3, 2): 8}
+{(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
 
 The edges labels are illustrated in Figure 2.
 
@@ -78,23 +80,23 @@ The edges labels are illustrated in Figure 2.
     :layout: neato
     :caption: Figure 2
 
-If we would write the edges labels accordingly to the the adjacency matrix order,
+If we would write the edges labels respecting the the adjacency matrix format,
 we would have the matrix `A_labels`.
 Intuitively, the edges are labeled in left-to-right top-to-bottom fashion.
 
->>> A_labels = [[edges_labels[(i,j)] if (i,j) in edges_labels else 0 for j in range(4)]
+>>> A_labels = [[edges_labels[(i,j)] if (i,j) in edges_labels else '' for j in range(4)]
 ...             for i in range(4)]
 >>> A_labels = np.matrix(A_labels)
 >>> A_labels
-matrix([[0, 1, 0, 0],
-        [2, 0, 3, 4],
-        [0, 5, 0, 6],
-        [0, 7, 8, 0]])
-
+matrix([['', '0', '', ''],
+        ['1', '', '2', '3'],
+        ['', '4', '', '5'],
+        ['', '6', '7', '']], dtype='<U21')
 
 For consistency, any state :math:`\ket\psi \in \mathcal{H}^{2|E|}`
-is such that :math:`\ket\psi = \sum_{i = 1}^{2|E|} \psi_i \ket{i}`
-where :math:`\ket i` is associated to the :math:`i`-th edge.
+is such that :math:`\ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i}`
+where :math:`\ket{i}` is the computational basis state
+associated to the :math:`i`-th edge.
 In our example, the state
 
 >>> psi = np.matrix([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0]).T

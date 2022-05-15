@@ -19,7 +19,8 @@ def UniformInitialCondition(AdjMatrix):
 
 def FlipFlopShiftOperator(AdjMatrix):
     r"""
-    Creates flip-flop shift operator (:math:`S`) based on adjacency matrix.
+    Creates flip-flop shift operator (:math:`S`) based on
+    an adjacency matrix.
 
     Parameters
     ----------
@@ -35,87 +36,14 @@ def FlipFlopShiftOperator(AdjMatrix):
     -----
 
     .. todo::
-        if `AdjMatrix` parameter is not sparse, throw exception of convert to sparse.
+        if `AdjMatrix` parameter is not sparse,
+        throw exception of convert to sparse.
 
-    For more information about the general flip-flop shift operator,
-    check "Quantum Walks and Search Algorithms" Section 7.2: Coined Walks on Arbitrary Graphs.
-
-    For generating S, the position-coin notation is used alongside the
-    Hilbert space :math:`\mathcal{H}^{2|E|}`.
-    It is supposed that the elements of any state
-    :math:`\ket{\psi} \in \mathcal{H}^{2|E|}`
-    respect the sorted edges order,
-    i.e. :math:`(v, u) < (v', u')` if either :math:`v < v'` or
-    :math:`v = v'` and :math:`u < u'`
-    where :math:`(v, u), (v', u')` are valid edges.
-    The created Matrix also respects the sorted edges order.
-
-    For example, the graph :math:`G(V, E)` shown in figure **TODO** has adjacency matrix
-
-    .. math::
-        A = \begin{bmatrix}
-                0 & 1 & 0 & 0 \\
-                1 & 0 & 1 & 1 \\
-                0 & 1 & 0 & 1 \\
-                0 & 1 & 1 & 0
-            \end{bmatrix} .
-
-    .. graphviz:: ../../graphviz/coined-model-sample.dot
-        :align: center
-        :layout: neato
-        :caption: Figure 1
-
-    .. graphviz:: ../../graphviz/coined-model-edges-labels.dot
-        :align: center
-        :layout: neato
-        :caption: Figure 2
+    .. note::
+        Check :ref:`CoinedModel Notes <CoinedModel Notes>` for details
+        about the order and dimension of the computational basis.
 
 
-    The edges are labelled according to sorted order;
-    i.e. labelled in a left-to-right and top-to-bottom fashion.
-    For example, :math:`A_\text{labels}` has the appropriated labels for :math:`A`
-    where invalid edges are omitted.
-
-    .. math::
-        A_\text{labels} = \begin{bmatrix}
-                  & 0 &   &   \\
-                1 &   & 2 & 3 \\
-                  & 4 &   & 5 \\
-                  & 6 & 7 &  
-            \end{bmatrix} .
-
-    The edges labels are illustrated in figure **TODO**.
-
-    For consistency, any state :math:`\ket\psi \in \mathcal{H}^{2|E|}`
-    must respect the sorted edges order.
-    In other words,
-    :math:`\ket\psi = \begin{bmatrix}
-    \psi_0 & \psi_1 & \cdots & \psi_{2|E| - 1}
-    \end{bmatrix}^T`
-    where :math:`\psi_i`  corresponds to the **AMPLITUDE?** of the walker being
-    in vertex :math:`v` and the coin pointing towards vertex :math:`u`
-    given that :math:`(v, u)` is the :math:`i`-th edge
-    for :math:`i \in [0, 1, \ldots, 2|E| - 1]`.
-
-    Note that labelling and sorting edges is done for computational purposes only.
-    We could simply use the `arc notation`:
-    
-    .. math::
-        \ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i} =
-        \sum_{(v, u) \in E} \psi_{(v, u)} \ket{(v, u)}
-
-    for appropriate choices of :math:`\psi_{(v, u)}`.
-
-    In our example,
-
-    .. math::
-        \ket\psi = \begin{bmatrix} \psi_0 \\ \psi_1 \\ \vdots \\ \psi_7 \end{bmatrix},
-
-    where :math:`\psi_0` is the amplitude of the walker being in vertex 0
-    and the coin pointing towards vertex 1;
-    :math:`\psi_1` is the amplitude of the walker being in vertex 1
-    and the coin pointing towards vertex 0;
-    and so on.
 
     The flip-flop shift operator :math:`S` is defined such that
 
@@ -125,32 +53,55 @@ def FlipFlopShiftOperator(AdjMatrix):
             \implies S\ket i &= \ket j
         \end{align*}
 
-    as long as :math:`i` is the label of edge :math:`(v, u)` and
-    :math:`j` is the label of edge :math:`(u, v)`.
-    As a consequence, in our example, the resulting flip-flop shift matrix is
+    where :math:`i` is the label of the edge :math:`(v, u)` and
+    :math:`j` is the label of the edge :math:`(u, v)`.
 
-    .. math::
-        S =
-        \begin{bmatrix}
-            0 & 1 & 0 & 0 & 0 & 0 & 0 & 0 \\
-            1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
-            0 & 0 & 0 & 0 & 1 & 0 & 0 & 0 \\
-            0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 \\
-            0 & 0 & 1 & 0 & 0 & 0 & 0 & 0 \\
-            0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 \\
-            0 & 0 & 0 & 1 & 0 & 0 & 0 & 0 \\
-            0 & 0 & 0 & 0 & 0 & 1 & 0 & 0 
-        \end{bmatrix}.
 
-    Note that as required, :math:`S^2 = I`,
-    :math:`S \ket 0 = \ket 1`, :math:`\ket 1 = \ket 0`,
-    :math:`S \ket 2 = \ket 4`, :math:`S \ket 4 = \ket 2`, etc.
+    For more information about the general flip-flop shift operator,
+    check "Quantum Walks and Search Algorithms"
+    Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
+    
 
+    References
+    ----------
+    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+        Vol. 19. New York: Springer, 2013.
 
     Examples
     --------
-    .. todo::
-        do some examples
+    Consider the Graph presented in the
+    :ref:`CoinedModel Notes <CoinedModel Notes>` Section example.
+    The corresponding flip-flop shift operator is
+
+    >>> from scipy.sparse import csr_matrix
+    >>> import CoinedModel as qcm
+    >>> A = csr_matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
+    >>> S = qcm.FlipFlopShiftOperator(A)
+    >>> Sd = S.todense()
+    >>> Sd
+    matrix([[0, 1, 0, 0, 0, 0, 0, 0],
+        [1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1],
+        [0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0]], dtype=int8)
+
+    Note that as required, :math:`S^2 = I`,
+    :math:`S \ket 0 = \ket 1`, :math:`S \ket 1 = \ket 0`,
+    :math:`S \ket 2 = \ket 4`, :math:`S \ket 4 = \ket 2`, etc.
+
+    >>> (Sd @ Sd == np.eye(8)).all() #True by definition
+    True
+    >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) #S|0> = |1>
+    array([0., 1., 0., 0., 0., 0., 0., 0.])
+    >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) #S|1> = |0>
+    array([1., 0., 0., 0., 0., 0., 0., 0.])
+    >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) #S|2> = |4>
+    array([0., 0., 0., 0., 1., 0., 0., 0.])
+    >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) #S|4> = |2>
+    array([0., 0., 1., 0., 0., 0., 0., 0.])
     """
 
     if DEBUG:
@@ -161,6 +112,7 @@ def FlipFlopShiftOperator(AdjMatrix):
     #storing indexes edges in data.
     #obs.: for some reason this does not throw exception,
     #   so technically it is a sparse matrix that stores zero
+    orig_dtype = AdjMatrix.dtype
     AdjMatrix.data = numpy.arange(num_edges)
 
     #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
@@ -179,7 +131,7 @@ def FlipFlopShiftOperator(AdjMatrix):
             shape=(num_edges, num_edges))
 
     #restores original data to AdjMatrix
-    AdjMatrix.data = numpy.ones(num_edges)
+    AdjMatrix.data = numpy.ones(num_edges, dtype=orig_dtype)
 
     #TODO: compare with old approach for creating S
 
