@@ -21,15 +21,16 @@ def FlipFlopShiftOperator(AdjMatrix):
     r"""
     Creates flip-flop shift operator (:math:`S`) based on
     an adjacency matrix.
+    :class:`scipy.sparse.csr_matrix`
 
     Parameters
     ----------
-    AdjMatrix: scipy.sparse.csr_matrix
+    AdjMatrix : :class:`scipy.sparse.csr_matrix`
         Adjacency Matrix of an unweighted undirected graph.
 
     Returns
     -------
-    scipy.sparse.csr_matrix
+    :class:`scipy.sparse.csr_matrix`
         Flip-flop shift operator.
 
     Notes
