@@ -31,6 +31,7 @@ release = '2.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    'sphinx.ext.intersphinx',
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx_autodoc_typehints',
@@ -41,7 +42,9 @@ extensions = [
 ]
 
 intersphinx_mapping = {
-    "python": ("https://docs.python.org/3/", None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy-1.8.0/html-scipyorg/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
 }
 
 autosummary_generate = True
