@@ -1,5 +1,5 @@
 """
-Module information
+Encapsules Animation class, responsible for managing animations.
 """
 
 from Constants import DEBUG
@@ -18,10 +18,10 @@ class Animation:
     ----------
     frames : list
         List of frames.
-    plt_anim : matplotlib.pyplot.Animation
+    plt_anim : :class:`matplotlib.animation.FuncAnimation`
         Animation object of matplotlib.
     save_path : str
-        Filepath for saving an animation.
+        Filepath for saving the animation.
     """
 
     def __init__(self):
@@ -40,17 +40,17 @@ class Animation:
 
     def AddFrame(self, fig):
         """
-        expects matplotlib fig
-        storing images on RAM and clearing matplotlib image
+        Draws and adds (appends) a new frame to the `frames` list.
 
         Parameters
         ----------
-        fig
-            matplotlib figure
+        fig : :class:`matplotlib.figure.Figure`
+            Figure to be added.
 
         Examples
         --------
-        Some stuff here
+        .. todo::
+            Create example
         """
         fig.canvas.draw()
 
@@ -62,7 +62,29 @@ class Animation:
 
     def CreateAnimation(self, interval, repeat_delay):
         """
-        TODO: repeat_delay not being used
+        Creates animation using the `frames` content.
+
+        Parameters
+        ----------
+        interval : int
+            Delay between frames in milliseconds.
+        repeat_delay : int
+            Additional time in milliseconds before repeating animation.
+
+        See Also
+        --------
+        AddFrame
+
+        Notes
+        -----
+        The animation is saved in `plt_anim` as a
+        :class:`matplotlib.animation.FuncAnimation` object.
+
+        .. todo::
+            - Default values for `intevaal` and `repeat_delay`
+            - `repeat_delay` is not being used.
+                For matplotlib 3.5, saving the gif using either Pillow or ffmpeg
+                ignores the `repeat_delay` parameter.
         """
         from PlotModule import ConfigureFigure
         from matplotlib.animation import FuncAnimation
@@ -103,6 +125,36 @@ class Animation:
     #ffmpeg is necessary for saving video and better quality gifs.
     #Pillow is sufficient for saving gifs, although colorbar may be discretized.
     def SaveAnimation(self, filename_prefix):
+        """
+        Saves animation as a gif if it is already created.
+
+        Parameters
+        ----------
+        filename_prefix : str
+            Filename (with no format) where the animation will be saved.
+
+        See Also
+        --------
+        CreateAnimation
+
+        Notes
+        -----
+        `repeat_delay` is not being used.
+        For matplotlib 3.5, saving the gif using either Pillow or ffmpeg
+        ignores the `repeat_delay` parameter.
+
+        .. todo::
+            Option to save animation as either gif or mp4 file
+            (and potentially other formats).
+
+        Examples
+        --------
+        >>> #add previous code
+        >>> anim.SaveAnimation('output') #saves animation in ``output.gif`` file
+
+        .. todo::
+            Complete example
+        """
         valid_extensions = ['.gif', '.mp4'] #TODO: add other valid matplotlib formats
 
         extension = filename_prefix[:-4]
@@ -153,9 +205,18 @@ class Animation:
         """
         Shows animation as long as it has been created.
 
+        In Jupyter Notebook, use ``%matplotlib inline``
+        before importing :obj:`PlotModule`.
+
         See Also
         --------
         CreateAnimation
+
+        Notes
+        -----
+        If the animation was saved, the file is open and shown.
+        If it was not saved, it is stored in a temporary file
+        and then shown.
         """
         if self.__IsInNotebook():
             self.__ShowAnimationNotebook()
