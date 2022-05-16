@@ -2,7 +2,6 @@ import numpy
 import scipy
 from scipy.linalg import block_diag as scipy_block_diag
 import networkx
-from AuxiliaryFunctions import *
 from PyneblinaInterface import *
 from Constants import DEBUG
 
@@ -115,13 +114,31 @@ def FlipFlopShiftOperator(AdjMatrix):
     orig_dtype = AdjMatrix.dtype
     AdjMatrix.data = numpy.arange(num_edges)
 
+    # expects sorted array and executes binary search in the subarray
+    # v[start:end] searching for elem.
+    # Return the index of the element if found, otherwise returns -1
+    # Cormen's binary search implementation.
+    # Used to improve time complexity
+    def __BinarySearch(v, elem, start=0, end=None):
+        if end == None:
+            end = len(v)
+        
+        while start < end:
+            mid = int((start + end)/2)
+            if elem <= v[mid]:
+                end = mid
+            else:
+                start = mid + 1
+
+    return end if v[end] == elem else -1
+
     #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
     row = 0
     S_cols = numpy.zeros(num_edges)
     for edge in range(num_edges):
         if edge >= AdjMatrix.indptr[row + 1]:
             row += 1
-        col_index = BinarySearch(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
+        col_index = __BinarySearch(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
                 end = AdjMatrix.indptr[row+1])
         S_cols[edge] = AdjMatrix[AdjMatrix.indices[col_index], row]
 
