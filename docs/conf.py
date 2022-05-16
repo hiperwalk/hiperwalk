@@ -12,7 +12,7 @@
 #
 import os
 import sys
-sys.path.append(os.path.abspath('../../'))
+sys.path.append(os.path.abspath('../'))
 
 
 # -- Project information -----------------------------------------------------
@@ -31,13 +31,13 @@ release = '2.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.intersphinx',
+    'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx_autodoc_typehints',
-    'sphinx.ext.todo',
+    'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
-    'numpydoc', #imports 'sphinx.ext.autosummary',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.todo', #'sphinx_autodoc_typehints',
+    'numpydoc',
     'sphinx.ext.graphviz',
 ]
 
@@ -57,7 +57,8 @@ templates_path = ['_templates']
 
 # Removes numpy auto documentation.
 # Documentation is generated recursively according to _templates files
-numpydoc_class_members_toctree = False
+numpydoc_show_class_members = False
+#numpydoc_class_members_toctree = False
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

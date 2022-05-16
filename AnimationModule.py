@@ -1,3 +1,7 @@
+"""
+Module information
+"""
+
 from Constants import DEBUG
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -8,7 +12,7 @@ if DEBUG:
 
 class Animation:
     """
-    Some class description
+    Class responsible for creating, managing and saving animations.
     
     Attributes
     ----------
@@ -21,7 +25,6 @@ class Animation:
     """
 
     def __init__(self):
-        # assigning default values
         self.frames = []
         self.plt_anim = None
         self.save_path = None
@@ -44,6 +47,10 @@ class Animation:
         ----------
         fig
             matplotlib figure
+
+        Examples
+        --------
+        Some stuff here
         """
         fig.canvas.draw()
 
