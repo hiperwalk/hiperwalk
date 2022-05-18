@@ -19,6 +19,7 @@ if DEBUG:
 plt.rcParams["figure.figsize"] = (10, 8)
 plt.rcParams["figure.dpi"] = 100
 
+
 # TODO: add documentation for 'fixed_probabilities' kwarg
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
@@ -68,7 +69,6 @@ def PlotProbabilityDistribution(
     #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
     #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
     """
-
     plot_type = plot_type.lower()
     if plot_type == 'hist':
         plot_type = 'histogram'
@@ -80,10 +80,10 @@ def PlotProbabilityDistribution(
 
     # dictionaries for function pointers
     # preconfiguration: executed once before the loop starts
-    preconfigs = {valid_plot_types[0]: PreconfigurePlot,
-            valid_plot_types[1]: PreconfigurePlot,
-            valid_plot_types[2]: PreconfigureGraphPlot,
-            valid_plot_types[3]: PreconfigurePlot}
+    preconfigs = {valid_plot_types[0]: _PreconfigurePlot,
+            valid_plot_types[1]: _PreconfigurePlot,
+            valid_plot_types[2]: _PreconfigureGraphPlot,
+            valid_plot_types[3]: _PreconfigurePlot}
     # configuration: executed every iteration before plotting
     # expects return of fig, ax to be used for animations
     configs = {valid_plot_types[0]: _ConfigurePlotFigure,
@@ -138,8 +138,10 @@ def PlotProbabilityDistribution(
         if filename_prefix is not None:
             anim.SaveAnimation(filename_prefix)
         if show_plot:
+            anim.ShowAnimation()
 
-def PreconfigurePlot(probabilities, kwargs):
+
+def _PreconfigurePlot(probabilities, kwargs):
     """
     Configure static parameters for matplotlib plot.
 
@@ -159,8 +161,9 @@ def PreconfigurePlot(probabilities, kwargs):
         kwargs['min_prob'] = 0
         kwargs['max_prob'] = probabilities.max()
 
+
 #kwargs passed by reference
-def PreconfigureGraphPlot(probabilities, kwargs):
+def _PreconfigureGraphPlot(probabilities, kwargs):
     """
     Configure static parameters for graph plot.
 
@@ -200,6 +203,7 @@ def PreconfigureGraphPlot(probabilities, kwargs):
     # kwargs dictionary is updated by reference
     # TODO: change ConfigureNodes parameters (remove G and use information from kwargs)
     _ConfigureNodes(kwargs['graph'], probabilities, kwargs)
+
 
 def _ConfigureFigure(num_vert, fig_width=None, fig_height=None):
     """
@@ -275,11 +279,9 @@ def _PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     matplotlib.pyplot.bar
     """
 
-    bars = plt.bar(arange(len(probabilities)), probabilities, **kwargs)
+    plt.bar(arange(len(probabilities)), probabilities, **kwargs)
     _PosconfigurePlotFigure(ax, len(probabilities), labels, graph,
                              min_prob, max_prob)
-
-    return bars, #used for animation
 
 
 def _PlotProbabilityDistributionOnHistogram(probabilities, ax, labels=None,
@@ -416,7 +418,6 @@ def _PlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
         print("_PlotProbabilityDistributionOnGraph: " + str(end - start) +'s')
         start = end
 
-    return nodes, labels
 
 def _ConfigureNodes(G, probabilities, kwargs):
     """
@@ -466,6 +467,7 @@ def _ConfigureNodes(G, probabilities, kwargs):
             kwargs['pos'] = func(G)
         else:
             kwargs['pos'] = nx.kamada_kawai_layout(G)
+
 
 def _UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
     """
