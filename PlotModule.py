@@ -27,14 +27,64 @@ def PlotProbabilityDistribution(
         probabilities, plot_type='bar', animate=False, show_plot=True,
         filename_prefix=None, interval=250, repeat_delay=250, **kwargs):
     """
-    #TODO: probabilities expects numpy array or matrix
-    #TODO: use graphviz to draw as noted by networkx's documentation:
-    #TODO: if that's the case, try to optimize plot and animations before changing to use graphviz
-    #Proper graph visualization is hard, and we highly recommend that
-    #people visualize their graphs with tools dedicated to that task. 
-    #https://networkx.org/documentation/stable/reference/drawing.html
-    #By default, node sizes are larger if the probability is larger.
-    #to fix node size, set "node_size" to a constant or an array, as described in networx documentation.
+    Plots probability distribution of quantum walk.
+
+    The probability distribution of multiple steps of a quantum walk
+    may be plotted.
+    The generated figures may be shown step-by-step,
+    saved in multiple files, animated or saved as animation.
+
+    Parameters
+    ----------
+    probabilities : :class:`numpy.ndarray`
+        The probabilities of the walker to be found on each step
+        of the quantum walk.
+        Columns represent vertices and rows represent the walk steps.
+    plot_type : {'bar', 'line', 'graph', 'histogram'}, default='bar'
+        The type of graph to be plotted
+    animate : bool, default=False
+        Whether or not to animate multiple plots.
+        If ``False``, each quantum walk step generates an image.
+        If ``True``, each quantum walk step is used as an animatino frame.
+    show_plot : bool, default=True
+        Whether or not to show plots.
+        With ``show_plot=True`` we have:
+        **Using Terminal**:
+        After shown, press *q* to quit.
+        If ``animate==False``,
+        the quantum walk will be shown step-by-step;
+        If ``animate==True``,
+        the entire animation is shown in a new window.
+        **Using Jupyter Notebook**:
+        If ``animate==False``,
+        all the quantum walk steps are shown at once.
+        If ``animate==True``,
+        the entire animation is shown as a html video.
+    filename_prefix : str, default=None
+        The filename path (with no format) where
+        the plot(s) will be saved.
+        If ``None`` no file is saved.
+        Otherwise, if ``animate==False``,
+        the j-step is saved in the ``filename_prefix-j.png`` file;
+        if ``animate==True``,
+        the entire walk is saved in the ``filename_prefix.fig`` file.
+
+
+    Other Parameters
+    ----------------
+    Graph Plots
+        min_node_size, max_node_size : int, default=(?, ?)
+            By default, nodes sizes depend on the probability.
+            ``min_node_size`` and ``max_node_size`` describe the
+            inferior and superior limits for the node sizes, respectively.
+        node_size : int? or list of int ?, optional
+            If ``node_size`` is an int, all nodes will have the same size.
+            If ``node_size`` is a list of int,
+            vertices may have different sizes and
+            the length of ``node_size`` must match ``probabilities``.
+
+    Notes
+    -----
     #parameters.
     #min_node_size, max_node_size: node size representing minimum/maximum probability.
     #   If min_node_size or max_node_size are not set and optional argument node_size is not set,
@@ -68,6 +118,35 @@ def PlotProbabilityDistribution(
     #   if ommited and plot_node_size is true, uses default size.
     #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
     #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
+
+    The core logic of the main implementation loop is more or less like follows.
+
+    >>> preconfigure()
+    >>> for prob in probabilities:
+    >>>     configure()
+    >>>     plot()
+
+    ``preconfigure()`` executes configurations that do
+    not change between plots, e.g. nodes positions in graph plots.
+    ``configure()`` executes configurates that must be
+    (re)done for each iteration, e.g. setting figure size.
+    ``plot()`` calls the appropriated plotting method with
+    customization parameters,
+    i.e. bar, line or graph plot with the respective valid kwargs.
+
+    .. todo::
+        - Accept the ``probabilities`` parameter as a list.
+        - Use Graphviz instead of NetworkX to draw graphs.
+            As noted by networkx's documentation:
+            Proper graph visualization is hard, and we highly recommend
+            that people visualize their graphs with tools dedicated to
+            that task. 
+            https://networkx.org/documentation/stable/reference/drawing.html
+
+    Examples
+    --------
+    .. todo::
+        probabilities expects numpy array or matrix
     """
     plot_type = plot_type.lower()
     if plot_type == 'hist':
