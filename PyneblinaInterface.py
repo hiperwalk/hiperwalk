@@ -1,6 +1,6 @@
 from neblina import *
 from numpy import array as np_array
-from Constants import NEBLINA_FLOAT, NEBLINA_COMPLEX
+from constants import NEBLINA_FLOAT, NEBLINA_COMPLEX
 
 # Transfers a vector (v) to Neblina-core, and moves it to the device to be used.
 # Returns a pointer to this vector (needed to call other pyneblina functions).
