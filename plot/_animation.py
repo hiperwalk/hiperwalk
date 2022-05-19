@@ -2,7 +2,7 @@
 Encapsules Animation class, responsible for managing animations.
 """
 
-from Constants import DEBUG
+from constants import DEBUG
 import matplotlib.pyplot as plt
 from PIL import Image
 

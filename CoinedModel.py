@@ -3,7 +3,7 @@ import scipy
 from scipy.linalg import block_diag as scipy_block_diag
 import networkx
 from PyneblinaInterface import *
-from Constants import DEBUG
+from constants import DEBUG
 
 if DEBUG:
     from time import time as now
