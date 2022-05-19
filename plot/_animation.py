@@ -84,7 +84,7 @@ class Animation:
                 For matplotlib 3.5, saving the gif using either Pillow or ffmpeg
                 ignores the `repeat_delay` parameter.
         """
-        from PlotModule import _ConfigureFigure
+        from ._plot import _ConfigureFigure
         from matplotlib.animation import FuncAnimation
 
         fig, ax = _ConfigureFigure(None)
