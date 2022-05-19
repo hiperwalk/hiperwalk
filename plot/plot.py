@@ -4,7 +4,6 @@ Module for plotting a probability distribution.
 
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 from numpy import linspace
 from numpy import arange
 from ModifiedNetworkXFunctions import *
@@ -618,6 +617,7 @@ def _ConfigureColorbar(ax, kwargs):
         colorbar values, respectively.
         'cmap' describes a valid matplotlib colormap
     """
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     sm = plt.cm.ScalarMappable(cmap=kwargs['cmap'],
             norm=plt.Normalize(vmin=kwargs['vmin'], vmax=kwargs['vmax']))
