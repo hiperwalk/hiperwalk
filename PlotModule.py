@@ -93,7 +93,13 @@ def PlotProbabilityDistribution(
         while for ``fixed_probabilities=False``,
         the step maximum node size shown is 3000.
 
-    Graph Plots : See :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>` for more optional keywords.
+    Bar Plots
+        See :obj:`matplotlib.pyplot.bar` for more optional keywords.
+
+    Graph Plots
+        See :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
+        for more optional keywords.
+
         min_node_size, max_node_size : scalar, default=(300, 3000)
             By default, nodes sizes depend on the probability.
             ``min_node_size`` and ``max_node_size`` describe the
@@ -111,6 +117,13 @@ def PlotProbabilityDistribution(
             if ``cmap='default'``, uses the ``'YlOrRd_r'`` colormap.
             For more colormap options, check
             `Matplolib's Colormap reference <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
+
+    Histogram Plots
+        See :obj:`matplotlib.pyplot.bar` for more optional keywords.
+        The ``width`` keyword is always overriden.
+
+    Line Plots
+        See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
 
     Notes
