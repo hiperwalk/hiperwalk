@@ -4,9 +4,7 @@ Module for plotting a probability distribution.
 
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
-from numpy import linspace
-from numpy import arange
-from ModifiedNetworkXFunctions import *
+import numpy as np
 from Constants import DEBUG
 from PIL import Image
 from ._animation import *
@@ -374,7 +372,7 @@ def _PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     matplotlib.pyplot.bar
     """
 
-    plt.bar(arange(len(probabilities)), probabilities, **kwargs)
+    plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
     _PosconfigurePlotFigure(ax, len(probabilities), labels, graph,
                              min_prob, max_prob)
 
@@ -424,7 +422,7 @@ def _PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
 
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
-    plt.plot(arange(len(probabilities)), probabilities, **kwargs)
+    plt.plot(np.arange(len(probabilities)), probabilities, **kwargs)
 
     _PosconfigurePlotFigure(ax, len(probabilities), labels, graph, min_prob, max_prob)
 
@@ -488,20 +486,20 @@ def _PlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
     See Also
     --------
     _UpdateNodes : sets volatile parameters
-    nx_draw
+    :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
     _ConfigureColorbar
     """
 
     # UpdateNodes may create kwargs['node_size']
-    # min_node_size and max_node_size are not valid keys for nx_draw kwargs
+    # min_node_size and max_node_size are not valid keys for nx.draw kwargs
     _UpdateNodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
-    nx_draw(kwargs.pop('graph'), ax=ax,
+    nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
             **kwargs)
     # Note: nx.draw_networkx_labels dramatically increases plotting time.
-    # It is called by nx_draw
+    # It is called by nx.draw
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
@@ -619,12 +617,19 @@ def _ConfigureColorbar(ax, kwargs):
     """
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    sm = plt.cm.ScalarMappable(cmap=kwargs['cmap'],
-            norm=plt.Normalize(vmin=kwargs['vmin'], vmax=kwargs['vmax']))
+    sm = plt.cm.ScalarMappable(
+        cmap=kwargs['cmap'],
+        norm=plt.Normalize(vmin=kwargs['vmin'],
+                           vmax=kwargs['vmax'])
+    )
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='2.5%', pad=0.01)
-    cbar = plt.colorbar(sm, ticks=linspace(kwargs['vmin'], kwargs['vmax'], num=5), cax=cax)
+    cbar = plt.colorbar(
+        sm,
+        ticks=np.linspace(kwargs['vmin'], kwargs['vmax'], num=5),
+        cax=cax
+    )
 
     cbar.ax.tick_params(labelsize=14, length=7)
 
