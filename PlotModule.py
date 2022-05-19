@@ -24,7 +24,7 @@ plt.rcParams["figure.dpi"] = 100
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
 def PlotProbabilityDistribution(
-        probabilities, plot_type='bar', animate=False, show_plot=True,
+        probabilities, plot_type='bar', animate=False, show=True,
         filename_prefix=None, interval=250, **kwargs):
     """
     Plots probability distribution of quantum walk.
@@ -49,9 +49,9 @@ def PlotProbabilityDistribution(
         Whether or not to animate multiple plots.
         If ``False``, each quantum walk step generates an image.
         If ``True``, each quantum walk step is used as an animation frame.
-    show_plot : bool, default=True
+    show : bool, default=True
         Whether or not to show plots or animation.
-        With ``show_plot=True`` we have:
+        With ``show=True`` we have:
         **Using Terminal**:
         After shown, press *q* to quit.
         If ``animate==False``,
@@ -220,9 +220,9 @@ def PlotProbabilityDistribution(
                 filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
                         if len(probabilities) > 1 else '' )
                 plt.savefig(filename_prefix + filename_suffix)
-                if not show_plot:
+                if not show:
                     plt.close()
-            if show_plot:
+            if show:
                 plt.show()
 
         else:
@@ -233,7 +233,7 @@ def PlotProbabilityDistribution(
 
         if filename_prefix is not None:
             anim.SaveAnimation(filename_prefix)
-        if show_plot:
+        if show:
             anim.ShowAnimation()
 
 

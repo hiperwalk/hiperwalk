@@ -60,7 +60,7 @@ class Animation:
 
         plt.close()
 
-    def CreateAnimation(self, interval, repeat_delay):
+    def CreateAnimation(self, interval):
         """
         Creates animation using the `frames` content.
 
@@ -68,8 +68,6 @@ class Animation:
         ----------
         interval : int
             Delay between frames in milliseconds.
-        repeat_delay : int
-            Additional time in milliseconds before repeating animation.
 
         See Also
         --------
@@ -81,8 +79,8 @@ class Animation:
         :class:`matplotlib.animation.FuncAnimation` object.
 
         .. todo::
-            - Default values for `intevaal` and `repeat_delay`
-            - `repeat_delay` is not being used.
+            - Default values for `inteval`
+            - Implement `repeat_delay` parameter.
                 For matplotlib 3.5, saving the gif using either Pillow or ffmpeg
                 ignores the `repeat_delay` parameter.
         """
