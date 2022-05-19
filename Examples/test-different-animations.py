@@ -2,7 +2,7 @@ import numpy as np
 import networkx as nx
 import sys
 sys.path.append('..')
-from PlotModule import *
+from plot import *
 
 #generating adjacency matrix of a 5x5 2d-horizontal-latiice
 grid_dim = 5

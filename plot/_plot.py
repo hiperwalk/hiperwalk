@@ -9,7 +9,7 @@ from numpy import arange
 from ModifiedNetworkXFunctions import *
 from Constants import DEBUG
 from PIL import Image
-from AnimationModule import *
+from ._animation import *
 
 if DEBUG:
     from time import time
