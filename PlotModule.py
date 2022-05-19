@@ -25,7 +25,7 @@ plt.rcParams["figure.dpi"] = 100
 # histogram is alias for bar width=1
 def PlotProbabilityDistribution(
         probabilities, plot_type='bar', animate=False, show_plot=True,
-        filename_prefix=None, interval=250, repeat_delay=250, **kwargs):
+        filename_prefix=None, interval=250, **kwargs):
     """
     Plots probability distribution of quantum walk.
 
@@ -40,14 +40,17 @@ def PlotProbabilityDistribution(
         The probabilities of the walker to be found on each step
         of the quantum walk.
         Columns represent vertices and rows represent the walk steps.
-    plot_type : {'bar', 'line', 'graph', 'histogram'}, default='bar'
-        The type of graph to be plotted
+    plot_type : str, default='bar'
+        The type of graph to be plotted.
+        The valid options are
+        ``{'bar', 'line', 'graph', 'hist', 'histogram'}`` where
+        ``'hist'`` is an alias for ``'histogram'``.
     animate : bool, default=False
         Whether or not to animate multiple plots.
         If ``False``, each quantum walk step generates an image.
-        If ``True``, each quantum walk step is used as an animatino frame.
+        If ``True``, each quantum walk step is used as an animation frame.
     show_plot : bool, default=True
-        Whether or not to show plots.
+        Whether or not to show plots or animation.
         With ``show_plot=True`` we have:
         **Using Terminal**:
         After shown, press *q* to quit.
@@ -68,63 +71,56 @@ def PlotProbabilityDistribution(
         the j-step is saved in the ``filename_prefix-j.png`` file;
         if ``animate==True``,
         the entire walk is saved in the ``filename_prefix.fig`` file.
-
+    interval : int, default=250
+        Time in milliseconds that each frame is shown if ``animate==True``.
+    **kwargs : dict, optional
+        Extra arguments to further customize plotting.
+        Valid arguments depend on ``plot_type``.
+        Check Other Parameters Section for details.
 
     Other Parameters
     ----------------
-    Graph Plots
-        min_node_size, max_node_size : int, default=(?, ?)
+    fixed_probabilities : bool, optional
+        If ``True`` or omitted, the reference maximum probability
+        is the global one.
+        If ``False``, the reference maximum probability depends on
+        the current step, changing every image or frame.
+        For example, if the global maximum probability is 1,
+        ``min_node_size, max_node_size = (300, 3000)``,
+        and the maximum probability of a given step is 0.5;
+        then for ``fixed_probabilities=True``,
+        the step maximum node size shown is halfway betweeen 300 and 3000,
+        while for ``fixed_probabilities=False``,
+        the step maximum node size shown is 3000.
+
+    Graph Plots : See :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>` for more optional keywords.
+        min_node_size, max_node_size : scalar, default=(300, 3000)
             By default, nodes sizes depend on the probability.
             ``min_node_size`` and ``max_node_size`` describe the
             inferior and superior limits for the node sizes, respectively.
-        node_size : int? or list of int ?, optional
-            If ``node_size`` is an int, all nodes will have the same size.
-            If ``node_size`` is a list of int,
+        node_size : scalar or list of scalars, optional
+            If ``node_size`` is a scalar,
+            all nodes will have the same size.
+            If ``node_size`` is a list of scalars,
             vertices may have different sizes and
             the length of ``node_size`` must match ``probabilities``.
+            The ``node_size`` argument is ignored if both
+            ``min_node_size`` and ``max_node_size`` are set.
+        cmap : str, optional
+            A colormap for representing vertices probabilities.
+            if ``cmap='default'``, uses the ``'YlOrRd_r'`` colormap.
+            For more colormap options, check
+            `Matplolib's Colormap reference <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
+
 
     Notes
     -----
-    #parameters.
-    #min_node_size, max_node_size: node size representing minimum/maximum probability.
-    #   If min_node_size or max_node_size are not set and optional argument node_size is not set,
-    #   min_node_size and max_node_size will assume default values (check configure nodes).
-    #   If optional argument node_size is set and either min_node_size or max_node_size is not set,
-    #   all nodes will have the size as described by node_size.
-    #   If min_node_size, max_node_size and node_size are set, node_size is disregarded.
-    #animate: Boolean. If False, generates one image for each of the probabilities.
-    #   If True, generates an animation.
-    #show_plot: Boolean. If False, does not show generated plot.
-    #   If True, shows the generated plot
-    #filename_prefix: str or None, default: None.
-    #   If None and show_plot is True, shows the plot and do not save in an output file.
-    #   If it is a string, saves plot in an output file;
-    #   if animate is True, the animation will be saved in a gif file, e.g. filename_prefix.gif;
-    #   if animate is False, saves a .png file for each of the probabilities,
-    #   e.g. filename_prefix-1.png, filename_prefix-2.png, etc.
-    #interval: int (kwargs). Interval between frames case animate=True,
-    #   check matplotlib.animation.FuncAnimation for more details.
-    #   If interval is set and animate=False, an exception will be thrown
-    #repeat_delay: int (kwargs). Delay before repeating the animation from the start
-    #   (the duration is summed up with interval). Check matplotlib.animation.FuncAnimation for details.
-    #   If repeat_delay is set and animate=False, an exception will be thrown
-    #For detailed info about **kwargs check networkx's documentation for
-    #draw_networkx, draw_networkx_nodes, drawnetworkx_edges, etc.
-    #Here, a few useful optional keywords are listed
-    #cmap: the colormap name to be used to represent probabilities (consult matplotlib colormap options);
-    #   if cmap='default', uses 'YlOrRd_r' colormap.
-    #   The optional kwargs vmin, vmax will be computed from probabilites
-    #node_size: either an integer for fixed node size or a tuple: (min_size, max_size).
-    #   if ommited and plot_node_size is true, uses default size.
-    #alpha: either a float in the [0, 1] interval for fixed node transparency or a float tuple:
-    #   (min_alpha, max_alpha). If ommited and plot_transparency is true, uses default values.
-
     The core logic of the main implementation loop is more or less like follows.
 
     >>> preconfigure()
     >>> for prob in probabilities:
     >>>     configure()
-    >>>     plot()
+    >>>     plot(prob)
 
     ``preconfigure()`` executes configurations that do
     not change between plots, e.g. nodes positions in graph plots.
@@ -142,6 +138,14 @@ def PlotProbabilityDistribution(
             that people visualize their graphs with tools dedicated to
             that task. 
             https://networkx.org/documentation/stable/reference/drawing.html
+        - Implement ``repeat_delay`` parameter:
+            An extra time to wait before the animation is repeated.
+            Pull requests to the
+            `Matplotlib animation writers
+            <https://matplotlib.org/stable/api/animation_api.html#writer-classes>`_
+            are needed.
+        - Implement ``transparency`` parameter:
+            change nodes transparency depending on probability.
 
     Examples
     --------
@@ -212,7 +216,7 @@ def PlotProbabilityDistribution(
             anim.AddFrame(fig)
 
     if animate:
-        anim.CreateAnimation(interval, repeat_delay)
+        anim.CreateAnimation(interval)
 
         if filename_prefix is not None:
             anim.SaveAnimation(filename_prefix)
