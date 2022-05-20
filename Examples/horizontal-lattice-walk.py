@@ -2,8 +2,8 @@ import numpy as np
 import networkx as nx
 import sys
 sys.path.append('..')
-from CoinedModel import *
-from PlotModule import *
+from qwalk import *
+from plot import *
 from neblina import init_engine, stop_engine
 
 #initialises neblina-core
@@ -28,7 +28,7 @@ psi0 = psi0 / 2
 
 
 #simulating walk
-U = EvolutionOperator_CoinedModel(adj_matrix)
+U = EvolutionOperator(adj_matrix)
 #num_steps = 1
 #halfway_state = SimulateWalk(U, psi0, num_steps)[0]
 #final_state = SimulateWalk(U, halfway_state, num_steps)[0]
@@ -51,7 +51,7 @@ states = SimulateWalk(U, psi0, num_steps, save_interval=1, save_initial_state=Tr
 prob = ProbabilityDistribution(adj_matrix, states)
 PlotProbabilityDistribution(prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
         animate=True, fixed_probabilities=False,
-        filename_prefix='animation', interval=1000, repeat_delay=2000)
+        filename_prefix='animation', interval=1000)
 print([(U**i @ psi0 == states[i]).all() for i in range(len(states))])
 
 #stops neblina-core
