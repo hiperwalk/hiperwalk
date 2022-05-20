@@ -20,7 +20,7 @@ plt.rcParams["figure.dpi"] = 100
 # TODO: add documentation for 'fixed_probabilities' kwarg
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
-def PlotProbabilityDistribution(
+def plot_probability_distribution(
         probabilities, plot_type='bar', animate=False, show=True,
         filename_prefix=None, interval=250, **kwargs):
     """
@@ -186,26 +186,30 @@ def PlotProbabilityDistribution(
     valid_plot_types = ['bar', 'line', 'graph', 'histogram']
 
     if plot_type not in valid_plot_types:
-        raise ValueError('Unexpected value for plot_type:' + str(plot_type) +
-                '. One of the following was expected: ' + str(valid_plot_types))
+        raise ValueError(
+            'Unexpected value for plot_type:' + str(plot_type) +
+            '. One of the following was expected: ' + str(valid_plot_types)
+        )
 
     # dictionaries for function pointers
     # preconfiguration: executed once before the loop starts
-    preconfigs = {valid_plot_types[0]: _PreconfigurePlot,
-            valid_plot_types[1]: _PreconfigurePlot,
-            valid_plot_types[2]: _PreconfigureGraphPlot,
-            valid_plot_types[3]: _PreconfigurePlot}
+    preconfigs = {valid_plot_types[0]: _preconfigure_plot,
+            valid_plot_types[1]: _preconfigure_plot,
+            valid_plot_types[2]: _preconfigure_graph_plot,
+            valid_plot_types[3]: _preconfigure_plot}
     # configuration: executed every iteration before plotting
     # expects return of fig, ax to be used for animations
-    configs = {valid_plot_types[0]: _ConfigurePlotFigure,
-            valid_plot_types[1]: _ConfigurePlotFigure,
-            valid_plot_types[2]: _ConfigureGraphFigure,
-            valid_plot_types[3]: _ConfigurePlotFigure}
+    configs = {valid_plot_types[0]: _configure_plot_figure,
+            valid_plot_types[1]: _configure_plot_figure,
+            valid_plot_types[2]: _configure_graph_figure,
+            valid_plot_types[3]: _configure_plot_figure}
     # plot functions: code for plotting the graph accordingly
-    plot_funcs = {valid_plot_types[0]: _PlotProbabilityDistributionOnBars,
-            valid_plot_types[1]: _PlotProbabilityDistributionOnLine,
-            valid_plot_types[2]: _PlotProbabilityDistributionOnGraph,
-            valid_plot_types[3]: _PlotProbabilityDistributionOnHistogram}
+    plot_funcs = {
+        valid_plot_types[0]: _plot_probability_distribution_on_bars,
+        valid_plot_types[1]: _plot_probability_distribution_on_line,
+        valid_plot_types[2]: _plot_probability_distribution_on_graph,
+        valid_plot_types[3]: _plot_probability_distribution_on_histogram
+    }
 
     # preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
@@ -213,8 +217,6 @@ def PlotProbabilityDistribution(
 
     # passes kwargs by reference to be updated accordingly
     preconfigs[plot_type](probabilities, kwargs)
-
-    # TODO: duplicated code with _PlotProbabilityDistributionOnGraph... refactor
 
     if animate:
         anim = Animation()
@@ -232,8 +234,10 @@ def PlotProbabilityDistribution(
         if not animate:
             if filename_prefix is not None:
                 # enumarating the plot
-                filename_suffix = ( '-' + (len(probabilities)-1)//10 * '0' + str(i)
-                        if len(probabilities) > 1 else '' )
+                filename_suffix = (
+                    '-' + (len(probabilities)-1)//10 * '0' + str(i)
+                    if len(probabilities) > 1 else ''
+                )
                 plt.savefig(filename_prefix + filename_suffix)
                 if not show:
                     plt.close()
@@ -252,7 +256,7 @@ def PlotProbabilityDistribution(
             anim.ShowAnimation()
 
 
-def _PreconfigurePlot(probabilities, kwargs):
+def _preconfigure_plot(probabilities, kwargs):
     """
     Configure static parameters for matplotlib plot.
 
@@ -274,7 +278,7 @@ def _PreconfigurePlot(probabilities, kwargs):
 
 
 #kwargs passed by reference
-def _PreconfigureGraphPlot(probabilities, kwargs):
+def _preconfigure_graph_plot(probabilities, kwargs):
     """
     Configure static parameters for graph plot.
 
@@ -293,7 +297,7 @@ def _PreconfigureGraphPlot(probabilities, kwargs):
 
     See Also
     --------
-    _ConfigureNodes
+    _configure_nodes
     """
 
     # vmin and vmax are default keywords used by networkx_draw.
@@ -321,10 +325,10 @@ def _PreconfigureGraphPlot(probabilities, kwargs):
     # setting static kwargs for plotting
     # kwargs dictionary is updated by reference
     # TODO: change ConfigureNodes parameters (remove G and use information from kwargs)
-    _ConfigureNodes(kwargs['graph'], probabilities, kwargs)
+    _configure_nodes(kwargs['graph'], probabilities, kwargs)
 
 
-def _ConfigureFigure(num_vert, fig_width=None, fig_height=None):
+def _configure_figure(num_vert, fig_width=None, fig_height=None):
     """
     Set basic figure configuration.
 
@@ -357,12 +361,12 @@ def _ConfigureFigure(num_vert, fig_width=None, fig_height=None):
     return fig, ax
 
 
-def _ConfigurePlotFigure(num_vert, fig_width=None, fig_height=None):
+def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
     """
     Set basic figure configuration for matplotlib plots.
     """
     
-    fig, ax = _ConfigureFigure(num_vert, fig_width, fig_height)
+    fig, ax = _configure_figure(num_vert, fig_width, fig_height)
 
     plt.xlabel("Vertex ID", size=18)
     plt.ylabel("Probability", size=18)
@@ -372,12 +376,15 @@ def _ConfigurePlotFigure(num_vert, fig_width=None, fig_height=None):
     return fig, ax
 
 
-def _ConfigureGraphFigure(num_vert=None, fig_width=None, fig_height=None):
-    return _ConfigureFigure(num_vert, fig_width, fig_height)
+def _configure_graph_figure(num_vert=None, fig_width=None,
+                            fig_height=None):
+    return _configure_figure(num_vert, fig_width, fig_height)
 
 
-def _PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
-        graph=None, min_prob=None, max_prob=None, **kwargs):
+def _plot_probability_distribution_on_bars(
+        probabilities, ax, labels=None, graph=None,
+        min_prob=None, max_prob=None, **kwargs
+    ):
     """
     Plot probability distribution using matplotlib bar plot.
 
@@ -388,23 +395,25 @@ def _PlotProbabilityDistributionOnBars(probabilities, ax, labels=None,
     ax
         matplotlib ax on which the figure is drawn.
     {labels, graph, min_prob, max_prob} : optional
-        Final configuration parameters. Refer to _PosconfigurePlotFigure.
+        Final configuration parameters. Refer to _posconfigure_plot_figure.
     **kwargs : dict, optional
         Extra parameters for plotting. Refer to matplotlib.pyplot.bar
 
     See Also
     --------
-    _PosconfigurePlotFigure : Sets final configuraation for exhibition.
+    _posconfigure_plot_figure : Sets final configuraation for exhibition.
     matplotlib.pyplot.bar
     """
 
     plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
-    _PosconfigurePlotFigure(ax, len(probabilities), labels, graph,
+    _posconfigure_plot_figure(ax, len(probabilities), labels, graph,
                              min_prob, max_prob)
 
 
-def _PlotProbabilityDistributionOnHistogram(probabilities, ax, labels=None,
-        graph=None, min_prob=None, max_prob=None, **kwargs):
+def _plot_probability_distribution_on_histogram(
+        probabilities, ax, labels=None, graph=None,
+        min_prob=None, max_prob=None, **kwargs
+    ):
     """
     Plot probability distribution as histogram.
 
@@ -412,20 +421,23 @@ def _PlotProbabilityDistributionOnHistogram(probabilities, ax, labels=None,
 
     Parameters
     ----------
-    Refer to _PlotProbabilityDistributionOnBars
+    Refer to _plot_probability_distribution_on_bars
 
     See Also
     --------
-    _PlotProbabilityDistributionOnBars
+    _plot_probability_distribution_on_bars
     """
     
     kwargs['width'] = 1
-    _PlotProbabilityDistributionOnBars(probabilities, ax, labels, graph,
-                                        min_prob, max_prob, **kwargs)
+    _plot_probability_distribution_on_bars(
+        probabilities, ax, labels, graph, min_prob, max_prob, **kwargs
+    )
 
 
-def _PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
-        graph=None, min_prob=None, max_prob=None, **kwargs):
+def _plot_probability_distribution_on_line(
+        probabilities, ax, labels=None, graph=None,
+        min_prob=None, max_prob=None, **kwargs
+    ):
     """
     Plots probability distribution using matplotlib's line plot.
 
@@ -436,13 +448,13 @@ def _PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
     ax
         matplotlib ax on which the figure is drawn.
     {labels, graph, min_prob, max_prob} : optional
-        Final configuration parameters. Refer to _PosconfigurePlotFigure.
+        Final configuration parameters. Refer to _posconfigure_plot_figure.
     **kwargs : dict, optional
         Extra parameters for plotting. Refer to matplotlib.pyplot.plot
 
     See Also
     --------
-    _PosconfigurePlotFigure : Sets final configuraation for exhibition.
+    _posconfigure_plot_figure : Sets final configuraation for exhibition.
     matplotlib.pyplot.plot
     """
 
@@ -450,10 +462,11 @@ def _PlotProbabilityDistributionOnLine(probabilities, ax, labels=None,
         kwargs['marker'] = 'o'
     plt.plot(np.arange(len(probabilities)), probabilities, **kwargs)
 
-    _PosconfigurePlotFigure(ax, len(probabilities), labels, graph, min_prob, max_prob)
+    _posconfigure_plot_figure(ax, len(probabilities), labels, graph, min_prob, max_prob)
 
 
-def _PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None, min_prob=None, max_prob=None):
+def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
+                              min_prob=None, max_prob=None):
     """
     Add final touches to the plotted figure.
 
@@ -504,21 +517,21 @@ def _PosconfigurePlotFigure(ax, num_vert, labels=None, graph=None, min_prob=None
         plt.ylim((min_prob, max_prob))
 
 
-def _PlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
+def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     """
     Draw graph and illustrates the probabilities depending on the
     volatile parameters.
 
     See Also
     --------
-    _UpdateNodes : sets volatile parameters
+    _update_nodes : sets volatile parameters
     :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
-    _ConfigureColorbar
+    _configure_colorbar
     """
 
     # UpdateNodes may create kwargs['node_size']
     # min_node_size and max_node_size are not valid keys for nx.draw kwargs
-    _UpdateNodes(probabilities, kwargs.pop('min_node_size'),
+    _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
     nx.draw(kwargs.pop('graph'), ax=ax,
@@ -529,16 +542,16 @@ def _PlotProbabilityDistributionOnGraph(probabilities, ax, **kwargs):
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
-        _ConfigureColorbar(ax, kwargs)
+        _configure_colorbar(ax, kwargs)
 
     if DEBUG:
         global start
         end = time()
-        print("_PlotProbabilityDistributionOnGraph: " + str(end - start) +'s')
+        print("_plot_probability_distribution_on_graph: " + str(end - start) +'s')
         start = end
 
 
-def _ConfigureNodes(G, probabilities, kwargs):
+def _configure_nodes(G, probabilities, kwargs):
     """
     Configure static attributes of nodes.
 
@@ -553,7 +566,7 @@ def _ConfigureNodes(G, probabilities, kwargs):
 
     See Also
     --------
-    _UpdateNodes
+    _update_nodes
     """
     # setting colormap related attributes
     if 'cmap' in kwargs:
@@ -579,7 +592,7 @@ def _ConfigureNodes(G, probabilities, kwargs):
     # the required parameter. Check
     # https://networkx.org/documentation/stable/reference/drawing.html#module-networkx.drawing.layout
     # For further customisation, the user may call any networkx graph layout function
-    # BEFORE calling PlotProbabilityDistribution and using its return as the 'pos' kwarg.
+    # BEFORE calling plot_probability_distribution and using its return as the 'pos' kwarg.
     if 'pos' not in kwargs:
         if 'graph_layout' in kwargs:
             func = kwargs.pop('graph_layout')
@@ -588,7 +601,7 @@ def _ConfigureNodes(G, probabilities, kwargs):
             kwargs['pos'] = nx.kamada_kawai_layout(G)
 
 
-def _UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
+def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
     """
     Configure probability-related attributes of nodes.
 
@@ -597,7 +610,7 @@ def _UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
 
     See Also
     --------
-    _ConfigureNodes
+    _configure_nodes
 
     Notes
     -----
@@ -614,20 +627,22 @@ def _UpdateNodes(probabilities, min_node_size, max_node_size, kwargs):
             max_node_size = 3000
 
     if min_node_size is not None and max_node_size is not None:
-        if 'fixed_probabilities' in kwargs and not kwargs.pop('fixed_probabilities'):
+        if ('fixed_probabilities' in kwargs
+                and not kwargs.pop('fixed_probabilities')):
             kwargs['vmin'] = 0
             kwargs['vmax'] = probabilities.max()
 
         # calculating size of each node acording to probability 
         # as a function f(x) = ax + b where b = min_size and
         # max_size = a*(max_prob-min_prob) + min_size
-        a = (max_node_size - min_node_size) / (kwargs['vmax'] - kwargs['vmin'])
+        a = (max_node_size - min_node_size)
+            / (kwargs['vmax'] - kwargs['vmin'])
         kwargs['node_size'] = list(map(
-                lambda x: a*x + min_node_size, probabilities
-            ))
+            lambda x: a*x + min_node_size, probabilities
+        ))
 
 
-def _ConfigureColorbar(ax, kwargs):
+def _configure_colorbar(ax, kwargs):
     """
     Add a colorbar in the figure besides the given ax
 
