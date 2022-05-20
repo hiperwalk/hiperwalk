@@ -135,8 +135,11 @@ def PlotProbabilityDistribution(
 
     Raises
     ------
-    .. todo::
-        Add exceptions here.
+    ValueError
+        If ``plot_type`` has an invalid value.
+    KeyError
+        If ``plot_type == True`` and neither of the keywords
+        ``graph`` or ``adj_matrix`` is set.
 
     Notes
     -----
