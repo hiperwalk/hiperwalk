@@ -130,7 +130,7 @@ def FlipFlopShiftOperator(AdjMatrix):
             else:
                 start = mid + 1
 
-    return end if v[end] == elem else -1
+        return end if v[end] == elem else -1
 
     #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
     row = 0

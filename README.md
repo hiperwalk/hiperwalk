@@ -43,7 +43,7 @@ Some code may need to be updated to match PEP 8's requirements.
 	- [ ] Mesh walk
 	- [ ] Tests for plotting graphs?
 - [ ] Clean examples
-- [ ] Add commentaries to CoinedModel
+- [ ] Add commentaries to qwalk/coined
 - [ ] Create documentation
 	- [ ] pdf (with LaTeX)
 	- [ ] webpage
