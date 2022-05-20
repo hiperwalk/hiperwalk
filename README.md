@@ -14,10 +14,10 @@ Some code may need to be updated to match PEP 8's requirements.
 
 # Python Libraries Dependencies
 - Matplotlib;
-- NetworkX;
+- NetworkX >= 2.7;
 	- PIL;
 - NumPy;
-- Scipy;
+- Scipy >= 1.8;
 - Sphinx;
 - numpydoc;
 

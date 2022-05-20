@@ -262,7 +262,9 @@ def _PreconfigureGraphPlot(probabilities, kwargs):
 
     Set parameters that need not to be changed for multiple plots
     or animation of a quantum walk.
-    For example: minimum and maximum allowed node size.
+    For example: the graph.
+    The graph must be sent via kwargs,
+    either via the 'graph' or the 'adj_matrix' keywords.
 
     Parameters
     ----------
@@ -283,9 +285,11 @@ def _PreconfigureGraphPlot(probabilities, kwargs):
         kwargs['vmax'] = probabilities.max() #max_prob
 
     if 'graph' not in kwargs:
-        kwargs['graph'] = nx.from_numpy_matrix( kwargs.pop('adj_matrix') )
-    if 'adj_matrix' in kwargs: #then kwargs['graph'] is set and the adj_matrix can be disregarded
-        kwargs.pop('adj_matrix')
+        if 'adj_matrix' not in kwargs:
+            raise KeyError('One of the following keys must be provided:'
+                           + str(['graph', 'adj_matrix']))
+        adj_matrix = kwargs.pop('adj_matrix')
+        kwargs['graph'] = nx.from_scipy_sparse_array(adj_matrix)
 
     if 'min_node_size' not in kwargs:
         kwargs['min_node_size'] = None
