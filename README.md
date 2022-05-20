@@ -47,7 +47,7 @@ Some code may need to be updated to match PEP 8's requirements.
 - [ ] Create documentation
 	- [ ] pdf (with LaTeX)
 	- [ ] webpage
-- [ ] PyneblinaInterface.py
+- [ ] pyneblina\_interface.py
 	- [ ] Rename functions
 	- [ ] Remove definition from examples
 	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?

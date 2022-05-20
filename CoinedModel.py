@@ -2,7 +2,7 @@ import numpy
 import scipy
 from scipy.linalg import block_diag as scipy_block_diag
 import networkx
-from PyneblinaInterface import *
+from pyneblina_interface import *
 from constants import DEBUG
 
 if DEBUG:
