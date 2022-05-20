@@ -10,13 +10,13 @@ if DEBUG:
     from guppy import hpy #used to check memory usage
 
 
-def UniformInitialCondition(AdjMatrix):
+def uniform_initial_condition(AdjMatrix):
     G = networkx.from_numpy_matrix(AdjMatrix)
     N = sum([G.degree(i) for i in range(AdjMatrix.shape[0])])
     return numpy.matrix([[1]]*N)/numpy.sqrt(N)
     #TODO: USE np.ones
 
-def FlipFlopShiftOperator(AdjMatrix):
+def flip_flop_shift_operator(AdjMatrix):
     r"""
     Creates flip-flop shift operator (:math:`S`) based on
     an adjacency matrix.
@@ -75,7 +75,7 @@ def FlipFlopShiftOperator(AdjMatrix):
     >>> from scipy.sparse import csr_matrix
     >>> import CoinedModel as qcm
     >>> A = csr_matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
-    >>> S = qcm.FlipFlopShiftOperator(A)
+    >>> S = qcm.flip_flop_shift_operator(A)
     >>> Sd = S.todense()
     >>> Sd
     matrix([[0, 1, 0, 0, 0, 0, 0, 0],
@@ -119,7 +119,7 @@ def FlipFlopShiftOperator(AdjMatrix):
     # Return the index of the element if found, otherwise returns -1
     # Cormen's binary search implementation.
     # Used to improve time complexity
-    def __BinarySearch(v, elem, start=0, end=None):
+    def __binary_search(v, elem, start=0, end=None):
         if end == None:
             end = len(v)
         
@@ -138,7 +138,7 @@ def FlipFlopShiftOperator(AdjMatrix):
     for edge in range(num_edges):
         if edge >= AdjMatrix.indptr[row + 1]:
             row += 1
-        col_index = __BinarySearch(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
+        col_index = __binary_search(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
                 end = AdjMatrix.indptr[row+1])
         S_cols[edge] = AdjMatrix[AdjMatrix.indices[col_index], row]
 
@@ -153,29 +153,29 @@ def FlipFlopShiftOperator(AdjMatrix):
     #TODO: compare with old approach for creating S
 
     if DEBUG:
-        print("FlipFlopShiftOperator Memory: " + str(hpy().heap().size))
-        print("FlipFlopShiftOperator Time: " + str(now() - start_time))
+        print("flip_flop_shift_operator Memory: " + str(hpy().heap().size))
+        print("flip_flop_shift_operator Time: " + str(now() - start_time))
 
     return S
 
-def CoinOperator(AdjMatrix, coin='grover'):
+def coin_operator(AdjMatrix, coin='grover'):
     n = AdjMatrix.shape[0]
     G = networkx.from_numpy_matrix(AdjMatrix)
     if coin == 'grover':
-        L = [GroverOperator(G.degree(i)) for i in range(n)]
+        L = [grover_operator(G.degree(i)) for i in range(n)]
     elif coin == 'hadamard':
-        L = [HadamardOperator() for i in range(n)]
+        L = [hadamard_operator() for i in range(n)]
     else:
         return None
     return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
-def GroverOperator(N):
+def grover_operator(N):
     return numpy.matrix(2/N*numpy.ones(N)-numpy.identity(N))
 
-def HadamardOperator():
+def hadamard_operator():
     return 1/numpy.sqrt(2) * numpy.matrix([[1, 1], [1, -1]])
 
-def OracleR(N):
+def oracle(N):
     """
     Create the oracle that marks the first element (vertex 0)
     """
@@ -183,13 +183,13 @@ def OracleR(N):
     R[0,0] = -1
     return numpy.matrix(R)
 
-def EvolutionOperator(AdjMatrix, CoinOp=None):
+def evolution_operator(AdjMatrix, CoinOp=None):
     #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
-        return FlipFlopShiftOperator(AdjMatrix) @ CoinOperator(AdjMatrix)
-    return FlipFlopShiftOperator(AdjMatrix) @ CoinOp
+        return flip_flop_shift_operator(AdjMatrix) @ coin_operator(AdjMatrix)
+    return flip_flop_shift_operator(AdjMatrix) @ CoinOp
 
-def SearchEvolutionOperator(AdjMatrix):
+def search_evolution_operator(AdjMatrix):
     """
     Creates the search evolution operator for the graph described by a
     given adjacency matrix.
@@ -206,7 +206,7 @@ def SearchEvolutionOperator(AdjMatrix):
 
     See Also
     --------
-    EvolutionOperator
+    evolution_operator
     OracleR
 
 
@@ -226,7 +226,7 @@ def SearchEvolutionOperator(AdjMatrix):
         Vol. 19. New York: Springer, 2013.
     """
     S = ShiftOperator(AdjMatrix)
-    C = CoinOperator(AdjMatrix)
+    C = coin_operator(AdjMatrix)
     N = S.shape[0]
     #TODO: should this matrix multiplication be performed by neblina?
     return S*C*OracleR(N)
@@ -234,19 +234,21 @@ def SearchEvolutionOperator(AdjMatrix):
 #TODO: check numpy vectorize documentation
 #TODO: move to auxiliary functions?
 #TODO: test with complex state
-def __UnvectorizedElementwiseProbability(elem):
+def __unvectorized_elementwise_probability(elem):
     #this is more efficient than:
     #(numpy.conj(elem) * elem).real
     #elem.real**2 + elem.imag**2
     return elem.real*elem.real + elem.imag*elem.imag
 
 #vectorized
-ElementwiseProbability = numpy.vectorize(__UnvectorizedElementwiseProbability)
+__elementwise_probability = numpy.vectorize(
+    __unvectorized_elementwise_probability
+)
 
 #TODO: documentation
 #TODO: test with nonregular graph
 #TODO: test with nonuniform condition
-def ProbabilityDistribution(AdjMatrix, states):
+def probability_distribution(AdjMatrix, states):
     if len(states.shape) == 1:
         states = [states]
 
@@ -258,7 +260,9 @@ def ProbabilityDistribution(AdjMatrix, states):
     #first splits state per vertex, then calculates probability of each vertex direction,
     #then sums the probabilities resulting in the vertix final probability
     prob = numpy.array([[
-            ElementwiseProbability(states[i][edges_indices[j]:edges_indices[j+1]]).sum()
+            __elementwise_probability(
+                states[i][edges_indices[j]:edges_indices[j+1]]
+            ).sum()
             for j in range(len(edges_indices)-1)
         ] for i in range(len(states)) ])
 
@@ -275,7 +279,7 @@ def ProbabilityDistribution(AdjMatrix, states):
 #   Default: None, i.e. saves only the final state
 #save_initial_condition: boolean. If True, adds the initial condition into the saved states.
 #returns array with saved states
-def SimulateWalk(U, initial_state, num_steps, save_interval=None, save_initial_state=False):
+def simulate_walk(U, initial_state, num_steps, save_interval=None, save_initial_state=False):
     #preparing walk
     nbl_matrix = NeblinaSendSparseMatrix(U)
     nbl_vec = NeblinaSendVector(initial_state)
