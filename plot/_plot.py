@@ -70,6 +70,10 @@ def PlotProbabilityDistribution(
         the entire walk is saved in the ``filename_prefix.fig`` file.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
+    graph : :class:`networkx.classes.graph`, optional
+        The structure of the graph on which the walk occurs.
+        The graph labels are used as plotting labels.
+        **Important**: check Graph Plots subsection in other parameters.
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
         Valid arguments depend on ``plot_type``.
@@ -97,6 +101,12 @@ def PlotProbabilityDistribution(
         See :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
         for more optional keywords.
 
+        graph : :class:`networkx.classes.graph`, optional
+            Either ``graph`` or ``adj_matrix`` must be set.
+            If both are set, ``adj_matrix`` is discarded.
+        adj_matrix : :class:`scipy.sparse.csr_matrix`, optional
+            Adjacency matrix of the graph on which the walk occurs.
+            Either ``graph`` or ``adj_matrix`` must be set.
         min_node_size, max_node_size : scalar, default=(300, 3000)
             By default, nodes sizes depend on the probability.
             ``min_node_size`` and ``max_node_size`` describe the
@@ -122,6 +132,11 @@ def PlotProbabilityDistribution(
     Line Plots
         See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
+
+    Raises
+    ------
+    .. todo::
+        Add exceptions here.
 
     Notes
     -----
@@ -290,6 +305,10 @@ def _PreconfigureGraphPlot(probabilities, kwargs):
                            + str(['graph', 'adj_matrix']))
         adj_matrix = kwargs.pop('adj_matrix')
         kwargs['graph'] = nx.from_scipy_sparse_array(adj_matrix)
+    if 'adj_matrix' in kwargs:
+        # Pops adj_matrix if both graph and adj_matrix keywords are set;
+        # otherwise invalid keyword may be raisen by networkx
+        kwargs.pop('adj_matrix')
 
     if 'min_node_size' not in kwargs:
         kwargs['min_node_size'] = None
