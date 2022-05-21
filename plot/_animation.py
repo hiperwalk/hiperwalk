@@ -81,7 +81,8 @@ class Animation:
         .. todo::
             - Default values for `inteval`
             - Implement `repeat_delay` parameter.
-                For matplotlib 3.5, saving the gif using either Pillow or ffmpeg
+                For matplotlib 3.5, saving the gif using
+                either Pillow or ffmpeg
                 ignores the `repeat_delay` parameter.
         """
         from ._plot import _configure_figure
@@ -89,10 +90,13 @@ class Animation:
 
         fig, ax = _configure_figure(None)
 
-        #it would be more efficient to use FuncAnimation as a previous version;
-        #i.e. to return only the artist that need to be redrawn.
-        #But workarounds for updating colorbar ticks and y-axes were not found
-        #TODO: documentation: recommend saving gif and not showing for any animations
+        # It would be more efficient to use FuncAnimation
+        # as a previous version;
+        # i.e. to return only the artist that need to be redrawn.
+        # But workarounds for updating colorbar ticks
+        # and y-axes were not found.
+        # TODO: documentation: recommend saving gif
+        # and not showing for any animations
         def updateFigure(img):
             ax.imshow(img)
 
@@ -103,25 +107,30 @@ class Animation:
                 print('\t' + str(img))
                 start = end
 
-        #TODO: repeat_delay not implemented in animation.save
-        self.plt_anim = FuncAnimation(fig, updateFigure, frames=self.frames,
-                interval=interval, repeat=self.__IsInNotebook())
-        #repeat=True causes updateFigure to be called even when it is not needed.
-        #However, it is necessary for creating a looping video in jupyter notebook
+        # TODO: repeat_delay not implemented in animation.save
+        self.plt_anim = FuncAnimation(
+            fig, updateFigure, frames=self.frames,
+            interval=interval, repeat=self.__IsInNotebook()
+        )
+        # repeat=True causes updateFigure to be called
+        # even when it is not needed.
+        # However, it is necessary for creating a
+        # looping video in jupyter notebook.
 
-        #removing axes and pads introduced by imshow,
-        #i.e. shows only the original axes and pads (from plots_as_imgs)
+        # removing axes and pads introduced by imshow,
+        # i.e. shows only the original axes and pads (from plots_as_imgs)
         plt.axis('off')
         plt.tight_layout(pad=0)
         if DEBUG:
-            #used to check if no extra padding is being added
+            # used to check if no extra padding is being added
             fig.patch.set_facecolor('red')
             print("Fig dpi " + str(fig.dpi))
 
-    #TODO: saving video is supported but not recommended because
+    # TODO: saving video is supported but not recommended because
     #   fps may not be respected.
-    #ffmpeg is necessary for saving video and better quality gifs.
-    #Pillow is sufficient for saving gifs, although colorbar may be discretized.
+    # ffmpeg is necessary for saving video and better quality gifs.
+    # Pillow is sufficient for saving gifs,
+    # although colorbar may be discretized.
     def SaveAnimation(self, filename_prefix):
         """
         Saves animation as a gif if it is already created.
@@ -147,13 +156,15 @@ class Animation:
 
         Examples
         --------
-        >>> #add previous code
-        >>> anim.SaveAnimation('output') #saves animation in ``output.gif`` file
+        >>> # add previous code
+        >>> # saves animation in ``output.gif`` file
+        >>> anim.SaveAnimation('output') 
 
         .. todo::
             Complete example
         """
-        valid_extensions = ['.gif', '.mp4'] #TODO: add other valid matplotlib formats
+        # TODO: add other valid matplotlib formats
+        valid_extensions = ['.gif', '.mp4']
 
         extension = filename_prefix[:-4]
         if extension not in valid_extensions:
@@ -166,10 +177,11 @@ class Animation:
         if DEBUG:
             print('finished saving')
 
-        #by ignoring this condition while using the terminal,
-        #a non-aborting exception is thrown:
-        #AttributeError: 'NoneType' object has no attribute 'add_callback'.
-        #The attributes deleted are needed for saving html5 video in jupyter notebooks
+        # by ignoring this condition while using the terminal,
+        # a non-aborting exception is thrown:
+        # AttributeError: 'NoneType' object has no attribute 'add_callback'.
+        # The attributes deleted are needed for saving
+        # html5 video in jupyter notebooks
         if not self.__IsInNotebook():
             del self.plt_anim
             self.plt_anim = None
@@ -179,8 +191,8 @@ class Animation:
     def __IsSaved(self):
         return self.save_path != None
 
-    #returns None if animation is already saved.
-    #Otherwise returns the temporary file
+    # returns None if animation is already saved.
+    # Otherwise returns the temporary file
     def __SaveAnimationInTempFile(self):
         if not self.__IsSaved():
             import tempfile
@@ -232,13 +244,13 @@ class Animation:
         from gi.repository.Gdk import KEY_Q
         from gi.repository.Gdk import RGBA
         
-        #creating window
+        # creating window
         window = gtk.ApplicationWindow(title="Animation")
         state = window.get_state()
         window.override_background_color(state, RGBA(1, 1, 1, 1))
 
         def ConfigureGifWindow(self):
-            #assign closing events
+            # assign closing events
             def on_key_press(self, event):
                 if event.keyval == KEY_q or event.keyval == KEY_Q :
                     window.close()
@@ -246,7 +258,7 @@ class Animation:
             window.connect("key-press-event", on_key_press)
             window.connect("destroy", gtk.main_quit)
 
-            #exhibits animation in gtk window
+            # exhibits animation in gtk window
             img = gtk.Image.new()
             img.set_from_file(self.save_path)
             window.add(img)
@@ -260,7 +272,7 @@ class Animation:
             ConfigureVideoWindow(self)
 
 
-        #showing window and starting gtk main loop
+        # showing window and starting gtk main loop
         window.show_all()
         gtk.main()
         
@@ -271,7 +283,7 @@ class Animation:
     def __ShowAnimationNotebook(self):
         from IPython import display
 
-        #embedding animation in jupyter notebook
+        # embedding animation in jupyter notebook
         video = self.plt_anim.to_html5_video()
         html = display.HTML(video)
         display.display(html)
