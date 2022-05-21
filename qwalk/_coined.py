@@ -318,7 +318,7 @@ def simulate_walk(U, initial_state, num_steps, save_interval=None,
     #TODO: check if intermediate states are being freed from memory
     for i in range(1, num_steps + 1):
         #TODO: request to change parameter order
-        nbl_vec = nbl.sparse_matvec_mul(nbl_vec, nbl_matrix)
+        nbl_vec = nbl.multiply_sparse_matrix_vector(nbl_matrix, nbl_vec)
 
         if save_interval is not None and i % save_interval == 0:
             saved_states[state_index] = nbl.retrieve_vector(

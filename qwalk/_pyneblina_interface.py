@@ -54,7 +54,8 @@ def retrieve_vector(v, vdim, delete_vector=True):
 
     # TODO: check type automatically, for now suppose it is only complex
     py_vec = np_array(
-                [vector_get(nbl_vec, 2*i) + 1j*vector_get(nbl_vec, 2*i+1)
+                [neblina.vector_get(nbl_vec, 2*i)
+                 + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
                  for i in range(vdim)]
             )
 
@@ -119,3 +120,35 @@ def send_sparse_matrix(M, is_complex=True):
     neblina.move_sparse_matrix_device(smat)
 
     return smat
+
+def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
+    """
+    Request matrix multiplication to neblina.
+
+    Multiplies the maatrix by the vector, i.e. ``smat @ vec``.
+
+    Parameters
+    ----------
+    smat
+        neblina sparse matrix object
+    vec
+        neblina vector object
+    is_complex : bool default=True
+        Whether or not smat or vec is complex.
+        .. todo::
+            Not implemented.
+            neblina implementation for the real case is required.
+
+    Returns
+    -------
+    Neblina vector object resulted from matrix multiplication.
+
+    See Also
+    --------
+    send_sparse_matrix : returns a neblina sparse matrix object
+    send_vector : returns a neblina vector object
+    """
+
+    # TODO: check if is_complex automatically?
+    # TODO: ask to change parameter order
+    return neblina.sparse_matvec_mul(vec, smat)
