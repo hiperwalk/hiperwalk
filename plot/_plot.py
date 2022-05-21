@@ -635,8 +635,8 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
         # calculating size of each node acording to probability 
         # as a function f(x) = ax + b where b = min_size and
         # max_size = a*(max_prob-min_prob) + min_size
-        a = (max_node_size - min_node_size)
-            / (kwargs['vmax'] - kwargs['vmin'])
+        a = ((max_node_size - min_node_size)
+             / (kwargs['vmax'] - kwargs['vmin']))
         kwargs['node_size'] = list(map(
             lambda x: a*x + min_node_size, probabilities
         ))

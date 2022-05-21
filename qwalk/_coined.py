@@ -1,8 +1,7 @@
-import numpy
+import numpy as np
 import scipy
 from scipy.linalg import block_diag as scipy_block_diag
 import networkx
-from pyneblina_interface import *
 from constants import DEBUG
 
 if DEBUG:
@@ -13,7 +12,7 @@ if DEBUG:
 def uniform_initial_condition(AdjMatrix):
     G = networkx.from_numpy_matrix(AdjMatrix)
     N = sum([G.degree(i) for i in range(AdjMatrix.shape[0])])
-    return numpy.matrix([[1]]*N)/numpy.sqrt(N)
+    return np.matrix([[1]]*N)/np.sqrt(N)
     #TODO: USE np.ones
 
 def flip_flop_shift_operator(AdjMatrix):
@@ -112,7 +111,7 @@ def flip_flop_shift_operator(AdjMatrix):
     #obs.: for some reason this does not throw exception,
     #   so technically it is a sparse matrix that stores zero
     orig_dtype = AdjMatrix.dtype
-    AdjMatrix.data = numpy.arange(num_edges)
+    AdjMatrix.data = np.arange(num_edges)
 
     # expects sorted array and executes binary search in the subarray
     # v[start:end] searching for elem.
@@ -134,21 +133,23 @@ def flip_flop_shift_operator(AdjMatrix):
 
     #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
     row = 0
-    S_cols = numpy.zeros(num_edges)
+    S_cols = np.zeros(num_edges)
     for edge in range(num_edges):
         if edge >= AdjMatrix.indptr[row + 1]:
             row += 1
-        col_index = __binary_search(AdjMatrix.data, edge, start = AdjMatrix.indptr[row],
-                end = AdjMatrix.indptr[row+1])
+        col_index = __binary_search(AdjMatrix.data, edge,
+                                    start=AdjMatrix.indptr[row],
+                                    end=AdjMatrix.indptr[row+1])
         S_cols[edge] = AdjMatrix[AdjMatrix.indices[col_index], row]
 
     # using csr_matrix((data, indices, indptr), shape)
     S = scipy.sparse.csr_matrix(
-            (numpy.ones(num_edges, dtype=numpy.int8), S_cols, numpy.arange(num_edges+1)),
-            shape=(num_edges, num_edges))
+        (np.ones(num_edges, dtype=np.int8), S_cols, np.arange(num_edges+1)),
+        shape=(num_edges, num_edges)
+    )
 
     #restores original data to AdjMatrix
-    AdjMatrix.data = numpy.ones(num_edges, dtype=orig_dtype)
+    AdjMatrix.data = np.ones(num_edges, dtype=orig_dtype)
 
     #TODO: compare with old approach for creating S
 
@@ -170,23 +171,24 @@ def coin_operator(AdjMatrix, coin='grover'):
     return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
 def grover_operator(N):
-    return numpy.matrix(2/N*numpy.ones(N)-numpy.identity(N))
+    return np.matrix(2/N*np.ones(N)-np.identity(N))
 
 def hadamard_operator():
-    return 1/numpy.sqrt(2) * numpy.matrix([[1, 1], [1, -1]])
+    return 1/np.sqrt(2) * np.matrix([[1, 1], [1, -1]])
 
 def oracle(N):
     """
     Create the oracle that marks the first element (vertex 0)
     """
-    R = numpy.identity(N)
+    R = np.identity(N)
     R[0,0] = -1
-    return numpy.matrix(R)
+    return np.matrix(R)
 
 def evolution_operator(AdjMatrix, CoinOp=None):
     #TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
-        return flip_flop_shift_operator(AdjMatrix) @ coin_operator(AdjMatrix)
+        return (flip_flop_shift_operator(AdjMatrix)
+                @ coin_operator(AdjMatrix))
     return flip_flop_shift_operator(AdjMatrix) @ CoinOp
 
 def search_evolution_operator(AdjMatrix):
@@ -236,12 +238,12 @@ def search_evolution_operator(AdjMatrix):
 #TODO: test with complex state
 def __unvectorized_elementwise_probability(elem):
     #this is more efficient than:
-    #(numpy.conj(elem) * elem).real
+    #(np.conj(elem) * elem).real
     #elem.real**2 + elem.imag**2
     return elem.real*elem.real + elem.imag*elem.imag
 
 #vectorized
-__elementwise_probability = numpy.vectorize(
+__elementwise_probability = np.vectorize(
     __unvectorized_elementwise_probability
 )
 
@@ -253,13 +255,17 @@ def probability_distribution(AdjMatrix, states):
         states = [states]
 
     #TODO: check if dimensions match and throw exception if necessary
-    edges_indices = AdjMatrix.indptr #TODO: check if just creates reference (no hard copy)
+    #TODO: check if just creates reference (no hard copy)
+    edges_indices = AdjMatrix.indptr 
 
-    #TODO: check it is more efficient on demand or using extra memory (aux_prob)
-    #aux_prob = ElementwiseProbability(state) 
-    #first splits state per vertex, then calculates probability of each vertex direction,
-    #then sums the probabilities resulting in the vertix final probability
-    prob = numpy.array([[
+    #TODO: check it is more efficient on demand or
+    #using extra memory (aux_prob)
+    #aux_prob = ElementwiseProbability(state)
+    #first splits state per vertex,
+    #then calculates probability of each vertex direction,
+    #then sums the probabilities resulting in
+    #the vertix final probability
+    prob = np.array([[
             __elementwise_probability(
                 states[i][edges_indices[j]:edges_indices[j+1]]
             ).sum()
@@ -271,27 +277,37 @@ def probability_distribution(AdjMatrix, states):
 
 
 #Simulating walk. Needed: U, state, stop_steps
-#num_steps: int. Number of iterations to be simulated, i.e. U^num_steps |initial_state>
+#num_steps: int. Number of iterations to be simulated,
+#i.e. U^num_steps |initial_state>
 #save_interval: int. Number of steps to execute before saving the state.
-#   For example if num_steps = 10 and save_interval = 5, the states at iterations
-#   5 and 10 will be saved and case save_interval = 3, the states at iterations
+#   For example if num_steps = 10 and save_interval = 5,
+#   the states at iterations
+#   5 and 10 will be saved and case save_interval = 3,
+#   the states at iterations
 #   3, 6, 9, and 10 will be saved.
 #   Default: None, i.e. saves only the final state
-#save_initial_condition: boolean. If True, adds the initial condition into the saved states.
+#save_initial_condition: boolean.
+#   If True, adds the initial condition into the saved states.
 #returns array with saved states
-def simulate_walk(U, initial_state, num_steps, save_interval=None, save_initial_state=False):
+def simulate_walk(U, initial_state, num_steps, save_interval=None,
+                  save_initial_state=False):
+    from . import _pyneblina_interface as nbl
     #preparing walk
-    nbl_matrix = NeblinaSendSparseMatrix(U)
-    nbl_vec = NeblinaSendVector(initial_state)
+    nbl_matrix = nbl.send_sparse_matrix(U)
+    nbl_vec = nbl.send_vector(initial_state)
 
     #number of states to save
-    num_states = int(numpy.ceil(num_steps/save_interval)) if save_interval is not None else 1
+    num_states = (int(np.ceil(num_steps/save_interval))
+                  if save_interval is not None else 1)
     if save_initial_state:
         num_states += 1
-    save_final_state = save_interval is None or num_steps % save_interval != 0
+    save_final_state = (save_interval is None
+                        or num_steps % save_interval != 0)
 
     #TODO: change dtype accordingly
-    saved_states = numpy.zeros((num_states, initial_state.shape[0]), dtype=complex)
+    saved_states = np.zeros(
+        (num_states, initial_state.shape[0]), dtype=complex
+    )
     state_index = 0 #index of the state to be saved
     if save_initial_state:
         saved_states[0] = initial_state
@@ -302,15 +318,17 @@ def simulate_walk(U, initial_state, num_steps, save_interval=None, save_initial_
     #TODO: check if intermediate states are being freed from memory
     for i in range(1, num_steps + 1):
         #TODO: request to change parameter order
-        nbl_vec = sparse_matvec_mul(nbl_vec, nbl_matrix)
+        nbl_vec = nbl.sparse_matvec_mul(nbl_vec, nbl_matrix)
 
         if save_interval is not None and i % save_interval == 0:
-            saved_states[state_index] = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0],
-                    deleteVector=True)
+            saved_states[state_index] = nbl.retrieve_vector(
+                nbl_vec, initial_state.shape[0], delete_vector=True
+            )
             state_index += 1
 
     if save_final_state:
-        saved_states[state_index] = NeblinaRetrieveVector(nbl_vec, initial_state.shape[0],
-                deleteVector=True)
+        saved_states[state_index] = nbl.retrieve_vector(
+            nbl_vec, initial_state.shape[0], delete_vector=True
+        )
 
     return saved_states
