@@ -6,14 +6,14 @@ from constants import DEBUG
 
 if DEBUG:
     from time import time as now
-    from guppy import hpy #used to check memory usage
+    from guppy import hpy # used to check memory usage
 
 
 def uniform_initial_condition(AdjMatrix):
     G = networkx.from_numpy_matrix(AdjMatrix)
     N = sum([G.degree(i) for i in range(AdjMatrix.shape[0])])
     return np.matrix([[1]]*N)/np.sqrt(N)
-    #TODO: USE np.ones
+    # TODO: USE np.ones
 
 def flip_flop_shift_operator(AdjMatrix):
     r"""
@@ -90,25 +90,25 @@ def flip_flop_shift_operator(AdjMatrix):
     :math:`S \ket 0 = \ket 1`, :math:`S \ket 1 = \ket 0`,
     :math:`S \ket 2 = \ket 4`, :math:`S \ket 4 = \ket 2`, etc.
 
-    >>> (Sd @ Sd == np.eye(8)).all() #True by definition
+    >>> (Sd @ Sd == np.eye(8)).all() # True by definition
     True
-    >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) #S|0> = |1>
+    >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
     array([0., 1., 0., 0., 0., 0., 0., 0.])
-    >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) #S|1> = |0>
+    >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
     array([1., 0., 0., 0., 0., 0., 0., 0.])
-    >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) #S|2> = |4>
+    >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) # S|2> = |4>
     array([0., 0., 0., 0., 1., 0., 0., 0.])
-    >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) #S|4> = |2>
+    >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
     array([0., 0., 1., 0., 0., 0., 0., 0.])
     """
 
     if DEBUG:
         start_time = now()
 
-    num_edges = AdjMatrix.sum() #expects weights to be 1 if adjacent
+    num_edges = AdjMatrix.sum() # expects weights to be 1 if adjacent
 
-    #storing indexes edges in data.
-    #obs.: for some reason this does not throw exception,
+    # storing indexes edges in data.
+    # obs.: for some reason this does not throw exception,
     #   so technically it is a sparse matrix that stores zero
     orig_dtype = AdjMatrix.dtype
     AdjMatrix.data = np.arange(num_edges)
@@ -131,7 +131,7 @@ def flip_flop_shift_operator(AdjMatrix):
 
         return end if v[end] == elem else -1
 
-    #calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
+    # calculating FlipFlopShift columns (to be used as indices of a csr_matrix)
     row = 0
     S_cols = np.zeros(num_edges)
     for edge in range(num_edges):
@@ -148,10 +148,10 @@ def flip_flop_shift_operator(AdjMatrix):
         shape=(num_edges, num_edges)
     )
 
-    #restores original data to AdjMatrix
+    # restores original data to AdjMatrix
     AdjMatrix.data = np.ones(num_edges, dtype=orig_dtype)
 
-    #TODO: compare with old approach for creating S
+    # TODO: compare with old approach for creating S
 
     if DEBUG:
         print("flip_flop_shift_operator Memory: " + str(hpy().heap().size))
@@ -185,7 +185,7 @@ def oracle(N):
     return np.matrix(R)
 
 def evolution_operator(AdjMatrix, CoinOp=None):
-    #TODO: should these matrix multiplication be performed by neblina?
+    # TODO: should these matrix multiplication be performed by neblina?
     if CoinOp is None:
         return (flip_flop_shift_operator(AdjMatrix)
                 @ coin_operator(AdjMatrix))
@@ -230,41 +230,41 @@ def search_evolution_operator(AdjMatrix):
     S = ShiftOperator(AdjMatrix)
     C = coin_operator(AdjMatrix)
     N = S.shape[0]
-    #TODO: should this matrix multiplication be performed by neblina?
+    # TODO: should this matrix multiplication be performed by neblina?
     return S*C*OracleR(N)
 
-#TODO: check numpy vectorize documentation
-#TODO: move to auxiliary functions?
-#TODO: test with complex state
+# TODO: check numpy vectorize documentation
+# TODO: move to auxiliary functions?
+# TODO: test with complex state
 def __unvectorized_elementwise_probability(elem):
-    #this is more efficient than:
+    # this is more efficient than:
     #(np.conj(elem) * elem).real
-    #elem.real**2 + elem.imag**2
+    # elem.real**2 + elem.imag**2
     return elem.real*elem.real + elem.imag*elem.imag
 
-#vectorized
+# vectorized
 __elementwise_probability = np.vectorize(
     __unvectorized_elementwise_probability
 )
 
-#TODO: documentation
-#TODO: test with nonregular graph
-#TODO: test with nonuniform condition
+# TODO: documentation
+# TODO: test with nonregular graph
+# TODO: test with nonuniform condition
 def probability_distribution(AdjMatrix, states):
     if len(states.shape) == 1:
         states = [states]
 
-    #TODO: check if dimensions match and throw exception if necessary
-    #TODO: check if just creates reference (no hard copy)
+    # TODO: check if dimensions match and throw exception if necessary
+    # TODO: check if just creates reference (no hard copy)
     edges_indices = AdjMatrix.indptr 
 
-    #TODO: check it is more efficient on demand or
-    #using extra memory (aux_prob)
-    #aux_prob = ElementwiseProbability(state)
-    #first splits state per vertex,
-    #then calculates probability of each vertex direction,
-    #then sums the probabilities resulting in
-    #the vertix final probability
+    # TODO: check it is more efficient on demand or
+    # using extra memory (aux_prob)
+    # aux_prob = ElementwiseProbability(state)
+    # first splits state per vertex,
+    # then calculates probability of each vertex direction,
+    # then sums the probabilities resulting in
+    # the vertix final probability
     prob = np.array([[
             __elementwise_probability(
                 states[i][edges_indices[j]:edges_indices[j+1]]
@@ -272,31 +272,31 @@ def probability_distribution(AdjMatrix, states):
             for j in range(len(edges_indices)-1)
         ] for i in range(len(states)) ])
 
-    #TODO: benchmark (time and memory usage)
+    # TODO: benchmark (time and memory usage)
     return prob
 
 
-#Simulating walk. Needed: U, state, stop_steps
-#num_steps: int. Number of iterations to be simulated,
-#i.e. U^num_steps |initial_state>
-#save_interval: int. Number of steps to execute before saving the state.
+# Simulating walk. Needed: U, state, stop_steps
+# num_steps: int. Number of iterations to be simulated,
+# i.e. U^num_steps |initial_state>
+# save_interval: int. Number of steps to execute before saving the state.
 #   For example if num_steps = 10 and save_interval = 5,
 #   the states at iterations
 #   5 and 10 will be saved and case save_interval = 3,
 #   the states at iterations
 #   3, 6, 9, and 10 will be saved.
 #   Default: None, i.e. saves only the final state
-#save_initial_condition: boolean.
+# save_initial_condition: boolean.
 #   If True, adds the initial condition into the saved states.
-#returns array with saved states
+# returns array with saved states
 def simulate_walk(U, initial_state, num_steps, save_interval=None,
                   save_initial_state=False):
     from . import _pyneblina_interface as nbl
-    #preparing walk
+    # preparing walk
     nbl_matrix = nbl.send_sparse_matrix(U)
     nbl_vec = nbl.send_vector(initial_state)
 
-    #number of states to save
+    # number of states to save
     num_states = (int(np.ceil(num_steps/save_interval))
                   if save_interval is not None else 1)
     if save_initial_state:
@@ -304,20 +304,20 @@ def simulate_walk(U, initial_state, num_steps, save_interval=None,
     save_final_state = (save_interval is None
                         or num_steps % save_interval != 0)
 
-    #TODO: change dtype accordingly
+    # TODO: change dtype accordingly
     saved_states = np.zeros(
         (num_states, initial_state.shape[0]), dtype=complex
     )
-    state_index = 0 #index of the state to be saved
+    state_index = 0 # index of the state to be saved
     if save_initial_state:
         saved_states[0] = initial_state
         state_index += 1
 
-    #simulating walk
-    #TODO: request multiple multiplications at once to neblina-core
-    #TODO: check if intermediate states are being freed from memory
+    # simulating walk
+    # TODO: request multiple multiplications at once to neblina-core
+    # TODO: check if intermediate states are being freed from memory
     for i in range(1, num_steps + 1):
-        #TODO: request to change parameter order
+        # TODO: request to change parameter order
         nbl_vec = nbl.multiply_sparse_matrix_vector(nbl_matrix, nbl_vec)
 
         if save_interval is not None and i % save_interval == 0:
