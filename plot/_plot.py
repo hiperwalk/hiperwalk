@@ -245,15 +245,15 @@ def plot_probability_distribution(
                 plt.show()
 
         else:
-            anim.AddFrame(fig)
+            anim.add_frame(fig)
 
     if animate:
-        anim.CreateAnimation(interval)
+        anim.create_animation(interval)
 
         if filename_prefix is not None:
-            anim.SaveAnimation(filename_prefix)
+            anim.save_animation(filename_prefix)
         if show:
-            anim.ShowAnimation()
+            anim.show_animation()
 
 
 def _preconfigure_plot(probabilities, kwargs):
