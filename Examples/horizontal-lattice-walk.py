@@ -28,7 +28,7 @@ psi0 = psi0 / 2
 
 
 #simulating walk
-U = EvolutionOperator(adj_matrix)
+U = evolution_operator(adj_matrix)
 #num_steps = 1
 #halfway_state = SimulateWalk(U, psi0, num_steps)[0]
 #final_state = SimulateWalk(U, halfway_state, num_steps)[0]
@@ -47,9 +47,9 @@ U = EvolutionOperator(adj_matrix)
 
 #num_steps = int((grid_dim - 1))
 num_steps = 9
-states = SimulateWalk(U, psi0, num_steps, save_interval=1, save_initial_state=True)
-prob = ProbabilityDistribution(adj_matrix, states)
-PlotProbabilityDistribution(prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
+states = simulate_walk(U, psi0, num_steps, save_interval=1, save_initial_state=True)
+prob = probability_distribution(adj_matrix, states)
+plot_probability_distribution(prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
         animate=True, fixed_probabilities=False,
         filename_prefix='animation', interval=1000)
 print([(U**i @ psi0 == states[i]).all() for i in range(len(states))])
