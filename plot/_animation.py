@@ -38,7 +38,7 @@ class Animation:
         _delete(self.frames)
         _delete(self.save_path)
 
-    def AddFrame(self, fig):
+    def add_frame(self, fig):
         """
         Draws and adds (appends) a new frame to the `frames` list.
 
@@ -60,7 +60,7 @@ class Animation:
 
         plt.close()
 
-    def CreateAnimation(self, interval):
+    def create_animation(self, interval):
         """
         Creates animation using the `frames` content.
 
@@ -71,7 +71,7 @@ class Animation:
 
         See Also
         --------
-        AddFrame
+        add_frame
 
         Notes
         -----
@@ -110,7 +110,7 @@ class Animation:
         # TODO: repeat_delay not implemented in animation.save
         self.plt_anim = FuncAnimation(
             fig, updateFigure, frames=self.frames,
-            interval=interval, repeat=self.__IsInNotebook()
+            interval=interval, repeat=self._is_in_notebook()
         )
         # repeat=True causes updateFigure to be called
         # even when it is not needed.
@@ -131,7 +131,7 @@ class Animation:
     # ffmpeg is necessary for saving video and better quality gifs.
     # Pillow is sufficient for saving gifs,
     # although colorbar may be discretized.
-    def SaveAnimation(self, filename_prefix):
+    def save_animation(self, filename_prefix):
         """
         Saves animation as a gif if it is already created.
 
@@ -142,7 +142,7 @@ class Animation:
 
         See Also
         --------
-        CreateAnimation
+        create_animation
 
         Notes
         -----
@@ -158,7 +158,7 @@ class Animation:
         --------
         >>> # add previous code
         >>> # saves animation in ``output.gif`` file
-        >>> anim.SaveAnimation('output') 
+        >>> anim.save_animation('output') 
 
         .. todo::
             Complete example
@@ -182,27 +182,27 @@ class Animation:
         # AttributeError: 'NoneType' object has no attribute 'add_callback'.
         # The attributes deleted are needed for saving
         # html5 video in jupyter notebooks
-        if not self.__IsInNotebook():
+        if not self._is_in_notebook():
             del self.plt_anim
             self.plt_anim = None
             del self.frames
             self.frames = None
 
-    def __IsSaved(self):
+    def _is_saved(self):
         return self.save_path != None
 
     # returns None if animation is already saved.
     # Otherwise returns the temporary file
-    def __SaveAnimationInTempFile(self):
-        if not self.__IsSaved():
+    def _save_animationInTempFile(self):
+        if not self._is_saved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
-            self.SaveAnimation(temp.name)
+            self.save_animation(temp.name)
             return temp
 
         return None
 
-    def __IsInNotebook(self):
+    def _is_in_notebook(self):
         try:
             shell = get_ipython().__class__.__name__
             if shell == 'ZMQInteractiveShell':
@@ -211,7 +211,7 @@ class Animation:
         except:
             return False
 
-    def ShowAnimation(self):
+    def show_animation(self):
         """
         Shows animation as long as it has been created.
 
@@ -220,7 +220,7 @@ class Animation:
 
         See Also
         --------
-        CreateAnimation
+        create_animation
 
         Notes
         -----
@@ -228,13 +228,13 @@ class Animation:
         If it was not saved, it is stored in a temporary file
         and then shown.
         """
-        if self.__IsInNotebook():
-            self.__ShowAnimationNotebook()
+        if self._is_in_notebook():
+            self._show_animation_notebook()
         else:
-            self.__ShowAnimationTerminal()
+            self._show_animation_terminal()
 
-    def __ShowAnimationTerminal(self):
-        temp = self.__SaveAnimationInTempFile()
+    def _show_animation_terminal(self):
+        temp = self._save_animationInTempFile()
 
         from gi import require_version
         require_version('Gtk', '3.0')
@@ -249,7 +249,7 @@ class Animation:
         state = window.get_state()
         window.override_background_color(state, RGBA(1, 1, 1, 1))
 
-        def ConfigureGifWindow(self):
+        def configure_gif_window(self):
             # assign closing events
             def on_key_press(self, event):
                 if event.keyval == KEY_q or event.keyval == KEY_Q :
@@ -263,13 +263,13 @@ class Animation:
             img.set_from_file(self.save_path)
             window.add(img)
 
-        def ConfigureVideoWindow(self):
+        def configure_video_window(self):
             print('Warning: show video not supported.')
 
         if self.save_path[-4:] == '.gif':
-            ConfigureGifWindow(self)
+            configure_gif_window(self)
         else:
-            ConfigureVideoWindow(self)
+            configure_video_window(self)
 
 
         # showing window and starting gtk main loop
@@ -280,7 +280,7 @@ class Animation:
             self.save_path = None
             temp.close()
 
-    def __ShowAnimationNotebook(self):
+    def _show_animation_notebook(self):
         from IPython import display
 
         # embedding animation in jupyter notebook
