@@ -29,7 +29,7 @@ psi0 = psi0 / 2
 
 
 # simulating walk
-U = evolution_operator(adj_matrix)
+U = hpw.evolution_operator(adj_matrix)
 
 num_steps = 9
 states = hpw.simulate_walk(
