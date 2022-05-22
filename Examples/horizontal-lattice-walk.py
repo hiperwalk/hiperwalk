@@ -27,8 +27,8 @@ psi0[4*mid_vert + 2] = -1   # pointing rightward
 psi0[4*mid_vert + 3] = 1    # pointing upward
 psi0 = psi0 / 2
 
-
 chl = hpw.Coined() #coined horizontal lattice
+psi0 = chl.uniform_initial_condition(adj_matrix)
 # simulating walk
 U = chl.evolution_operator(adj_matrix)
 
@@ -45,7 +45,11 @@ hplot.plot_probability_distribution(
 )
 
 # checking with python result
-print([(U**i @ psi0 == states[i]).all() for i in range(len(states))])
+epsilon = 1e-15
+print([
+    np.linalg.norm(U**i @ psi0 - states[i]) <= epsilon
+    for i in range(len(states))
+])
 
 # stops neblina-core
 stop_engine()

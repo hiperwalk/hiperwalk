@@ -17,8 +17,7 @@ class Coined:
     def uniform_initial_condition(self, adj_matrix):
         G = networkx.from_numpy_matrix(adj_matrix)
         N = sum([G.degree(i) for i in range(adj_matrix.shape[0])])
-        return np.matrix([[1]]*N)/np.sqrt(N)
-        # TODO: USE np.ones
+        return np.ones(N, dtype=float)/np.sqrt(N)
 
     def flip_flop_shift_operator(self, adj_matrix):
         r"""
