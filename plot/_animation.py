@@ -97,19 +97,19 @@ class Animation:
         # and y-axes were not found.
         # TODO: documentation: recommend saving gif
         # and not showing for any animations
-        def updateFigure(img):
+        def update_figure(img):
             ax.imshow(img)
 
             if DEBUG:
                 global start
                 end = time()
-                print('updateFigure: ' + str(end - start) + 's')
+                print('update_figure: ' + str(end - start) + 's')
                 print('\t' + str(img))
                 start = end
 
         # TODO: repeat_delay not implemented in animation.save
         self.plt_anim = FuncAnimation(
-            fig, updateFigure, frames=self.frames,
+            fig, update_figure, frames=self.frames,
             interval=interval, repeat=self._is_in_notebook()
         )
         # repeat=True causes updateFigure to be called
@@ -193,7 +193,7 @@ class Animation:
 
     # returns None if animation is already saved.
     # Otherwise returns the temporary file
-    def _save_animationInTempFile(self):
+    def _save_animation_in_temp_file(self):
         if not self._is_saved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
@@ -234,7 +234,7 @@ class Animation:
             self._show_animation_terminal()
 
     def _show_animation_terminal(self):
-        temp = self._save_animationInTempFile()
+        temp = self._save_animation_in_temp_file()
 
         from gi import require_version
         require_version('Gtk', '3.0')

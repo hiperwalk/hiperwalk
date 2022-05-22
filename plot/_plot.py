@@ -272,7 +272,8 @@ def _preconfigure_plot(probabilities, kwargs):
         Reference of kwargs containing all extra keywords.
     """
 
-    if 'fixed_probabilities' not in kwargs or kwargs.pop('fixed_probabilities'):
+    if ('fixed_probabilities' not in kwargs
+            or kwargs.pop('fixed_probabilities')):
         kwargs['min_prob'] = 0
         kwargs['max_prob'] = probabilities.max()
 
@@ -302,7 +303,8 @@ def _preconfigure_graph_plot(probabilities, kwargs):
 
     # vmin and vmax are default keywords used by networkx_draw.
     # if an invalid keyword is passed to nx.draw(), it does not execute
-    if 'fixed_probabilities' not in kwargs or kwargs['fixed_probabilities']:
+    if ('fixed_probabilities' not in kwargs
+            or kwargs['fixed_probabilities']):
         kwargs['vmin'] = 0 #min_prob
         kwargs['vmax'] = probabilities.max() #max_prob
 
@@ -324,7 +326,8 @@ def _preconfigure_graph_plot(probabilities, kwargs):
 
     # setting static kwargs for plotting
     # kwargs dictionary is updated by reference
-    # TODO: change ConfigureNodes parameters (remove G and use information from kwargs)
+    # TODO: change ConfigureNodes parameters
+    # (remove G and use information from kwargs)
     _configure_nodes(kwargs['graph'], probabilities, kwargs)
 
 
@@ -395,7 +398,8 @@ def _plot_probability_distribution_on_bars(
     ax
         matplotlib ax on which the figure is drawn.
     {labels, graph, min_prob, max_prob} : optional
-        Final configuration parameters. Refer to _posconfigure_plot_figure.
+        Final configuration parameters.
+        Refer to _posconfigure_plot_figure.
     **kwargs : dict, optional
         Extra parameters for plotting. Refer to matplotlib.pyplot.bar
 
@@ -448,7 +452,8 @@ def _plot_probability_distribution_on_line(
     ax
         matplotlib ax on which the figure is drawn.
     {labels, graph, min_prob, max_prob} : optional
-        Final configuration parameters. Refer to _posconfigure_plot_figure.
+        Final configuration parameters.
+        Refer to _posconfigure_plot_figure.
     **kwargs : dict, optional
         Extra parameters for plotting. Refer to matplotlib.pyplot.plot
 
@@ -462,7 +467,9 @@ def _plot_probability_distribution_on_line(
         kwargs['marker'] = 'o'
     plt.plot(np.arange(len(probabilities)), probabilities, **kwargs)
 
-    _posconfigure_plot_figure(ax, len(probabilities), labels, graph, min_prob, max_prob)
+    _posconfigure_plot_figure(
+        ax, len(probabilities), labels, graph, min_prob, max_prob
+    )
 
 
 def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
@@ -503,7 +510,9 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
     else:
         from matplotlib.ticker import MaxNLocator
 
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=num_vert, integer=True))
+        ax.xaxis.set_major_locator(
+            MaxNLocator(nbins=num_vert, integer=True)
+        )
         if graph is not None:
             loc = ax.xaxis.get_major_locator()
             ind = loc().astype('int')
@@ -530,7 +539,8 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     """
 
     # UpdateNodes may create kwargs['node_size']
-    # min_node_size and max_node_size are not valid keys for nx.draw kwargs
+    # min_node_size and max_node_size are not valid keys
+    # for nx.draw kwargs
     _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
@@ -547,7 +557,8 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     if DEBUG:
         global start
         end = time()
-        print("_plot_probability_distribution_on_graph: " + str(end - start) +'s')
+        print("_plot_probability_distribution_on_graph: "
+              + str(end - start) + 's')
         start = end
 
 
@@ -588,11 +599,14 @@ def _configure_nodes(G, probabilities, kwargs):
 
     # calculates vertices positions.
     # needed to do beforehand in order to fix position for multiple steps
-    # the user may choose any networkx graph_layout function as long as only the graph is
+    # the user may choose any networkx graph_layout function
+    # as long as only the graph is
     # the required parameter. Check
     # https://networkx.org/documentation/stable/reference/drawing.html#module-networkx.drawing.layout
-    # For further customisation, the user may call any networkx graph layout function
-    # BEFORE calling plot_probability_distribution and using its return as the 'pos' kwarg.
+    # For further customisation,
+    # the user may call any networkx graph layout function
+    # BEFORE calling plot_probability_distribution and
+    # using its return as the 'pos' kwarg.
     if 'pos' not in kwargs:
         if 'graph_layout' in kwargs:
             func = kwargs.pop('graph_layout')
