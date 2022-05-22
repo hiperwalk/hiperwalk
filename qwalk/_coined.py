@@ -9,20 +9,20 @@ if DEBUG:
     from guppy import hpy # used to check memory usage
 
 
-def uniform_initial_condition(AdjMatrix):
-    G = networkx.from_numpy_matrix(AdjMatrix)
-    N = sum([G.degree(i) for i in range(AdjMatrix.shape[0])])
+def uniform_initial_condition(adj_matrix):
+    G = networkx.from_numpy_matrix(adj_matrix)
+    N = sum([G.degree(i) for i in range(adj_matrix.shape[0])])
     return np.matrix([[1]]*N)/np.sqrt(N)
     # TODO: USE np.ones
 
-def flip_flop_shift_operator(AdjMatrix):
+def flip_flop_shift_operator(adj_matrix):
     r"""
     Creates flip-flop shift operator (:math:`S`) based on
     an adjacency matrix.
 
     Parameters
     ----------
-    AdjMatrix : :class:`scipy.sparse.csr_matrix`
+    adj_matrix : :class:`scipy.sparse.csr_matrix`
         Adjacency Matrix of an unweighted undirected graph.
 
     Returns
@@ -34,7 +34,7 @@ def flip_flop_shift_operator(AdjMatrix):
     -----
 
     .. todo::
-        if `AdjMatrix` parameter is not sparse,
+        if `adj_matrix` parameter is not sparse,
         throw exception of convert to sparse.
 
     .. note::
@@ -105,13 +105,13 @@ def flip_flop_shift_operator(AdjMatrix):
     if DEBUG:
         start_time = now()
 
-    num_edges = AdjMatrix.sum() # expects weights to be 1 if adjacent
+    num_edges = adj_matrix.sum() # expects weights to be 1 if adjacent
 
     # storing indexes edges in data.
     # obs.: for some reason this does not throw exception,
     #   so technically it is a sparse matrix that stores zero
-    orig_dtype = AdjMatrix.dtype
-    AdjMatrix.data = np.arange(num_edges)
+    orig_dtype = adj_matrix.dtype
+    adj_matrix.data = np.arange(num_edges)
 
     # expects sorted array and executes binary search in the subarray
     # v[start:end] searching for elem.
@@ -135,12 +135,12 @@ def flip_flop_shift_operator(AdjMatrix):
     row = 0
     S_cols = np.zeros(num_edges)
     for edge in range(num_edges):
-        if edge >= AdjMatrix.indptr[row + 1]:
+        if edge >= adj_matrix.indptr[row + 1]:
             row += 1
-        col_index = __binary_search(AdjMatrix.data, edge,
-                                    start=AdjMatrix.indptr[row],
-                                    end=AdjMatrix.indptr[row+1])
-        S_cols[edge] = AdjMatrix[AdjMatrix.indices[col_index], row]
+        col_index = __binary_search(adj_matrix.data, edge,
+                                    start=adj_matrix.indptr[row],
+                                    end=adj_matrix.indptr[row+1])
+        S_cols[edge] = adj_matrix[adj_matrix.indices[col_index], row]
 
     # using csr_matrix((data, indices, indptr), shape)
     S = scipy.sparse.csr_matrix(
@@ -148,8 +148,8 @@ def flip_flop_shift_operator(AdjMatrix):
         shape=(num_edges, num_edges)
     )
 
-    # restores original data to AdjMatrix
-    AdjMatrix.data = np.ones(num_edges, dtype=orig_dtype)
+    # restores original data to adj_matrix
+    adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
 
     # TODO: compare with old approach for creating S
 
@@ -159,9 +159,9 @@ def flip_flop_shift_operator(AdjMatrix):
 
     return S
 
-def coin_operator(AdjMatrix, coin='grover'):
-    n = AdjMatrix.shape[0]
-    G = networkx.from_numpy_matrix(AdjMatrix)
+def coin_operator(adj_matrix, coin='grover'):
+    n = adj_matrix.shape[0]
+    G = networkx.from_numpy_matrix(adj_matrix)
     if coin == 'grover':
         L = [grover_operator(G.degree(i)) for i in range(n)]
     elif coin == 'hadamard':
@@ -171,7 +171,7 @@ def coin_operator(AdjMatrix, coin='grover'):
     return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
 def grover_operator(N):
-    return np.matrix(2/N*np.ones(N)-np.identity(N))
+    return np.matrix(2/N*np.ones(N) - np.identity(N))
 
 def hadamard_operator():
     return 1/np.sqrt(2) * np.matrix([[1, 1], [1, -1]])
@@ -184,21 +184,21 @@ def oracle(N):
     R[0,0] = -1
     return np.matrix(R)
 
-def evolution_operator(AdjMatrix, CoinOp=None):
+def evolution_operator(adj_matrix, coin=None):
     # TODO: should these matrix multiplication be performed by neblina?
-    if CoinOp is None:
-        return (flip_flop_shift_operator(AdjMatrix)
-                @ coin_operator(AdjMatrix))
-    return flip_flop_shift_operator(AdjMatrix) @ CoinOp
+    if coin is None:
+        return (flip_flop_shift_operator(adj_matrix)
+                @ coin_operator(adj_matrix))
+    return flip_flop_shift_operator(adj_matrix) @ coin
 
-def search_evolution_operator(AdjMatrix):
+def search_evolution_operator(adj_matrix):
     """
     Creates the search evolution operator for the graph described by a
     given adjacency matrix.
 
     Parameters
     ----------
-    AdjMatrix : :class:`scipy.sparse.csr_matrix`
+    adj_matrix : :class:`scipy.sparse.csr_matrix`
         Adjacency matrix of the graph where the walk is performed.
 
     Returns
@@ -209,7 +209,7 @@ def search_evolution_operator(AdjMatrix):
     See Also
     --------
     evolution_operator
-    OracleR
+    oracle
 
 
     Notes
@@ -227,11 +227,11 @@ def search_evolution_operator(AdjMatrix):
     .. [1] Portugal, Renato. "Quantum walks and search algorithms".
         Vol. 19. New York: Springer, 2013.
     """
-    S = ShiftOperator(AdjMatrix)
-    C = coin_operator(AdjMatrix)
+    S = flip_flop_shift_operator(adj_matrix)
+    C = coin_operator(adj_matrix)
     N = S.shape[0]
     # TODO: should this matrix multiplication be performed by neblina?
-    return S*C*OracleR(N)
+    return S*C*oracle(N)
 
 # TODO: check numpy vectorize documentation
 # TODO: move to auxiliary functions?
@@ -250,13 +250,13 @@ __elementwise_probability = np.vectorize(
 # TODO: documentation
 # TODO: test with nonregular graph
 # TODO: test with nonuniform condition
-def probability_distribution(AdjMatrix, states):
+def probability_distribution(adj_matrix, states):
     if len(states.shape) == 1:
         states = [states]
 
     # TODO: check if dimensions match and throw exception if necessary
     # TODO: check if just creates reference (no hard copy)
-    edges_indices = AdjMatrix.indptr 
+    edges_indices = adj_matrix.indptr 
 
     # TODO: check it is more efficient on demand or
     # using extra memory (aux_prob)
@@ -267,9 +267,9 @@ def probability_distribution(AdjMatrix, states):
     # the vertix final probability
     prob = np.array([[
             __elementwise_probability(
-                states[i][edges_indices[j]:edges_indices[j+1]]
+                states[i][edges_indices[j]:edges_indices[j + 1]]
             ).sum()
-            for j in range(len(edges_indices)-1)
+            for j in range(len(edges_indices) - 1)
         ] for i in range(len(states)) ])
 
     # TODO: benchmark (time and memory usage)
