@@ -2,7 +2,7 @@
 ``CoinedModel``
 ===============
 
-.. currentmodule:: CoinedModel
+.. currentmodule:: qwalk
 
 This module contains functions for the Coined Quantum Walk Model.
 
@@ -19,14 +19,14 @@ Functions
     :toctree: generated
     :nosignatures:
 
-    CoinOperator
-    EvolutionOperator
-    FlipFlopShiftOperator
-    GroverOperator
-    HadamardOperator
-    OracleR
-    SearchEvolutionOperator
-    UniformInitialCondition
+    coin_operator
+    evolution_operator
+    flip_flop_shift_operator
+    grover_operator
+    hadamard_operator
+    oracle
+    search_evolution_operator
+    uniform_initial_condition
 
 .. _CoinedModel Notes:
 
