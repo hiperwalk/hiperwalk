@@ -28,14 +28,15 @@ psi0[4*mid_vert + 3] = 1    # pointing upward
 psi0 = psi0 / 2
 
 
+chl = hpw.Coined() #coined horizontal lattice
 # simulating walk
-U = hpw.evolution_operator(adj_matrix)
+U = chl.evolution_operator(adj_matrix)
 
 num_steps = 9
-states = hpw.simulate_walk(
+states = chl.simulate_walk(
     U, psi0, num_steps, save_interval=1, save_initial_state=True
 )
-prob = hpw.probability_distribution(adj_matrix, states)
+prob = chl.probability_distribution(adj_matrix, states)
 
 hplot.plot_probability_distribution(
     prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
