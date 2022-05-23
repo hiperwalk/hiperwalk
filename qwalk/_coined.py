@@ -11,8 +11,11 @@ if DEBUG:
 
 class Coined:
 
-    def __init__(self):
-        pass
+    def __init__(self, adj_matrix):
+        self._initial_condition = None
+        self._evolution_operator = None
+        self._num_steps = 0
+        self.adj_matrix = adj_matrix
 
     def uniform_initial_condition(self, adj_matrix):
         G = networkx.from_numpy_matrix(adj_matrix)
