@@ -114,9 +114,9 @@ class Coined:
 
         num_edges = adj_matrix.sum() # expects weights to be 1 if adjacent
 
-        # storing indexes edges in data.
-        # obs.: for some reason this does not throw exception,
-        #   so technically it is a sparse matrix that stores zero
+        # Storing edges' indeces in data.
+        # Obs.: for some reason this does not throw exception,
+        #   so technically it is a sparse matrix that stores a zero entry
         orig_dtype = adj_matrix.dtype
         adj_matrix.data = np.arange(num_edges)
 
@@ -138,19 +138,24 @@ class Coined:
 
             return end if v[end] == elem else -1
 
-        # calculating FlipFlopShift columns
+        # Calculating flip_flop_shift columns
         # (to be used as indices of a csr_matrix)
         row = 0
         S_cols = np.zeros(num_edges)
         for edge in range(num_edges):
             if edge >= adj_matrix.indptr[row + 1]:
                 row += 1
+            # Column index (in the adj_matrix struct) of the current edge
             col_index = __binary_search(adj_matrix.data, edge,
                                         start=adj_matrix.indptr[row],
                                         end=adj_matrix.indptr[row+1])
+            # S[edge, S_cols[edge]] = 1
+            # S_cols[edge] is the edge_id such that
+            # S|edge> = |edge_id>
             S_cols[edge] = adj_matrix[adj_matrix.indices[col_index], row]
 
-        # using csr_matrix((data, indices, indptr), shape)
+        # Using csr_matrix((data, indices, indptr), shape)
+        # Note that there is only one entry per row and column
         S = scipy.sparse.csr_matrix(
             ( np.ones(num_edges, dtype=np.int8),
               S_cols, np.arange(num_edges+1) ),
