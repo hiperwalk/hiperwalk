@@ -293,6 +293,38 @@ class Coined:
         # TODO: benchmark (time and memory usage)
         return prob
 
+    def prepare_walk(self, evolution_operator,
+                     initial_condition, num_steps):
+        """
+        Set all information needed for simulating a quantum walk.
+
+        Parameters
+        ----------
+        evolution_operator
+            Operator that describes the quantum walk
+
+        initial_coidition
+            The initial state
+
+        num_steps : int
+            Numbert of times to apply the ``evolution_operator`` on
+            the ``initial_condition``
+
+        See Also
+        --------
+        simulate_walk
+
+        Notes
+        -----
+        .. todo::
+            Implement assertion of arguments.
+            For example: check if evolution operator is unitary.
+        """
+
+        self._evolution_operator = evolution_operator
+        self._initial_condition = initial_condition
+        self._num_steps = num_steps
+
     # Simulating walk. Needed: U, state, stop_steps
     # num_steps: int. Number of iterations to be simulated,
     # i.e. U^num_steps |initial_state>
