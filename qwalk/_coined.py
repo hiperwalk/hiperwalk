@@ -14,8 +14,7 @@ class Coined:
     Manage an instance of the general coined quantum walk model.
 
     Methods for managing, simulating and generating operators of
-    the coined quantum walk model for general and
-    specific graphs are available.
+    the coined quantum walk model for general graphs are available.
 
     For implementation details, see the Notes Section.
 
