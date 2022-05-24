@@ -10,11 +10,128 @@ if DEBUG:
 
 
 class Coined:
+    r"""
+    Manage an instance of the general coined quantum walk model.
+
+    Methods for managing, simulating and generating operators of
+    the coined quantum walk model for general and
+    specific graphs are available.
+
+    For implementation details, see the Notes Section.
+
+    Parameters
+    ----------
+    adj_matrix : :class:`scipy.sparse.csr_array`
+        Adjacency matrix of the graph on
+        which the quantum walk occurs.
+
+    Notes
+    -----
+    The preferable parameter type is
+
+    #. scipy.sparse.array using ``dtype=np.int8``
+    #. numpy.array using ``dtype=np.int8``
+    #. networkx graph
+
+    .. todo::
+        * Add option: numpy dense matrix as parameters.
+        * Add option: networkx graph as parameter.
+
+    For more information about the general general Coined Quantum Walk Model,
+    check Quantum Walks and Search Algorithms's
+    Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
+
+    The Coined class uses the position-coin notation
+    and the Hilbert space :math:`\mathcal{H}^{2|E|}` for general Graphs.
+    Matrices and states respect the sorted edges order,
+    i.e. :math:`(v, u) < (v', u')` if either :math:`v < v'` or
+    :math:`v = v'` and :math:`u < u'`
+    where :math:`(v, u), (v', u')` are valid edges.
+
+    For example, the graph :math:`G(V, E)` shown in Figure 1 has adjacency matrix `A`.
+
+    >>> import numpy as np
+    >>> A = np.matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
+    >>> A
+    matrix([[0, 1, 0, 0],
+            [1, 0, 1, 1],
+            [0, 1, 0, 1],
+            [0, 1, 1, 0]])
+
+     .. graphviz:: ../../graphviz/coined-model-sample.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1
+
+    Letting :math:`(v, u)` denote the edge from vertex :math:`v` to :math:`u`,
+    the `edges` of :math:`G` are
+
+    >>> edges = [(i, j) for i in range(4) for j in range(4) if A[i,j] == 1]
+    >>> edges
+    [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+
+    Note that `edges` is already sorted, hence the labels are
+
+    >>> edges_labels = {edges[i]: i for i in range(len(edges))}
+    >>> edges_labels
+    {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
+
+    The edges labels are illustrated in Figure 2.
+
+    .. graphviz:: ../../graphviz/coined-model-edges-labels.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 2
+
+    If we would write the edges labels respecting the the adjacency matrix format,
+    we would have the matrix `A_labels`.
+    Intuitively, the edges are labeled in left-to-right top-to-bottom fashion.
+
+    >>> A_labels = [[edges_labels[(i,j)] if (i,j) in edges_labels else '' for j in range(4)]
+    ...             for i in range(4)]
+    >>> A_labels = np.matrix(A_labels)
+    >>> A_labels
+    matrix([['', '0', '', ''],
+            ['1', '', '2', '3'],
+            ['', '4', '', '5'],
+            ['', '6', '7', '']], dtype='<U21')
+
+    For consistency, any state :math:`\ket\psi \in \mathcal{H}^{2|E|}`
+    is such that :math:`\ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i}`
+    where :math:`\ket{i}` is the computational basis state
+    associated to the :math:`i`-th edge.
+    In our example, the state
+
+    >>> psi = np.matrix([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0]).T
+    >>> psi
+    matrix([[0.70710678+0.j        ],
+            [0.        +0.j        ],
+            [0.        +0.70710678j],
+            [0.        +0.j        ],
+            [0.        +0.j        ],
+            [0.        +0.j        ],
+            [0.        +0.j        ],
+            [0.        +0.j        ]])
+
+    corresponds to the walker being at vertex 0
+    and the coin pointing to vertex 1 with
+    associated amplitude of :math:`\frac{1}{\sqrt 2}`, and
+    to the walker being at vertex 1
+    and the coin pointing to vertex 2 with
+    associated amplitude of :math:`\frac{\text{i}}{\sqrt 2}`.
+
+
+    References
+    ----------
+    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+        Vol. 19. New York: Springer, 2013.
+    """
 
     def __init__(self, adj_matrix):
         self._initial_condition = None
         self._evolution_operator = None
         self._num_steps = 0
+        # TODO: create sparse matrix from graph or dense adjacency matrix
         self.adj_matrix = adj_matrix
 
     def uniform_initial_condition(self, adj_matrix):
@@ -41,13 +158,14 @@ class Coined:
         -----
 
         .. todo::
-            if `adj_matrix` parameter is not sparse,
-            throw exception of convert to sparse.
+            - If `adj_matrix` parameter is not sparse,
+                throw exception of convert to sparse.
+            - Change :class:`scipy.sparse.csr_matrix` to
+                :class:`scipy.sparse.csr_array`.
 
         .. note::
-            Check :ref:`CoinedModel Notes <CoinedModel Notes>` for details
+            Check :class:`Coined` Notes for details
             about the order and dimension of the computational basis.
-
 
 
         The flip-flop shift operator :math:`S` is defined such that
@@ -75,7 +193,7 @@ class Coined:
         Examples
         --------
         Consider the Graph presented in the
-        :ref:`CoinedModel Notes <CoinedModel Notes>` Section example.
+        :class:`Coined` Notes Section example.
         The corresponding flip-flop shift operator is
 
         >>> from scipy.sparse import csr_matrix

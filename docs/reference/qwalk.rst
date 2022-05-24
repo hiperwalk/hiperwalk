@@ -6,19 +6,13 @@
 
 .. currentmodule:: qwalk
 
-Coined Model
-------------
-.. toctree::
-    Coined
-
-Functions
----------
+Classes
+-------
 .. autosummary::
     :toctree: generated
     :nosignatures:
 
-    uniform_initial_condition
-    flip_flop_shift_operator
+    Coined
 
 
 Pyneblina Interface
