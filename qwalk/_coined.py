@@ -341,6 +341,30 @@ class Coined:
         return S
 
     def coin_operator(self, coin='grover'):
+        """
+        Generate a coin operator based on the graph structure.
+
+        Parameters
+        ----------
+        coin : {'grover', 'fourier', 'hadamard'}
+            Type of the coin to be used.
+        
+        Returns
+        -------
+        :class:`scipy.sparse.csr_matrix`
+
+        .. todo::
+            Check if return automatically changed to
+            :class:`scipy.sparse.csr_array`.
+
+        Notes
+        -----
+        Due to the chosen computational basis
+        (see :class:`Coined` Notes),
+        the resulting operator is a block diagonal where
+        each block is the :math:`\deg(v)`-dimensional ``coin``.
+        Consequently, there are :math:`|V|` blocks.
+        """
         # dict with valid coins as keys and the respective
         # function pointers.
         coin_funcs = {
@@ -370,7 +394,7 @@ class Coined:
 
     @staticmethod
     def _grover_coin(dim):
-        return np.array(2/dim * np.ones(dim) - np.identity(dim))
+        return np.array(2/dim * np.ones((dim, dim)) - np.identity(dim))
 
     @staticmethod
     def _hadamard_coin(dim):
