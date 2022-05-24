@@ -359,7 +359,8 @@ class Coined:
     def _grover_coin(N):
         return np.matrix(2/N*np.ones(N) - np.identity(N))
 
-    def hadamard_operator(self):
+    @staticmethod
+    def _hadamard_coin():
         return 1/np.sqrt(2) * np.matrix([[1, 1], [1, -1]])
 
     def oracle(self, N):
