@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
-from scipy.linalg import block_diag as scipy_block_diag
-import networkx
+import scipy.sparse
+import networkx as nx
 from constants import DEBUG
 
 if DEBUG:
@@ -340,28 +340,42 @@ class Coined:
 
         return S
 
-    def coin_operator(self, adj_matrix, coin='grover'):
-        n = adj_matrix.shape[0]
-        G = networkx.from_numpy_matrix(adj_matrix)
-        if coin == 'grover':
-            L = [self.grover_operator(G.degree(i)) for i in range(n)]
-        elif coin == 'hadamard':
-            L = [self.hadamard_operator() for i in range(n)]
-        else:
-            return None
-        return scipy.sparse.csr_matrix(scipy_block_diag(*L))
+    def coin_operator(self, coin='grover'):
+        # dict with valid coins as keys and the respective
+        # function pointers.
+        coin_funcs = {
+            'fourier': Coined._fourier_coin,
+            'grover': Coined._grover_coin,
+            'hadamard': Coined._hadamard_coin
+        }
+
+        if coin not in coin_funcs.keys():
+            raise ValueError(
+                'Invalid coin. Expected any of '
+                + str(list(coin_funcs.keys())) + ', '
+                + "but received '" + str(coin) + "'."
+            )
+
+        num_vert = self.adj_matrix.shape[0]
+        degrees = self.adj_matrix.sum(1) # sum rows
+
+        blocks = (coin_funcs[coin](degrees[v]) for v in range(num_vert))
+
+        return scipy.sparse.block_diag(blocks, format='csr')
 
     @staticmethod
-    def _fourier_coin(N):
+    def _fourier_coin(dim):
+        # TODO: implement
         return None
 
     @staticmethod
-    def _grover_coin(N):
-        return np.matrix(2/N*np.ones(N) - np.identity(N))
+    def _grover_coin(dim):
+        return np.array(2/dim * np.ones(dim) - np.identity(dim))
 
     @staticmethod
-    def _hadamard_coin():
-        return 1/np.sqrt(2) * np.matrix([[1, 1], [1, -1]])
+    def _hadamard_coin(dim):
+        # TODO: change according to dimension
+        return 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
 
     def oracle(self, vertex_id):
         """
