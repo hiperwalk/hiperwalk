@@ -352,6 +352,10 @@ class Coined:
         return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
     @staticmethod
+    def _fourier_coin(N):
+        return None
+
+    @staticmethod
     def _grover_coin(N):
         return np.matrix(2/N*np.ones(N) - np.identity(N))
 
