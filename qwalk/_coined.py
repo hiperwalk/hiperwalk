@@ -135,6 +135,38 @@ class Coined:
         self.adj_matrix = adj_matrix
 
     def uniform_state(self):
+        r"""
+        Generate the uniform state.
+
+        The state is constructed based on the ``adj_matrix`` attribute.
+        The uniform initial condition is the state where
+        all entries have the same amplitude.
+
+        Returns
+        -------
+        :obj:`numpy.ndarray`
+
+        Notes
+        -----
+        The uniform initial condition is the state
+
+        .. math::
+
+            \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
+
+        where :math:`N` is the dimension of the Hilbert space.
+        For a graph :math:`G(V, E)`,
+        in the general case, :math:`N = 2|E|`.
+
+        Examples
+        --------
+        >>> # Importing and generating adj_matrix
+        >>> # of Coined Notes example
+        >>> coined_model = hpw.Coined(adj_matrix)
+        >>> coined_model.uniform_state()
+        array([0.35355339, 0.35355339, 0.35355339, 0.35355339, 0.35355339,
+               0.35355339, 0.35355339, 0.35355339])
+        """
         hilb_dim = self.adj_matrix.sum()
         return np.ones(hilb_dim, dtype=float)/np.sqrt(hilb_dim)
 
