@@ -351,7 +351,8 @@ class Coined:
             return None
         return scipy.sparse.csr_matrix(scipy_block_diag(*L))
 
-    def grover_operator(self, N):
+    @staticmethod
+    def _grover_coin(N):
         return np.matrix(2/N*np.ones(N) - np.identity(N))
 
     def hadamard_operator(self):
