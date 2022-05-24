@@ -413,8 +413,9 @@ class Coined:
         """
         Create the oracle that marks the first element (vertex 0)
         """
-        R = np.identity(vertex_id)
-        R[0,0] = -1
+        R = np.identity(self.hilb_dim)
+        # TODO: fix oracle
+        R[vertex_id, vertex_id] = -1
         return np.matrix(R)
 
     def evolution_operator(self, adj_matrix, coin=None):
