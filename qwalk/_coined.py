@@ -134,10 +134,9 @@ class Coined:
         # TODO: create sparse matrix from graph or dense adjacency matrix
         self.adj_matrix = adj_matrix
 
-    def uniform_initial_condition(self, adj_matrix):
-        G = networkx.from_numpy_matrix(adj_matrix)
-        N = sum([G.degree(i) for i in range(adj_matrix.shape[0])])
-        return np.ones(N, dtype=float)/np.sqrt(N)
+    def uniform_state(self):
+        hilb_dim = self.adj_matrix.sum()
+        return np.ones(hilb_dim, dtype=float)/np.sqrt(hilb_dim)
 
     def flip_flop_shift_operator(self, adj_matrix):
         r"""
