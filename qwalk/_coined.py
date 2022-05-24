@@ -24,17 +24,17 @@ class Coined:
         Adjacency matrix of the graph on
         which the quantum walk occurs.
 
+    Raises
+    ------
+    TypeError
+        if ``adj_matrix`` is not an instance of
+        :class:`scipy.sparse.csr_array`.
+
     Notes
     -----
     The preferable parameter type is
+    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``.
 
-    #. scipy.sparse.array using ``dtype=np.int8``
-    #. numpy.array using ``dtype=np.int8``
-    #. networkx graph
-
-    .. todo::
-        * Add option: numpy dense matrix as parameters.
-        * Add option: networkx graph as parameter.
 
     For more information about the general general Coined Quantum Walk Model,
     check Quantum Walks and Search Algorithms's
@@ -119,6 +119,9 @@ class Coined:
     and the coin pointing to vertex 2 with
     associated amplitude of :math:`\frac{\text{i}}{\sqrt 2}`.
 
+    .. todo::
+        * Add option: numpy dense matrix as parameters.
+        * Add option: networkx graph as parameter.
 
     References
     ----------
@@ -130,8 +133,16 @@ class Coined:
         self._initial_condition = None
         self._evolution_operator = None
         self._num_steps = 0
+
         # TODO: create sparse matrix from graph or dense adjacency matrix
-        self.adj_matrix = adj_matrix
+        if isinstance(adj_matrix, scipy.sparse.csr_array):
+            self.adj_matrix = adj_matrix
+        else:
+            raise TypeError(
+                "Invalid 'adj_matrix' type."
+                + " Expected 'scipy.sparse.csr_array',"
+                + " but received " + str(type(adj_matrix)) + '.'
+            )
 
     def uniform_state(self):
         r"""
