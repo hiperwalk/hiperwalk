@@ -11,7 +11,8 @@ if DEBUG:
 
 class Coined:
     r"""
-    Manage an instance of the general coined quantum walk model.
+    Manage an instance of the coined quantum walk model
+    on general unweighted graphs.
 
     Methods for managing, simulating and generating operators of
     the coined quantum walk model for general graphs are available.
@@ -32,9 +33,11 @@ class Coined:
 
     Notes
     -----
-    The preferable parameter type is
-    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``.
-
+    The recommended parameter type is
+    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``
+    with 1 denoting adjacency and 0 denoting non-adjacency.
+    If any entry is different from 0 or 1,
+    some methods may not work as expected.
 
     For more information about the general general Coined Quantum Walk Model,
     check Quantum Walks and Search Algorithms's
@@ -144,6 +147,9 @@ class Coined:
                 + " but received " + str(type(adj_matrix)) + '.'
             )
 
+        # Expects adjacency matrix with only 0 and 1 as entries
+        self.hilb_dim = self.adj_matrix.sum()
+
     def uniform_state(self):
         r"""
         Generate the uniform state.
@@ -177,8 +183,8 @@ class Coined:
         array([0.35355339, 0.35355339, 0.35355339, 0.35355339, 0.35355339,
                0.35355339, 0.35355339, 0.35355339])
         """
-        hilb_dim = self.adj_matrix.sum()
-        return np.ones(hilb_dim, dtype=float)/np.sqrt(hilb_dim)
+        return (np.ones(self.hilb_dim, dtype=float)
+                / np.sqrt(self.hilb_dim))
 
     def uniform_initial_condition(self):
         """
@@ -186,15 +192,10 @@ class Coined:
         """
         return self.uniform_state()
 
-    def flip_flop_shift_operator(self, adj_matrix):
+    def flip_flop_shift_operator(self):
         r"""
-        Creates flip-flop shift operator (:math:`S`) based on
-        an adjacency matrix.
-
-        Parameters
-        ----------
-        adj_matrix : :class:`scipy.sparse.csr_matrix`
-            Adjacency Matrix of an unweighted undirected graph.
+        Create the flip-flop shift operator (:math:`S`) based on
+        the ``adj_matrix`` attribute.
 
         Returns
         -------
@@ -207,8 +208,6 @@ class Coined:
         .. todo::
             - If `adj_matrix` parameter is not sparse,
                 throw exception of convert to sparse.
-            - Change :class:`scipy.sparse.csr_matrix` to
-                :class:`scipy.sparse.csr_array`.
 
         .. note::
             Check :class:`Coined` Notes for details
@@ -243,13 +242,16 @@ class Coined:
         :class:`Coined` Notes Section example.
         The corresponding flip-flop shift operator is
 
-        >>> from scipy.sparse import csr_matrix
+        >>> from scipy.sparse import csr_array
         >>> import CoinedModel as qcm
-        >>> A = csr_matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
+        >>> A = csr_array([[0, 1, 0, 0],
+        ...                [1, 0, 1, 1],
+        ...                [0, 1, 0, 1],
+        ...                [0, 1, 1, 0]])
         >>> S = qcm.flip_flop_shift_operator(A)
         >>> Sd = S.todense()
         >>> Sd
-        matrix([[0, 1, 0, 0, 0, 0, 0, 0],
+        array([[0, 1, 0, 0, 0, 0, 0, 0],
             [1, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 1, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 1, 0],
@@ -277,13 +279,14 @@ class Coined:
         if DEBUG:
             start_time = now()
 
-        num_edges = adj_matrix.sum() # expects weights to be 1 if adjacent
+        # expects weights to be 1 if adjacent
+        num_edges = self.adj_matrix.sum()
 
         # Storing edges' indeces in data.
         # Obs.: for some reason this does not throw exception,
         #   so technically it is a sparse matrix that stores a zero entry
-        orig_dtype = adj_matrix.dtype
-        adj_matrix.data = np.arange(num_edges)
+        orig_dtype = self.adj_matrix.dtype
+        self.adj_matrix.data = np.arange(num_edges)
 
         # expects sorted array and executes binary search in the subarray
         # v[start:end] searching for elem.
@@ -304,31 +307,33 @@ class Coined:
             return end if v[end] == elem else -1
 
         # Calculating flip_flop_shift columns
-        # (to be used as indices of a csr_matrix)
+        # (to be used as indices of a csr_array)
         row = 0
         S_cols = np.zeros(num_edges)
         for edge in range(num_edges):
-            if edge >= adj_matrix.indptr[row + 1]:
+            if edge >= self.adj_matrix.indptr[row + 1]:
                 row += 1
             # Column index (in the adj_matrix struct) of the current edge
-            col_index = __binary_search(adj_matrix.data, edge,
-                                        start=adj_matrix.indptr[row],
-                                        end=adj_matrix.indptr[row+1])
+            col_index = __binary_search(self.adj_matrix.data, edge,
+                                        start=self.adj_matrix.indptr[row],
+                                        end=self.adj_matrix.indptr[row+1])
             # S[edge, S_cols[edge]] = 1
             # S_cols[edge] is the edge_id such that
             # S|edge> = |edge_id>
-            S_cols[edge] = adj_matrix[adj_matrix.indices[col_index], row]
+            S_cols[edge] = self.adj_matrix[
+                self.adj_matrix.indices[col_index], row
+            ]
 
-        # Using csr_matrix((data, indices, indptr), shape)
+        # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
-        S = scipy.sparse.csr_matrix(
+        S = scipy.sparse.csr_array(
             ( np.ones(num_edges, dtype=np.int8),
               S_cols, np.arange(num_edges+1) ),
             shape=(num_edges, num_edges)
         )
 
         # restores original data to adj_matrix
-        adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
+        self.adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
 
         # TODO: compare with old approach for creating S
 
@@ -364,6 +369,9 @@ class Coined:
         the resulting operator is a block diagonal where
         each block is the :math:`\deg(v)`-dimensional ``coin``.
         Consequently, there are :math:`|V|` blocks.
+
+        .. todo::
+            Implement general fourier and hadamard coins.
         """
         # dict with valid coins as keys and the respective
         # function pointers.
