@@ -138,6 +138,12 @@ class Coined:
         hilb_dim = self.adj_matrix.sum()
         return np.ones(hilb_dim, dtype=float)/np.sqrt(hilb_dim)
 
+    def uniform_initial_condition(self):
+        """
+        Alias for :obj:`uniform_state`.
+        """
+        return self.uniform_state()
+
     def flip_flop_shift_operator(self, adj_matrix):
         r"""
         Creates flip-flop shift operator (:math:`S`) based on
