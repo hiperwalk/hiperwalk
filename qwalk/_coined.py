@@ -363,11 +363,11 @@ class Coined:
     def _hadamard_coin():
         return 1/np.sqrt(2) * np.matrix([[1, 1], [1, -1]])
 
-    def oracle(self, N):
+    def oracle(self, vertex_id):
         """
         Create the oracle that marks the first element (vertex 0)
         """
-        R = np.identity(N)
+        R = np.identity(vertex_id)
         R[0,0] = -1
         return np.matrix(R)
 
