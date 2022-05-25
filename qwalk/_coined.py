@@ -362,6 +362,12 @@ class Coined:
             Check if return automatically changed to
             :class:`scipy.sparse.csr_array`.
 
+        Raises
+        ------
+        ValueError
+            If ``coin='hadamard'`` and any vertex of the graph
+            has a non-power of two degree.
+
         Notes
         -----
         Due to the chosen computational basis
@@ -397,8 +403,8 @@ class Coined:
 
     @staticmethod
     def _fourier_coin(dim):
-        # TODO: implement
-        return None
+        import scipy.linalg
+        return scipy.linalg.dft(dim, scale='sqrtn')
 
     @staticmethod
     def _grover_coin(dim):
@@ -406,8 +412,8 @@ class Coined:
 
     @staticmethod
     def _hadamard_coin(dim):
-        # TODO: change according to dimension
-        return 1/np.sqrt(2) * np.array([[1, 1], [1, -1]])
+        import scipy.linalg
+        return scipy.linalg.hadamard(dim) / np.sqrt(dim)
 
     def oracle(self, vertex_id):
         """
