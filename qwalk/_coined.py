@@ -415,13 +415,34 @@ class Coined:
         import scipy.linalg
         return scipy.linalg.hadamard(dim) / np.sqrt(dim)
 
-    def oracle(self, vertex_id):
+    def oracle(self, vertices):
         """
         Create the oracle that marks the first element (vertex 0)
+
+        Parameters
+        ----------
+        vertices : array_like
+            IDs of the vertices to be marked.
+
+        .. todo::
+            - Implement a valid oracle.
+            - Search about different valid oracles for the coined model.
         """
-        R = np.identity(self.hilb_dim)
-        # TODO: fix oracle
-        R[vertex_id, vertex_id] = -1
+        try:
+            iter_ = iter(vertices)
+        except:
+            vertices = [vertices]
+            iter_ = iter(vertices)
+
+        R = scipy.sparse.identity(self.hilb_dim)
+
+        for vertex_id in iter_:
+            first_edge = self.adj_matrix.ptr[vertex_id]
+            last_edge = self.adj_matrix.ptr[vertex_id + 1]
+
+            for edge in range(first_edge, last_edge):
+                R[edge, edge] = -1
+
         return np.matrix(R)
 
     def evolution_operator(self, adj_matrix, coin=None):
