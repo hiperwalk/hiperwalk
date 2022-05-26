@@ -416,17 +416,37 @@ class Coined:
         return scipy.linalg.hadamard(dim) / np.sqrt(dim)
 
     def oracle(self, vertices):
-        """
-        Create the oracle that marks the first element (vertex 0)
+        r"""
+        Create the oracle that marks the given vertices.
+
+        The oracle flips the phase of every entry associated
+        with the marked vertices.
+
+        .. todo::
+            - Search about different valid oracles for the coined model.
 
         Parameters
         ----------
         vertices : array_like
-            IDs of the vertices to be marked.
+            ID(s) of the vertex (vertices) to be marked.
 
-        .. todo::
-            - Implement a valid oracle.
-            - Search about different valid oracles for the coined model.
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+
+        Notes
+        -----
+        The oracle is described by
+
+        .. math::
+            R = I - 2 \sum_{v \in M}\sum_{u \in \text{adj}(v)}
+                \ketbra{(v,u)}{(v,u)}
+
+        where :math:`M` is the set of marked vertices and
+        :math:`\text{adj}(v)` is the set of all vertices adjacent
+        to :math:`v \in V`.
+        See :class:`Coined` Notes for more details about
+        the used computational basis.
         """
         try:
             iter_ = iter(vertices)
