@@ -518,23 +518,55 @@ class Coined:
 
         return [S, C]
 
-    def search_evolution_operator(self, adj_matrix):
+    def search_evolution_operator(self, vertices, coin='grover',
+                                  single=False, hpc=False):
         """
-        Creates the search evolution operator for the graph described by a
-        given adjacency matrix.
+        Create the search evolution operator.
 
         Parameters
         ----------
-        adj_matrix : :class:`scipy.sparse.csr_matrix`
-            Adjacency matrix of the graph where the walk is performed.
+        vertices : array_like
+            The marked vertex (vertices) IDs.
+            See :obj:`oracle`'s ``vertices`` parameter.
+
+        coin : str, default='grover'
+            The coin to be used as diffusion operator.
+            See :obj:`evolution_operator` and :obj:`coin_operator`.
+
+        single : bool, default=False
+            Whether or not the evolution operator should be
+            returned as a single matrix (its parts multiplicated)
+            or partwise.
+
+        hpc : bool, default=False
+            Whether or not evolution operator should be
+            constructed using nelina's high-performance computating.
+            It has no effect if ``single=False``.
+            If ``single=True`` and ``hpc=True``,
+            python is used to perform matrix multiplication.
+
+            .. todo::
+                Implement if True.
 
         Returns
         -------
-        :class:`scipy.sparse.csr_matrix`
-            Search evolution operator
+        U : :class:`scipy.sparse.csr_array` or \
+        list of :class:`scipy.sparse.csr_array`
+            The search evolution operator.
+            If ``single=True``, the search operator is returned as
+            a single matrix, i.e. as a :class:`scipy.sparse.csr_array`.
+            If ``single=False``, the parts of the search operator
+            in the mathematical order are returned,
+            i.e. as a list of :class:`scipy.sparse.csr_array`
+            such that the search operator can be obtained by
+            
+            >>> search_op = U[0]
+            >>> for i in range(1, len(U_w)):
+            >>>     search_op = search_op @ U[i]
 
         See Also
         --------
+        coin_operator
         evolution_operator
         oracle
 
@@ -544,7 +576,7 @@ class Coined:
         The search evolution operator is
 
         .. math::
-            U = U_w R
+            U = U_w R = S C R
 
         where :math:`U_w` is the coined quantum walk evolution operator
         and :math:`R` is the oracle [1]_.
@@ -554,15 +586,24 @@ class Coined:
         .. [1] Portugal, Renato. "Quantum walks and search algorithms".
             Vol. 19. New York: Springer, 2013.
         """
-        S = self.flip_flop_shift_operator(adj_matrix)
-        C = self.coin_operator(adj_matrix)
-        N = S.shape[0]
-        # TODO: should this matrix multiplication be performed by neblina?
-        return S @ C @ self.oracle(N)
+        evol_op = self.evolution_operator(coin=coin, single=single,
+                                          hpc=hpc)
+        oracle = self.oracle(vertices)
 
-    # TODO: check numpy vectorize documentation
-    # TODO: move to auxiliary functions?
-    # TODO: test with complex state
+        if single:
+            if hpc:
+                # TODO: check if sending SCR instead of U_wR
+                # to neblina is more efficient
+                raise NotImplementedError (
+                    'Calculating the search evolution operator via'
+                    + 'hpc (high-performance computing)'
+                    + 'is not supported yet.'
+                )
+                return None
+            return evol_op @ oracle
+
+        return evol_op.append(oracle)
+
     @staticmethod
     def __elementwise_probability(elem):
         # this is more efficient than:
@@ -570,10 +611,9 @@ class Coined:
         # elem.real**2 + elem.imag**2
         return elem.real*elem.real + elem.imag*elem.imag
 
-    # TODO: documentation
-    # TODO: test with nonregular graph
-    # TODO: test with nonuniform condition
     def probability_distribution(self, adj_matrix, states):
+        # TODO: test with nonregular graph
+        # TODO: test with nonuniform condition
         if DEBUG:
             start = now()
 
