@@ -445,12 +445,78 @@ class Coined:
 
         return np.matrix(R)
 
-    def evolution_operator(self, adj_matrix, coin=None):
-        # TODO: should these matrix multiplication be performed by neblina?
-        if coin is None:
-            return (self.flip_flop_shift_operator(adj_matrix)
-                    @ self.coin_operator(adj_matrix))
-        return self.flip_flop_shift_operator(adj_matrix) @ coin
+    def evolution_operator(self, coin='grover', single=False, hpc=False):
+        """
+        Create the standard evolution operator.
+
+        Parameters
+        ----------
+        coin : str, default='grover'
+            The coin to be used as diffusion operator.
+            See :obj:`coin_operator`'s ``coin``
+            attribute for valid options.
+
+        single : bool, default=False
+            Whether or not the evolution operator should be
+            returned as a single matrix (its parts multiplicated)
+            or partwise.
+
+        hpc : bool, default=False
+            Whether or not evolution operator should be
+            constructed using nelina's high-performance computating.
+            It has no effect if ``single=False``.
+            If ``single=True`` and ``hpc=True``,
+            python is used to perform matrix multiplication.
+
+            .. todo::
+                Implement if True.
+
+        Returns
+        -------
+        U_w : :class:`scipy.sparse.csr_array` or \
+        list of :class:`scipy.sparse.csr_array`
+            The evolution operator.
+            If ``single=True``, the evolution operator is returned as
+            a single matrix, i.e. as a :class:`scipy.sparse.csr_array`.
+            If ``single=False``, the parts of the evolution operator
+            in the mathematical order are returned,
+            i.e. as a list of :class:`scipy.sparse.csr_array`
+            such that the evolution operator can be obtained by
+            
+            >>> evolution_op = U_w[0]
+            >>> for i in range(1, len(U_w)):
+            >>>     evolution_op = evolution_op @ U_w[i]
+
+        Notes
+        -----
+        The evolution operator is
+
+        .. math::
+            U_w = SC
+
+        where :math`S` is the flip-flop shift operator and
+        :math:`C` is the coin operator.
+
+        See Also
+        --------
+        flip_flop_shift_operator
+        coin_operator
+        """
+        S = self.flip_flop_shift_operator()
+        C = self.coin_operator(coin=coin)
+
+        if single:
+            if hpc:
+                #TODO: import neblina and implement
+                raise NotImplementedError (
+                    'Calculating the evolution operator via'
+                    + 'hpc (high-performance computing)'
+                    + 'is not supported yet.'
+                )
+                return None
+            return S@C
+
+        return [S, C]
 
     def search_evolution_operator(self, adj_matrix):
         """
