@@ -695,6 +695,8 @@ class Coined:
         self._evolution_operator = evolution_operator
         self._initial_condition = initial_condition
         self._num_steps = num_steps
+        # TODO: add initial_condition in states matrix
+        # and create states matrix as np.zeros
 
     # Simulating walk. Needed: U, state, stop_steps
     # num_steps: int. Number of iterations to be simulated,
@@ -754,3 +756,12 @@ class Coined:
             )
 
         return saved_states
+
+    def plot_probability(self, **kwargs):
+        print("automatically call plot_probability distribution")
+        return None
+
+    # TODO:
+    def plot_states(self):
+        # function to plot each state and the direction it is pointing to.
+        return None
