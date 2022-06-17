@@ -1,19 +1,20 @@
 import numpy as np
 import networkx as nx
+import scipy.sparse
 import sys
 sys.path.append('..')
 import qwalk as hpw
 import plot as hplot
-from neblina import init_engine, stop_engine
+# from neblina import init_engine, stop_engine
 
 # initialises neblina-core
 # TODO: transfer this to inferface (check if it is already initialised)
-init_engine(0)
+# init_engine(0)
 
 # generating adjacency matrix of a 5x5 2d-horizontal-latiice
-grid_dim = 25
+grid_dim = 5
 G = nx.grid_graph(dim=(grid_dim, grid_dim), periodic=True)
-adj_matrix = nx.adjacency_matrix(G)
+adj_matrix = scipy.sparse.csr_array(nx.adjacency_matrix(G))
 del G # only the adjacency matrix is going to be used
 
 # creating specific initial condition
@@ -27,16 +28,19 @@ psi0[4*mid_vert + 2] = -1   # pointing rightward
 psi0[4*mid_vert + 3] = 1    # pointing upward
 psi0 = psi0 / 2
 
-chl = hpw.Coined() #coined horizontal lattice
-psi0 = chl.uniform_initial_condition(adj_matrix)
+chl = hpw.Coined(adj_matrix) #coined horizontal lattice
+#psi0 = chl.uniform_initial_condition()
+print(len(psi0))
 # simulating walk
-U = chl.evolution_operator(adj_matrix)
+U = chl.evolution_operator()
 
 num_steps = 9
-states = chl.simulate_walk(
-    U, psi0, num_steps, save_interval=1, save_initial_state=True
-)
+
+chl.prepare_walk(U, psi0, num_steps)
+states = chl.simulate_walk(save_interval=1)
+
 prob = chl.probability_distribution(adj_matrix, states)
+print(prob)
 
 hplot.plot_probability_distribution(
     prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
@@ -52,4 +56,4 @@ print([
 ])
 
 # stops neblina-core
-stop_engine()
+# stop_engine()
