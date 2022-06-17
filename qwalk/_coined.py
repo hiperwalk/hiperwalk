@@ -476,7 +476,7 @@ class Coined:
 
         return np.matrix(R)
 
-    def evolution_operator(self, coin='grover', single=False, hpc=False):
+    def evolution_operator(self, coin='grover', hpc=False):
         """
         Create the standard evolution operator.
 
@@ -487,36 +487,14 @@ class Coined:
             See :obj:`coin_operator`'s ``coin``
             attribute for valid options.
 
-        single : bool, default=False
-            Whether or not the evolution operator should be
-            returned as a single matrix (its parts multiplicated)
-            or partwise.
-
         hpc : bool, default=False
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
-            It has no effect if ``single=False``.
-            If ``single=True`` and ``hpc=True``,
-            python is used to perform matrix multiplication.
-
-            .. todo::
-                Implement if True.
 
         Returns
         -------
-        U_w : :class:`scipy.sparse.csr_array` or \
-        list of :class:`scipy.sparse.csr_array`
+        U_w : :class:`scipy.sparse.csr_array` or
             The evolution operator.
-            If ``single=True``, the evolution operator is returned as
-            a single matrix, i.e. as a :class:`scipy.sparse.csr_array`.
-            If ``single=False``, the parts of the evolution operator
-            in the mathematical order are returned,
-            i.e. as a list of :class:`scipy.sparse.csr_array`
-            such that the evolution operator can be obtained by
-            
-            >>> evolution_op = U_w[0]
-            >>> for i in range(1, len(U_w)):
-            >>>     evolution_op = evolution_op @ U_w[i]
 
         Notes
         -----
@@ -536,21 +514,18 @@ class Coined:
         S = self.flip_flop_shift_operator()
         C = self.coin_operator(coin=coin)
 
-        if single:
-            if hpc:
-                #TODO: import neblina and implement
-                raise NotImplementedError (
-                    'Calculating the evolution operator via'
-                    + 'hpc (high-performance computing)'
-                    + 'is not supported yet.'
-                )
-                return None
-            return S@C
-
-        return [S, C]
+        if hpc:
+            #TODO: import neblina and implement
+            raise NotImplementedError (
+                'Calculating the evolution operator via'
+                + 'hpc (high-performance computing)'
+                + 'is not supported yet.'
+            )
+            return None
+        return S@C
 
     def search_evolution_operator(self, vertices, coin='grover',
-                                  single=False, hpc=False):
+                                  hpc=False):
         """
         Create the search evolution operator.
 
@@ -564,36 +539,14 @@ class Coined:
             The coin to be used as diffusion operator.
             See :obj:`evolution_operator` and :obj:`coin_operator`.
 
-        single : bool, default=False
-            Whether or not the evolution operator should be
-            returned as a single matrix (its parts multiplicated)
-            or partwise.
-
         hpc : bool, default=False
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
-            It has no effect if ``single=False``.
-            If ``single=True`` and ``hpc=True``,
-            python is used to perform matrix multiplication.
-
-            .. todo::
-                Implement if True.
 
         Returns
         -------
-        U : :class:`scipy.sparse.csr_array` or \
-        list of :class:`scipy.sparse.csr_array`
+        U : :class:`scipy.sparse.csr_array` or
             The search evolution operator.
-            If ``single=True``, the search operator is returned as
-            a single matrix, i.e. as a :class:`scipy.sparse.csr_array`.
-            If ``single=False``, the parts of the search operator
-            in the mathematical order are returned,
-            i.e. as a list of :class:`scipy.sparse.csr_array`
-            such that the search operator can be obtained by
-            
-            >>> search_op = U[0]
-            >>> for i in range(1, len(U_w)):
-            >>>     search_op = search_op @ U[i]
 
         See Also
         --------
@@ -617,23 +570,19 @@ class Coined:
         .. [1] Portugal, Renato. "Quantum walks and search algorithms".
             Vol. 19. New York: Springer, 2013.
         """
-        evol_op = self.evolution_operator(coin=coin, single=single,
-                                          hpc=hpc)
+        evol_op = self.evolution_operator(coin=coin, hpc=hpc)
         oracle = self.oracle(vertices)
 
-        if single:
-            if hpc:
-                # TODO: check if sending SCR instead of U_wR
-                # to neblina is more efficient
-                raise NotImplementedError (
-                    'Calculating the search evolution operator via'
-                    + 'hpc (high-performance computing)'
-                    + 'is not supported yet.'
-                )
-                return None
-            return evol_op @ oracle
-
-        return evol_op.append(oracle)
+        if hpc:
+            # TODO: check if sending SCR instead of U_wR
+            # to neblina is more efficient
+            raise NotImplementedError (
+                'Calculating the search evolution operator via'
+                + 'hpc (high-performance computing)'
+                + 'is not supported yet.'
+            )
+            return None
+        return evol_op @ oracle
 
     @staticmethod
     def __elementwise_probability(elem):
