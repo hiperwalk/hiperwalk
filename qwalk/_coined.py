@@ -137,6 +137,17 @@ class Coined:
         self._evolution_operator = None
         self._num_steps = 0
 
+        ##############################
+        ### Simulation attributes. ###
+        ##############################
+        # Matrix object used during simulation.
+        # It may by a scipy matrix or a neblina matrix.
+        # Should be different from None during simulation only.
+        self._simul_mat = None
+        # Vector object used during simulation.
+        # Should be different from None during simulation only.
+        self._simul_vec = None
+
         # TODO: create sparse matrix from graph or dense adjacency matrix
         if isinstance(adj_matrix, scipy.sparse.csr_array):
             self.adj_matrix = adj_matrix
