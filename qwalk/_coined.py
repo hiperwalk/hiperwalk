@@ -632,14 +632,14 @@ class Coined:
         Parameters
         ----------
         evolution_operator
-            Operator that describes the quantum walk
+            Operator that describes the quantum walk.
 
         initial_coidition
-            The initial state
+            The initial state.
 
         num_steps : int
-            Numbert of times to apply the ``evolution_operator`` on
-            the ``initial_condition``
+            Number of times to apply the ``evolution_operator`` on
+            the ``initial_condition``.
 
         See Also
         --------
@@ -658,62 +658,121 @@ class Coined:
         # TODO: add initial_condition in states matrix
         # and create states matrix as np.zeros
 
-    # Simulating walk. Needed: U, state, stop_steps
-    # num_steps: int. Number of iterations to be simulated,
-    # i.e. U^num_steps |initial_state>
-    # save_interval: int. Number of steps to execute before
-    # saving the state.
-    #   For example if num_steps = 10 and save_interval = 5,
-    #   the states at iterations
-    #   5 and 10 will be saved and case save_interval = 3,
-    #   the states at iterations
-    #   3, 6, 9, and 10 will be saved.
-    #   Default: None, i.e. saves only the final state
-    # save_initial_condition: boolean.
-    #   If True, adds the initial condition into the saved states.
-    # returns array with saved states
-    def simulate_walk(self, U, initial_state, num_steps,
-                      save_interval=None, save_initial_state=False):
-        from . import _pyneblina_interface as nbl
-        # preparing walk
-        nbl_matrix = nbl.send_sparse_matrix(U)
-        nbl_vec = nbl.send_vector(initial_state)
+    def simulate_walk(self, save_interval=0, hpc=False):
+        r"""
+        Simulates quantum walk.
+        
+        It is necessary to call :obj:`prepare_walk` beforehand.
+
+        Parameters
+        ----------
+        save_interval : int, default=0
+            Number of applications of the evolution operation
+            before saving an intermediate state.
+            If ``save_interval=0``, returns only the final state.
+            Otherwise, returns the initial state, the intermediate
+            states and the final state.
+        hpc : bool, default=False
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses python.
+
+        Returns
+        -------
+        returns array with saved states
+
+        See Also
+        --------
+        prepare_walk
+
+        Examples
+        --------
+        If ``num_steps=10`` and ``save_interval=3``,
+        the returned saved states are:
+        the initial state, the intermediate states (3, 6, and 9),
+        and the final state (10).
+
+        >>> cqw.prepare_walk(U, psi0, 10)
+        >>> cqw.simulate_walk(save_interval=3)
+        """
+
+        if hpc:
+            from . import _pyneblina_interface as nbl
+
+        def _prepare_engine(self):
+            if hpc:
+                self._simul_mat = nbl.send_sparse_matrix(
+                    self._evolution_operator)
+                self._simul_vec = nbl.send_vector(
+                    self._initial_condition)
+
+            else:
+                self._simul_mat = self._evolution_operator
+                self._simul_vec = self._initial_condition
+
+        def _simulate_steps(self, num_steps):
+            if hpc:
+                # TODO: request multiple multiplications at once
+                #       to neblina-core
+                # TODO: check if intermediate states are being freed
+                for i in range(num_steps):
+                    self._simul_vec = nbl.multiply_sparse_matrix_vector(
+                        self._simul_mat, self._simul_vec)
+            else:
+                for i in range(num_steps):
+                    self._simul_vec = self._simul_mat @ self._simul_vec
+
+                # TODO: compare with numpy.linalg.matrix_power
+
+        def _save_simul_vec(self):
+            if hpc:
+                # TODO: check if vector must be deleted or
+                #       if it can be reused via neblina-core commands.
+                return nbl.retrieve_vector(
+                    self._simul_vec, self._initial_condition.shape[0],
+                    delete_vector=True
+                )
+            return self._simul_vec
+
+        _prepare_engine(self)
 
         # number of states to save
-        num_states = (int(np.ceil(num_steps/save_interval))
-                      if save_interval is not None else 1)
-        if save_initial_state:
+        num_states = (int(np.ceil(self._num_steps / save_interval))
+                      if save_interval >= 0 else 1)
+        if save_interval > 0:
+            # saves initial state
             num_states += 1
-        save_final_state = (save_interval is None
-                            or num_steps % save_interval != 0)
 
-        # TODO: change dtype accordingly
+        # create saved states matrix
+        dtype = (self._initial_condition.dtype if
+            self._initial_condition.dtype == self._evolution_operator.dtype
+            else complex
+        )
         saved_states = np.zeros(
-            (num_states, initial_state.shape[0]), dtype=complex
+            (num_states, self._initial_condition.shape[0]), dtype=dtype
         )
         state_index = 0 # index of the state to be saved
-        if save_initial_state:
-            saved_states[0] = initial_state
+
+        # if save_initial_state:
+        if save_interval > 0:
+            saved_states[0] = self._initial_condition
+            state_index += 1
+        else:
+            save_interval = 1 # saves only final state
+
+        # simulate walk / apply evolution operator
+        for i in range(int(self._num_steps / save_interval)):
+            _simulate_steps(self, save_interval)
+            saved_states[state_index] = _save_simul_vec(self)
             state_index += 1
 
-        # simulating walk
-        # TODO: request multiple multiplications at once to neblina-core
-        # TODO: check if intermediate states are being freed from memory
-        for i in range(1, num_steps + 1):
-            # TODO: request to change parameter order
-            nbl_vec = nbl.multiply_sparse_matrix_vector(
-                nbl_matrix, nbl_vec)
+        if self._num_steps % save_interval > 0:
+            _simulate_steps(self, self._num_steps % save_interval)
+            saved_states[state_index] = _save_simul_vec(self)
 
-            if save_interval is not None and i % save_interval == 0:
-                saved_states[state_index] = nbl.retrieve_vector(
-                    nbl_vec, initial_state.shape[0], delete_vector=True
-                )
-                state_index += 1
-
-        if save_final_state:
-            saved_states[state_index] = nbl.retrieve_vector(
-                nbl_vec, initial_state.shape[0], delete_vector=True
-            )
+        # TODO: free vector from neblina core
+        self._simul_mat = None
+        self._simul_vec = None
 
         return saved_states
 
