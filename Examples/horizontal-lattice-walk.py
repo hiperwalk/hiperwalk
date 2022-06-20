@@ -39,7 +39,7 @@ num_steps = 9
 chl.prepare_walk(U, psi0, num_steps)
 states = chl.simulate_walk(save_interval=1)
 
-prob = chl.probability_distribution(adj_matrix, states)
+prob = chl.probability_distribution(states)
 print(prob)
 
 hplot.plot_probability_distribution(
