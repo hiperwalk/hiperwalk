@@ -12,6 +12,7 @@ Classes
     :toctree: generated
     :nosignatures:
 
+    BaseWalk
     Coined
 
 
