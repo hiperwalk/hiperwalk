@@ -2,6 +2,7 @@ import numpy as np
 import scipy
 import scipy.sparse
 import networkx as nx
+from ._base_walk import *
 from constants import DEBUG
 
 if DEBUG:
@@ -9,7 +10,7 @@ if DEBUG:
     from guppy import hpy # used to check memory usage
 
 
-class Coined:
+class Coined(BaseWalk):
     r"""
     Manage an instance of the coined quantum walk model
     on general unweighted graphs.
@@ -133,75 +134,10 @@ class Coined:
     """
 
     def __init__(self, adj_matrix):
-        self._initial_condition = None
-        self._evolution_operator = None
-        self._num_steps = 0
-
-        ##############################
-        ### Simulation attributes. ###
-        ##############################
-        # Matrix object used during simulation.
-        # It may by a scipy matrix or a neblina matrix.
-        # Should be different from None during simulation only.
-        self._simul_mat = None
-        # Vector object used during simulation.
-        # Should be different from None during simulation only.
-        self._simul_vec = None
-
-        # TODO: create sparse matrix from graph or dense adjacency matrix
-        if isinstance(adj_matrix, scipy.sparse.csr_array):
-            self.adj_matrix = adj_matrix
-        else:
-            raise TypeError(
-                "Invalid 'adj_matrix' type."
-                + " Expected 'scipy.sparse.csr_array',"
-                + " but received " + str(type(adj_matrix)) + '.'
-            )
+        super().__init__(adj_matrix)
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self.adj_matrix.sum()
-
-    def uniform_state(self):
-        r"""
-        Generate the uniform state.
-
-        The state is constructed based on the ``adj_matrix`` attribute.
-        The uniform initial condition is the state where
-        all entries have the same amplitude.
-
-        Returns
-        -------
-        :obj:`numpy.ndarray`
-
-        Notes
-        -----
-        The uniform initial condition is the state
-
-        .. math::
-
-            \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
-
-        where :math:`N` is the dimension of the Hilbert space.
-        For a graph :math:`G(V, E)`,
-        in the general case, :math:`N = 2|E|`.
-
-        Examples
-        --------
-        >>> # Importing and generating adj_matrix
-        >>> # of Coined Notes example
-        >>> coined_model = hpw.Coined(adj_matrix)
-        >>> coined_model.uniform_state()
-        array([0.35355339, 0.35355339, 0.35355339, 0.35355339, 0.35355339,
-               0.35355339, 0.35355339, 0.35355339])
-        """
-        return (np.ones(self.hilb_dim, dtype=float)
-                / np.sqrt(self.hilb_dim))
-
-    def uniform_initial_condition(self):
-        """
-        Alias for :obj:`uniform_state`.
-        """
-        return self.uniform_state()
 
     def flip_flop_shift_operator(self):
         r"""
@@ -476,24 +412,24 @@ class Coined:
 
         return np.matrix(R)
 
-    def evolution_operator(self, coin='grover', hpc=False):
+    def evolution_operator(self, hpc=False, coin='grover'):
         """
         Create the standard evolution operator.
 
         Parameters
         ----------
+        hpc : bool, default=False
+            Whether or not evolution operator should be
+            constructed using nelina's high-performance computating.
+
         coin : str, default='grover'
             The coin to be used as diffusion operator.
             See :obj:`coin_operator`'s ``coin``
             attribute for valid options.
 
-        hpc : bool, default=False
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
-
         Returns
         -------
-        U_w : :class:`scipy.sparse.csr_array` or
+        U_w : :class:`scipy.sparse.csr_array`
             The evolution operator.
 
         Notes
@@ -524,8 +460,8 @@ class Coined:
             return None
         return S@C
 
-    def search_evolution_operator(self, vertices, coin='grover',
-                                  hpc=False):
+    def search_evolution_operator(self, vertices, hpc=False,
+                                  coin='grover'):
         """
         Create the search evolution operator.
 
@@ -535,17 +471,17 @@ class Coined:
             The marked vertex (vertices) IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
 
-        coin : str, default='grover'
-            The coin to be used as diffusion operator.
-            See :obj:`evolution_operator` and :obj:`coin_operator`.
-
         hpc : bool, default=False
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
+        coin : str, default='grover'
+            The coin to be used as diffusion operator.
+            See :obj:`evolution_operator` and :obj:`coin_operator`.
+
         Returns
         -------
-        U : :class:`scipy.sparse.csr_array` or
+        U : :class:`scipy.sparse.csr_array`
             The search evolution operator.
 
         See Also
@@ -553,7 +489,6 @@ class Coined:
         coin_operator
         evolution_operator
         oracle
-
 
         Notes
         -----
@@ -584,14 +519,26 @@ class Coined:
             return None
         return evol_op @ oracle
 
-    @staticmethod
-    def __elementwise_probability(elem):
-        # this is more efficient than:
-        #(np.conj(elem) * elem).real
-        # elem.real**2 + elem.imag**2
-        return elem.real*elem.real + elem.imag*elem.imag
+    def probability_distribution(self, states):
+        """
+        Compute the probability distribution of given states.
 
-    def probability_distribution(self, adj_matrix, states):
+        The probability of the walker being found on each vertex
+        for the given states.
+
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray`
+            The states used to compute the probabilities.
+
+        Returns
+        -------
+        probabilities : :class:`numpy.ndarray`
+
+        See Also
+        --------
+        simulate_walk
+        """
         # TODO: test with nonregular graph
         # TODO: test with nonuniform condition
         if DEBUG:
@@ -602,7 +549,7 @@ class Coined:
 
         # TODO: check if dimensions match and throw exception if necessary
         # TODO: check if just creates reference (no hard copy)
-        edges_indices = adj_matrix.indptr 
+        edges_indices = self.adj_matrix.indptr 
 
         # TODO: check it is more efficient on demand or
         # using extra memory (aux_prob)
@@ -612,7 +559,7 @@ class Coined:
         # then sums the probabilities resulting in
         # the vertix final probability
         prob = np.array([[
-                Coined.__elementwise_probability(
+                Coined._elementwise_probability(
                     states[i][edges_indices[j]:edges_indices[j + 1]]
                 ).sum()
                 for j in range(len(edges_indices) - 1)
@@ -623,164 +570,3 @@ class Coined:
             print("probability_distribution: " + str(end - start) + 's')
         # TODO: benchmark (time and memory usage)
         return prob
-
-    def prepare_walk(self, evolution_operator,
-                     initial_condition, num_steps):
-        """
-        Set all information needed for simulating a quantum walk.
-
-        Parameters
-        ----------
-        evolution_operator
-            Operator that describes the quantum walk.
-
-        initial_coidition
-            The initial state.
-
-        num_steps : int
-            Number of times to apply the ``evolution_operator`` on
-            the ``initial_condition``.
-
-        See Also
-        --------
-        simulate_walk
-
-        Notes
-        -----
-        .. todo::
-            Implement assertion of arguments.
-            For example: check if evolution operator is unitary.
-        """
-
-        self._evolution_operator = evolution_operator
-        self._initial_condition = initial_condition
-        self._num_steps = num_steps
-        # TODO: add initial_condition in states matrix
-        # and create states matrix as np.zeros
-
-    def simulate_walk(self, save_interval=0, hpc=False):
-        r"""
-        Simulates quantum walk.
-        
-        It is necessary to call :obj:`prepare_walk` beforehand.
-
-        Parameters
-        ----------
-        save_interval : int, default=0
-            Number of applications of the evolution operation
-            before saving an intermediate state.
-            If ``save_interval=0``, returns only the final state.
-            Otherwise, returns the initial state, the intermediate
-            states and the final state.
-        hpc : bool, default=False
-            Whether or not to use neblina's high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses python.
-
-        Returns
-        -------
-        returns array with saved states
-
-        See Also
-        --------
-        prepare_walk
-
-        Examples
-        --------
-        If ``num_steps=10`` and ``save_interval=3``,
-        the returned saved states are:
-        the initial state, the intermediate states (3, 6, and 9),
-        and the final state (10).
-
-        >>> cqw.prepare_walk(U, psi0, 10)
-        >>> cqw.simulate_walk(save_interval=3)
-        """
-
-        if hpc:
-            from . import _pyneblina_interface as nbl
-
-        def _prepare_engine(self):
-            if hpc:
-                self._simul_mat = nbl.send_sparse_matrix(
-                    self._evolution_operator)
-                self._simul_vec = nbl.send_vector(
-                    self._initial_condition)
-
-            else:
-                self._simul_mat = self._evolution_operator
-                self._simul_vec = self._initial_condition
-
-        def _simulate_steps(self, num_steps):
-            if hpc:
-                # TODO: request multiple multiplications at once
-                #       to neblina-core
-                # TODO: check if intermediate states are being freed
-                for i in range(num_steps):
-                    self._simul_vec = nbl.multiply_sparse_matrix_vector(
-                        self._simul_mat, self._simul_vec)
-            else:
-                for i in range(num_steps):
-                    self._simul_vec = self._simul_mat @ self._simul_vec
-
-                # TODO: compare with numpy.linalg.matrix_power
-
-        def _save_simul_vec(self):
-            if hpc:
-                # TODO: check if vector must be deleted or
-                #       if it can be reused via neblina-core commands.
-                return nbl.retrieve_vector(
-                    self._simul_vec, self._initial_condition.shape[0],
-                    delete_vector=True
-                )
-            return self._simul_vec
-
-        _prepare_engine(self)
-
-        # number of states to save
-        num_states = (int(np.ceil(self._num_steps / save_interval))
-                      if save_interval >= 0 else 1)
-        if save_interval > 0:
-            # saves initial state
-            num_states += 1
-
-        # create saved states matrix
-        dtype = (self._initial_condition.dtype if
-            self._initial_condition.dtype == self._evolution_operator.dtype
-            else complex
-        )
-        saved_states = np.zeros(
-            (num_states, self._initial_condition.shape[0]), dtype=dtype
-        )
-        state_index = 0 # index of the state to be saved
-
-        # if save_initial_state:
-        if save_interval > 0:
-            saved_states[0] = self._initial_condition
-            state_index += 1
-        else:
-            save_interval = 1 # saves only final state
-
-        # simulate walk / apply evolution operator
-        for i in range(int(self._num_steps / save_interval)):
-            _simulate_steps(self, save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
-            state_index += 1
-
-        if self._num_steps % save_interval > 0:
-            _simulate_steps(self, self._num_steps % save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
-
-        # TODO: free vector from neblina core
-        self._simul_mat = None
-        self._simul_vec = None
-
-        return saved_states
-
-    def plot_probability(self, **kwargs):
-        print("automatically call plot_probability distribution")
-        return None
-
-    # TODO:
-    def plot_states(self):
-        # function to plot each state and the direction it is pointing to.
-        return None
