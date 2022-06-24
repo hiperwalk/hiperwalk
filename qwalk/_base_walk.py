@@ -369,3 +369,23 @@ class BaseWalk(ABC):
         if 'adj_matrix' not in kwargs:
             kwargs['adj_matrix'] = self.adj_matrix
         hpw_plot.plot_probability_distribution(probabilities, **kwargs)
+
+    # TODO:
+    def plot_states(self, states):
+        """
+        Plot amplitudes  of saved states.
+
+        It is strongly recommend that subclasses overwrite this method.
+
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray` 
+            The states to be plotted.
+
+        Warnings
+        --------
+        .. todo::
+            Not implemented.
+        """
+        # Function to plot each state and the direction it is pointing to.
+        raise NotImplementedError("Implement general function")
