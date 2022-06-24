@@ -5,11 +5,14 @@ import sys
 sys.path.append('..')
 import qwalk as hpw
 import plot as hplot
-# from neblina import init_engine, stop_engine
 
-# initialises neblina-core
-# TODO: transfer this to inferface (check if it is already initialised)
-# init_engine(0)
+hpc = True
+
+if hpc:
+    # initialises neblina-core
+    # TODO: transfer this to inferface (check if it is already initialised)
+    from neblina import init_engine, stop_engine
+    init_engine(0)
 
 # generating adjacency matrix of a 5x5 2d-horizontal-latiice
 grid_dim = 5
@@ -37,7 +40,7 @@ U = chl.evolution_operator()
 num_steps = 9
 
 chl.prepare_walk(U, psi0, num_steps)
-states = chl.simulate_walk(save_interval=1)
+states = chl.simulate_walk(save_interval=1, hpc=hpc)
 
 prob = chl.probability_distribution(states)
 print(prob)
@@ -56,4 +59,5 @@ print([
 ])
 
 # stops neblina-core
-# stop_engine()
+if hpc:
+    stop_engine()
