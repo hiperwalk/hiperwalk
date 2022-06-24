@@ -4,7 +4,6 @@ import scipy.sparse
 import sys
 sys.path.append('..')
 import qwalk as hpw
-import plot as hplot
 
 hpc = True
 
@@ -45,7 +44,7 @@ states = chl.simulate_walk(save_interval=1, hpc=hpc)
 prob = chl.probability_distribution(states)
 print(prob)
 
-hplot.plot_probability_distribution(
+chl.plot_probability(
     prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
     animate=True, fixed_probabilities=False,
     filename_prefix='animation', interval=1000

@@ -338,3 +338,34 @@ class BaseWalk(ABC):
         self._simul_vec = None
 
         return saved_states
+
+    def plot_probability(self, probabilities, **kwargs):
+        """
+        Plot probabilities of saved states.
+
+        It is strongly recommend that subclasses overwrite this method.
+
+        Parameters
+        ----------
+        probabilities : :class:`numpy.ndarray`
+            The probabilities of the states.
+
+        **kwargs : dict, optional
+            Optional keywords arguments used for customizing the plot.
+
+        Notes
+        -----
+        Currently calls :obj:`plot.plot_probability_distribution`,
+        respecting its ``kwargs``.
+
+        By default, ``self.adj_matrix`` is sent as a ``kwargs`` entry.
+
+        See Also
+        --------
+        :obj:`plot.plot_probability_distribution`
+        """
+        import plot as hpw_plot
+
+        if 'adj_matrix' not in kwargs:
+            kwargs['adj_matrix'] = self.adj_matrix
+        hpw_plot.plot_probability_distribution(probabilities, **kwargs)
