@@ -38,8 +38,8 @@ U = chl.evolution_operator()
 
 num_steps = 9
 
-chl.prepare_walk(U, psi0, num_steps)
-states = chl.simulate_walk(save_interval=1, hpc=hpc)
+chl.prepare_walk(U, psi0, num_steps, save_interval=1)
+states = chl.simulate_walk(hpc=hpc)
 
 prob = chl.probability_distribution(states)
 print(prob)

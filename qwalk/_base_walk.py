@@ -33,7 +33,7 @@ class BaseWalk(ABC):
 
     @abstractmethod
     def __init__(self, adj_matrix):
-        self._initial_condition = None
+        self._states = None
         self._evolution_operator = None
         self._num_steps = 0
 
@@ -189,8 +189,8 @@ class BaseWalk(ABC):
         """
         return None
 
-    def prepare_walk(self, evolution_operator,
-                     initial_condition, num_steps):
+    def prepare_walk(self, evolution_operator, initial_condition,
+                     num_steps, save_interval=0):
         """
         Set all information needed for simulating a quantum walk.
 
@@ -205,6 +205,23 @@ class BaseWalk(ABC):
         num_steps : int
             Number of times to apply the ``evolution_operator`` on
             the ``initial_condition``.
+            Must be a positive integer.
+
+        save_interval : int, default=0
+            Number of applications of the evolution operation
+            before saving an intermediate state.
+            If ``save_interval=0``,
+            only saves the initial and final states.
+            Otherwise, saves the initial state, the intermediate
+            states and the final state.
+
+        Raises
+        ------
+        ValueError
+            If ``num_steps`` is not a positive integer.
+            If ``evolution_operator`` or ``initial_condition``'s
+            dimensions are inconsistent with the Hilbert Space
+            (``self.hilb_dim``).
 
         See Also
         --------
@@ -215,13 +232,58 @@ class BaseWalk(ABC):
         .. todo::
             Implement assertion of arguments.
             For example: check if evolution operator is unitary.
+
+        Examples
+        --------
+        If ``num_steps=10`` and ``save_interval=3``,
+        the returned saved states are:
+        the initial state, the intermediate states (3, 6, and 9),
+        and the final state (10).
+
+        >>> qw.prepare_walk(U, psi0, 10, 3)
         """
 
-        self._evolution_operator = evolution_operator
-        self._initial_condition = initial_condition
-        self._num_steps = num_steps
+        if num_steps <= 0 :
+            raise ValueError('Expected a positive integer for num_steps.')
 
-    def simulate_walk(self, save_interval=0, hpc=False):
+        if evolution_operator.shape != (self.hilb_dim, self.hilb_dim):
+            raise ValueError(
+                'Evolution operator has wrong dimension.'
+                + 'It has shape ' + str(evolution_operator.shape)
+                + ', but shape ' + str((self.hilb_dim, self.hilb_dim))
+                + ' was expected.'
+            )
+
+        if initial_condition.shape != (self.hilb_dim,):
+            raise ValueError(
+                'Initial condition has wrong dimension.'
+                + 'It has shape ' + str(initial_condition.shape)
+                + ', but shape ' + str((self.hilb_dim,))
+                + ' was expected.'
+            )
+
+        self._evolution_operator = evolution_operator
+
+        # number of states to save
+        if save_interval <= 0:
+            save_interval = num_steps
+        num_states = int(np.ceil(num_steps / save_interval))
+        num_states += 1 # saves initial state
+
+        # create saved states matrix
+        dtype = (initial_condition.dtype if
+            initial_condition.dtype == evolution_operator.dtype
+            else complex
+        )
+        self._states = np.zeros(
+            (num_states, self.hilb_dim), dtype=dtype
+        )
+        self._states[0] = initial_condition
+
+        self._num_steps = num_steps
+        self._save_interval = save_interval
+
+    def simulate_walk(self, hpc=False):
         r"""
         Simulates quantum walk.
         
@@ -229,12 +291,6 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        save_interval : int, default=0
-            Number of applications of the evolution operation
-            before saving an intermediate state.
-            If ``save_interval=0``, returns only the final state.
-            Otherwise, returns the initial state, the intermediate
-            states and the final state.
         hpc : bool, default=False
             Whether or not to use neblina's high-performance computing
             to perform matrix multiplications.
@@ -247,16 +303,6 @@ class BaseWalk(ABC):
         See Also
         --------
         prepare_walk
-
-        Examples
-        --------
-        If ``num_steps=10`` and ``save_interval=3``,
-        the returned saved states are:
-        the initial state, the intermediate states (3, 6, and 9),
-        and the final state (10).
-
-        >>> qw.prepare_walk(U, psi0, 10)
-        >>> qw.simulate_walk(save_interval=3)
         """
 
         if hpc:
@@ -267,7 +313,7 @@ class BaseWalk(ABC):
                 self._simul_mat = nbl.send_sparse_matrix(
                     self._evolution_operator)
                 self._simul_vec = nbl.send_vector(
-                    self._initial_condition)
+                    self._states[0])
 
             else:
                 self._simul_mat = self._evolution_operator
@@ -292,52 +338,31 @@ class BaseWalk(ABC):
                 # TODO: check if vector must be deleted or
                 #       if it can be reused via neblina-core commands.
                 return nbl.retrieve_vector(
-                    self._simul_vec, self._initial_condition.shape[0],
-                    delete_vector=True
+                    self._simul_vec, self.hilb_dim, delete_vector=True
                 )
             return self._simul_vec
 
         _prepare_engine(self)
 
-        # number of states to save
-        num_states = (int(np.ceil(self._num_steps / save_interval))
-                      if save_interval >= 0 else 1)
-        if save_interval > 0:
-            # saves initial state
-            num_states += 1
-
-        # create saved states matrix
-        dtype = (self._initial_condition.dtype if
-            self._initial_condition.dtype == self._evolution_operator.dtype
-            else complex
-        )
-        saved_states = np.zeros(
-            (num_states, self._initial_condition.shape[0]), dtype=dtype
-        )
-        state_index = 0 # index of the state to be saved
-
-        # if save_initial_state:
-        if save_interval > 0:
-            saved_states[0] = self._initial_condition
-            state_index += 1
-        else:
-            save_interval = 1 # saves only final state
+        # Index of the state to be saved.
+        # Initial condition is always saved in the 0-th index.
+        state_index = 1 
 
         # simulate walk / apply evolution operator
-        for i in range(int(self._num_steps / save_interval)):
-            _simulate_steps(self, save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
+        for i in range(int(self._num_steps / self._save_interval)):
+            _simulate_steps(self, self._save_interval)
+            self._states[state_index] = _save_simul_vec(self)
             state_index += 1
 
-        if self._num_steps % save_interval > 0:
-            _simulate_steps(self, self._num_steps % save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
+        if self._num_steps % self._save_interval > 0:
+            _simulate_steps(self, self._num_steps % self._save_interval)
+            self._states[state_index] = _save_simul_vec(self)
 
         # TODO: free vector from neblina core
         self._simul_mat = None
         self._simul_vec = None
 
-        return saved_states
+        return self._states
 
     def plot_probability(self, probabilities, **kwargs):
         """
