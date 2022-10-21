@@ -189,46 +189,24 @@ class BaseWalk(ABC):
         """
         return None
 
-    def prepare_walk(self, evolution_operator,
-                     initial_condition, num_steps):
-        """
-        Set all information needed for simulating a quantum walk.
+    def simulate_walk(self, evolution_operator, initial_condition,
+                      num_steps, save_interval=0, hpc=False):
+        r"""
+        Simulates quantum walk by applying ``num_steps`` times the
+        ``evolution_operator`` to the ``initial_coidition``.
 
         Parameters
         ----------
         evolution_operator
             Operator that describes the quantum walk.
 
-        initial_coidition
+        initial_condition
             The initial state.
 
         num_steps : int
             Number of times to apply the ``evolution_operator`` on
             the ``initial_condition``.
-
-        See Also
-        --------
-        simulate_walk
-
-        Notes
-        -----
-        .. todo::
-            Implement assertion of arguments.
-            For example: check if evolution operator is unitary.
-        """
-
-        self._evolution_operator = evolution_operator
-        self._initial_condition = initial_condition
-        self._num_steps = num_steps
-
-    def simulate_walk(self, save_interval=0, hpc=False):
-        r"""
-        Simulates quantum walk.
-        
-        It is necessary to call :obj:`prepare_walk` beforehand.
-
-        Parameters
-        ----------
+            
         save_interval : int, default=0
             Number of applications of the evolution operation
             before saving an intermediate state.
@@ -242,11 +220,19 @@ class BaseWalk(ABC):
 
         Returns
         -------
-        Returns array with saved states.
+        states : :class:`numpy.ndarray`.
+            States saved during simulation where
+            ``states[i]`` corresponds to the ``i``-th saved state.
 
-        See Also
-        --------
-        prepare_walk
+        Notes
+        -----
+        The parameters ``evolution_operator``, ``initial_condition``,
+        and ``num_steps`` are saved as attributes for possible later usage.
+
+        .. todo::
+            Implement assertion of arguments.
+            For example: check if evolution operator is unitary and
+            if locality is respected.
 
         Examples
         --------
@@ -255,14 +241,19 @@ class BaseWalk(ABC):
         the initial state, the intermediate states (3, 6, and 9),
         and the final state (10).
 
-        >>> qw.prepare_walk(U, psi0, 10)
-        >>> qw.simulate_walk(save_interval=3)
+        >>> qw.simulate_walk(U, psi0, 10, save_interval=3)
         """
+        ###########################
+        ### Auxiliary functions ###
+        ###########################
 
-        if hpc:
-            from . import _pyneblina_interface as nbl
+        def __save_simulation_parameters(self, evolution_operator,
+                         initial_condition, num_steps):
+            self._evolution_operator = evolution_operator
+            self._initial_condition = initial_condition
+            self._num_steps = num_steps
 
-        def _prepare_engine(self):
+        def __prepare_engine(self):
             if hpc:
                 self._simul_mat = nbl.send_sparse_matrix(
                     self._evolution_operator)
@@ -273,7 +264,7 @@ class BaseWalk(ABC):
                 self._simul_mat = self._evolution_operator
                 self._simul_vec = self._initial_condition
 
-        def _simulate_steps(self, num_steps):
+        def __simulate_steps(self, num_steps):
             if hpc:
                 # TODO: request multiple multiplications at once
                 #       to neblina-core
@@ -287,7 +278,7 @@ class BaseWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
-        def _save_simul_vec(self):
+        def __save_simul_vec(self):
             if hpc:
                 # TODO: check if vector must be deleted or
                 #       if it can be reused via neblina-core commands.
@@ -297,7 +288,17 @@ class BaseWalk(ABC):
                 )
             return self._simul_vec
 
-        _prepare_engine(self)
+        
+        ####################################
+        ### simulate_walk implemantation ###
+        ####################################
+        
+        __save_simulation_parameters(self, evolution_operator,
+                                     initial_condition, num_steps)
+
+        if hpc:
+            from . import _pyneblina_interface as nbl
+        __prepare_engine(self)
 
         # number of states to save
         num_states = (int(np.ceil(self._num_steps / save_interval))
@@ -325,13 +326,13 @@ class BaseWalk(ABC):
 
         # simulate walk / apply evolution operator
         for i in range(int(self._num_steps / save_interval)):
-            _simulate_steps(self, save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
+            __simulate_steps(self, save_interval)
+            saved_states[state_index] = __save_simul_vec(self)
             state_index += 1
 
         if self._num_steps % save_interval > 0:
-            _simulate_steps(self, self._num_steps % save_interval)
-            saved_states[state_index] = _save_simul_vec(self)
+            __simulate_steps(self, self._num_steps % save_interval)
+            saved_states[state_index] = __save_simul_vec(self)
 
         # TODO: free vector from neblina core
         self._simul_mat = None
