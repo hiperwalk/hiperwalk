@@ -3,6 +3,23 @@ from scipy.sparse import csr_array
 from .coined import *
 
 class Segment(Coined):
+    r"""
+    Class for managing quantum walks on the segment.
+    In other words, a finite one-dimensional lattice.
+
+    Notes
+    -----
+    Since :class:`Segment` is built on top of :class:`Coined`,
+    operators and states respect the edge order
+    (See :class:`Coined` notes for more details).
+    For example, the edges labels of the 4-vertices :class:`Segment`
+    are represented in Figure 1.
+    
+    .. graphviz:: ../../graphviz/coined-segment-edges-labels.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1.
+    """
 
     def __init__(self, num_vert):
         # Creating adjacency matrix
@@ -16,9 +33,6 @@ class Segment(Coined):
         col_ind = [col+shift for shift in [1, 0]
                              for col in range(num_vert - 1)]
         adj_matrix = csr_array((data, (row_ind, col_ind)))
-        # print(adj_matrix.data)
-        # print(adj_matrix.indptr)
-        # print(adj_matrix.indices)
     
         # initializing
         super().__init__(adj_matrix)

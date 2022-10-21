@@ -24,6 +24,10 @@ class BaseWalk(ABC):
         Hilbert Space dimension.
         It must be updated by the subclass' ``__init__``.
 
+    adj_matrix : :class:`scipy.sparse.csr_array`
+        Adjacency matrix of the graph on
+        which the quantum walk occurs.
+
     Raises
     ------
     TypeError

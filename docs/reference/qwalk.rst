@@ -14,6 +14,7 @@ Classes
 
     BaseWalk
     Coined
+    Segment
 
 
 Pyneblina Interface
