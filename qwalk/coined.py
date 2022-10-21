@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 import scipy.sparse
 import networkx as nx
-from ._base_walk import *
+from .base_walk import *
 from constants import DEBUG
 
 if DEBUG:

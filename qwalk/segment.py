@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.sparse import csr_array
-from ._coined import *
+from .coined import *
 
 class Segment(Coined):
 
