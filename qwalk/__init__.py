@@ -2,3 +2,4 @@
 # hiperwalk.qwalk package
 from ._base_walk import *
 from ._coined import *
+from .segment import *
