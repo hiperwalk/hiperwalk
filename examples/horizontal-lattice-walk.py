@@ -4,12 +4,14 @@ import scipy.sparse
 import sys
 sys.path.append('..')
 import qwalk as hpw
-import plot as hplot
-# from neblina import init_engine, stop_engine
 
-# initialises neblina-core
-# TODO: transfer this to inferface (check if it is already initialised)
-# init_engine(0)
+hpc = True
+
+if hpc:
+    # initialises neblina-core
+    # TODO: transfer this to inferface (check if it is already initialised)
+    from neblina import init_engine, stop_engine
+    init_engine(0)
 
 # generating adjacency matrix of a 5x5 2d-horizontal-latiice
 grid_dim = 5
@@ -41,7 +43,7 @@ states = chl.simulate_walk(U, psi0, num_steps, save_interval=1)
 prob = chl.probability_distribution(states)
 print(prob)
 
-hplot.plot_probability_distribution(
+chl.plot_probability(
     prob, adj_matrix=adj_matrix, plot_type='graph', cmap='viridis',
     animate=True, fixed_probabilities=False,
     filename_prefix='animation', interval=1000
@@ -55,4 +57,5 @@ print([
 ])
 
 # stops neblina-core
-# stop_engine()
+if hpc:
+    stop_engine()
