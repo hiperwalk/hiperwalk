@@ -7,11 +7,20 @@ class Segment(Coined):
     Class for managing quantum walks on the segment.
     In other words, a finite one-dimensional lattice.
 
+    Parameters
+    ----------
+    num_vert : int
+        Number of vertices in the segment.
+
     Notes
     -----
     Since :class:`Segment` is built on top of :class:`Coined`,
     operators and states respect the edge order
     (See :class:`Coined` notes for more details).
+    As a consequence, for any vertex :math:`v \in V`,
+    the state :math:`\ket{2v - d}` for :math:`d \in \{0, 1\}`
+    corresponds to the walker being on vertex :math:`v` and the
+    coin pointing rightwars (:math:`d = 0`) or leftwards (:math:`d = 1`).
     For example, the edges labels of the 4-vertices :class:`Segment`
     are represented in Figure 1.
     
@@ -36,3 +45,34 @@ class Segment(Coined):
     
         # initializing
         super().__init__(adj_matrix)
+
+    def shift_operator(self):
+        r"""
+        Create the ship operator (:math:`S`) base on the
+        ``adj_matrix`` atribute.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_matrix`
+            Shift operator.
+
+        Notes
+        -----
+        The shift operator :math:`S` for any vertex :math:`v \in V`
+        is defined by
+
+        .. math::
+            \begin{align*}
+                S \ket{2v} &= \ket{\min(2v + 2, 2|V| - 1)} \\
+                S \ket{2v-1} &= \ket{\max(2v - 1 - 2, 0)}. 
+            \end{align*}
+
+        Hence, if the walker reaches a boundary vertex
+        :math:`u \in \{0, |V| - 1\}`,
+        the coin starts pointing in the opposite direction.
+
+        .. todo::
+            Add option to implement boundary vertices as sinks.
+        """
+
+        return None
