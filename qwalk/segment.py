@@ -81,14 +81,10 @@ class Segment(Coined):
         indptr = np.arange(num_edges + 1)
         indices = np.zeros(num_edges)
 
-        # TODO: use lambda function
-        for i in range(num_edges):
-            if i == 0:
-                indices[i] = 1
-            elif i == num_edges - 1:
-                indices[i] = num_edges - 2
-            else:
-                indices[i] = i + 2 if i % 2 == 1 else i - 2
+        indices = [i + 2 if i % 2 == 1 else i - 2
+                   for i in range(num_edges)]
+        indices[0] = 1
+        indices[num_edges - 1] = num_edges - 2
 
         S = scipy.sparse.csr_array((
             data, indices, indptr        
