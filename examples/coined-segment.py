@@ -4,7 +4,7 @@ sys.path.append('..')
 import qwalk as qw
 import plot as hplot
 
-num_vert = 7
+num_vert = 8
 seg = qw.Segment(num_vert)
 print(seg.adj_matrix.todense())
 print(seg.flip_flop_shift_operator())
@@ -21,8 +21,9 @@ init_cond[middle_left] = 1
 
 
 # U = seg.evolution_operator(coin='hadamard')
-U = seg.flip_flop_shift_operator()
-num_steps = int(num_vert/2)
+# U = seg.flip_flop_shift_operator()
+U = seg.shift_operator()
+num_steps = int(2*num_vert - 2)
 
 states = seg.simulate_walk(U, init_cond, num_steps, save_interval=1)
 prob = seg.probability_distribution(states)

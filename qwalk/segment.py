@@ -48,7 +48,7 @@ class Segment(Coined):
 
     def shift_operator(self):
         r"""
-        Create the ship operator (:math:`S`) base on the
+        Create the shift operator (:math:`S`) based on the
         ``adj_matrix`` atribute.
 
         Returns
@@ -75,4 +75,23 @@ class Segment(Coined):
             Add option to implement boundary vertices as sinks.
         """
 
-        return None
+        num_edges = 2*self.adj_matrix.shape[0] - 2
+
+        data = np.ones(num_edges, np.int8)
+        indptr = np.arange(num_edges + 1)
+        indices = np.zeros(num_edges)
+
+        # TODO: use lambda function
+        for i in range(num_edges):
+            if i == 0:
+                indices[i] = 1
+            elif i == num_edges - 1:
+                indices[i] = num_edges - 2
+            else:
+                indices[i] = i + 2 if i % 2 == 1 else i - 2
+
+        S = scipy.sparse.csr_array((
+            data, indices, indptr        
+        ))
+
+        return S
