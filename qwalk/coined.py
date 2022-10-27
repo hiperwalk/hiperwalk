@@ -579,3 +579,58 @@ class Coined(BaseWalk):
             print("probability_distribution: " + str(end - start) + 's')
         # TODO: benchmark (time and memory usage)
         return prob
+
+    def state(self, entries, amplitudes=None, type='vertex_dir'):
+        """
+        Generates a valid state.
+
+        The state corresponds to the walker being in a superposition
+        of ``entries[i]`` with amplitudes ``amplitudes[i]``, respectively.
+
+        The ``amplitudes`` are normalized so the state is unitary.
+
+        Parameters
+        ----------
+        entries :
+            There are three types of accaptable entries:
+            `(vertices, coin_dir)`, `(vertices, target_vertex)`,
+            and `arc_number`.
+
+
+            vertices : :class:`numpy.array`
+                The vertices corresponding to the positions of the walker
+                in the superposition.
+            coin_dir : :class:`numpy.array`
+                The direction to which the coin is pointing to.
+                Each array entry is expected to be a value between
+                0 and degree(``vertices[i]``) - 1,
+                which respect the sorted arcs order.
+            target_vertex : :class:`numpy.array`
+                The target vertex for the given positions.
+                This respects the arc notation,
+                i.e. (``vertices[i]``, ``target_vertex[i]``).
+            arc_number : :class:`numpy.array`
+                The arc number with respect to the sorted arcs order.
+
+        amplitudes : :class:`numpy.array`, default=None
+            The amplitudes of each entry.
+            If ``none``, computes the entries' uniform superposition.
+
+        type : {'vertex_dir', 'arc_notation', 'arc_order'}
+            The type of the ``entries`` argument.
+            The (default) value 'vertex_dir' corresponds to
+            the (`vertices, coin_dir`) entry.
+            The 'arc_notation' value corresponds to the
+            `(vertices, target_vertex)` entry.
+            The 'arc_order' value corresponds to the `arc_number` entry.
+
+
+        Notes
+        -----
+        If entries are repeated, they are overwritten by the last one.
+
+        .. todo::
+            Normalize state given an amplitude?
+        """
+
+        return None
