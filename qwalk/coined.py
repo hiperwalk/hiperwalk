@@ -625,12 +625,53 @@ class Coined(BaseWalk):
             The 'arc_order' value corresponds to the `arc_number` entry.
 
 
+        Raises
+        ------
+        ValueError
+            If ``type`` has invalid value.
+
         Notes
         -----
         If entries are repeated, they are overwritten by the last one.
 
-        .. todo::
-            Normalize state given an amplitude?
+        More efficient implementation of state construction is desirable.
+
         """
 
-        return None
+        def _normalize(state, error=1e-16):
+            norm = np.linalg.norm(state)
+            if 1 - error <= norm and norm <= 1 + error:
+                return state
+            return state / norm
+
+        def _vertex_dir(self, entries, amplitudes):
+            return None
+
+        def _arc_notation(self, entries, amplitudes):
+            return None
+
+        def _arc_order(self, entries, amplitudes):
+            state = (np.zeros(self.hilb_dim) if amplitudes is None else
+                     np.zeros(self.hilb_dim, amplitudes.dtype))
+            if amplitudes is None:
+                for i in entries:
+                    state[i] = 1
+            else:
+                for i in range(len(entries)):
+                    state[entries[i]] = amplitudes[i]
+
+            state = _normalize(state)
+
+            return state
+        
+        funcs = {'vertex_dir' : _vertex_dir,
+                 'arc_notation' : _arc_notation,
+                 'arc_order' : _arc_order}
+
+        if type not in list(funcs.keys()):
+            raise ValueError(
+                    'Invalid `type` argument. Expected any from '
+                    + str(list(funcs.keys()))
+            )
+
+        return funcs[type](self, entries, amplitudes)
