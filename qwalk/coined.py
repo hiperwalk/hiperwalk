@@ -44,18 +44,28 @@ class Coined(BaseWalk):
     check Quantum Walks and Search Algorithms's
     Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
 
-    The Coined class uses the position-coin notation
+    The Coined class uses the arc notation
     and the Hilbert space :math:`\mathcal{H}^{2|E|}` for general Graphs.
-    Matrices and states respect the sorted edges order,
+    That is, for a given graph :math:`G(V, E)`,
+    the walk occurs in the graph :math:`\vec{G}(V, A)`
+    where
+
+    .. math::
+        \begin{align*}
+            A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
+        \end{align*}
+
+    Matrices and states respect the sorted arcs order,
     i.e. :math:`(v, u) < (v', u')` if either :math:`v < v'` or
     :math:`v = v'` and :math:`u < u'`
-    where :math:`(v, u), (v', u')` are valid edges.
+    where :math:`(v, u), (v', u')` are valid arcs.
 
-    For example, the graph :math:`G(V, E)` shown in Figure 1 has adjacency matrix `A`.
+    For example, the graph :math:`G(V, E)` shown in
+    Figure 1 has adjacency matrix ``adj_matrix``.
 
     >>> import numpy as np
-    >>> A = np.matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
-    >>> A
+    >>> adj_matrix = np.matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
+    >>> adj_matrix
     matrix([[0, 1, 0, 0],
             [1, 0, 1, 1],
             [0, 1, 0, 1],
@@ -66,34 +76,33 @@ class Coined(BaseWalk):
         :layout: neato
         :caption: Figure 1
 
-    Letting :math:`(v, u)` denote the edge from vertex :math:`v` to :math:`u`,
-    the `edges` of :math:`G` are
+    The corresponding arcs are
 
-    >>> edges = [(i, j) for i in range(4) for j in range(4) if A[i,j] == 1]
-    >>> edges
+    >>> arcs = [(i, j) for i in range(4) for j in range(4) if A[i,j] == 1]
+    >>> arcs
     [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
 
-    Note that `edges` is already sorted, hence the labels are
+    Note that ``arcs`` is already sorted, hence the labels are
 
-    >>> edges_labels = {edges[i]: i for i in range(len(edges))}
-    >>> edges_labels
+    >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
+    >>> arcs_labels
     {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
 
-    The edges labels are illustrated in Figure 2.
+    The arcs labels are illustrated in Figure 2.
 
     .. graphviz:: ../../graphviz/coined-model-edges-labels.dot
         :align: center
         :layout: neato
         :caption: Figure 2
 
-    If we would write the edges labels respecting the the adjacency matrix format,
-    we would have the matrix `A_labels`.
-    Intuitively, the edges are labeled in left-to-right top-to-bottom fashion.
+    If we would write the arcs labels respecting the the adjacency matrix format,
+    we would have the matrix ``adj_labels``.
+    Intuitively, the arcs are labeled in left-to-right top-to-bottom fashion.
 
-    >>> A_labels = [[edges_labels[(i,j)] if (i,j) in edges_labels else '' for j in range(4)]
+    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels else '' for j in range(4)]
     ...             for i in range(4)]
-    >>> A_labels = np.matrix(A_labels)
-    >>> A_labels
+    >>> adj_labels = np.matrix(adj_labels)
+    >>> adj_labels
     matrix([['', '0', '', ''],
             ['1', '', '2', '3'],
             ['', '4', '', '5'],
@@ -102,7 +111,7 @@ class Coined(BaseWalk):
     For consistency, any state :math:`\ket\psi \in \mathcal{H}^{2|E|}`
     is such that :math:`\ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i}`
     where :math:`\ket{i}` is the computational basis state
-    associated to the :math:`i`-th edge.
+    associated to the :math:`i`-th arc.
     In our example, the state
 
     >>> psi = np.matrix([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0]).T
