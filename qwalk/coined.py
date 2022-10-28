@@ -649,7 +649,21 @@ class Coined(BaseWalk):
             return None
 
         def _arc_notation(self, entries, amplitudes):
-            return None
+            state = (np.zeros(self.hilb_dim) if amplitudes is None else
+                     np.zeros(self.hilb_dim, amplitudes.dtype))
+
+            sources, targets = entries
+            indices = self.adj_matrix.indices
+            indptr = self.adj_matrix.indptr
+
+            for i in range(len(sources)):
+                src = sources[i]
+                arc = _binary_search(indices, targets[i],
+                                     start=indptr[src],
+                                     end=indptr[src+1])
+                state[arc] = amplitudes[i] if amplitudes is not None else 1
+
+            return _normalize(state)
 
         def _arc_order(self, entries, amplitudes):
             state = (np.zeros(self.hilb_dim) if amplitudes is None else

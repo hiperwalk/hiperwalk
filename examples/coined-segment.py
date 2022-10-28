@@ -18,9 +18,12 @@ middle_left = num_vert - 2
 # init_cond[middle_left] = 1
 # init_cond[middle_right] = 1/np.sqrt(2)
 # init_cond[middle_left] = -1j/np.sqrt(2)
-init_cond = seg.state([middle_right, middle_left],
-                      amplitudes=np.array([1, -1j]),
-                      type="arc_order")
+# init_cond = seg.state([middle_right, middle_left],
+#                       amplitudes=np.array([1, -1j]),
+#                       type="arc_order")
+init_cond = seg.state(([2], [3]),
+                      np.array([1]),
+                      type="arc_notation")
 print(init_cond)
 
 
