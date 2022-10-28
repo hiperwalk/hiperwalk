@@ -631,6 +631,10 @@ class Coined(BaseWalk):
         ValueError
             If ``type`` has invalid value.
 
+        IndexError
+            If ``type='vertex_dir'`` and ``coin_dir`` is not a value in
+            the valid interval (from 0 to degree(``vertices[i]``) - 1).
+
         Notes
         -----
         If entries are repeated, they are overwritten by the last one.
@@ -656,9 +660,17 @@ class Coined(BaseWalk):
                 src = sources[i]
                 arc = indptr[src] + directions[i]
 
+                if arc < indptr[src] or arc >= indptr[src+1]:
+                    raise IndexError(
+                        "The " + str(i) + "-th entry (vertex "
+                        + str(src)
+                        + ") expected a direction value in the [0, "
+                        + str(indptr[src+1] - indptr[src] - 1)
+                        + "] interval. But received the value "
+                        + str(directions[i]) + " instead."
+                    )
+
                 state[arc] = amplitudes[i] if amplitudes is not None else 1
-                
-                print("check for nonadjacency VERTEX DIR")
 
             return state
 
