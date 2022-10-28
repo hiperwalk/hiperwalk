@@ -24,7 +24,7 @@ middle_left = num_vert - 2
 # init_cond = seg.state(([2], [3]),
 #                       np.array([1]),
 #                       type="arc_notation")
-init_cond = seg.state(([2], [0]),
+init_cond = seg.state(([0], [0]),
                       np.array([1]))
 print(init_cond)
 

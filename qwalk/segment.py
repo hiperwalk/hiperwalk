@@ -102,6 +102,7 @@ class Segment(Coined):
         sources, directions = entries
         indices = self.adj_matrix.indices
         indptr = self.adj_matrix.indptr
+        num_vert = self.adj_matrix.shape[0]
 
         for i in range(len(sources)):
             src = sources[i]
@@ -113,7 +114,23 @@ class Segment(Coined):
                     + "but received " + str(directions[i]) + " instead."
                 )
 
-            arc = indptr[src] + 1 - directions[i]
+            # bound conditions
+            if src == 0 and directions[i] != 0:
+                raise ValueError(
+                    "Invalid " + str(i) + "-th entry coin direction. "
+                    + "Since 0 is the leftmost vertex, "
+                    + "the only available direction is 0 (rightwards). "
+                    + "But received " + str(directions[i]) + " instead."
+                )
+            if src == num_vert - 1 and directions[i] != 1:
+                raise ValueError(
+                    "Invalid " + str(i) + "-th entry coin direction. "
+                    + "Since " + str(src) + " is the rightmost vertex, "
+                    + "the only available direction is 1 (leftwards). "
+                    + "But received " + str(directions[i]) + " instead."
+                )
+
+            arc = indptr[src] + 1 - directions[i] if src != 0 else 0
 
             state[arc] = amplitudes[i] if amplitudes is not None else 1
 
@@ -126,6 +143,21 @@ class Segment(Coined):
         However, when ``type='vertex_dir'``,
         the default coin directions are used.
         In other words, 0 for rightwards and 1 for leftwards.
+
+        Raises
+        ------
+        ValueError
+            If ``type='vertex_dir'`` and one of the following occurs
+            for some ``entries[i] = (vertices[i], coin_dir[i])``.
+
+            * ``coin_dir[i]`` is different from 0 and 1:
+                the only valid directions are 0 and 1.
+            * ``vertices[i]=0`` and ``coin_dir=1``:
+                0 is the leftmost vertex,
+                hence the only possible direction is rightwards.
+            * ``vertices[i]=``:math:`|V|-1` and ``coin_dir=0``:
+                :math:`|V|-1` is the rightmost vertex,
+                hence the only possible direction is leftwards.
 
         Notes
         -----
