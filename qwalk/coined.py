@@ -646,7 +646,21 @@ class Coined(BaseWalk):
             return state / norm
 
         def _vertex_dir(adj_matrix, state, entries, amplitudes):
-            return None
+            sources, directions = entries
+            indices = adj_matrix.indices
+            indptr = adj_matrix.indptr
+            print(indices)
+            print(indptr)
+
+            for i in range(len(sources)):
+                src = sources[i]
+                arc = indptr[src] + directions[i]
+
+                state[arc] = amplitudes[i] if amplitudes is not None else 1
+                
+                print("check for nonadjacency VERTEX DIR")
+
+            return state
 
         def _arc_notation(adj_matrix, state, entries, amplitudes):
             sources, targets = entries
@@ -658,6 +672,8 @@ class Coined(BaseWalk):
                 arc = _binary_search(indices, targets[i],
                                      start=indptr[src],
                                      end=indptr[src+1])
+                print("check for nonadjacency")
+
                 state[arc] = amplitudes[i] if amplitudes is not None else 1
 
             return state
