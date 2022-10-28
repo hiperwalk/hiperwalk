@@ -586,106 +586,94 @@ class Coined(BaseWalk):
     ######### Auxiliary Methods for state() method ##########
     #########################################################
 
-    def _state_vertex_dir(self, state, entries, amplitudes):
-        sources, directions = entries
+    def _state_vertex_dir(self, state, entries):
         indices = self.adj_matrix.indices
         indptr = self.adj_matrix.indptr
 
-        for i in range(len(sources)):
-            src = sources[i]
-            arc = indptr[src] + directions[i]
+        for amplitude, src, coin_dir in entries:
+            arc = indptr[src] + coin_dir
 
             if arc < indptr[src] or arc >= indptr[src+1]:
                 raise IndexError(
-                    "The " + str(i) + "-th entry (vertex "
-                    + str(src)
-                    + ") expected a direction value in the [0, "
+                    "For vertex " + str(src) + ", "
+                    + "a coin direction value from 0 to "
                     + str(indptr[src+1] - indptr[src] - 1)
-                    + "] interval. But received the value "
-                    + str(directions[i]) + " instead."
+                    + " was expected. But the value "
+                    + str(coin_dir) + " was received instead."
                 )
 
-            state[arc] = amplitudes[i] if amplitudes is not None else 1
+            state[arc] = amplitude
 
         return state
 
-    def _state_arc_notation(self, state, entries, amplitudes):
-        sources, targets = entries
+    def _state_arc_notation(self, state, entries):
         indices = self.adj_matrix.indices
         indptr = self.adj_matrix.indptr
 
-        for i in range(len(sources)):
-            src = sources[i]
+        for amplitude, src, dst in entries:
             
-            if self.adj_matrix[src, targets[i]] == 0:
+            if self.adj_matrix[src, dst] == 0:
                 raise ValueError(
-                    "At the " + str(i) + "-th entry: vertices "
-                    + str(src) + " and " + str(targets[i])
+                    "Vertices " + str(src) + " and " + str(dst)
                     + " are not adjacent."
                 )
 
-            arc = _binary_search(indices, targets[i],
-                                 start=indptr[src],
+            arc = _binary_search(indices, dst, start=indptr[src],
                                  end=indptr[src+1])
 
-            state[arc] = amplitudes[i] if amplitudes is not None else 1
+            state[arc] = amplitude
 
         return state
 
 
-    def _state_arc_order(self, state, entries, amplitudes):
-        if amplitudes is None:
-            for i in entries:
-                state[i] = 1
-        else:
-            for i in range(len(entries)):
-                state[entries[i]] = amplitudes[i]
+    def _state_arc_order(self, state, entries):
+        for amplitude, arc in entries:
+            state[arc] = amplitude
 
         return state
 
-    def state(self, entries, amplitudes=None, type='vertex_dir'):
+    def state(self, entries, type='vertex_dir'):
         """
         Generates a valid state.
 
         The state corresponds to the walker being in a superposition
-        of ``entries[i]`` with amplitudes ``amplitudes[i]``, respectively.
+        of the ``entries``.
 
-        The ``amplitudes`` are normalized so the state is unitary.
+        The final state is normalized in order to be unitary.
 
         Parameters
         ----------
         entries :
+            Each entry is a tuple (or array).
             There are three types of accaptable entries:
-            `(vertices, coin_dir)`, `(vertices, target_vertices)`,
-            and `arc_number`.
+            `(amplitude, vertex, coin_dir)`,
+            `(amplitude, vertex, dst_vertex)`,
+            `(amplitude, arc)`.
 
-
-            vertices : :class:`numpy.array`
-                The vertices corresponding to the positions of the walker
+            amplitude :
+                The amplitudes of the given entry.
+            vertex :
+                The vertex corresponding to the position of the walker
                 in the superposition.
-            coin_dir : :class:`numpy.array`
-                The direction to which the coin is pointing to.
-                Each array entry is expected to be a value between
-                0 and degree(``vertices[i]``) - 1,
-                which respect the sorted arcs order.
-            target_vertices : :class:`numpy.array`
-                The target vertex for the given positions.
-                This respects the arc notation,
-                i.e. (``vertices[i]``, ``target_vertices[i]``).
-            arc_number : :class:`numpy.array`
+            coin_dir :
+                The direction towards which the coin is pointing.
+                A value between 0 and degree(``vertices[i]``) - 1
+                is expected, respecting the sorted arcs order.
+            dst_vertex : 
+                The vertex which the coin is pointing to.
+                In other words, the tuple
+                (vertex, dst_vertex) must be a valid arc.
+            arc_number :
                 The arc number with respect to the sorted arcs order.
-
-        amplitudes : :class:`numpy.array`, default=None
-            The amplitudes of each entry.
-            If ``none``, computes the entries' uniform superposition.
 
         type : {'vertex_dir', 'arc_notation', 'arc_order'}
             The type of the ``entries`` argument.
-            The (default) value 'vertex_dir' corresponds to
-            the (`vertices, coin_dir`) entry.
-            The 'arc_notation' value corresponds to the
-            `(vertices, target_vertices)` entry.
-            The 'arc_order' value corresponds to the `arc_number` entry.
+            * `'vertex_dir'` (default): corresponds to
+                the `(amplitude, vertex, dst_vertex)` entry type;
+            * `'arc_notation'` : corresponds to the
+                `(amplitude, vertex, dst_vertex)` entry type;
+            * `arc_order` : corresponds to the
+                `(amplitude, arc)` entry type.
 
 
         Raises
@@ -694,17 +682,21 @@ class Coined(BaseWalk):
             If ``type`` has invalid value.
 
             If ``type='arc_notation'`` and there exists an entry such that
-            ``vertices[i]`` and ``target_vertices[i]`` are not adjacent.
+            `vertex` and `dst_vertex` are not adjacent.
 
         IndexError
-            If ``type='vertex_dir'`` and ``coin_dir`` is not a value in
-            the valid interval (from 0 to degree(``vertices[i]``) - 1).
+            If ``type='vertex_dir'`` and `coin_dir` is not a value in
+            the valid interval (from 0 to degree(`vertex`) - 1).
 
         Notes
         -----
-        If entries are repeated, they are overwritten by the last one.
+        If entries are repeated (except by the amplitude),
+        they are overwritten by the last one.
 
-        More efficient implementation of state construction is desirable.
+        .. todo::
+            * Allow real states (only complex allowed at the moment).
+            * More efficient implementation of
+                state construction is desirable.
 
         """
 
@@ -724,8 +716,7 @@ class Coined(BaseWalk):
                     + str(list(funcs.keys()))
             )
 
-        state = (np.zeros(self.hilb_dim) if amplitudes is None else
-                 np.zeros(self.hilb_dim, amplitudes.dtype))
-        state = funcs[type](state, entries, amplitudes)
+        state = np.zeros(self.hilb_dim, dtype=complex)
+        state = funcs[type](state, entries)
 
         return _normalize(state)

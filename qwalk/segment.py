@@ -92,47 +92,44 @@ class Segment(Coined):
 
         return S
 
-    def _state_vertex_dir(self, state, entries, amplitudes):
+    def _state_vertex_dir(self, state, entries):
         r"""
         Overrides Coined model method so the directions respect
         the default coin directions.
         In other words:
         0 pointing rightwards and 1 pointing leftwards.
         """
-        sources, directions = entries
         indices = self.adj_matrix.indices
         indptr = self.adj_matrix.indptr
         num_vert = self.adj_matrix.shape[0]
 
-        for i in range(len(sources)):
-            src = sources[i]
-            
-            if directions[i] != 0 and directions[i] != 1:
+        for amplitude, src, coin_dir in entries:
+            if coin_dir != 0 and coin_dir != 1:
                 raise ValueError(
-                    "Invalid " + str(i) + "-th entry coin direction. "
-                    + "Expected either 0 (rightwards) or 1 (leftwards), "
-                    + "but received " + str(directions[i]) + " instead."
+                    "Invalid entry coin direction for vertex " + str(src)
+                    + ". Expected either 0 (rightwards) or 1 (leftwards),"
+                    + " but received " + str(coin_dir) + " instead."
                 )
 
             # bound conditions
-            if src == 0 and directions[i] != 0:
+            if src == 0 and coin_dir != 0:
                 raise ValueError(
-                    "Invalid " + str(i) + "-th entry coin direction. "
+                    "Invalid entry coin direction for vertex 0."
                     + "Since 0 is the leftmost vertex, "
                     + "the only available direction is 0 (rightwards). "
-                    + "But received " + str(directions[i]) + " instead."
+                    + "But received " + str(coin_dir) + " instead."
                 )
-            if src == num_vert - 1 and directions[i] != 1:
+            if src == num_vert - 1 and coin_dir != 1:
                 raise ValueError(
-                    "Invalid " + str(i) + "-th entry coin direction. "
-                    + "Since " + str(src) + " is the rightmost vertex, "
+                    "Invalid entry coin direction for vertex " + str(src)
+                    + ". Since " + str(src) + " is the rightmost vertex, "
                     + "the only available direction is 1 (leftwards). "
-                    + "But received " + str(directions[i]) + " instead."
+                    + "But received " + str(coin_dir) + " instead."
                 )
 
-            arc = indptr[src] + 1 - directions[i] if src != 0 else 0
+            arc = indptr[src] + 1 - coin_dir if src != 0 else 0
 
-            state[arc] = amplitudes[i] if amplitudes is not None else 1
+            state[arc] = amplitude
 
         return state
 
@@ -165,4 +162,4 @@ class Segment(Coined):
         sorted arcs order.
         Hence, the directions would be shifted.
         """
-        return super().state(entries, amplitudes, type)
+        return super().state(entries, type)
