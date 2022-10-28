@@ -661,9 +661,7 @@ class Coined(BaseWalk):
                 for i in range(len(entries)):
                     state[entries[i]] = amplitudes[i]
 
-            state = _normalize(state)
-
-            return state
+            return _normalize(state)
         
         funcs = {'vertex_dir' : _vertex_dir,
                  'arc_notation' : _arc_notation,
