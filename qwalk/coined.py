@@ -594,7 +594,7 @@ class Coined(BaseWalk):
         ----------
         entries :
             There are three types of accaptable entries:
-            `(vertices, coin_dir)`, `(vertices, target_vertex)`,
+            `(vertices, coin_dir)`, `(vertices, target_vertices)`,
             and `arc_number`.
 
 
@@ -606,10 +606,10 @@ class Coined(BaseWalk):
                 Each array entry is expected to be a value between
                 0 and degree(``vertices[i]``) - 1,
                 which respect the sorted arcs order.
-            target_vertex : :class:`numpy.array`
+            target_vertices : :class:`numpy.array`
                 The target vertex for the given positions.
                 This respects the arc notation,
-                i.e. (``vertices[i]``, ``target_vertex[i]``).
+                i.e. (``vertices[i]``, ``target_vertices[i]``).
             arc_number : :class:`numpy.array`
                 The arc number with respect to the sorted arcs order.
 
@@ -622,7 +622,7 @@ class Coined(BaseWalk):
             The (default) value 'vertex_dir' corresponds to
             the (`vertices, coin_dir`) entry.
             The 'arc_notation' value corresponds to the
-            `(vertices, target_vertex)` entry.
+            `(vertices, target_vertices)` entry.
             The 'arc_order' value corresponds to the `arc_number` entry.
 
 
@@ -630,6 +630,9 @@ class Coined(BaseWalk):
         ------
         ValueError
             If ``type`` has invalid value.
+
+            If ``type='arc_notation'`` and there exists an entry such that
+            ``vertices[i]`` and ``target_vertices[i]`` are not adjacent.
 
         IndexError
             If ``type='vertex_dir'`` and ``coin_dir`` is not a value in
@@ -681,10 +684,17 @@ class Coined(BaseWalk):
 
             for i in range(len(sources)):
                 src = sources[i]
+                
+                if adj_matrix[src, targets[i]] == 0:
+                    raise ValueError(
+                        "At the " + str(i) + "-th entry: vertices "
+                        + str(src) + " and " + str(targets[i])
+                        + " are not adjacent."
+                    )
+
                 arc = _binary_search(indices, targets[i],
                                      start=indptr[src],
                                      end=indptr[src+1])
-                print("check for nonadjacency")
 
                 state[arc] = amplitudes[i] if amplitudes is not None else 1
 
