@@ -581,6 +581,70 @@ class Coined(BaseWalk):
         # TODO: benchmark (time and memory usage)
         return prob
 
+
+    #########################################################
+    ######### Auxiliary Methods for state() method ##########
+    #########################################################
+
+    def _state_vertex_dir(self, state, entries, amplitudes):
+        sources, directions = entries
+        indices = self.adj_matrix.indices
+        indptr = self.adj_matrix.indptr
+        print(indices)
+        print(indptr)
+
+        for i in range(len(sources)):
+            src = sources[i]
+            arc = indptr[src] + directions[i]
+
+            if arc < indptr[src] or arc >= indptr[src+1]:
+                raise IndexError(
+                    "The " + str(i) + "-th entry (vertex "
+                    + str(src)
+                    + ") expected a direction value in the [0, "
+                    + str(indptr[src+1] - indptr[src] - 1)
+                    + "] interval. But received the value "
+                    + str(directions[i]) + " instead."
+                )
+
+            state[arc] = amplitudes[i] if amplitudes is not None else 1
+
+        return state
+
+    def _state_arc_notation(self, state, entries, amplitudes):
+        sources, targets = entries
+        indices = self.adj_matrix.indices
+        indptr = self.adj_matrix.indptr
+
+        for i in range(len(sources)):
+            src = sources[i]
+            
+            if self.adj_matrix[src, targets[i]] == 0:
+                raise ValueError(
+                    "At the " + str(i) + "-th entry: vertices "
+                    + str(src) + " and " + str(targets[i])
+                    + " are not adjacent."
+                )
+
+            arc = _binary_search(indices, targets[i],
+                                 start=indptr[src],
+                                 end=indptr[src+1])
+
+            state[arc] = amplitudes[i] if amplitudes is not None else 1
+
+        return state
+
+
+    def _state_arc_order(self, state, entries, amplitudes):
+        if amplitudes is None:
+            for i in entries:
+                state[i] = 1
+        else:
+            for i in range(len(entries)):
+                state[entries[i]] = amplitudes[i]
+
+        return state
+
     def state(self, entries, amplitudes=None, type='vertex_dir'):
         """
         Generates a valid state.
@@ -651,69 +715,10 @@ class Coined(BaseWalk):
             if 1 - error <= norm and norm <= 1 + error:
                 return state
             return state / norm
-
-        def _vertex_dir(adj_matrix, state, entries, amplitudes):
-            sources, directions = entries
-            indices = adj_matrix.indices
-            indptr = adj_matrix.indptr
-            print(indices)
-            print(indptr)
-
-            for i in range(len(sources)):
-                src = sources[i]
-                arc = indptr[src] + directions[i]
-
-                if arc < indptr[src] or arc >= indptr[src+1]:
-                    raise IndexError(
-                        "The " + str(i) + "-th entry (vertex "
-                        + str(src)
-                        + ") expected a direction value in the [0, "
-                        + str(indptr[src+1] - indptr[src] - 1)
-                        + "] interval. But received the value "
-                        + str(directions[i]) + " instead."
-                    )
-
-                state[arc] = amplitudes[i] if amplitudes is not None else 1
-
-            return state
-
-        def _arc_notation(adj_matrix, state, entries, amplitudes):
-            sources, targets = entries
-            indices = adj_matrix.indices
-            indptr = adj_matrix.indptr
-
-            for i in range(len(sources)):
-                src = sources[i]
-                
-                if adj_matrix[src, targets[i]] == 0:
-                    raise ValueError(
-                        "At the " + str(i) + "-th entry: vertices "
-                        + str(src) + " and " + str(targets[i])
-                        + " are not adjacent."
-                    )
-
-                arc = _binary_search(indices, targets[i],
-                                     start=indptr[src],
-                                     end=indptr[src+1])
-
-                state[arc] = amplitudes[i] if amplitudes is not None else 1
-
-            return state
-
-
-        def _arc_order(adj_matrix, state, entries, amplitudes):
-            if amplitudes is None:
-                for i in entries:
-                    state[i] = 1
-            else:
-                for i in range(len(entries)):
-                    state[entries[i]] = amplitudes[i]
-
-            return state
         
-        funcs = {'vertex_dir' : _vertex_dir,
-                 'arc_notation' : _arc_notation,
-                 'arc_order' : _arc_order}
+        funcs = {'vertex_dir' : self._state_vertex_dir,
+                 'arc_notation' : self._state_arc_notation,
+                 'arc_order' : self._state_arc_order}
 
         if type not in list(funcs.keys()):
             raise ValueError(
@@ -723,6 +728,6 @@ class Coined(BaseWalk):
 
         state = (np.zeros(self.hilb_dim) if amplitudes is None else
                  np.zeros(self.hilb_dim, amplitudes.dtype))
-        state = funcs[type](self.adj_matrix, state, entries, amplitudes)
+        state = funcs[type](state, entries, amplitudes)
 
         return _normalize(state)
