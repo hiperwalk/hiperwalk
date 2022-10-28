@@ -9,6 +9,25 @@ if DEBUG:
     from time import time as now
     from guppy import hpy # used to check memory usage
 
+def _binary_search(v, elem, start=0, end=None):
+    r"""
+    expects sorted array and executes binary search in the subarray
+    v[start:end] searching for elem.
+    Return the index of the element if found, otherwise returns -1
+    Cormen's binary search implementation.
+    Used to improve time complexity
+    """
+    if end == None:
+        end = len(v)
+    
+    while start < end:
+        mid = int((start + end)/2)
+        if elem <= v[mid]:
+            end = mid
+        else:
+            start = mid + 1
+
+    return end if v[end] == elem else -1
 
 class Coined(BaseWalk):
     r"""
@@ -244,24 +263,6 @@ class Coined(BaseWalk):
         orig_dtype = self.adj_matrix.dtype
         self.adj_matrix.data = np.arange(num_edges)
 
-        # expects sorted array and executes binary search in the subarray
-        # v[start:end] searching for elem.
-        # Return the index of the element if found, otherwise returns -1
-        # Cormen's binary search implementation.
-        # Used to improve time complexity
-        def __binary_search(v, elem, start=0, end=None):
-            if end == None:
-                end = len(v)
-            
-            while start < end:
-                mid = int((start + end)/2)
-                if elem <= v[mid]:
-                    end = mid
-                else:
-                    start = mid + 1
-
-            return end if v[end] == elem else -1
-
         # Calculating flip_flop_shift columns
         # (to be used as indices of a csr_array)
         row = 0
@@ -270,7 +271,7 @@ class Coined(BaseWalk):
             if edge >= self.adj_matrix.indptr[row + 1]:
                 row += 1
             # Column index (in the adj_matrix struct) of the current edge
-            col_index = __binary_search(self.adj_matrix.data, edge,
+            col_index = _binary_search(self.adj_matrix.data, edge,
                                         start=self.adj_matrix.indptr[row],
                                         end=self.adj_matrix.indptr[row+1])
             # S[edge, S_cols[edge]] = 1
