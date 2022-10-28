@@ -590,8 +590,6 @@ class Coined(BaseWalk):
         sources, directions = entries
         indices = self.adj_matrix.indices
         indptr = self.adj_matrix.indptr
-        print(indices)
-        print(indptr)
 
         for i in range(len(sources)):
             src = sources[i]

@@ -91,3 +91,46 @@ class Segment(Coined):
         ))
 
         return S
+
+    def _state_vertex_dir(self, state, entries, amplitudes):
+        r"""
+        Overrides Coined model method so the directions respect
+        the default coin directions.
+        In other words:
+        0 pointing rightwards and 1 pointing leftwards.
+        """
+        sources, directions = entries
+        indices = self.adj_matrix.indices
+        indptr = self.adj_matrix.indptr
+
+        for i in range(len(sources)):
+            src = sources[i]
+            
+            if directions[i] != 0 and directions[i] != 1:
+                raise ValueError(
+                    "Invalid " + str(i) + "-th entry coin direction. "
+                    + "Expected either 0 (rightwards) or 1 (leftwards), "
+                    + "but received " + str(directions[i]) + " instead."
+                )
+
+            arc = indptr[src] + 1 - directions[i]
+
+            state[arc] = amplitudes[i] if amplitudes is not None else 1
+
+        return state
+
+    def state(self, entries, amplitudes=None, type='vertex_dir'):
+        r"""
+        Similar to :meth:`qwalk.Coined.state`.
+
+        However, when ``type='vertex_dir'``,
+        the default coin directions are used.
+        In other words, 0 for rightwards and 1 for leftwards.
+
+        Notes
+        -----
+        The default of :meth:`qwalk.Coined.state` is to use the
+        sorted arcs order.
+        Hence, the directions would be shifted.
+        """
+        return super().state(entries, amplitudes, type)
