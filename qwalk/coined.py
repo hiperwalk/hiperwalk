@@ -645,16 +645,13 @@ class Coined(BaseWalk):
                 return state
             return state / norm
 
-        def _vertex_dir(self, entries, amplitudes):
+        def _vertex_dir(adj_matrix, state, entries, amplitudes):
             return None
 
-        def _arc_notation(self, entries, amplitudes):
-            state = (np.zeros(self.hilb_dim) if amplitudes is None else
-                     np.zeros(self.hilb_dim, amplitudes.dtype))
-
+        def _arc_notation(adj_matrix, state, entries, amplitudes):
             sources, targets = entries
-            indices = self.adj_matrix.indices
-            indptr = self.adj_matrix.indptr
+            indices = adj_matrix.indices
+            indptr = adj_matrix.indptr
 
             for i in range(len(sources)):
                 src = sources[i]
@@ -663,11 +660,10 @@ class Coined(BaseWalk):
                                      end=indptr[src+1])
                 state[arc] = amplitudes[i] if amplitudes is not None else 1
 
-            return _normalize(state)
+            return state
 
-        def _arc_order(self, entries, amplitudes):
-            state = (np.zeros(self.hilb_dim) if amplitudes is None else
-                     np.zeros(self.hilb_dim, amplitudes.dtype))
+
+        def _arc_order(adj_matrix, state, entries, amplitudes):
             if amplitudes is None:
                 for i in entries:
                     state[i] = 1
@@ -675,7 +671,7 @@ class Coined(BaseWalk):
                 for i in range(len(entries)):
                     state[entries[i]] = amplitudes[i]
 
-            return _normalize(state)
+            return state
         
         funcs = {'vertex_dir' : _vertex_dir,
                  'arc_notation' : _arc_notation,
@@ -687,4 +683,8 @@ class Coined(BaseWalk):
                     + str(list(funcs.keys()))
             )
 
-        return funcs[type](self, entries, amplitudes)
+        state = (np.zeros(self.hilb_dim) if amplitudes is None else
+                 np.zeros(self.hilb_dim, amplitudes.dtype))
+        state = funcs[type](self.adj_matrix, state, entries, amplitudes)
+
+        return _normalize(state)
