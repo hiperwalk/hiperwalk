@@ -133,7 +133,7 @@ class Segment(Coined):
 
         return state
 
-    def state(self, entries, amplitudes=None, type='vertex_dir'):
+    def state(self, entries, type='vertex_dir'):
         r"""
         Similar to :meth:`qwalk.Coined.state`.
 
