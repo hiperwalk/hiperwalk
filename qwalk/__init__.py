@@ -3,3 +3,4 @@
 from .base_walk import *
 from .coined import *
 from .segment import *
+from .line import *
