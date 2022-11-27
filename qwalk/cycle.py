@@ -9,6 +9,7 @@ class Cycle(Coined):
     ----------
     num_vert : int
         Number of vertices in the cycle.
+
     """
 
     def __init__(self, num_vert):
@@ -29,3 +30,93 @@ class Cycle(Coined):
     
         # initializing
         super().__init__(adj_matrix)
+
+    def shift_operator(self):
+        r"""
+        Create the shift operator (:math:`S`) based on the
+        ``adj_matrix`` atribute.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_matrix`
+            Shift operator.
+
+        Notes
+        -----
+        The shift operator :math:`S` for any vertex :math:`v \in V`
+        is defined by
+
+        .. math::
+            \begin{align*}
+                S \ket{2v} &= \ket{2v + 2 \mod 2|E|} \\
+                S \ket{2v+1} &= \ket{2v+1 - 2 \mod 2|E|}. 
+            \end{align*}
+
+        Hence, if the walker reaches a boundary vertex
+        :math:`u \in \{0, |V| - 1\}`,
+        the coin starts pointing in the opposite direction.
+
+        .. todo::
+            Add option to implement boundary vertices as sinks.
+        """
+
+        num_edges = 2*self.adj_matrix.shape[0]
+
+        data = np.ones(num_edges, np.int8)
+        indptr = np.arange(num_edges + 1)
+        indices = np.zeros(num_edges)
+
+        indices = [(i - 2) % num_edges if i % 2 == 0
+                   else (i + 2) % num_edges
+                   for i in range(num_edges)]
+
+        S = scipy.sparse.csr_array((
+            data, indices, indptr        
+        ))
+
+        return S
+
+    def _state_vertex_dir(self, state, entries):
+        r"""
+        Overrides Coined model method so the directions respect
+        the default coin directions.
+        In other words:
+        0 pointing rightwards and 1 pointing leftwards.
+        """
+        num_vert = self.adj_matrix.shape[0]
+
+        for amplitude, src, coin_dir in entries:
+            if coin_dir != 0 and coin_dir != 1:
+                raise ValueError(
+                    "Invalid entry coin direction for vertex " + str(src)
+                    + ". Expected either 0 (rightwards) or 1 (leftwards),"
+                    + " but received " + str(coin_dir) + " instead."
+                )
+
+            arc = 2*src + coin_dir
+            # if src == 0 or src == num_vert - 1:
+            #     arc = 2*src + coin_dir 
+
+            print(arc)
+            state[arc] = amplitude
+
+        return state
+
+    def _state_arc_notation(self, state, entries):
+        num_vert = self.adj_matrix.shape[0]
+
+        for amplitude, src, dst in entries:
+            if (dst != (src - 1) % num_vert and
+                dst != (src + 1) % num_vert):
+                raise ValueError (
+                    "Vertices " + str(src) + " and " + str(dst)
+                    + " are not adjacent."
+                )
+            
+            print(dst > src)
+            print(dst - src < 0)
+            arc = (2*src if dst - src == 1 or src - dst == num_vert - 1
+                   else 2*src + 1)
+            state[arc] = amplitude
+
+        return state
