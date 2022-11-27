@@ -2,6 +2,10 @@ import numpy as np
 from .segment import Segment
 
 class Line(Segment):
+    r"""
+    Add documentation
+    """
+
     def __init__(self, num_steps, state_entries, entry_type='vertex_dir'):
         r"""
         .. todo::
