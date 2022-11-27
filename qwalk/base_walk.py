@@ -306,7 +306,7 @@ class BaseWalk(ABC):
 
         # number of states to save
         num_states = (int(np.ceil(self._num_steps / save_interval))
-                      if save_interval >= 0 else 1)
+                      if save_interval > 0 else 1)
         if save_interval > 0:
             # saves initial state
             num_states += 1
