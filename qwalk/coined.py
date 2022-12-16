@@ -422,12 +422,21 @@ class Coined(BaseWalk):
 
         return np.matrix(R)
 
-    def evolution_operator(self, hpc=False, coin='grover'):
+    def has_persistent_shift_operator(self):
+        return False
+
+    def evolution_operator(self, persistent_shift=False, hpc=False,
+                           coin='grover'):
         """
         Create the standard evolution operator.
 
         Parameters
         ----------
+        persistent_shift : bool, default=False
+            Wheter to use persistent shift operator
+            (``persistent_shift=True``) or
+            the flip flop shift operator (``persistent_shift=False``).
+
         hpc : bool, default=False
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
@@ -442,6 +451,18 @@ class Coined(BaseWalk):
         U_w : :class:`scipy.sparse.csr_array`
             The evolution operator.
 
+        Raises
+        ------
+        NotImplementedError
+            If ``persistent_shift=True`` and the
+            persistent shift operator is not defined.
+
+        See Also
+        --------
+        flip_flop_shift_operator
+        coin_operator
+        has_persistent_shift_operator
+
         Notes
         -----
         The evolution operator is
@@ -452,12 +473,17 @@ class Coined(BaseWalk):
         where :math`S` is the flip-flop shift operator and
         :math:`C` is the coin operator.
 
-        See Also
-        --------
-        flip_flop_shift_operator
-        coin_operator
+        The persistent shift operator is only defined for specific graphs
+        that can be embedded into the plane.
+        Hence, a direction can be inferred (left, right, up, down).
         """
-        S = self.flip_flop_shift_operator()
+        if persistent_shift and not self.has_persistent_shift_operator():
+            raise NotImplementedError (
+                "Quantum walk has no persistent shift operator."
+            )
+
+        S = (self.persistent_shift_operator() if persistent_shift
+             else self.flip_flop_shift_operator())
         C = self.coin_operator(coin=coin)
 
         if hpc:
@@ -470,8 +496,8 @@ class Coined(BaseWalk):
             return None
         return S@C
 
-    def search_evolution_operator(self, vertices, hpc=False,
-                                  coin='grover'):
+    def search_evolution_operator(self, vertices, persistent_shift=False,
+                                  hpc=False, coin='grover'):
         """
         Create the search evolution operator.
 
