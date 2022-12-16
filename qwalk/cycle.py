@@ -54,6 +54,9 @@ class Cycle(Coined):
         # initializing
         super().__init__(adj_matrix)
 
+    def has_persistent_shift_operator(self):
+        return True
+
     def persistent_shift_operator(self):
         r"""
         Create the persistent shift operator (:math:`S`) based on the
@@ -136,8 +139,6 @@ class Cycle(Coined):
                     + " are not adjacent."
                 )
             
-            print(dst > src)
-            print(dst - src < 0)
             arc = (2*src if dst - src == 1 or src - dst == num_vert - 1
                    else 2*src + 1)
             state[arc] = amplitude
@@ -151,5 +152,10 @@ class Cycle(Coined):
         """
         return super().coin_operator(coin)
 
-    def evolution_operator(self, hpc=False, coin='hadamard'):
-        return super().coin_operator
+    def evolution_operator(self, persistent_shift=True, hpc=False,
+                           coin='hadamard'):
+        """
+        Same as :meth:`Coined.evolution_operator` with
+        overriden default arguments.
+        """
+        return super().evolution_operator(persistent_shift, hpc, coin)

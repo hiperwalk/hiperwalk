@@ -46,6 +46,9 @@ class Segment(Coined):
         # initializing
         super().__init__(adj_matrix)
 
+    def has_persistent_shift_operator(self):
+        return True
+
     def persistent_shift_operator(self):
         r"""
         Create the persistent shift operator (:math:`S`) based on the
