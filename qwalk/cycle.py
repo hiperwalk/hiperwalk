@@ -10,6 +10,31 @@ class Cycle(Coined):
     num_vert : int
         Number of vertices in the cycle.
 
+    Notes
+    -----
+    The cycle may be interpreted as being embedded on the line
+    with cyclic boundary condition.
+
+    The edge order respects the default vertex-coin notation.
+    In other words, 0 corresponds to the coin pointing rightwards,
+    and 1 to the coin pointing leftwards.
+    Therefore, the arcs are sorted with respect to this order
+    (vertex has precedence over direction and
+    right has precedence over left):
+
+    .. math::
+        \begin{align*}
+            \ket{(v, c)} = \ket{2v + c}
+        \end{align*}
+
+    where :math:`v \in V` and :math:`c \in \{0, 1\}`.
+    Figure 1 illustrates the arcs of a 3 vertices cycle.
+
+    .. graphviz:: ../../graphviz/coined-cycle-edges-labels.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1.
+
     """
 
     def __init__(self, num_vert):
@@ -25,8 +50,6 @@ class Cycle(Coined):
                              for shift in [-1, 1]]
         print(col_ind)
         adj_matrix = csr_array((data, (row_ind, col_ind)))
-
-        print('hello')
     
         # initializing
         super().__init__(adj_matrix)
