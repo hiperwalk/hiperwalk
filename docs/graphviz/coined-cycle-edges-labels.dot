@@ -1,0 +1,13 @@
+digraph {
+	l0 [pos="-2,0!" style="dashed" label="2"];
+	0 [pos="0,0!"];
+	1 [pos="2,0!"];
+	2 [pos="4,0!"];
+	r2 [pos="6,0!" style="dashed" label="0"];
+	0 -> 1 [headlabel=0 labeldistance=4.75 labelangle=-10];
+	0 -> l0 [headlabel=1 labeldistance=4.75 labelangle=-10];
+	1 -> 2 [headlabel=2 labeldistance=4.75 labelangle=-10];
+	1 -> 0 [headlabel=3 labeldistance=4.75 labelangle=-10];
+	2 -> r2 [headlabel=4 labeldistance=4.75 labelangle=-10];
+	2 -> 1 [headlabel=5 labeldistance=4.75 labelangle=-10];
+}
