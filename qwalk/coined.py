@@ -668,6 +668,7 @@ class Coined(BaseWalk):
 
         type : {'vertex_dir', 'arc_notation', 'arc_order'}
             The type of the ``entries`` argument.
+
             * `'vertex_dir'` (default): corresponds to
                 the `(amplitude, vertex, dst_vertex)` entry type;
             * `'arc_notation'` : corresponds to the
@@ -697,7 +698,6 @@ class Coined(BaseWalk):
             * Allow real states (only complex allowed at the moment).
             * More efficient implementation of
                 state construction is desirable.
-
         """
 
         def _normalize(state, error=1e-16):
