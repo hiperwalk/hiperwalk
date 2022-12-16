@@ -31,20 +31,20 @@ class Cycle(Coined):
         # initializing
         super().__init__(adj_matrix)
 
-    def shift_operator(self):
+    def persistent_shift_operator(self):
         r"""
-        Create the shift operator (:math:`S`) based on the
+        Create the persistent shift operator (:math:`S`) based on the
         ``adj_matrix`` atribute.
 
         Returns
         -------
         :class:`scipy.sparse.csr_matrix`
-            Shift operator.
+            Persistent shift operator.
 
         Notes
         -----
-        The shift operator :math:`S` for any vertex :math:`v \in V`
-        is defined by
+        The persistent shift operator :math:`S`
+        for any vertex :math:`v \in V` is defined by
 
         .. math::
             \begin{align*}
@@ -120,3 +120,13 @@ class Cycle(Coined):
             state[arc] = amplitude
 
         return state
+
+    def coin_operator(self, coin='hadamard'):
+        """
+        Same as :meth:`Coined.coin_operator`,
+        but uses Hadamard as default coin.
+        """
+        return super().coin_operator(coin)
+
+    def evolution_operator(self, hpc=False, coin='hadamard'):
+        return super().coin_operator

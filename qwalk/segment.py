@@ -46,9 +46,9 @@ class Segment(Coined):
         # initializing
         super().__init__(adj_matrix)
 
-    def shift_operator(self):
+    def persistent_shift_operator(self):
         r"""
-        Create the shift operator (:math:`S`) based on the
+        Create the persistent shift operator (:math:`S`) based on the
         ``adj_matrix`` atribute.
 
         Returns
@@ -58,8 +58,8 @@ class Segment(Coined):
 
         Notes
         -----
-        The shift operator :math:`S` for any vertex :math:`v \in V`
-        is defined by
+        The persistent shift operator :math:`S`
+        for any vertex :math:`v \in V` is defined by
 
         .. math::
             \begin{align*}
