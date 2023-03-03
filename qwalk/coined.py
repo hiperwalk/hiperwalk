@@ -302,14 +302,26 @@ class Coined(BaseWalk):
 
         return S
 
-    def coin_operator(self, coin='grover'):
+    def coin_operator(self, coin='grover', coin2=None, vertices2=[]):
         """
         Generate a coin operator based on the graph structure.
 
+        Constructs coin operator depending on the degree of each vertex.
+        The ``coin`` argument is used for all vertices.
+        However, if ``coin2 is not None``,
+        its argument is used for all vertices in ``vertices2``
+        instead of ``coin``.
+
         Parameters
         ----------
-        coin : {'grover', 'fourier', 'hadamard'}
+        coin : {'grover', 'fourier', 'hadamard', 'minus_identity'}
             Type of the coin to be used.
+
+        coin2 : {'grover', 'fourier', 'hadamard', 'minus_identity'}, default=None 
+            Type of the coin to be used for ``vertices2``.
+
+        vertices2 : 
+            Vertices to use ``coin2`` instead of ``coin``.
         
         Returns
         -------
@@ -322,6 +334,8 @@ class Coined(BaseWalk):
         Raises
         ------
         ValueError
+            If ``coin`` or ``coin2`` values are invalid.
+
             If ``coin='hadamard'`` and any vertex of the graph
             has a non-power of two degree.
 
