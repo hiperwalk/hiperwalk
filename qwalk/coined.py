@@ -372,6 +372,10 @@ class Coined(BaseWalk):
         import scipy.linalg
         return scipy.linalg.hadamard(dim) / np.sqrt(dim)
 
+    @staticmethod
+    def _minus_identity(dim):
+        return -np.identity(dim)
+
     def oracle(self, vertices):
         r"""
         Create the oracle that marks the given vertices.
