@@ -307,20 +307,18 @@ class Coined(BaseWalk):
         Generate a coin operator based on the graph structure.
 
         Constructs coin operator depending on the degree of each vertex.
-        The ``coin`` argument is used for all vertices.
-        However, if ``coin2 is not None``,
-        its argument is used for all vertices in ``vertices2``
-        instead of ``coin``.
+        A single coin type may be applied to all vertices,
+        or two coins may be applied to selected vertices.
 
         Parameters
         ----------
         coin : {'grover', 'fourier', 'hadamard', 'minus_identity'}
             Type of the coin to be used.
 
-        coin2 : {'grover', 'fourier', 'hadamard', 'minus_identity'}, default=None 
+        coin2 : {'grover', 'fourier', 'hadamard', 'minus_identity'}, default=None
             Type of the coin to be used for ``vertices2``.
 
-        vertices2 : 
+        vertices2 :
             Vertices to use ``coin2`` instead of ``coin``.
         
         Returns
