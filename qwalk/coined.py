@@ -399,20 +399,18 @@ class Coined(BaseWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def oracle(self, vertices):
+    def oracle(self, vertices, oracle_type="standard"):
         r"""
         Create the oracle that marks the given vertices.
 
-        The oracle flips the phase of every entry associated
-        with the marked vertices.
-
-        .. todo::
-            - Search about different valid oracles for the coined model.
 
         Parameters
         ----------
         vertices : array_like
             ID(s) of the vertex (vertices) to be marked.
+
+        oracle_type : {'standard', 'phase_flip'}
+            Oracle type to be used.
 
         Returns
         -------
@@ -420,15 +418,32 @@ class Coined(BaseWalk):
 
         Notes
         -----
-        The oracle is described by
+        There are two types of oracle possible.
+        The standard oracle applies Grover coin to unmarked vertices and
+        flips the phase of marked vertices.
+        The other oracle flips the phase of every entry associated
+        with the marked vertices,
+        leaving the unmarked vertices unchanged.
+
+        The standard oracle is given by
+
+        .. math::
+            R &= \sum_{v \in M^C} \sum_{u \in \text{adj}(v)}
+                G_{\deg(v)} \ketbra{(v,u)}{(v,u)} \\
+            &- \sum_{v \in M}\sum_{u \in \text{adj}(v)}
+                \ketbra{(v,u)}{(v,u)},
+
+        and the phase flip oracle is described by
 
         .. math::
             R = I - 2 \sum_{v \in M}\sum_{u \in \text{adj}(v)}
                 \ketbra{(v,u)}{(v,u)}
 
-        where :math:`M` is the set of marked vertices and
+        where :math:`M` is the set of marked vertices,
         :math:`\text{adj}(v)` is the set of all vertices adjacent
-        to :math:`v \in V`.
+        to :math:`v \in V`, and
+        :math:`G_{\deg(v)}` is the Grover matrix of
+        dimension :math:`\deg(v)`.
         See :class:`Coined` Notes for more details about
         the used computational basis.
         """
