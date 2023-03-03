@@ -453,16 +453,28 @@ class Coined(BaseWalk):
             vertices = [vertices]
             iter_ = iter(vertices)
 
-        R = scipy.sparse.identity(self.hilb_dim)
+        if oracle_type == 'standard':
+            return self.coin_operator('grover', 'minus_identity',
+                                      vertices)
 
-        for vertex_id in iter_:
-            first_edge = self.adj_matrix.ptr[vertex_id]
-            last_edge = self.adj_matrix.ptr[vertex_id + 1]
+        elif oracle_type == 'phase_flip':
+            R = scipy.sparse.eye(self.hilb_dim, format='csr')
 
-            for edge in range(first_edge, last_edge):
-                R[edge, edge] = -1
+            for vertex_id in iter_:
+                first_edge = self.adj_matrix.indptr[vertex_id]
+                last_edge = self.adj_matrix.indptr[vertex_id + 1]
 
-        return np.matrix(R)
+                for edge in range(first_edge, last_edge):
+                    R.data[edge] = -1
+
+            return R
+
+        raise ValueError(
+            "Invalid oracle_type value. Expected one of"
+            + "{'standard', 'phase_flip'} but received '"
+            + str(oracle_type) + "' instead."
+        )
+
 
     def has_persistent_shift_operator(self):
         return False
