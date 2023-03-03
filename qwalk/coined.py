@@ -333,18 +333,18 @@ class Coined(BaseWalk):
         each block is the :math:`\deg(v)`-dimensional ``coin``.
         Consequently, there are :math:`|V|` blocks.
 
-        .. todo::
-            Implement general fourier and hadamard coins.
         """
         # dict with valid coins as keys and the respective
         # function pointers.
         coin_funcs = {
             'fourier': Coined._fourier_coin,
             'grover': Coined._grover_coin,
-            'hadamard': Coined._hadamard_coin
+            'hadamard': Coined._hadamard_coin,
+            'minus_identity': Coined._minus_identity
         }
 
-        if coin not in coin_funcs.keys():
+        if coin not in coin_funcs.keys() or (coin2 != None and
+            coin2 not in coin_funcs.keys()):
             raise ValueError(
                 'Invalid coin. Expected any of '
                 + str(list(coin_funcs.keys())) + ', '
@@ -353,8 +353,19 @@ class Coined(BaseWalk):
 
         num_vert = self.adj_matrix.shape[0]
         degrees = self.adj_matrix.sum(1) # sum rows
+        blocks = []
 
-        blocks = (coin_funcs[coin](degrees[v]) for v in range(num_vert))
+        if coin2 is None:
+            blocks = [coin_funcs[coin](degrees[v])
+                      for v in range(num_vert)]
+        else:
+            not_vertex2 = [True] * num_vert
+            for v in vertices2:
+                not_vertex2[v] = False
+
+            blocks = [coin_funcs[coin](degrees[v]) if not_vertex2[v]
+                      else coin_funcs[coin2](degrees[v])
+                      for v in range(num_vert)]
 
         return scipy.sparse.block_diag(blocks, format='csr')
 
