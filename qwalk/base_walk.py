@@ -326,7 +326,7 @@ class BaseWalk(ABC):
             saved_states[0] = self._initial_condition
             state_index += 1
         else:
-            save_interval = 1 # saves only final state
+            save_interval = self._num_steps # saves only final state
 
         # simulate walk / apply evolution operator
         for i in range(int(self._num_steps / save_interval)):
