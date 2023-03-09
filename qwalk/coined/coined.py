@@ -2,7 +2,7 @@ import numpy as np
 import scipy
 import scipy.sparse
 import networkx as nx
-from .base_walk import *
+from ..base_walk import BaseWalk
 from constants import DEBUG
 
 if DEBUG:
@@ -750,7 +750,7 @@ class Coined(BaseWalk):
             The type of the ``entries`` argument.
 
             * `'vertex_dir'` (default): corresponds to
-                the `(amplitude, vertex, dst_vertex)` entry type;
+                the `(amplitude, vertex, coin_dir)` entry type;
             * `'arc_notation'` : corresponds to the
                 `(amplitude, vertex, dst_vertex)` entry type;
             * `arc_order` : corresponds to the

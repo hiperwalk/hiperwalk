@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.sparse import csr_array
-from .coined import *
+from sys import path as sys_path
+from .coined import Coined
 
 class Segment(Coined):
     r"""
@@ -89,7 +90,7 @@ class Segment(Coined):
         indices[0] = 1
         indices[num_edges - 1] = num_edges - 2
 
-        S = scipy.sparse.csr_array((
+        S = csr_array((
             data, indices, indptr        
         ))
 
