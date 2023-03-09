@@ -47,7 +47,7 @@ class Line(Segment):
         super().__init__(num_vert)
 
         self._num_steps = num_steps
-        self._initial_condition = self.state(state_entries, entry_type)
+        self._initial_condition = self.state(shifted_entries, entry_type)
 
 
     def __get_extreme_vertices(self, state_entries, entry_type):
