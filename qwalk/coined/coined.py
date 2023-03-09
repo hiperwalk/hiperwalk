@@ -778,6 +778,8 @@ class Coined(BaseWalk):
             * Allow real states (only complex allowed at the moment).
             * More efficient implementation of
                 state construction is desirable.
+            * Turn simple `entries` in iterable format. For example,
+                (1, 0, 0) into [(1, 0, 0)]
         """
 
         def _normalize(state, error=1e-16):
