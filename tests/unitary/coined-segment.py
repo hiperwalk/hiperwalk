@@ -8,6 +8,9 @@ import unittest
 class TestCoinedSegment(unittest.TestCase):
 
     def test_persistent_shift_state_transfer(self):
+        # initial state in leftmost vertex
+        # final state in rightmost vertex
+
         num_vert = 10
         seg = hpseg.Segment(num_vert)
 

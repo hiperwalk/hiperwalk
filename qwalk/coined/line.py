@@ -87,5 +87,7 @@ class Line(Segment):
         passed as arguments to the constructor,
         the respective parameters are ommited.
         """
-        super().simulate_walk(evolution_operator, self._initial_condition,
-                              self._num_steps, save_interval, hpc)
+        return super().simulate_walk(
+            evolution_operator, self._initial_condition,
+            self._num_steps, save_interval, hpc
+        )
