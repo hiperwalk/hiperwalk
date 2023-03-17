@@ -2,7 +2,7 @@ import numpy as np
 from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
-from qwalk.coined import line as hpline
+import qwalk.coined as hpcoined
 import unittest
 
 class TestCoinedLine(unittest.TestCase):
@@ -11,7 +11,7 @@ class TestCoinedLine(unittest.TestCase):
         # middle right
         num_steps = 5
         entries = [[1, 0, 0]]
-        line = hpline.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries)
 
         S = line.flip_flop_shift_operator()
         I = S@S
@@ -27,7 +27,7 @@ class TestCoinedLine(unittest.TestCase):
         # middle left
         num_steps = 5
         entries = [[1, 0, 1]]
-        line = hpline.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries)
 
         init_state = line.simulate_walk(I)[0]
 
@@ -43,7 +43,7 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 5
         entries = [[1, 0, 0]]
-        line = hpline.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries)
 
         S = line.persistent_shift_operator()
         final_state = line.simulate_walk(S)
@@ -59,7 +59,7 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 5
         entries = [[1, 0, 1]]
-        line = hpline.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries)
 
         S = line.persistent_shift_operator()
         final_state = line.simulate_walk(S)

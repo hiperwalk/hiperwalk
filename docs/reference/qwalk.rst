@@ -13,11 +13,14 @@ Classes
     :nosignatures:
 
     BaseWalk
-    Coined
-    Segment
-    Line
-    Cycle
 
+Modules
+-------
+.. toctree::
+    :maxdepth: 1
+
+    coined.rst
+    continuous.rst
 
 Pyneblina Interface
 -------------------
