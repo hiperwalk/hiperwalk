@@ -2,7 +2,7 @@ import numpy as np
 from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
-from qwalk.coined import segment as hpseg
+import qwalk.coined as hpcoined
 import unittest
 
 class TestCoinedSegment(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestCoinedSegment(unittest.TestCase):
         # final state in rightmost vertex
 
         num_vert = 10
-        seg = hpseg.Segment(num_vert)
+        seg = hpcoined.Segment(num_vert)
 
         init_cond = seg.state([(1, 0, 0)])
         S = seg.persistent_shift_operator()
