@@ -15,7 +15,8 @@ Documentation
 -------------
 
 It is very likely that there are new features in the ``main`` branch.
-These new features are not documentated online.
+These new features are documentated online in the **latest** version.
+
 To generate the current (under development) documentation locally,
 install all the requirements (``docs/requirements.txt``),
 then execute
