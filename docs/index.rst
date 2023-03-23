@@ -19,6 +19,7 @@ It is under development and employs C, Python, and OpenCL.
 
    tutorial/index
    reference/index
+   development/index
 
 
 Indices and tables
