@@ -3,6 +3,14 @@ Tutorial
 
 In the future, the tutorial will be written.
 
+Installation
+------------
+Execute the following commands to install the stable version.
+
+.. code-block:: shell
+
+   git clone -b stable https://github.com/hiperwalk/hiperwalk.git
+
 First Steps
 -----------
 Simple example.
