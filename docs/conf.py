@@ -23,7 +23,7 @@ author = 'Gustavo Bezerra'
 
 # The full version, including alpha/beta/rc tags
 # release = '2.0a0'
-version = 'stable'
+version = 'latest'
 
 
 # -- General configuration ---------------------------------------------------
