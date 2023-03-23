@@ -77,7 +77,7 @@ html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
     "switcher": {
-        "json_url": "_static/switcher.json",
+        "json_url": "https://hiperwalk.readthedocs.io/en/latest/_static/switcher.json",
         "version_match": version,
     },
    "navbar_start": ["navbar-logo", "version-switcher"]
