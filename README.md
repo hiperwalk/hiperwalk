@@ -14,10 +14,10 @@ Some code may need to be updated to match PEP 8's requirements.
 
 # Python Libraries Dependencies
 - Matplotlib;
-- NetworkX;
+- NetworkX >= 2.7;
 	- PIL;
 - NumPy;
-- Scipy;
+- Scipy >= 1.8;
 - Sphinx;
 - numpydoc;
 
@@ -43,11 +43,11 @@ Some code may need to be updated to match PEP 8's requirements.
 	- [ ] Mesh walk
 	- [ ] Tests for plotting graphs?
 - [ ] Clean examples
-- [ ] Add commentaries to CoinedModel
+- [ ] Add commentaries to qwalk/coined
 - [ ] Create documentation
 	- [ ] pdf (with LaTeX)
 	- [ ] webpage
-- [ ] PyneblinaInterface.py
+- [ ] pyneblina\_interface.py
 	- [ ] Rename functions
 	- [ ] Remove definition from examples
 	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?
