@@ -11,6 +11,10 @@ To contribute, clone the repository.
 Then, make the desired alterations.
 And make a pull request.
 
+.. todo::
+
+   Continuous model must be implemented.
+
 Documentation
 -------------
 
