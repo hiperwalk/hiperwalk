@@ -18,11 +18,11 @@ sys.path.append(os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'HiPerWalk'
-copyright = '2022, Koruja'
-author = 'Koruja'
+copyright = '2023'
+author = 'Gustavo Bezerra'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0'
+release = '2.0.1'
 
 
 # -- General configuration ---------------------------------------------------
