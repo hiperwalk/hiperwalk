@@ -22,7 +22,8 @@ copyright = '2023'
 author = 'Gustavo Bezerra'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0.0a'
+release = '2.0a0 (stable)'
+version = '2.0a0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -74,9 +75,17 @@ exclude_patterns = []
 #
 html_theme = 'pydata_sphinx_theme'
 
+html_theme_options = {
+    "switcher": {
+        "json_url": "_static/switcher.json",
+        "version_match": version,
+    },
+   "navbar_start": ["navbar-logo", "version-switcher"]
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+html_static_path = ['_static']
 
 master_doc = 'index'
