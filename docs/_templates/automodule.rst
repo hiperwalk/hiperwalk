@@ -1,0 +1,77 @@
+..
+    [comment] Adapted from Sphinx-Autosummary-Recursion.
+    https://github.com/JamesALeedham/Sphinx-Autosummary-Recursion/tree/master/docs/_templates
+
+{{ fullname | escape | underline}}
+
+.. automodule:: {{ fullname }}
+
+   {% block attributes %}
+   {% if attributes %}
+   Attributes
+   ----------
+
+   .. autosummary::
+      :toctree:
+   {% for item in attributes %}
+      {{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
+   {% block functions %}
+   {% if functions %}
+   Functions
+   ---------
+
+   .. autosummary::
+      :toctree:
+      :nosignatures:
+   {% for item in functions %}
+      {{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
+   {% block classes %}
+   {% if classes %}
+   Classes
+   -------
+
+   .. autosummary::
+      :toctree:
+      :template: autoclass.rst
+      :nosignatures:
+   {% for item in classes %}
+      {{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
+   {% block exceptions %}
+   {% if exceptions %}
+   Exceptions
+   ----------
+
+   .. autosummary::
+      :toctree:
+   {% for item in exceptions %}
+      {{ item }}
+   {%- endfor %}
+   {% endif %}
+   {% endblock %}
+
+**HELLO**
+
+{% block modules %}
+{% if modules %}
+
+.. autosummary::
+   :toctree:
+   :template: automodule.rst
+   :recursive:
+{% for item in modules %}
+   {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
