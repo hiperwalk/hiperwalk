@@ -2,9 +2,12 @@
 Install
 =======
 
-HiperWalk is built on top of multiple Python libraries.
+HiperWalk is built on top of some Python libraries.
 By just installing the Python libraries,
 HiperWalk does not make use of High-Performance Computing (HPC).
+If an installating without support for HPC is desired,
+you can jump to :ref:`docs_install_hiperwalk`.
+
 For supporting HPC,
 HiperWalk uses 
 `neblina-core <https://github.com/paulomotta/neblina-core>`_,
@@ -24,6 +27,7 @@ the necessary Python libraries.
    Support for Ubuntu 22.04 is under development.
    Contributions are welcomed.
 
+.. _docs_install_prerequisites:
 
 Prerequisites
 =============
@@ -196,6 +200,71 @@ Thus,
    cd ~
    git clone https://github.com/paulomotta/pyneblina.git
 
-.. todo::
+Then enter the newly created ``pyneblina`` directory to install it.
 
-   continue
+.. code-block:: shell
+
+   cd pyneblina
+   sudo python3 setup.py install
+
+To verify if the installationg completed successfully,
+run the test.
+
+.. code-block:: shell
+
+   python3 test.py
+
+.. _docs_install_hiperwalk:
+
+HiperWalk
+=========
+
+As stated previously,
+HiperWalk is built on top of some Python libraries.
+Before installing HiperWalk,
+we must install these libraries.
+
+
+.. note::
+
+   If you are installing HiperWalk with no HPC support,
+   you probably did not install ``pip`` as mentioned in
+   :ref:`docs_install_prerequisites`.
+   If that's the case, run the following command.
+
+   .. code-block:: shell
+
+       sudo apt install python3-pip
+
+
+HiperWalk requires
+`numpy <https://numpy.org/>`_,
+`scipy <https://scipy.org/>`_,
+`networkx <https://networkx.org/>`_, and
+`matplotlib <https://matplotlib.org/>`_.
+To install these libraries run
+
+.. code-block:: shell
+
+   pip3 install numpy
+   pip3 install scipy
+   pip3 install networkx
+   pip3 install matplotlib
+
+Then, clone the HiperWalk repository --
+e.g. in the home directory where neblina-core and pyneblina are.
+
+.. code-block:: shell
+
+   cd ~
+   git clone https://github.com/hiperwalk/hiperwalk.git
+
+The installation is finished.
+To test if it was successful,
+run any Python code in ``hiperwalk/examples/``.
+For instance,
+
+.. code-block:: shell
+
+    cd hiperwalk/examples/
+    python3 coined-line.py
