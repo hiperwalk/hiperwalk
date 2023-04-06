@@ -222,11 +222,20 @@ class Animation:
         --------
         create_animation
 
+        Warnings
+        --------
+        The current version only supports GTK 3.0 (used in Ubuntu 20.04).
+        It mus be updated to support GTK 4.0 (used in Ubuntu 22.04).
+
         Notes
         -----
         If the animation was saved, the file is open and shown.
         If it was not saved, it is stored in a temporary file
         and then shown.
+
+        .. todo::
+
+            Implement usage of GTK 4.0.
         """
         if self._is_in_notebook():
             self._show_animation_notebook()
