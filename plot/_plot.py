@@ -141,6 +141,12 @@ def plot_probability_distribution(
         If ``plot_type == True`` and neither of the keywords
         ``graph`` or ``adj_matrix`` is set.
 
+    Warnings
+    --------
+    For showing animations,
+    the current version only supports Jupyter and GTK 3.0.
+    It must be updated to support GTK 4.0 for Ubuntu 22.04.
+
     Notes
     -----
     The core logic of the main implementation loop is more or less like follows.
@@ -174,6 +180,9 @@ def plot_probability_distribution(
             are needed.
         - Implement ``transparency`` parameter:
             change nodes transparency depending on probability.
+
+    .. todo::
+        Implement GTK 4.0 support.
 
     Examples
     --------
