@@ -1,3 +1,4 @@
+===========
 Development
 ===========
 
@@ -16,20 +17,44 @@ And make a pull request.
    Continuous model must be implemented.
 
 Documentation
--------------
+=============
 
 It is very likely that there are new features in the ``main`` branch.
 These new features are documentated online in the **latest** version.
 
+Install Requirements
+--------------------
+
 To generate the current (under development) documentation locally,
-install all the requirements (``docs/requirements.txt``),
-then execute
+it is necessary to install all the requirements
+(see ``hiperwalk/docs/requirements.txt``).
+
+Supposing that all HiperWalk requirements are installed
+(see *TODO*),
+the following commands install the remaining documentation only requirements.
 
 .. code-block:: shell
 
-   cd docs
+   sudo apt install python3-sphinx
+   sudo apt install graphviz
+   pip3 instll numpydoc
+   pip3 install sphinx-autodoc-typehints
+   pip3 install pydata-sphinx-theme
+
+Compilation
+-----------
+
+Inside the ``hiperwalk/docs/`` directory, execute
+
+
+.. code-block:: shell
+
    ./go
 
 Todo
-----
+====
 * Releases notes.
+* The current version was tested with Ubuntu 20.04.
+  Hiperwalk failed to be configured in Ubuntu 22.04.
+* The current version only works with GTK 3.0.
+  Implementation using GTK 4.0 are postponed to the next release.
