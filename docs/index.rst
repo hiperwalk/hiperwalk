@@ -17,6 +17,7 @@ It is under development and employs C, Python, and OpenCL.
    :maxdepth: 3
    :caption: Contents:
 
+   install/index
    tutorial/index
    reference/index
    development/index
