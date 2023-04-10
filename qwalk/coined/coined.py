@@ -90,7 +90,7 @@ class Coined(BaseWalk):
             [0, 1, 0, 1],
             [0, 1, 1, 0]])
 
-     .. graphviz:: ../../graphviz/coined-model-sample.dot
+    .. graphviz:: ../../graphviz/coined-model-sample.dot
         :align: center
         :layout: neato
         :caption: Figure 1
