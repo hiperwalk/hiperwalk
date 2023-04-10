@@ -1,6 +1,4 @@
 import sys
-import numpy as np
-import scipy.sparse
 sys.path.append('..')
 import qwalk.coined as coined_qw
 import plot as hplot
