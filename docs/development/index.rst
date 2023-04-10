@@ -26,8 +26,9 @@ Install Requirements
 --------------------
 
 To generate the current (under development) documentation locally,
-it is necessary to install all the requirements
-(see ``hiperwalk/docs/requirements.txt``).
+it is necessary to install all the HiperWalk requirements
+(see :ref:`HiperWalk section in the installation guide
+<docs_install_hiperwalk>`).
 
 Supposing that all HiperWalk requirements are installed
 (see *TODO*),
