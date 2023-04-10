@@ -251,13 +251,37 @@ To install these libraries run
    pip3 install networkx
    pip3 install matplotlib
 
-Then, clone the HiperWalk repository --
+Then, choose which version you are going to install.
+The stable version or
+the latest version (under development).
+
+Stable
+------
+
+Clone the HiperWalk repository branch tagged as stable.
+For example, run the following command
+in the directory where neblina-core and pyneblina are --
+most likely the home directory.
+
+.. code-block:: shell
+
+   cd ~
+   git clone -b stable https://github.com/hiperwalk/hiperwalk.git
+
+Latest
+------
+
+Clone the HiperWalk repository --
 e.g. in the home directory where neblina-core and pyneblina are.
 
 .. code-block:: shell
 
    cd ~
    git clone https://github.com/hiperwalk/hiperwalk.git
+
+
+Testing
+-------
 
 The installation is finished.
 To test if it was successful,
