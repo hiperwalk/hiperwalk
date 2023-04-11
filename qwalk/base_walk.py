@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
+from constants import DEBUG
 
 class BaseWalk(ABC):
     """
@@ -258,9 +259,14 @@ class BaseWalk(ABC):
             self._num_steps = num_steps
 
         def __prepare_engine(self):
+            if DEBUG:
+                print("Preparing engine")
+
             if hpc:
+                print("send sparse")
                 self._simul_mat = nbl.send_sparse_matrix(
                     self._evolution_operator)
+                print("send vector")
                 self._simul_vec = nbl.send_vector(
                     self._initial_condition)
 
@@ -268,7 +274,13 @@ class BaseWalk(ABC):
                 self._simul_mat = self._evolution_operator
                 self._simul_vec = self._initial_condition
 
+            if DEBUG:
+                print("Done\n")
+
         def __simulate_steps(self, num_steps):
+            if DEBUG:
+                print("Simulating steps")
+
             if hpc:
                 # TODO: request multiple multiplications at once
                 #       to neblina-core
@@ -282,15 +294,29 @@ class BaseWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
+            if DEBUG:
+                print("Done\n")
+
         def __save_simul_vec(self):
+            if DEBUG:
+                print("Saving simulated vec")
+
+            ret = None
+
             if hpc:
                 # TODO: check if vector must be deleted or
                 #       if it can be reused via neblina-core commands.
-                return nbl.retrieve_vector(
+                ret = nbl.retrieve_vector(
                     self._simul_vec, self._initial_condition.shape[0],
                     delete_vector=True
                 )
-            return self._simul_vec
+            else:
+                ret = self._simul_vec
+
+            if DEBUG:
+                print("Done\n")
+
+            return ret
 
         
         ####################################
