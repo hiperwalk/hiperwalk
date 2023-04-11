@@ -1,6 +1,25 @@
 import neblina
 from numpy import array as np_array
-from constants import NEBLINA_FLOAT, NEBLINA_COMPLEX
+from constants import *
+
+############################################
+# used for automatically stopping the engine
+import atexit
+
+__engine_initiated = False
+
+def exit_handler():
+    global __engine_initiated
+    if __engine_initiated:
+        if DEBUG:
+            print("Stop engine")
+        neblina.stop_engine()
+    elif DEBUG:
+        print("Engine not initiated. Not needed to stop engine.")
+
+atexit.register(exit_handler)
+############################################
+
 
 # Transfers a vector (v) to Neblina-core, and moves it
 # to the device to be used.
@@ -13,6 +32,11 @@ from constants import NEBLINA_FLOAT, NEBLINA_COMPLEX
 # I think an auxiliary vector is beign created,
 # thus twice the memory needed is being used
 def send_vector(v, is_complex=True):
+    global __engine_initiated
+    if not __engine_initiated:
+        neblina.init_engine(0)
+        __engine_initiated = True
+
     # TODO: check if is_complex automatically?
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
@@ -50,6 +74,11 @@ def send_vector(v, is_complex=True):
 # thus it is going to be deleted to free memory.
 # TODO: get vector dimension(vdim) automatically
 def retrieve_vector(v, vdim, delete_vector=True):
+    global __engine_initiated
+    if not __engine_initiated:
+        # TODO: throw exception
+        print("Engined was not initiated. Nothing to retrieve.")
+
     nbl_vec = neblina.move_vector_host(v)
 
     # TODO: check type automatically, for now suppose it is only complex
@@ -81,6 +110,11 @@ def retrieve_vector(v, vdim, delete_vector=True):
 # TODO: isn't there a way for neblina-core to use the csr matrix directly?
 #   In order to avoid double memory usage
 def send_sparse_matrix(M, is_complex=True):
+    global __engine_initiated
+    if not __engine_initiated:
+        neblina.init_engine(0)
+        __engine_initiated = True
+
     # TODO: check if is_complex automatically?
     n = M.shape[0]
 
@@ -122,6 +156,11 @@ def send_sparse_matrix(M, is_complex=True):
     return smat
 
 def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
+    global __engine_initiated
+    if not __engine_initiated:
+        # TODO: throw exception
+        print("Engined was not initiated. Nothing to multiply.")
+
     """
     Request matrix multiplication to neblina.
 
