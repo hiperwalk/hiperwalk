@@ -167,3 +167,27 @@ class Segment(Coined):
         Hence, the directions would be shifted.
         """
         return super().state(entries, type)
+
+    def evolution_operator(self, persistent_shift=True, hpc=False,
+                           coin='hadamard'):
+        r"""
+        :meth:`qwalk.Coined.evolution_operator` with
+        different default parameters.
+
+        Parameters
+        ----------
+        persistent_shift : bool, default=True
+            Wheter to use persistent shift operator
+            (``persistent_shift=True``) or
+            the flip flop shift operator (``persistent_shift=False``).
+
+        hpc : bool, default=False
+            Whether or not evolution operator should be
+            constructed using nelina's high-performance computating.
+
+        coin : str, default='hadamard'
+            The coin to be used as diffusion operator.
+            See :obj:`coin_operator`'s ``coin``
+            attribute for valid options.
+        """
+        return super().evolution_operator(persistent_shift, hpc, coin)
