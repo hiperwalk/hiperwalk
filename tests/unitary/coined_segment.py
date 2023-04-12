@@ -4,9 +4,11 @@ sys_path.append('../')
 sys_path.append('../../')
 import qwalk.coined as hpcoined
 import unittest
+from test_constants import *
 
 class TestCoinedSegment(unittest.TestCase):
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
