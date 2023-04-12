@@ -1,0 +1,2 @@
+TEST_HPC = False
+TEST_NONHPC = True

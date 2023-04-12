@@ -2,11 +2,13 @@ import numpy as np
 from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
+from test_constants import *
 import qwalk.coined as hpcoined
 import unittest
 
 class TestCoinedCycle(unittest.TestCase):
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_clockwise_roundabout(self):
         num_steps = 20
         cycle = hpcoined.Cycle(num_steps)
@@ -18,6 +20,7 @@ class TestCoinedCycle(unittest.TestCase):
 
         self.assertTrue(np.all(init_state == final_state))
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_anticlockwise_roundabout(self):
         num_steps = 20
         cycle = hpcoined.Cycle(num_steps)
@@ -29,6 +32,7 @@ class TestCoinedCycle(unittest.TestCase):
 
         self.assertTrue(np.all(init_state == final_state))
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hadamard_evolution_operator(self):
         num_vert = 10
         cycle = hpcoined.Cycle(num_vert)

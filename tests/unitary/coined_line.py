@@ -1,12 +1,15 @@
 import numpy as np
 from sys import path as sys_path
+from sys import argv
 sys_path.append('../')
 sys_path.append('../../')
 import qwalk.coined as hpcoined
 import unittest
+from test_constants import *
 
 class TestCoinedLine(unittest.TestCase):
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_initial_condition_in_middle(self):
         # middle right
         num_steps = 5
@@ -37,6 +40,7 @@ class TestCoinedLine(unittest.TestCase):
             and np.all(init_state[2*num_steps:] == 0)
         )
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
@@ -53,6 +57,7 @@ class TestCoinedLine(unittest.TestCase):
             final_state[-1] == 1 and np.all(final_state[:-1] == 0)
         )
 
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_left_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
