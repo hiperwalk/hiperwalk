@@ -68,3 +68,46 @@ class TestCoinedCycle(unittest.TestCase):
         self.assertTrue(np.allclose(states, rec_states,
                                     rtol=1e-15, atol=1e-15))
 
+    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
+    def test_hpc_clockwise_roundabout(self):
+        num_steps = 20
+        cycle = hpcoined.Cycle(num_steps)
+
+        S = cycle.persistent_shift_operator()
+        init_state = cycle.state([(1, 0, 0)])
+
+        final_state = cycle.simulate_walk(S, init_state, num_steps,
+                                          hpc=True)[0]
+
+        self.assertTrue(np.all(init_state == final_state))
+
+    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
+    def test_hpc_anticlockwise_roundabout(self):
+        num_steps = 20
+        cycle = hpcoined.Cycle(num_steps)
+
+        S = cycle.persistent_shift_operator()
+        init_state = cycle.state([(1, 0, 1)])
+
+        final_state = cycle.simulate_walk(S, init_state, num_steps,
+                                          hpc=True)[0]
+
+        self.assertTrue(np.all(init_state == final_state))
+
+    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
+    def test_hpc_evolution_operator_matches_nonhpc(self):
+        num_vert = 10
+        cycle = hpcoined.Cycle(num_vert)
+
+        U = cycle.evolution_operator()
+        init_state = cycle.state([(1, 0, 0)])
+
+        num_steps = num_vert*2
+        states = cycle.simulate_walk(U, init_state, num_steps,
+                                     save_interval=1)
+        states = states.real
+        hpc_states = cycle.simulate_walk(U, init_state, num_steps,
+                                     save_interval=1, hpc=True)
+        
+        self.assertTrue(np.allclose(states, hpc_states,
+                                    rtol=1e-15, atol=1e-15))
