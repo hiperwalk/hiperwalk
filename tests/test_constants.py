@@ -1,2 +1,2 @@
-TEST_HPC = False
-TEST_NONHPC = True
+TEST_HPC = True
+TEST_NONHPC = False

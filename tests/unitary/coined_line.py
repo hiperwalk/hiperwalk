@@ -73,3 +73,17 @@ class TestCoinedLine(unittest.TestCase):
         self.assertTrue(
             final_state[0] == 1 and np.all(final_state[1:] == 0)
         )
+
+    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
+    def test_hpc_default_evolution_operator(self):
+
+        num_steps = 20
+        entries = [[1, 0, 0], [-1j, 0, 1]]
+        line = hpcoined.Line(num_steps, entries)
+        U = line.evolution_operator()
+        states = line.simulate_walk(U, save_interval=1, hpc=False)
+        hpc_states = line.simulate_walk(U, save_interval=1, hpc=True)
+
+        self.assertTrue(
+            np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
+        )
