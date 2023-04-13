@@ -15,7 +15,7 @@ init_cond = seg.state([(1, mid_vert, 0),
 
 U = seg.evolution_operator(coin='hadamard')
 num_steps = int(15)
-states = seg.simulate_walk(U, init_cond, num_steps, save_interval=1)
+states = seg.simulate_walk(U, init_cond, (0, num_steps))
 
 prob = seg.probability_distribution(states)
 hplot.plot_probability_distribution(prob, animate=True, plot_type='line')

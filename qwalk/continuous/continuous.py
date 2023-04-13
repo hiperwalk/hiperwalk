@@ -43,7 +43,9 @@ class Continuous(BaseWalk):
     """
 
     def __init__(self, adj_matrix):
-        return None
+        super().__init__(adj_matrix)
+
+        self.hilb_dim = self.adj_matrix.shape[0]
 
     def oracle(self, vertices):
         return None
@@ -57,3 +59,9 @@ class Continuous(BaseWalk):
     def probability_distribution(self, states):
         return None
 
+    def simulate_walk(self, initial_condition, save_interval=0,
+                      hpc=False):
+        return super().simulate_walk(
+            self._evolution_operator, initial_condition, num_steps,
+            save_interval=save_interval, hpc=hpc
+        )

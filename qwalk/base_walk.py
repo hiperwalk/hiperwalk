@@ -40,7 +40,7 @@ class BaseWalk(ABC):
     def __init__(self, adj_matrix):
         self._initial_condition = None
         self._evolution_operator = None
-        self._num_steps = 0
+        self._steps = 0
 
         ##############################
         ### Simulation attributes. ###
@@ -194,11 +194,56 @@ class BaseWalk(ABC):
         """
         return None
 
-    def simulate_walk(self, evolution_operator, initial_condition,
-                      num_steps, save_interval=0, hpc=False):
+    def _clean_steps(self, steps):
         r"""
-        Simulates quantum walk by applying ``num_steps`` times the
-        ``evolution_operator`` to the ``initial_coidition``.
+        Clean and format ``steps`` to ``(start, end, step)`` format.
+
+        See :meth:`simulate_walk` for valid input format options.
+
+        Raises
+        ------
+        ValueError
+            If ``steps`` is in an invalid input format.
+
+        See Also
+        --------
+        simulate_walk
+        """
+
+        if not hasattr(steps, '__iter__'):
+            steps = [steps]
+
+        start = steps[0]
+        end = steps[1] if len(steps) >= 2 else start
+        step = steps[2] if len(steps) >= 3 else 1
+
+        steps = (start, end, step)
+
+        if start < 0 or end < 0 or step <= 0:
+            raise ValueError(
+                "Invalid 'steps' value."
+                + "'start' and 'end' must be non-negative"
+                + " and 'step' must be positive."
+            )
+
+        if (end - start)%step != 0:
+            raise ValueError(
+                "Invalid 'steps' value."
+                + "'start' and 'end' are not a multiple of "
+                + "'step' steps apart"
+            )
+
+        return steps
+
+
+    def simulate_walk(self, evolution_operator, initial_condition,
+                      steps, hpc=False):
+        r"""
+        Simulates quantum walk by applying the
+        ``evolution_operator`` to the ``initial_coidition``
+        multiple times.
+
+        The maximum number of applications is described by ``steps``.
 
         Parameters
         ----------
@@ -208,16 +253,27 @@ class BaseWalk(ABC):
         initial_condition
             The initial state.
 
-        num_steps : int
-            Number of times to apply the ``evolution_operator`` on
-            the ``initial_condition``.
+        steps : int, 2-tuple or 3-tuple
+            Describes at which steps the state must be saved.
+            It can be specified in three different ways.
             
-        save_interval : int, default=0
-            Number of applications of the evolution operation
-            before saving an intermediate state.
-            If ``save_interval=0``, returns only the final state.
-            Otherwise, returns the initial state, the intermediate
-            states and the final state.
+            * ``end``
+                The evolution operator is applied
+                ``end`` times. Only the final state is saved.
+
+            * ``(start, end)``
+                Saves each state from the
+                ``start``-th to the ``end``-th application
+                of the evolution operator.
+                That is, ``[start, start + 1, ..., end - 1, end]``.
+
+            * ``(start, end, step)``
+                Saves every state from the
+                ``start``-th to the ``end``-th application
+                of the evolution operator separated by
+                ``step`` applications.
+                That is, ``[start, start + step, ..., end - step, end]``.
+            
         hpc : bool, default=False
             Whether or not to use neblina's high-performance computing
             to perform matrix multiplications.
@@ -229,10 +285,26 @@ class BaseWalk(ABC):
             States saved during simulation where
             ``states[i]`` corresponds to the ``i``-th saved state.
 
+        Raises
+        ------
+        ValueError
+            If ``steps=(start, end, step)`` and
+            ``end`` cannot be reached from ``start`` after a
+            multiple of ``step`` applications.
+            In other words, if
+            ``end - start`` is not a multiple of ``step``.
+            
+            It is also raised if any of the following occurs.
+            
+            * ``start < 0``,
+            * ``end < 0``,
+            * ``step <= 0``.
+
+
         Notes
         -----
         The parameters ``evolution_operator``, ``initial_condition``,
-        and ``num_steps`` are saved as attributes for possible later usage.
+        and ``steps`` are saved as attributes for possible later usage.
 
         .. todo::
             Implement assertion of arguments.
@@ -241,22 +313,21 @@ class BaseWalk(ABC):
 
         Examples
         --------
-        If ``num_steps=10`` and ``save_interval=3``,
-        the returned saved states are:
+        If ``steps=(0, 12, 3)``, the returned saved states are:
         the initial state, the intermediate states (3, 6, and 9),
-        and the final state (10).
+        and the final state (12).
 
-        >>> qw.simulate_walk(U, psi0, 10, save_interval=3)
+        >>> qw.simulate_walk(U, psi0, (0, 12, 3))
         """
         ###########################
         ### Auxiliary functions ###
         ###########################
 
         def __save_simulation_parameters(self, evolution_operator,
-                         initial_condition, num_steps):
+                         initial_condition, steps):
             self._evolution_operator = evolution_operator
             self._initial_condition = initial_condition
-            self._num_steps = num_steps
+            self._steps = steps
 
         def __prepare_engine(self):
             if DEBUG:
@@ -278,6 +349,11 @@ class BaseWalk(ABC):
                 print("Done\n")
 
         def __simulate_steps(self, num_steps):
+            """
+            Apply the simulation evolution operator ``num_steps`` times
+            to the simulation vector.
+            Simulation vector is then updated.
+            """
             if DEBUG:
                 print("Simulating steps")
 
@@ -318,24 +394,22 @@ class BaseWalk(ABC):
 
             return ret
 
-        
+
         ####################################
         ### simulate_walk implemantation ###
         ####################################
+
+        start, end, step = self._clean_steps(steps)
         
         __save_simulation_parameters(self, evolution_operator,
-                                     initial_condition, num_steps)
+                                     initial_condition, steps)
 
         if hpc:
             from . import _pyneblina_interface as nbl
         __prepare_engine(self)
 
         # number of states to save
-        num_states = (int(np.ceil(self._num_steps / save_interval))
-                      if save_interval > 0 else 1)
-        if save_interval > 0:
-            # saves initial state
-            num_states += 1
+        num_states = int((end - start)/step) + 1
 
         # create saved states matrix
         dtype = (self._initial_condition.dtype if
@@ -348,21 +422,19 @@ class BaseWalk(ABC):
         state_index = 0 # index of the state to be saved
 
         # if save_initial_state:
-        if save_interval > 0:
+        if start == 0:
             saved_states[0] = self._initial_condition
             state_index += 1
-        else:
-            save_interval = self._num_steps # saves only final state
+            num_states -= 1
 
         # simulate walk / apply evolution operator
-        for i in range(int(self._num_steps / save_interval)):
-            __simulate_steps(self, save_interval)
+        if start > 0:
+            __simulate_steps(self, start - step)
+
+        for i in range(num_states):
+            __simulate_steps(self, step)
             saved_states[state_index] = __save_simul_vec(self)
             state_index += 1
-
-        if self._num_steps % save_interval > 0:
-            __simulate_steps(self, self._num_steps % save_interval)
-            saved_states[state_index] = __save_simul_vec(self)
 
         # TODO: free vector from neblina core
         self._simul_mat = None

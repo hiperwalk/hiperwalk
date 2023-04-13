@@ -11,8 +11,7 @@ init_cond = cycle.state([(1, 0, 0)])
 S = cycle.persistent_shift_operator()
 num_steps = num_vert
 
-states = cycle.simulate_walk(S, init_cond, num_steps,
-                             save_interval=1)
+states = cycle.simulate_walk(S, init_cond, (0, num_steps))
 
 prob = cycle.probability_distribution(states)
 hplot.plot_probability_distribution(prob, plot_type='bar', animate=True)
