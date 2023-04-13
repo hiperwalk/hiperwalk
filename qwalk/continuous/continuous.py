@@ -2,9 +2,11 @@ from ..base_walk import BaseWalk
 from constants import DEBUG
 
 class Continuous(BaseWalk):
-    """
+    r"""
     Manage instance of the continuous time quantum walk model
     on unweighted graphs.
+
+    For implemantation details see Notes Section.
 
     Parameters
     ----------
@@ -17,7 +19,20 @@ class Continuous(BaseWalk):
 
     Notes
     -----
-    This class can be used to simulate the evolution of any
+    Let :math:`A` be the adjacency matrix of the graph :math:`G(V, E)`.
+    :math:`A` is a :math:`|V| \times |V|`-dimensional matrix such that
+
+    .. math::
+        A_{i,j} = \begin{cases}
+            1, \text{ if } (i,j) \in E(G),\\
+            0, \text{ otherwise}
+        \end{cases}
+
+    The states of the computational basis are :math:`\ket{i}` for
+    :math:`0 \leq i < |V|` where
+    :math:`\ket i` is associated with the :math:`i`-th vertex.
+
+    This class can also be used to simulate the evolution of any
     continuous time matrix in the format
 
     .. math::
