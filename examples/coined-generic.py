@@ -19,8 +19,7 @@ U = random.evolution_operator()
 # Initial state at vertex 0 pointing to the first directiong possible
 init_state = random.state([[1, 0, 0]])
 num_steps = num_vert
-states = random.simulate_walk(U, init_state, num_steps,
-                              save_interval=1)
+states = random.simulate_walk(U, init_state, (0, num_steps))
 
 # Calculating probabilities and plotting
 prob = random.probability_distribution(states)
