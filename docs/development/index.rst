@@ -42,8 +42,8 @@ the following commands install the remaining documentation only requirements.
    pip3 install sphinx-autodoc-typehints
    pip3 install pydata-sphinx-theme
 
-Compilation
------------
+Generate Documentation
+----------------------
 
 Inside the ``hiperwalk/docs/`` directory, execute
 
@@ -51,6 +51,16 @@ Inside the ``hiperwalk/docs/`` directory, execute
 .. code-block:: shell
 
    ./go
+
+View Generated Documentation
+----------------------------
+
+If everything went right,
+the recently compiled documentation is available locally.
+To view (and test) it,
+open the file ``hiperwalk/docs/build/html/index.html``
+in the browser of your preference --
+e.g. by double clicking it.
 
 Todo
 ====
