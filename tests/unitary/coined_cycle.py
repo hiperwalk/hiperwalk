@@ -41,8 +41,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = cycle.state([(1, 0, 0)])
 
         num_steps = num_vert*2
-        states = cycle.simulate_walk(U, init_state, num_steps,
-                                     save_interval=1)
+        states = cycle.simulate_walk(U, init_state, (0, num_steps))
         states = states.real
 
         def recursive_expression():
@@ -103,11 +102,10 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = cycle.state([(1, 0, 0)])
 
         num_steps = num_vert*2
-        states = cycle.simulate_walk(U, init_state, num_steps,
-                                     save_interval=1)
+        states = cycle.simulate_walk(U, init_state, (0, num_steps))
         states = states.real
-        hpc_states = cycle.simulate_walk(U, init_state, num_steps,
-                                     save_interval=1, hpc=True)
+        hpc_states = cycle.simulate_walk(U, init_state, (0, num_steps),
+                                         hpc=True)
         
         self.assertTrue(np.allclose(states, hpc_states,
                                     rtol=1e-15, atol=1e-15))

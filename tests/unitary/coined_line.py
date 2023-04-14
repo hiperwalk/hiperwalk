@@ -79,10 +79,10 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 20
         entries = [[1, 0, 0], [-1j, 0, 1]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line((0, num_steps), entries)
         U = line.evolution_operator()
-        states = line.simulate_walk(U, save_interval=1, hpc=False)
-        hpc_states = line.simulate_walk(U, save_interval=1, hpc=True)
+        states = line.simulate_walk(U, hpc=False)
+        hpc_states = line.simulate_walk(U, hpc=True)
 
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
