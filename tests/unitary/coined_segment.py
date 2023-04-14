@@ -55,10 +55,10 @@ class TestCoinedSegment(unittest.TestCase):
         U = seg.evolution_operator()
         init_state = seg.state(entries)
         states = seg.simulate_walk(
-            U, init_state, num_steps, save_interval=1, hpc=False
+            U, init_state, (0, num_steps), hpc=False
         )
         hpc_states = seg.simulate_walk(
-            U, init_state, num_steps, save_interval=1, hpc=True
+            U, init_state, (0, num_steps), hpc=True
         )
 
         self.assertTrue(
