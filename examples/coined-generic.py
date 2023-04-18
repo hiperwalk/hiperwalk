@@ -15,10 +15,12 @@ del G
 # Quantum Walk preparation and simulation
 random = coined_qw.Coined(adj)
 # By default uses flip-flop shift operator and Grover coin
-U = random.evolution_operator()
-U = random.evolution_operator()
+U = random.evolution_operator(hpc=False)
+random.set_evolution_operator(U)
 # Initial state at vertex 0 pointing to the first directiong possible
-init_state = random.state([[1, 0, 0]])
+#init_state = random.state([[1, 0, 0]])
+#random.set_initial_condition(init_state)
+random.initial_condition([[1, 0, 0]])
 num_steps = num_vert
 random.time((0, num_steps))
 states = random.simulate()
