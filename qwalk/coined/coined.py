@@ -802,3 +802,38 @@ class Coined(BaseWalk):
         state = funcs[type](state, entries)
 
         return _normalize(state)
+
+    def time(self, time_range):
+        r"""
+        Same as :meth:`qwalk.BaseWalk.time` but
+        only accepts int arguments.
+
+        Parameters
+        ----------
+        time_range : int, 2-tuple, or 3-tuple
+            Range of the states to be saved by the simulation.
+
+        Raises
+        ------
+        TypeError
+            If (any element of) ``time_range`` is not ``int``.
+        """
+
+        if not hasattr(time_range, '__iter__'):
+            time_range = [time_range]
+
+        for i in range(len(time_range)):
+            if time_range[i]:
+                raise TypeError(
+                    "`time_range` has non-int value "
+                    + str(time_range[i]) + ". "
+                    + "`time_range` = " + str(time_range) + "."
+                )
+
+        return super().time(time_range)
+
+    def step(self, steps):
+        r"""
+        Alias for :meth:`time`.
+        """
+        return self.time(steps)
