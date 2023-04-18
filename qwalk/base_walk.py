@@ -460,10 +460,10 @@ class BaseWalk(ABC):
         ValueError
             If ``state`` has not the right dimension.
         """
-        if state.shape != (1, self.hilb_dim) :
+        if state.shape != (self.hilb_dim, ) :
             raise ValueError(
                 "`state` has invalid shape. "
-                + "Expected (1, " + str(self.hilb_dim) + ")."
+                + "Expected (" + str(self.hilb_dim) + ",)."
             )
 
         self._initial_condition = state
@@ -642,10 +642,10 @@ class BaseWalk(ABC):
 
         # simulate walk / apply evolution operator
         if start > 0:
-            __simulate_steps(self, start - step)
+            __simulate_step(self, start - step)
 
         for i in range(num_states):
-            __simulate_steps(self, step)
+            __simulate_step(self, step)
             saved_states[state_index] = __save_simul_vec(self)
             state_index += 1
 
