@@ -237,7 +237,7 @@ class BaseWalk(ABC):
 
         hpc : bool, default=True
             Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
+            constructed using nelina's high-performance computing.
 
         **kwargs : dict, optional
             Additional arguments for constructing the evolution operator
@@ -503,7 +503,7 @@ class BaseWalk(ABC):
         ------
         ValueError
             If the time, evolution operator, or initial condition
-            was not set previously.
+            were not set previously.
 
         See Also
         --------

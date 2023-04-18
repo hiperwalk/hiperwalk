@@ -478,6 +478,70 @@ class Coined(BaseWalk):
         )
 
 
+    def set_evolution_operator(self, U, hpc=True):
+        r"""
+        Sets ``U`` as the evolution operator.
+        It is used during the simulation.
+
+        If ``U`` is none, the evolution operator is constructed
+        from the previously set shift operator (:math:`S`),
+        coin operator (:math:`C`), and oracle (:math:`R`) by
+
+        .. math::
+            U = SCR .
+
+        If any of these matrices was not set previously,
+        the identity is used instead.
+
+        Parameters
+        ----------
+        U : :class:`scipy.sparse.csr_array`
+            Evolution Operator.
+
+        hpc : bool, default=True
+            Whether or not to use hpc to construct the evolution operator
+            when ``U is None``.
+
+
+        Raises
+        ------
+        ValueError
+            If ``U`` has invalid dimensions.
+
+        Notes
+        -----
+        .. todo::
+            Check if ``U`` is unitary and respects locality.
+        """
+        if U is None:
+
+            if self._shift_operator is None:
+                self._shift_operator = scipy.sparse.identity(self.hilb_dim)
+            if self._coin_operator is None:
+                self._coin_operator = scipy.sparse.identity(self.hilb_dim)
+            if self._oracle is None:
+                self._oracle = scipy.sparse.identity(self.hilb_dim)
+
+            if hpc:
+                raise NotImplementedError()
+
+            SC = self._shift_operator @ self._coin_operator
+            self._evolution_operator = SC @ self._oracle
+
+        if U.shape != (self.hilb_dim, self.hilb_dim):
+            raise ValueError(
+                "Matrix `U` has invalid dimensions."
+                + " Expected " + str((self.hilb_dim, self.hilb_dim))
+                + " but received " + str(U.shape) + " instead."
+            )
+
+        self._evolution_operator = U
+        # it is not known whether the shift operator, coin operator, and
+        # oracle were used to construct U
+        self._shift_operator = None
+        self._coin_operator = None
+        self._oracle = None
+
     def has_persistent_shift_operator(self):
         return False
 
@@ -848,3 +912,58 @@ class Coined(BaseWalk):
         Alias for :meth:`time`.
         """
         return self.time(steps)
+
+    def simulate(self, hpc=True):
+        r"""
+        Simulates the quantum walk using the
+        evolution operator, initial condition and
+        time previously set.
+
+        If the evolution operator was not previously set,
+        it is constructed from the previously set
+        shift operator (S), coin operator (C) and oracle (R)
+        as follows.
+
+        .. math::
+            U = S C R .
+
+        If any of these matrices was not set previously,
+        it is substituted by the identity.
+
+        Parameters
+        ----------
+        hpc : bool, default=True
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses standalone python.
+
+        Returns
+        -------
+        states : :class:`numpy.ndarray`.
+            States saved during simulation where
+            ``states[i]`` corresponds to the ``i``-th saved state.
+
+        Raises
+        ------
+        ValueError
+            If the time or the initial condition
+            were not set previously.
+
+        See Also
+        --------
+        time
+        evolution_operator
+        initial_condition
+
+        Notes
+        -----
+        The walk is simulated by applying the
+        evolution operator to the initial condition multiple times.
+        The maximum and intermediate applications
+        are describred by ``time``.
+        """
+
+        if self._evolution_operator is None:
+            self.set_evolution_operator(None, hpc=hpc)
+
+        return super().simulate(hpc)
