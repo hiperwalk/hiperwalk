@@ -1,5 +1,4 @@
 from ..base_walk import BaseWalk
-from constants import DEBUG
 
 class Continuous(BaseWalk):
     r"""

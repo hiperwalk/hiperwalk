@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
-from constants import DEBUG
 from sys import modules as sys_modules
 
 class BaseWalk(ABC):
@@ -543,7 +542,7 @@ class BaseWalk(ABC):
         ###########################
 
         def __prepare_engine(self):
-            if DEBUG:
+            if not __debug__:
                 print("Preparing engine")
 
             if hpc:
@@ -558,7 +557,7 @@ class BaseWalk(ABC):
                 self._simul_mat = self._evolution_operator
                 self._simul_vec = self._initial_condition
 
-            if DEBUG:
+            if not __debug__:
                 print("Done\n")
 
         def __simulate_step(self, step):
@@ -567,7 +566,7 @@ class BaseWalk(ABC):
             to the simulation vector.
             Simulation vector is then updated.
             """
-            if DEBUG:
+            if not __debug__:
                 print("Simulating steps")
 
             if hpc:
@@ -583,11 +582,11 @@ class BaseWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
-            if DEBUG:
+            if not __debug__:
                 print("Done\n")
 
         def __save_simul_vec(self):
-            if DEBUG:
+            if not __debug__:
                 print("Saving simulated vec")
 
             ret = None
@@ -602,7 +601,7 @@ class BaseWalk(ABC):
             else:
                 ret = self._simul_vec
 
-            if DEBUG:
+            if not __debug__:
                 print("Done\n")
 
             return ret
@@ -615,7 +614,7 @@ class BaseWalk(ABC):
         start, end, step = self._time
         
         if hpc and not self._pyneblina_imported():
-            if DEBUG:
+            if not __debug__:
                 print("IMPORTING PYNEBLINA")
             from . import _pyneblina_interface as nbl
 
