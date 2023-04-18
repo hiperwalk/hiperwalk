@@ -5,7 +5,7 @@ import networkx as nx
 from ..base_walk import BaseWalk
 from sys import modules as sys_modules
 
-if not __debug__:
+if __debug__:
     from time import time as now
     from guppy import hpy # used to check memory usage
 
@@ -253,7 +253,7 @@ class Coined(BaseWalk):
         array([0., 0., 1., 0., 0., 0., 0., 0.])
         """
 
-        if not __debug__:
+        if __debug__:
             start_time = now()
 
         # expects weights to be 1 if adjacent
@@ -296,7 +296,7 @@ class Coined(BaseWalk):
 
         # TODO: compare with old approach for creating S
 
-        if not __debug__:
+        if __debug__:
             print("flip_flop_shift_operator Memory: "
                   + str(hpy().heap().size))
             print("flip_flop_shift_operator Time: "
@@ -706,7 +706,7 @@ class Coined(BaseWalk):
         """
         # TODO: test with nonregular graph
         # TODO: test with nonuniform condition
-        if not __debug__:
+        if __debug__:
             start = now()
 
         if len(states.shape) == 1:
@@ -730,7 +730,7 @@ class Coined(BaseWalk):
                 for j in range(len(edges_indices) - 1)
             ] for i in range(len(states)) ])
 
-        if not __debug__:
+        if __debug__:
             end = now()
             print("probability_distribution: " + str(end - start) + 's')
         # TODO: benchmark (time and memory usage)

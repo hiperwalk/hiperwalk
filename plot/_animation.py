@@ -5,7 +5,7 @@ Encapsules Animation class, responsible for managing animations.
 import matplotlib.pyplot as plt
 from PIL import Image
 
-if not __debug__:
+if __debug__:
     from time import time
     start = time()
 
@@ -99,7 +99,7 @@ class Animation:
         def update_figure(img):
             ax.imshow(img)
 
-            if not __debug__:
+            if __debug__:
                 global start
                 end = time()
                 print('update_figure: ' + str(end - start) + 's')
@@ -120,7 +120,7 @@ class Animation:
         # i.e. shows only the original axes and pads (from plots_as_imgs)
         plt.axis('off')
         plt.tight_layout(pad=0)
-        if not __debug__:
+        if __debug__:
             # used to check if no extra padding is being added
             fig.patch.set_facecolor('red')
             print("Fig dpi " + str(fig.dpi))
@@ -173,7 +173,7 @@ class Animation:
         self.plt_anim.save(self.save_path)
         plt.close()
 
-        if not __debug__:
+        if __debug__:
             print('finished saving')
 
         # by ignoring this condition while using the terminal,

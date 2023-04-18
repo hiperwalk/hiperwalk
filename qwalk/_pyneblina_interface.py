@@ -11,10 +11,10 @@ __engine_initiated = False
 def exit_handler():
     global __engine_initiated
     if __engine_initiated:
-        if not __debug__:
+        if __debug__:
             print("Stop engine")
         neblina.stop_engine()
-    elif not __debug__:
+    elif __debug__:
         print("Engine not initiated. Not needed to stop engine.")
 
 atexit.register(exit_handler)

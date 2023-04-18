@@ -8,7 +8,7 @@ import numpy as np
 from PIL import Image
 from ._animation import *
 
-if not __debug__:
+if __debug__:
     from time import time
 
 # TODO: move to constants
@@ -562,7 +562,7 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     if 'cmap' in kwargs:
         _configure_colorbar(ax, kwargs)
 
-    if not __debug__:
+    if __debug__:
         global start
         end = time()
         print("_plot_probability_distribution_on_graph: "
@@ -699,5 +699,5 @@ def _configure_colorbar(ax, kwargs):
 
 #########################################################################################
 
-if not __debug__:
+if __debug__:
     start = time()
