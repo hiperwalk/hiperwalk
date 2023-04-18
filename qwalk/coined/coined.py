@@ -479,7 +479,7 @@ class Coined(BaseWalk):
     def has_persistent_shift_operator(self):
         return False
 
-    def evolution_operator(self, persistent_shift=False, hpc=False,
+    def evolution_operator(self, persistent_shift=False, hpc=True,
                            coin='grover'):
         """
         Create the standard evolution operator.
@@ -491,7 +491,7 @@ class Coined(BaseWalk):
             (``persistent_shift=True``) or
             the flip flop shift operator (``persistent_shift=False``).
 
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
@@ -551,7 +551,7 @@ class Coined(BaseWalk):
         return S@C
 
     def search_evolution_operator(self, vertices, persistent_shift=False,
-                                  hpc=False, coin='grover'):
+                                  hpc=True, coin='grover'):
         """
         Create the search evolution operator.
 
@@ -561,7 +561,7 @@ class Coined(BaseWalk):
             The marked vertex (vertices) IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
 
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 

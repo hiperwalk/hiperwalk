@@ -168,7 +168,7 @@ class Segment(Coined):
         """
         return super().state(entries, type)
 
-    def evolution_operator(self, persistent_shift=True, hpc=False,
+    def evolution_operator(self, persistent_shift=True, hpc=True,
                            coin='hadamard'):
         r"""
         :meth:`qwalk.Coined.evolution_operator` with
@@ -181,7 +181,7 @@ class Segment(Coined):
             (``persistent_shift=True``) or
             the flip flop shift operator (``persistent_shift=False``).
 
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 

@@ -291,4 +291,8 @@ For instance,
 .. code-block:: shell
 
     cd hiperwalk/examples/
-    python3 coined-line.py
+    python3 non-hpc-coined-line.py
+
+Recall that the HiperWalk default is to use HPC.
+Hence, most examples will not work
+if the HPC support was not installed successfully. 

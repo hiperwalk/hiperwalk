@@ -81,7 +81,7 @@ class Line(Segment):
 
         return shifted_state
 
-    def simulate_walk(self, evolution_operator, hpc=False):
+    def simulate_walk(self, evolution_operator, hpc=True):
         r"""
         Starts quantum walk simulation.
 

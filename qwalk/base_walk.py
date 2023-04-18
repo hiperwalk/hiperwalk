@@ -113,13 +113,13 @@ class BaseWalk(ABC):
         return None
 
     @abstractmethod
-    def evolution_operator(self, hpc=False, **kwargs):
+    def evolution_operator(self, hpc=True, **kwargs):
         """
         Create the standard evolution operator.
 
         Parameters
         ----------
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
@@ -134,7 +134,7 @@ class BaseWalk(ABC):
         return None
 
     @abstractmethod
-    def search_evolution_operator(self, vertices, hpc=False,
+    def search_evolution_operator(self, vertices, hpc=True,
                                   **kwargs):
         """
         Create the search evolution operator.
@@ -145,7 +145,7 @@ class BaseWalk(ABC):
             The marked vertex (vertices) IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
 
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
@@ -237,7 +237,7 @@ class BaseWalk(ABC):
 
 
     def simulate_walk(self, evolution_operator, initial_condition,
-                      steps, hpc=False):
+                      steps, hpc=True):
         r"""
         Simulates quantum walk by applying the
         ``evolution_operator`` to the ``initial_coidition``
@@ -274,10 +274,10 @@ class BaseWalk(ABC):
                 ``step`` applications.
                 That is, ``[start, start + step, ..., end - step, end]``.
             
-        hpc : bool, default=False
+        hpc : bool, default=True
             Whether or not to use neblina's high-performance computing
             to perform matrix multiplications.
-            If ``hpc=False`` uses python.
+            If ``hpc=False`` uses standalone python.
 
         Returns
         -------
