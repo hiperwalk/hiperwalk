@@ -73,7 +73,7 @@ def send_vector(v, is_complex=True):
 # other pyneblina calculations,
 # thus it is going to be deleted to free memory.
 # TODO: get vector dimension(vdim) automatically
-def retrieve_vector(v, vdim, delete_vector=True):
+def retrieve_vector(v, vdim):
     global __engine_initiated
     if not __engine_initiated:
         # TODO: throw exception
@@ -89,12 +89,6 @@ def retrieve_vector(v, vdim, delete_vector=True):
             )
 
     # TODO: check if vector is being deleted (or not)
-    # according to the demand
-    if delete_vector:
-        print('TODO: vector_delete from pyneblina is not available')
-        # vector_delete(v)
-    print('TODO: vector_delete from pyneblina is not available')
-    # vector_delete(nbl_vec)
 
     return py_vec
         

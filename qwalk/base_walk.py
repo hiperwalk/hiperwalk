@@ -590,8 +590,7 @@ class BaseWalk(ABC):
                 # TODO: check if vector must be deleted or
                 #       if it can be reused via neblina-core commands.
                 ret = nbl.retrieve_vector(
-                    self._simul_vec, self._initial_condition.shape[0],
-                    delete_vector=True
+                    self._simul_vec, self._initial_condition.shape[0]
                 )
             else:
                 ret = self._simul_vec
