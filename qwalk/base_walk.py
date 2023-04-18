@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
 from constants import DEBUG
+from sys import modules as sys_modules
 
 class BaseWalk(ABC):
     """
@@ -200,7 +201,7 @@ class BaseWalk(ABC):
         if U.shape != (self.hilb_dim, self.hilb_dim):
             raise ValueError(
                 "Matrix `U` has invalid dimensions."
-                + " Expected " str((self.hilb_dim, self.hilb_dim))
+                + " Expected " + str((self.hilb_dim, self.hilb_dim))
                 + " but received " + str(U.shape) + " instead."
             )
 
@@ -468,13 +469,19 @@ class BaseWalk(ABC):
         self._initial_condition = state
 
 
-    def get_initial_condition():
+    def get_initial_condition(self):
         r"""
         Returns the current initial condition.
 
         If ``None``, no initial condition was set.
         """
         return self._initial_condition
+
+    def _pyneblina_imported(self):
+        print('---------------------------')
+        print('qwalk._pyneblina_interface' in sys_modules)
+        print('---------------------------')
+        return 'qwalk._pyneblina_interface' in sys_modules
 
 
     def simulate(self, hpc=True):
@@ -607,8 +614,11 @@ class BaseWalk(ABC):
 
         start, end, step = self._time
         
-        if hpc:
+        if hpc and not self._pyneblina_imported():
+            if DEBUG:
+                print("IMPORTING PYNEBLINA")
             from . import _pyneblina_interface as nbl
+
         __prepare_engine(self)
 
         # number of states to save

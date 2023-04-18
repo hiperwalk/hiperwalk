@@ -4,6 +4,7 @@ import scipy.sparse
 import networkx as nx
 from ..base_walk import BaseWalk
 from constants import DEBUG
+from sys import modules as sys_modules
 
 if DEBUG:
     from time import time as now
@@ -163,6 +164,8 @@ class Coined(BaseWalk):
 
     def __init__(self, adj_matrix):
         super().__init__(adj_matrix)
+        self._shift_operator = None
+        self._coin_operator = None
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self.adj_matrix.sum()
@@ -484,6 +487,9 @@ class Coined(BaseWalk):
         """
         Create the standard evolution operator.
 
+        The created evolution operator is set to be used in the
+        quantum walk simulation.
+
         Parameters
         ----------
         persistent_shift : bool, default=False
@@ -538,17 +544,23 @@ class Coined(BaseWalk):
 
         S = (self.persistent_shift_operator() if persistent_shift
              else self.flip_flop_shift_operator())
-        C = self.coin_operator(coin=coin)
+        self._shift_operator = S
 
-        if hpc:
-            #TODO: import neblina and implement
-            raise NotImplementedError (
-                'Calculating the evolution operator via'
-                + 'hpc (high-performance computing)'
-                + 'is not supported yet.'
-            )
+        C = self.coin_operator(coin=coin)
+        self._coin_operator = C
+        
+        import warnings
+        warnings.warn("create gset_shift_operator and gset_coin_operator")
+
+        if hpc and not self._pyneblina_imported():
+            from .. import _pyneblina_interface as nbl
+            nbl_S = nbl.send_sparse_matrix(S)
+            nbl_C = nbl.send_sparse_matrix(C)
             return None
-        return S@C
+
+        U = S@C
+        self._evolution_operator = U
+        return U
 
     def search_evolution_operator(self, vertices, persistent_shift=False,
                                   hpc=True, coin='grover'):
@@ -627,7 +639,7 @@ class Coined(BaseWalk):
 
         See Also
         --------
-        simulate_walk
+        simulate
         """
         # TODO: test with nonregular graph
         # TODO: test with nonuniform condition
@@ -823,7 +835,7 @@ class Coined(BaseWalk):
             time_range = [time_range]
 
         for i in range(len(time_range)):
-            if time_range[i]:
+            if not isinstance(time_range[i], int):
                 raise TypeError(
                     "`time_range` has non-int value "
                     + str(time_range[i]) + ". "

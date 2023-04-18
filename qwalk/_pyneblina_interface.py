@@ -164,7 +164,7 @@ def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
     """
     Request matrix multiplication to neblina.
 
-    Multiplies the maatrix by the vector, i.e. ``smat @ vec``.
+    Multiplies the matrix by the vector, i.e. ``smat @ vec``.
 
     Parameters
     ----------
