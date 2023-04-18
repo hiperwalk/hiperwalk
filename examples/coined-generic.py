@@ -16,10 +16,12 @@ del G
 random = coined_qw.Coined(adj)
 # By default uses flip-flop shift operator and Grover coin
 U = random.evolution_operator()
+U = random.evolution_operator()
 # Initial state at vertex 0 pointing to the first directiong possible
 init_state = random.state([[1, 0, 0]])
 num_steps = num_vert
-states = random.simulate_walk(U, init_state, (0, num_steps))
+random.time((0, num_steps))
+states = random.simulate()
 
 # Calculating probabilities and plotting
 prob = random.probability_distribution(states)
