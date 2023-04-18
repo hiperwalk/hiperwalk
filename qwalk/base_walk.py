@@ -477,9 +477,6 @@ class BaseWalk(ABC):
         return self._initial_condition
 
     def _pyneblina_imported(self):
-        print('---------------------------')
-        print('qwalk._pyneblina_interface' in sys_modules)
-        print('---------------------------')
         return 'qwalk._pyneblina_interface' in sys_modules
 
 
@@ -546,10 +543,8 @@ class BaseWalk(ABC):
                 print("Preparing engine")
 
             if hpc:
-                print("send sparse")
                 self._simul_mat = nbl.send_sparse_matrix(
                     self._evolution_operator)
-                print("send vector")
                 self._simul_vec = nbl.send_vector(
                     self._initial_condition)
 
