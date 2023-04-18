@@ -10,9 +10,11 @@ class Continuous(BaseWalk):
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`
-        Adjacency matrix of the graph on which
-        the quantum walk occurs.
+    H : :class:`scipy.sparse.csr_array`
+        Hamiltonian to be simulated.
+        Any Hermitian matrix.
+        For the Quantum Walk,
+        it may be the graph Adjacency matrix.
 
         .. todo::
             * Accept other types such as numpy array
@@ -33,34 +35,34 @@ class Continuous(BaseWalk):
     :math:`\ket i` is associated with the :math:`i`-th vertex.
 
     This class can also be used to simulate the evolution of any
-    continuous time matrix in the format
+    matrix in the format
 
     .. math::
 
-        U = e^{\mathrm{i}H}
+        U = e^{\text{i}H}
 
     as long as :math:`H` is hermitian.
     """
 
-    def __init__(self, adj_matrix):
-        super().__init__(adj_matrix)
+    def __init__(self, H):
+        super().__init__(H)
 
         self.hilb_dim = self.adj_matrix.shape[0]
 
     def oracle(self, vertices):
         return None
 
-    def evolution_operator(self, hpc=False, **kwargs):
+    def evolution_operator(self, hpc=True, **kwargs):
         return None
 
-    def search_evolution_operator(self, vertices, hpc=False, **kwargs):
+    def search_evolution_operator(self, vertices, hpc=True, **kwargs):
         return None
 
     def probability_distribution(self, states):
         return None
 
     def simulate_walk(self, initial_condition, save_interval=0,
-                      hpc=False):
+                      hpc=True):
         return super().simulate_walk(
             self._evolution_operator, initial_condition, num_steps,
             save_interval=save_interval, hpc=hpc

@@ -152,7 +152,7 @@ class Cycle(Coined):
         """
         return super().coin_operator(coin)
 
-    def evolution_operator(self, persistent_shift=True, hpc=False,
+    def evolution_operator(self, persistent_shift=True, hpc=True,
                            coin='hadamard'):
         """
         Same as :meth:`Coined.evolution_operator` with
