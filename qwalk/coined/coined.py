@@ -170,6 +170,29 @@ class Coined(BaseWalk):
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self.adj_matrix.sum()
 
+        import inspect
+
+        self._evol_op_kwargs = dict()
+
+        self._evol_op_kwargs['shift'] = inspect.getargspec(
+            self.shift_operator
+        )[0][1:]
+
+        self._evol_op_kwargs['coin'] = inspect.getargspec(
+            self.coin_operator
+        )[0][1:]
+
+        self._evol_op_kwargs['oracle'] = inspect.getargspec(
+            self.oracle
+        )[0][1:]
+
+        if __debug__:
+            methods = list(self._evol_op_kwargs)
+            params = [p for m in methods
+                        for p in self._evol_op_kwargs[m]]
+            if len(params) != len(set(params)):
+                raise AssertionError
+
     def flip_flop_shift_operator(self):
         r"""
         Create the flip-flop shift operator (:math:`S`) based on
@@ -607,8 +630,7 @@ class Coined(BaseWalk):
         """
         return False
 
-    def evolution_operator(self, persistent_shift=False, hpc=True,
-                           coin='grover'):
+    def evolution_operator(self, vertices=[], **kwargs):
         """
         Create the standard evolution operator.
 
@@ -617,62 +639,78 @@ class Coined(BaseWalk):
 
         Parameters
         ----------
-        persistent_shift : bool, default=False
-            Wheter to use persistent shift operator
-            (``persistent_shift=True``) or
-            the flip flop shift operator (``persistent_shift=False``).
-
         hpc : bool, default=True
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
-        coin : str, default='grover'
-            The coin to be used as diffusion operator.
-            See :obj:`coin_operator`'s ``coin``
-            attribute for valid options.
+        vertices : array_like, default=[]
+            The marked vertices IDs.
+            See :obj:`oracle`'s ``vertices`` parameter.
+
+        **kwargs : dict, optional
+            Additional arguments for constructing the evolution operator.
+            Accepts any valid keywords from
+            :meth:`shift_operator`
+            :meth:`coin_operator`
+            :meth:`has_persistent_shift_operator`, and
+            :meth:`evolution_operator_from_SCR`.
 
         Returns
         -------
-        U_w : :class:`scipy.sparse.csr_array`
+        U : :class:`scipy.sparse.csr_array`
             The evolution operator.
-
-        Raises
-        ------
-        NotImplementedError
-            If ``persistent_shift=True`` and the
-            persistent shift operator is not defined.
 
         See Also
         --------
-        flip_flop_shift_operator
+        shift_operator
         coin_operator
         has_persistent_shift_operator
+        evolution_operator_from_SCR
 
         Notes
         -----
-        The evolution operator is
+        This method is an alias for
+
+        >>> c.shift_operator()
+        >>> c.coin_operator()
+        >>> c.oracle()
+        >>> c.evolution_operator_from_SCR()
+
+        where the valid arguments for each method is
+        passed via ``**kwargs``.
+        If any argument is omitted, the default value is used.
+
+        The evolution operator is given by
 
         .. math::
-            U_w = SC
+            U = SCR
 
-        where :math`S` is the flip-flop shift operator and
-        :math:`C` is the coin operator.
+        where :math`S` is the shift operator,
+        :math:`C` is the coin operator, and
+        :math:`R` is the oracle [1]_.
 
-        The persistent shift operator is only defined for specific graphs
-        that can be embedded into the plane.
-        Hence, a direction can be inferred (left, right, up, down).
+        References
+        ----------
+        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+            Vol. 19. New York: Springer, 2013.
+
         """
-        if persistent_shift and not self.has_persistent_shift_operator():
-            raise NotImplementedError (
-                "Quantum walk has no persistent shift operator."
-            )
 
-        S = (self.persistent_shift_operator() if persistent_shift
-             else self.flip_flop_shift_operator())
-        self._shift_operator = S
+        S_kwargs = {k : kwargs.get(k)
+                    for k in self._evol_op_kwargs['shift']
+                    if kwargs.get(k) is not None}
+        C_kwargs = {k : kwargs.get(k)
+                    for k in self._evol_op_kwargs['coin']
+                    if kwargs.get(k) is not None}
+        R_kwargs = {k : kwargs.get(k)
+                    for k in self._evol_op_kwargs['oracle']
+                    if kwargs.get(k) is not None}
+        R_kwargs['vertices'] = vertices
 
-        C = self.coin_operator(coin=coin)
-        self._coin_operator = C
+        self.shift_operator(**S_kwargs)
+        self.coin_operator(**C_kwargs)
+        self.oracle(**R_kwargs)
+        U = self.evolution_operator_from_SCR(hpc)
         
         warnings.warn("create gset_shift_operator and gset_coin_operator")
 
@@ -682,68 +720,16 @@ class Coined(BaseWalk):
             nbl_C = nbl.send_sparse_matrix(C)
             return None
 
-        U = S@C
-        self._evolution_operator = U
+
+        if __debug__:
+            if (self._shift_operator is None
+                or self._coin_operator is None
+                or (self._oracle is None and len(vertices) != 0)
+                or self._evolution_operator is None
+            ):
+                raise AssertionError
+
         return U
-
-    def search_evolution_operator(self, vertices, persistent_shift=False,
-                                  hpc=True, coin='grover'):
-        """
-        Create the search evolution operator.
-
-        Parameters
-        ----------
-        vertices : array_like
-            The marked vertex (vertices) IDs.
-            See :obj:`oracle`'s ``vertices`` parameter.
-
-        hpc : bool, default=True
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
-
-        coin : str, default='grover'
-            The coin to be used as diffusion operator.
-            See :obj:`evolution_operator` and :obj:`coin_operator`.
-
-        Returns
-        -------
-        U : :class:`scipy.sparse.csr_array`
-            The search evolution operator.
-
-        See Also
-        --------
-        coin_operator
-        evolution_operator
-        oracle
-
-        Notes
-        -----
-        The search evolution operator is
-
-        .. math::
-            U = U_w R = S C R
-
-        where :math:`U_w` is the coined quantum walk evolution operator
-        and :math:`R` is the oracle [1]_.
-
-        References
-        ----------
-        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-            Vol. 19. New York: Springer, 2013.
-        """
-        evol_op = self.evolution_operator(coin=coin, hpc=hpc)
-        oracle = self.oracle(vertices)
-
-        if hpc:
-            # TODO: check if sending SCR instead of U_wR
-            # to neblina is more efficient
-            raise NotImplementedError (
-                'Calculating the search evolution operator via'
-                + 'hpc (high-performance computing)'
-                + 'is not supported yet.'
-            )
-            return None
-        return evol_op @ oracle
 
     def probability_distribution(self, states):
         """
