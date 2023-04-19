@@ -304,6 +304,37 @@ class Coined(BaseWalk):
 
         return S
 
+    def shift_operator(self, flip_flop=True):
+        r"""
+        Create the shift operator.
+
+        If ``flip_flop=True``, creates the flip flop shift operator.
+        Otherwise, the persistent shift operator is created.
+
+        The created shift operator is saved to be used
+        for generating the evolution operator.
+
+        Parameters
+        ----------
+        flip_flop: bool, default=True
+            Whether to create the flip flop or the persistent
+            shift operator.
+
+        Raises
+        ------
+        AttributeError
+            If ``flip_flop=True`` and
+            the persistent shift operator is not implemented.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_matrix`
+            Shift operator
+        """
+        if flip_flop:
+            return self.flip_flop_shift_operator()
+        return self.persistent_shift_operator()
+
     def coin_operator(self, coin='grover', coin2=None, vertices2=[]):
         """
         Generate a coin operator based on the graph structure.
