@@ -333,9 +333,13 @@ class Coined(BaseWalk):
         :class:`scipy.sparse.csr_matrix`
             Shift operator
         """
-        if flip_flop:
-            return self.flip_flop_shift_operator()
-        return self.persistent_shift_operator()
+        S = (self.flip_flop_shift_operator() if flip_flop
+             else self.persistent_shift_operator())
+
+        if __debug__:
+            if self._shift_operator is None: raise AssertionError
+
+        return S
 
     def coin_operator(self, coin='grover', coin2=None, vertices2=[]):
         """
