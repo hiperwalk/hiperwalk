@@ -48,7 +48,7 @@ class Continuous(BaseWalk):
 
         self.hilb_dim = self.adj_matrix.shape[0]
 
-    def oracle(self, vertices):
+    def oracle(self, vertices=[0]):
         return None
 
     def evolution_operator(self, hpc=True, **kwargs):

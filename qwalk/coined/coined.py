@@ -401,14 +401,14 @@ class Coined(BaseWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def oracle(self, vertices, oracle_type="standard"):
+    def oracle(self, vertices=[0], oracle_type="standard"):
         r"""
         Create the oracle that marks the given vertices.
 
 
         Parameters
         ----------
-        vertices : array_like
+        vertices : array_like, default=[0]
             ID(s) of the vertex (vertices) to be marked.
 
         oracle_type : {'standard', 'phase_flip'}
