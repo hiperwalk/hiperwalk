@@ -52,6 +52,7 @@ execute the following commands to install the prerequisites.
    sudo apt install libgtest-dev
    sudo apt install python3-distutils
    sudo apt install python3-pip
+   pip3 install pytest
 
 
 The newly installed programs are needed for the following purposes.
@@ -61,7 +62,8 @@ The newly installed programs are needed for the following purposes.
 * cmake: compiling neblina-core;
 * libgtest-dev: test if neblina-core installation is correct;
 * python3-distutils: install pyneblina;
-* python3-pip: install Python libraries.
+* python3-pip: install Python libraries;
+* pytest: test pyneblina.
 
 It is **recommend** but not necessary to install FFmpeg.
 It is used for generating animations.
