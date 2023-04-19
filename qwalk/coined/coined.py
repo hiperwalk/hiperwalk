@@ -596,6 +596,15 @@ class Coined(BaseWalk):
         self._oracle = None
 
     def has_persistent_shift_operator(self):
+        r"""
+        Returns if the persistent shift operator is defined
+        for the current graph.
+
+        The persistent shift operator is only defined for specific graphs
+        that can be embedded into the plane.
+        Hence, a direction can be inferred --
+        e.g. left, right, up, down.
+        """
         return False
 
     def evolution_operator(self, persistent_shift=False, hpc=True,
