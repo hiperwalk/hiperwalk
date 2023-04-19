@@ -1,5 +1,6 @@
 import neblina
 from numpy import array as np_array
+import scipy.sparse
 from constants import *
 
 ############################################
@@ -31,7 +32,7 @@ def _init_engine():
         neblina.init_engine(0)
         __engine_initiated = True
 
-def send_vector(v, is_complex=True):
+def send_vector(v, complex=True):
     r"""
     Transfers a vector (v) to Neblina-core, and moves it
     to the device to be used.
@@ -46,7 +47,7 @@ def send_vector(v, is_complex=True):
     """
 
     _init_engine()
-    # TODO: check if is_complex automatically?
+    # TODO: check if complex automatically?
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
     # use next instruction (commented).
@@ -57,10 +58,10 @@ def send_vector(v, is_complex=True):
     # convert to an array of float or of complex numbers accordingly.
     # 
     # vec = (neblina.vector_new(n, NEBLINA_COMPLEX)
-    #        if is_complex else neblina.vector_new(n, NEBLINA_FLOAT))
+    #        if complex else neblina.vector_new(n, NEBLINA_FLOAT))
     vec = neblina.vector_new(n, NEBLINA_COMPLEX)
 
-    if is_complex:
+    if complex:
         for i in range(n):
             neblina.vector_set(vec, i, v[i].real, v[i].imag)
     else:
@@ -105,7 +106,7 @@ def retrieve_vector(v, vdim):
 
     return py_vec
         
-def send_sparse_matrix(M, is_complex=True):
+def _send_sparse_matrix(M, complex):
     r"""
     Transfers a sparse Matrix (M) stored in csr format to Neblina-core and
     moves it to the device (ready to be used).
@@ -122,7 +123,7 @@ def send_sparse_matrix(M, is_complex=True):
     
     _init_engine()
 
-    # TODO: check if is_complex automatically?
+    # TODO: check if complex automatically?
     n = M.shape[0]
 
     # creates neblina sparse matrix structure
@@ -134,7 +135,7 @@ def send_sparse_matrix(M, is_complex=True):
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
     # smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
-    #     if is_complex else neblina.sparse_matrix_new(n, n, NEBLINA_FLOAT)
+    #     if complex else neblina.sparse_matrix_new(n, n, NEBLINA_FLOAT)
     smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
     
     # inserts elements into neblina sparse matrix
@@ -148,7 +149,7 @@ def send_sparse_matrix(M, is_complex=True):
             j += 1
             
         col = M.indices[i]
-        if is_complex:
+        if complex:
             neblina.sparse_matrix_set(smat, row, col, M[row, col].real,
                               M[row, col].imag)
         else:
@@ -162,7 +163,15 @@ def send_sparse_matrix(M, is_complex=True):
 
     return smat
 
-def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
+def send_matrix(M):
+    print(M.dtype)
+    complex = True
+    if scipy.sparse.issparse(M):
+        return _send_sparse_matrix(M, complex)
+
+    return _send_dense_matrix(M, complex)
+
+def multiply_sparse_matrix_vector(smat, vec, complex=True):
     """
     Request matrix multiplication to neblina.
 
@@ -174,7 +183,7 @@ def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
         neblina sparse matrix object
     vec
         neblina vector object
-    is_complex : bool default=True
+    complex : bool, default=True
         Whether or not smat or vec is complex.
         .. todo::
             Not implemented.
