@@ -51,10 +51,7 @@ class Continuous(BaseWalk):
     def oracle(self, vertices=[0]):
         return None
 
-    def evolution_operator(self, hpc=True, **kwargs):
-        return None
-
-    def search_evolution_operator(self, vertices, hpc=True, **kwargs):
+    def evolution_operator(self, hpc=True, vertices=[], **kwargs):
         return None
 
     def probability_distribution(self, states):
