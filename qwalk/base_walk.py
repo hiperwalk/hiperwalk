@@ -449,7 +449,11 @@ class BaseWalk(ABC):
         return self._initial_condition
 
     def _pyneblina_imported(self):
-        return 'qwalk._pyneblina_interface' in sys_modules
+        """
+        Expects pyneblina interface to be imported as nbl
+        """
+        return ('qwalk._pyneblina_interface' in sys_modules
+                and 'nbl' in locals())
 
 
     def simulate(self, hpc=True):

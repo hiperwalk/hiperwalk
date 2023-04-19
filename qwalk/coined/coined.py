@@ -774,7 +774,7 @@ class Coined(BaseWalk):
             warnings.warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
             nbl_C = nbl.send_matrix(C)
-            nbl_U = nbl.multiply_matrices(S, C)
+            nbl_U = nbl.multiply_matrices(nbl_S, nbl_C)
 
             warnings.warn("Check if matrices are deleted "
                           + "from memory and GPU.")
@@ -786,10 +786,10 @@ class Coined(BaseWalk):
             if self._oracle is not None:
                 R = self._oracle.todense()
                 nbl_R = nbl.send_matrix(R)
-                nbl_U = nbl.multiply_matrices(U, R)
+                nbl_U = nbl.multiply_matrices(nbl_U, nbl_R)
                 del R
 
-            U = nbl.retrieve_matrix()
+            U = nbl.retrieve_matrix(nbl_U)
             U = scipy.sparse.csr_array(U)
 
         else:
@@ -1022,8 +1022,8 @@ class Coined(BaseWalk):
 
         return super().time(time_range)
 
-    def step(self, steps):
+    def step(self, step_range):
         r"""
         Alias for :meth:`time`.
         """
-        return self.time(steps)
+        return self.time(step_range)

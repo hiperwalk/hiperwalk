@@ -1,5 +1,6 @@
 import neblina
 from numpy import array as np_array
+from numpy import zeros as np_zeros
 import scipy.sparse
 from constants import *
 from warnings import warn
@@ -125,7 +126,8 @@ def retrieve_vector(pynbl_vec):
 
     nbl_vec = neblina.move_vector_host(pynbl_vec.nbl_obj)
 
-    warn("check type automatically, for now suppose it is only complex")
+    if not pynbl_vec.is_complex:
+        raise NotImplementedError("Cannot retrieve real-only vectors.")
     py_vec = np_array(
                 [neblina.vector_get(nbl_vec, 2*i)
                  + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
@@ -154,6 +156,7 @@ def _send_sparse_matrix(M, is_complex):
     _init_engine()
 
     # TODO: check if complex automatically?
+    warn("Only working for square matrices")
     n = M.shape[0]
 
     # creates neblina sparse matrix structure
@@ -197,7 +200,23 @@ def _send_sparse_matrix(M, is_complex):
     return PyNeblinaMatrix(smat, M.shape, is_complex, True)
 
 def _send_dense_matrix(M, is_complex):
-    return None
+    _init_engine()
+
+    num_rows, num_cols = M.shape
+    mat = (neblina.matrix_new(num_rows, num_cols, NEBLINA_COMPLEX)
+           if is_complex
+           else neblina.matrix_new(num_rows, num_cols, NEBLINA_FLOAT))
+    
+    # inserts elements into neblina matrix
+    warn("Check if there really is a difference between real and complex")
+    warn("Check if default value is zero so we can jump setting element.")
+    for i in range(num_rows):
+        for j in range(num_cols):
+            neblina.matrix_set(mat, i, j, M[i, j].real, M[i, j].imag)
+
+    neblina.move_matrix_device(mat)
+
+    return PyNeblinaMatrix(mat, M.shape, is_complex, False)
 
 def send_matrix(M):
     print(M.dtype)
@@ -213,8 +232,37 @@ def send_matrix(M):
     if scipy.sparse.issparse(M):
         return _send_sparse_matrix(M, is_complex)
 
-    warn("Dense matrix as input not supported.")
     return _send_dense_matrix(M, is_complex)
+
+def retrieve_matrix(pynbl_mat):
+
+    if pynbl_mat.sparse:
+        raise NotImplementedError(
+            "Cannot retrieve sparse matrix."
+        )
+
+    nbl_mat = neblina.move_matrix_host(pynbl_mat.nbl_obj)
+
+    warn("Check if using default numpy datatype.")
+    py_mat = np_zeros(pynbl_mat.shape, dtype=(
+        complex if pynbl_mat.is_complex else float
+    ))
+
+    num_rows, num_cols = pynbl_mat.shape
+    warn("Not vectorized. Implement with list comprehension. "
+         + "This may require the double memory usage. "
+         + "Check memory usage before choosing which method to use.")
+    for i in range(num_rows):
+        for j in range(num_cols):
+            if pynbl_mat.is_complex:
+                py_mat[i,j] = (
+                      neblina.matrix_get(nbl_mat, i, 2*j)
+                    + neblina.matrix_get(nbl_mat, i, 2*j + 1)*1j
+                )
+            else:
+                py_mat[i,j] = neblina.matrix_get(nbl_mat, i, j)
+
+    return py_mat
 
 def multiply_matrix_vector(pynbl_mat, pynbl_vec):
     """
@@ -255,3 +303,25 @@ def multiply_matrix_vector(pynbl_mat, pynbl_vec):
         return new_vec
     warn("Dense matrix-vector multiplication not implemented.")
     return None
+
+def multiply_matrices(pynbl_A, pynbl_B):
+
+    if pynbl_A.shape[1] != pynbl_B.shape[0]:
+        raise ValueError("Matrices dimensions do not match.")
+
+    if pynbl_A.sparse or pynbl_B.sparse:
+        raise NotImplementedError(
+            "No sparse matrix multiplication implemented."
+        )
+
+    A = pynbl_A.nbl_obj
+    B = pynbl_B.nbl_obj
+    C = neblina.mat_mul(A, B)
+
+    pynbl_C = PyNeblinaMatrix(
+        C, (pynbl_A.shape[0], pynbl_B.shape[1]),
+        pynbl_A.is_complex or pynbl_B.is_complex,
+        False
+    )
+
+    return pynbl_C
