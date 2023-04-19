@@ -303,6 +303,7 @@ class Coined(BaseWalk):
             print("flip_flop_shift_operator Time: "
                   + str(now() - start_time))
 
+        self._shift_operator = S
         return S
 
     def shift_operator(self, flip_flop=True):
