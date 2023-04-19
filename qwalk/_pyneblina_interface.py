@@ -2,6 +2,7 @@ import neblina
 from numpy import array as np_array
 import scipy.sparse
 from constants import *
+from warnings import warn
 
 ############################################
 # used for automatically stopping the engine
@@ -186,13 +187,20 @@ def _send_dense_matrix(M, complex):
 
 def send_matrix(M):
     print(M.dtype)
+    if not isinstance(M.dtype, complex):
+        warn(
+            "Real multiplication not implemented. "
+            + "Treating entries as complex."
+        )
+
     complex = True
     if scipy.sparse.issparse(M):
         return _send_sparse_matrix(M, complex)
 
+    warn("Dense matrix as input not supported.")
     return _send_dense_matrix(M, complex)
 
-def multiply_sparse_matrix_vector(smat, vec, complex=True):
+def multiply_matrix_vector(mat, vec):
     """
     Request matrix multiplication to neblina.
 
@@ -200,15 +208,10 @@ def multiply_sparse_matrix_vector(smat, vec, complex=True):
 
     Parameters
     ----------
-    smat
-        neblina sparse matrix object
-    vec
+    mat : :class:`NeblinaMatrix`
+        neblina matrix object
+    vec : :class:`NeblinaVector`
         neblina vector object
-    complex : bool, default=True
-        Whether or not smat or vec is complex.
-        .. todo::
-            Not implemented.
-            neblina implementation for the real case is required.
 
     Returns
     -------
@@ -225,4 +228,8 @@ def multiply_sparse_matrix_vector(smat, vec, complex=True):
         global __engine_initiated
         if not __engine_initiated: raise AssertionError
 
-    return neblina.sparse_matvec_mul(vec, smat)
+    if mat.sparse:
+        return neblina.sparse_matvec_mul(vec, smat)
+
+    warn("Dense matrix-vector multiplication not implemented.")
+    return None
