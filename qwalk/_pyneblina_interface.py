@@ -20,6 +20,16 @@ def exit_handler():
 atexit.register(exit_handler)
 ############################################
 
+def _init_engine():
+    r"""
+    Initiates neblina-core engine.
+
+    Initiates the engine if it was not previously initiated
+    """
+    global __engine_initiated
+    if not __engine_initiated:
+        neblina.init_engine(0)
+        __engine_initiated = True
 
 def send_vector(v, is_complex=True):
     r"""
@@ -35,11 +45,7 @@ def send_vector(v, is_complex=True):
     thus twice the memory needed is being used
     """
 
-    global __engine_initiated
-    if not __engine_initiated:
-        neblina.init_engine(0)
-        __engine_initiated = True
-
+    _init_engine()
     # TODO: check if is_complex automatically?
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
@@ -79,10 +85,12 @@ def retrieve_vector(v, vdim):
     thus it is going to be deleted to free memory.
     TODO: get vector dimension(vdim) automatically
     """
-    global __engine_initiated
-    if not __engine_initiated:
-        # TODO: throw exception
-        print("Engined was not initiated. Nothing to retrieve.")
+
+    # if a vector is being retrieved.
+    # the engine should have been already initiated
+    if __debug__:
+        global __engine_initiated
+        if not __engine_initiated: raise AssertionError
 
     nbl_vec = neblina.move_vector_host(v)
 
@@ -111,10 +119,8 @@ def send_sparse_matrix(M, is_complex=True):
     TODO: isn't there a way for neblina-core to use the csr matrix directly?
       In order to avoid double memory usage
     """
-    global __engine_initiated
-    if not __engine_initiated:
-        neblina.init_engine(0)
-        __engine_initiated = True
+    
+    _init_engine()
 
     # TODO: check if is_complex automatically?
     n = M.shape[0]
@@ -183,12 +189,10 @@ def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
     send_sparse_matrix : returns a neblina sparse matrix object
     send_vector : returns a neblina vector object
     """
-
-    # TODO: check if is_complex automatically?
-    # TODO: ask to change parameter order
-    global __engine_initiated
-    if not __engine_initiated:
-        # TODO: throw exception
-        print("Engined was not initiated. Nothing to multiply.")
+    # if a matrix-vector operation is being requested,
+    # the engine should have been already initiated
+    if __debug__:
+        global __engine_initiated
+        if not __engine_initiated: raise AssertionError
 
     return neblina.sparse_matvec_mul(vec, smat)
