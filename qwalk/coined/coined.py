@@ -9,6 +9,7 @@ if __debug__:
     from time import time as now
     from guppy import hpy # used to check memory usage
     import warnings
+    warnings.warn("create gset_shift_operator and gset_coin_operator")
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -185,6 +186,11 @@ class Coined(BaseWalk):
         self._evol_op_kwargs['oracle'] = inspect.getargspec(
             self.oracle
         )[0][1:]
+
+        self._evol_op_kwargs['U_from_SCR'] = inspect.getargspec(
+            self.evolution_operator_from_SCR
+        )[0][1:]
+
 
         if __debug__:
             methods = list(self._evol_op_kwargs)
@@ -639,10 +645,6 @@ class Coined(BaseWalk):
 
         Parameters
         ----------
-        hpc : bool, default=True
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
-
         vertices : array_like, default=[]
             The marked vertices IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
@@ -706,19 +708,14 @@ class Coined(BaseWalk):
                     for k in self._evol_op_kwargs['oracle']
                     if kwargs.get(k) is not None}
         R_kwargs['vertices'] = vertices
+        U_kwargs = {k : kwargs.get(k)
+                    for k in self._evol_op_kwargs['U_from_SCR']
+                    if kwargs.get(k) is not None}
 
         self.shift_operator(**S_kwargs)
         self.coin_operator(**C_kwargs)
         self.oracle(**R_kwargs)
-        U = self.evolution_operator_from_SCR(hpc)
-        
-        warnings.warn("create gset_shift_operator and gset_coin_operator")
-
-        if hpc and not self._pyneblina_imported():
-            from .. import _pyneblina_interface as nbl
-            nbl_S = nbl.send_sparse_matrix(S)
-            nbl_C = nbl.send_sparse_matrix(C)
-            return None
+        U = self.evolution_operator_from_SCR(**U_kwargs)
 
 
         if __debug__:
@@ -730,6 +727,79 @@ class Coined(BaseWalk):
                 raise AssertionError
 
         return U
+
+    def evolution_operator_from_SCR(self, hpc=True):
+        r"""
+        Create evolution operator from previously set matrices.
+
+        Creates evolution operator by multiplying the
+        shift operator, coin operator and oracle.
+
+        Parameters
+        ----------
+        hpc : bool, default=True
+            Whether or not the evolution operator should be
+            constructed using nelina's high-performance computating.
+        """
+
+        if self._shift_operator is None:
+            raise AttributeError(
+                "Shift operator was not set. "
+                + "Did you forget to call shift_operator(), "
+                + "flip_flop_shift_operator(), "
+                + "persistent_shift_operator(), or"
+                + "set_shift_operator()?"
+            )
+        if self._coin_operator is None:
+            raise AttributeError(
+                "Coin operator was not set. "
+                + "Did you forget to call coin_operator() or "
+                + "set_coin_operator()?"
+            )
+
+        U = None
+        if hpc:
+            if not self._pyneblina_imported():
+                from .. import _pyneblina_interface as nbl
+
+            warnings.warn(
+                "Sparse matrix multipliation is not supported yet. "
+                + "Converting all matrices to dense. "
+                + "Then converting back to sparse. "
+                + "This uses unnecessary memory and computational time."
+            )
+            S = self._shift_operator.todense()
+            C = self._coin_operator.todense()
+
+            warnings.warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
+            nbl_S = nbl.send_matrix(S)
+            nbl_C = nbl.send_matrix(C)
+            nbl_U = nbl.multiply_matrices(S, C)
+
+            warnings.warn("Check if matrices are deleted "
+                          + "from memory and GPU.")
+            del S
+            del C
+            del nbl_S
+            del nbl_C
+
+            if oracle is not None:
+                R = self._oracle.todense()
+                nbl_R = nbl.send_matrix(R)
+                nbl_U = nbl.multiply_matrices(U, R)
+                del R
+
+            U = nbl.retrieve_matrix()
+            U = scipy.sparse.csr_array(U)
+
+        else:
+            U = self._shift_operator @ self._coin_operator
+            if oracle is not None:
+                U = U @ self._oracle
+
+        self._evolution_operator = U
+        return U
+
 
     def probability_distribution(self, states):
         """
