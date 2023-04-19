@@ -157,7 +157,7 @@ class BaseWalk(ABC):
         return self._oracle
 
     @abstractmethod
-    def evolution_operator(self, hpc=True, vertices=[], **kwargs):
+    def evolution_operator(self, vertices=[], **kwargs):
         """
         Create the standard evolution operator.
 
@@ -165,10 +165,6 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        hpc : bool, default=True
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
-
         vertices : array_like, default=[]
             The marked vertices IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
