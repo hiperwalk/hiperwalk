@@ -857,12 +857,6 @@ class Coined(BaseWalk):
                 (1, 0, 0) into [(1, 0, 0)]
         """
 
-        def _normalize(state, error=1e-16):
-            norm = np.linalg.norm(state)
-            if 1 - error <= norm and norm <= 1 + error:
-                return state
-            return state / norm
-        
         funcs = {'vertex_dir' : self._state_vertex_dir,
                  'arc_notation' : self._state_arc_notation,
                  'arc_order' : self._state_arc_order}
@@ -876,7 +870,7 @@ class Coined(BaseWalk):
         state = np.zeros(self.hilb_dim, dtype=complex)
         state = funcs[type](state, entries)
 
-        return _normalize(state)
+        return self._normalize(state)
 
     def time(self, time_range):
         r"""
