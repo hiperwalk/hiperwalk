@@ -112,13 +112,13 @@ class BaseWalk(ABC):
         return self._initial_condition
 
     @abstractmethod
-    def oracle(self, vertices):
+    def oracle(self, vertices=[0]):
         r"""
         Create the oracle that marks the given vertices.
 
         Parameters
         ----------
-        vertices : array_like
+        vertices : array_like, default=[0]
             ID(s) of the vertex (vertices) to be marked.
 
         Returns
@@ -151,7 +151,7 @@ class BaseWalk(ABC):
         return self._oracle
 
     @abstractmethod
-    def evolution_operator(self, hpc=True, **kwargs):
+    def evolution_operator(self, hpc=True, vertices=[], **kwargs):
         """
         Create the standard evolution operator.
 
@@ -163,16 +163,21 @@ class BaseWalk(ABC):
             Whether or not evolution operator should be
             constructed using nelina's high-performance computating.
 
+        vertices : array_like, default=[]
+            The marked vertices IDs.
+            See :obj:`oracle`'s ``vertices`` parameter.
+
         **kwargs : dict, optional
             Additional arguments for constructing the evolution operator
 
         Returns
         -------
-        U_w : :class:`scipy.sparse.csr_array`
+        U : :class:`scipy.sparse.csr_array`
             The evolution operator.
 
         See Also
         --------
+        oracle
         simulate
         """
         return None
@@ -219,41 +224,6 @@ class BaseWalk(ABC):
         no evolution operator was set.
         """
         return self._evolution_operator
-
-    @abstractmethod
-    def search_evolution_operator(self, vertices, hpc=True,
-                                  **kwargs):
-        """
-        Create the search evolution operator.
-
-        The search evolution operator is saved to be used
-        during the simulation.
-
-        Parameters
-        ----------
-        vertices : array_like
-            The marked vertex (vertices) IDs.
-            See :obj:`oracle`'s ``vertices`` parameter.
-
-        hpc : bool, default=True
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computing.
-
-        **kwargs : dict, optional
-            Additional arguments for constructing the evolution operator
-
-        Returns
-        -------
-        U : :class:`scipy.sparse.csr_array`
-            The search evolution operator.
-
-        See Also
-        --------
-        evolution_operator
-        oracle
-        simulate
-        """
-        return None
 
     @staticmethod
     def _elementwise_probability(elem):
