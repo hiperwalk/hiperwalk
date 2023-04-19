@@ -440,15 +440,19 @@ class Coined(BaseWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def oracle(self, vertices=[0], oracle_type="standard"):
+    def oracle(self, vertices=0, oracle_type="standard"):
         r"""
         Create the oracle that marks the given vertices.
 
+        The oracle is set to be used for generating the evolution operator.
+
+        If ``vertices=[]`` no oracle is created and it is set to ``None``.
 
         Parameters
         ----------
-        vertices : array_like, default=[0]
+        vertices : int, array_like, default=0
             ID(s) of the vertex (vertices) to be marked.
+            If ``vertices=[]`` no oracle is created.
 
         oracle_type : {'standard', 'phase_flip'}
             Oracle type to be used.
@@ -456,6 +460,8 @@ class Coined(BaseWalk):
         Returns
         -------
         :class:`scipy.sparse.csr_array`
+            The oracle in matricial form or
+            ``None`` if no vertex if marked.
 
         Notes
         -----
@@ -488,33 +494,41 @@ class Coined(BaseWalk):
         See :class:`Coined` Notes for more details about
         the used computational basis.
         """
-        try:
-            iter_ = iter(vertices)
-        except:
+
+        R = None
+
+        if isinstance(vertices, int):
             vertices = [vertices]
-            iter_ = iter(vertices)
 
-        if oracle_type == 'standard':
-            return self.coin_operator('grover', 'minus_identity',
-                                      vertices)
+        if len(vertices) > 0:
 
-        elif oracle_type == 'phase_flip':
-            R = scipy.sparse.eye(self.hilb_dim, format='csr')
+            if oracle_type == 'standard':
+                S = self._coin_operator
+                # this changes the _coin_operator attribute
+                R = self.coin_operator('grover', 'minus_identity',
+                                          vertices)
+                # revert unexpected changes
+                self._coin_operator = S
 
-            for vertex_id in iter_:
-                first_edge = self.adj_matrix.indptr[vertex_id]
-                last_edge = self.adj_matrix.indptr[vertex_id + 1]
+            elif oracle_type == 'phase_flip':
+                R = scipy.sparse.eye(self.hilb_dim, format='csr')
 
-                for edge in range(first_edge, last_edge):
-                    R.data[edge] = -1
+                for vertex_id in vertices:
+                    first_edge = self.adj_matrix.indptr[vertex_id]
+                    last_edge = self.adj_matrix.indptr[vertex_id + 1]
 
-            return R
+                    for edge in range(first_edge, last_edge):
+                        R.data[edge] = -1
 
-        raise ValueError(
-            "Invalid oracle_type value. Expected one of"
-            + "{'standard', 'phase_flip'} but received '"
-            + str(oracle_type) + "' instead."
-        )
+            else:
+                raise ValueError(
+                    "Invalid oracle_type value. Expected one of"
+                    + "{'standard', 'phase_flip'} but received '"
+                    + str(oracle_type) + "' instead."
+                )
+
+        self._oracle = R
+        return R
 
 
     def set_evolution_operator(self, U, hpc=True):
