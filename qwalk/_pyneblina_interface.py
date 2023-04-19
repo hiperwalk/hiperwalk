@@ -21,17 +21,20 @@ atexit.register(exit_handler)
 ############################################
 
 
-# Transfers a vector (v) to Neblina-core, and moves it
-# to the device to be used.
-# Returns a pointer to this vector
-# (needed to call other pyneblina functions).
-# by default, a vector with complex entries is expected.
-# If the matrix has only real entries, invoke this function by
-# TransferVector(v, False); this saves half the memory that would be used.
-# TODO: is there a way to move the vector to the device directly?
-# I think an auxiliary vector is beign created,
-# thus twice the memory needed is being used
 def send_vector(v, is_complex=True):
+    r"""
+    Transfers a vector (v) to Neblina-core, and moves it
+    to the device to be used.
+    Returns a pointer to this vector
+    (needed to call other pyneblina functions).
+    by default, a vector with complex entries is expected.
+    If the matrix has only real entries, invoke this function by
+    TransferVector(v, False); this saves half the memory that would be used.
+    TODO: is there a way to move the vector to the device directly?
+    I think an auxiliary vector is beign created,
+    thus twice the memory needed is being used
+    """
+
     global __engine_initiated
     if not __engine_initiated:
         neblina.init_engine(0)
@@ -68,12 +71,14 @@ def send_vector(v, is_complex=True):
     neblina.move_vector_device(vec)
     return vec
 
-# Retrieves vector from the device and converts it to python array.
-# By default, it is supposed that the vector is not going to be used in
-# other pyneblina calculations,
-# thus it is going to be deleted to free memory.
-# TODO: get vector dimension(vdim) automatically
 def retrieve_vector(v, vdim):
+    r"""
+    Retrieves vector from the device and converts it to python array.
+    By default, it is supposed that the vector is not going to be used in
+    other pyneblina calculations,
+    thus it is going to be deleted to free memory.
+    TODO: get vector dimension(vdim) automatically
+    """
     global __engine_initiated
     if not __engine_initiated:
         # TODO: throw exception
@@ -92,18 +97,20 @@ def retrieve_vector(v, vdim):
 
     return py_vec
         
-# Transfers a sparse Matrix (M) stored in csr format to Neblina-core and
-# moves it to the device (ready to be used).
-# By default, a matrix with complex elements is expected.
-# If the matrix has only real elements, invoke this function by
-# TransferSparseMatrix(M, False);
-# this saves half the memory that would be used.
-# TODO: Add tests
-#   - Transfer and check real Matrix
-#   - Transfer and check complex Matrix
-# TODO: isn't there a way for neblina-core to use the csr matrix directly?
-#   In order to avoid double memory usage
 def send_sparse_matrix(M, is_complex=True):
+    r"""
+    Transfers a sparse Matrix (M) stored in csr format to Neblina-core and
+    moves it to the device (ready to be used).
+    By default, a matrix with complex elements is expected.
+    If the matrix has only real elements, invoke this function by
+    TransferSparseMatrix(M, False);
+    this saves half the memory that would be used.
+    TODO: Add tests
+      - Transfer and check real Matrix
+      - Transfer and check complex Matrix
+    TODO: isn't there a way for neblina-core to use the csr matrix directly?
+      In order to avoid double memory usage
+    """
     global __engine_initiated
     if not __engine_initiated:
         neblina.init_engine(0)
@@ -150,11 +157,6 @@ def send_sparse_matrix(M, is_complex=True):
     return smat
 
 def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
-    global __engine_initiated
-    if not __engine_initiated:
-        # TODO: throw exception
-        print("Engined was not initiated. Nothing to multiply.")
-
     """
     Request matrix multiplication to neblina.
 
@@ -184,4 +186,9 @@ def multiply_sparse_matrix_vector(smat, vec, is_complex=True):
 
     # TODO: check if is_complex automatically?
     # TODO: ask to change parameter order
+    global __engine_initiated
+    if not __engine_initiated:
+        # TODO: throw exception
+        print("Engined was not initiated. Nothing to multiply.")
+
     return neblina.sparse_matvec_mul(vec, smat)
