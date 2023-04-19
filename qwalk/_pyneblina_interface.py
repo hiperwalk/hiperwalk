@@ -21,6 +21,18 @@ def exit_handler():
 atexit.register(exit_handler)
 ############################################
 
+class NeblinaMatrix:
+    def __init__(self, matrix, complex, sparse):
+        self.matrix = matrix
+        self.complex = complex
+        self.sparse = sparse
+
+class NeblinaVector:
+    def __init__(self, vector, complex):
+        self.vector = vector
+        self.complex = complex
+
+
 def _init_engine():
     r"""
     Initiates neblina-core engine.
@@ -32,7 +44,7 @@ def _init_engine():
         neblina.init_engine(0)
         __engine_initiated = True
 
-def send_vector(v, complex=True):
+def send_vector(v, complex):
     r"""
     Transfers a vector (v) to Neblina-core, and moves it
     to the device to be used.
@@ -40,7 +52,8 @@ def send_vector(v, complex=True):
     (needed to call other pyneblina functions).
     by default, a vector with complex entries is expected.
     If the matrix has only real entries, invoke this function by
-    TransferVector(v, False); this saves half the memory that would be used.
+    TransferVector(v, False);
+    this saves half the memory that would be used.
     TODO: is there a way to move the vector to the device directly?
     I think an auxiliary vector is beign created,
     thus twice the memory needed is being used
@@ -76,7 +89,9 @@ def send_vector(v, complex=True):
     # immediately after being transferred
     # TODO: check if this is the case
     neblina.move_vector_device(vec)
-    return vec
+    if __debug__:
+        print("Type of neblina vector obj: " + str(type(vec)))
+    return NeblinaVector(vec, complex)
 
 def retrieve_vector(v, vdim):
     r"""
@@ -161,7 +176,13 @@ def _send_sparse_matrix(M, complex):
     neblina.sparse_matrix_pack(smat) # TODO: is this needed?
     neblina.move_sparse_matrix_device(smat)
 
-    return smat
+    if __debug__:
+        print("Type of neblina matrix obj: " + str(type(smat)))
+
+    return NeblinaMatrix(smat, complex, True)
+
+def _send_dense_matrix(M, complex):
+    return None
 
 def send_matrix(M):
     print(M.dtype)
