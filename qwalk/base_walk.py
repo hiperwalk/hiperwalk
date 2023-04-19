@@ -112,13 +112,19 @@ class BaseWalk(ABC):
         return self._initial_condition
 
     @abstractmethod
-    def oracle(self, vertices=[0]):
+    def oracle(self, vertices=0):
         r"""
         Create the oracle that marks the given vertices.
 
+        The oracle is set to be used for constructing the
+        evolution operator.
+
+        If ``vertices=[]`` no oracle is created and
+        ``None`` is returned.
+
         Parameters
         ----------
-        vertices : array_like, default=[0]
+        vertices : int, array_like, default=0
             ID(s) of the vertex (vertices) to be marked.
 
         Returns
