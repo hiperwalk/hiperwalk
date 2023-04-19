@@ -1003,6 +1003,10 @@ class Coined(BaseWalk):
         ------
         TypeError
             If (any element of) ``time_range`` is not ``int``.
+
+        See Also
+        --------
+        step
         """
 
         if not hasattr(time_range, '__iter__'):
@@ -1023,58 +1027,3 @@ class Coined(BaseWalk):
         Alias for :meth:`time`.
         """
         return self.time(steps)
-
-    def simulate(self, hpc=True):
-        r"""
-        Simulates the quantum walk using the
-        evolution operator, initial condition and
-        time previously set.
-
-        If the evolution operator was not previously set,
-        it is constructed from the previously set
-        shift operator (S), coin operator (C) and oracle (R)
-        as follows.
-
-        .. math::
-            U = S C R .
-
-        If any of these matrices was not set previously,
-        it is substituted by the identity.
-
-        Parameters
-        ----------
-        hpc : bool, default=True
-            Whether or not to use neblina's high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses standalone python.
-
-        Returns
-        -------
-        states : :class:`numpy.ndarray`.
-            States saved during simulation where
-            ``states[i]`` corresponds to the ``i``-th saved state.
-
-        Raises
-        ------
-        ValueError
-            If the time or the initial condition
-            were not set previously.
-
-        See Also
-        --------
-        time
-        evolution_operator
-        initial_condition
-
-        Notes
-        -----
-        The walk is simulated by applying the
-        evolution operator to the initial condition multiple times.
-        The maximum and intermediate applications
-        are describred by ``time``.
-        """
-
-        if self._evolution_operator is None:
-            self.set_evolution_operator(None, hpc=hpc)
-
-        return super().simulate(hpc)
