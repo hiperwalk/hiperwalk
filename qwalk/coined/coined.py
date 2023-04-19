@@ -8,6 +8,7 @@ from sys import modules as sys_modules
 if __debug__:
     from time import time as now
     from guppy import hpy # used to check memory usage
+    import warnings
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -643,7 +644,6 @@ class Coined(BaseWalk):
         C = self.coin_operator(coin=coin)
         self._coin_operator = C
         
-        import warnings
         warnings.warn("create gset_shift_operator and gset_coin_operator")
 
         if hpc and not self._pyneblina_imported():
