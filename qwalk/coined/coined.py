@@ -418,7 +418,9 @@ class Coined(BaseWalk):
                       else coin_funcs[coin2](degrees[v])
                       for v in range(num_vert)]
 
-        return scipy.sparse.block_diag(blocks, format='csr')
+        C = scipy.sparse.block_diag(blocks, format='csr')
+        self._coin_operator = C
+        return C
 
     @staticmethod
     def _fourier_coin(dim):
