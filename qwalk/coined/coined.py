@@ -783,7 +783,7 @@ class Coined(BaseWalk):
             del nbl_S
             del nbl_C
 
-            if oracle is not None:
+            if self._oracle is not None:
                 R = self._oracle.todense()
                 nbl_R = nbl.send_matrix(R)
                 nbl_U = nbl.multiply_matrices(U, R)
@@ -794,7 +794,7 @@ class Coined(BaseWalk):
 
         else:
             U = self._shift_operator @ self._coin_operator
-            if oracle is not None:
+            if self._oracle is not None:
                 U = U @ self._oracle
 
         self._evolution_operator = U
