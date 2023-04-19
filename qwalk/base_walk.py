@@ -515,7 +515,7 @@ class BaseWalk(ABC):
                 print("Preparing engine")
 
             if hpc:
-                self._simul_mat = nbl.send_sparse_matrix(
+                self._simul_mat = nbl.send_matrix(
                     self._evolution_operator)
                 self._simul_vec = nbl.send_vector(
                     self._initial_condition)
@@ -541,7 +541,7 @@ class BaseWalk(ABC):
                 #       to neblina-core
                 # TODO: check if intermediate states are being freed
                 for i in range(step):
-                    self._simul_vec = nbl.multiply_sparse_matrix_vector(
+                    self._simul_vec = nbl.multiply_matrix_vector(
                         self._simul_mat, self._simul_vec)
             else:
                 for i in range(step):
@@ -561,9 +561,7 @@ class BaseWalk(ABC):
             if hpc:
                 # TODO: check if vector must be deleted or
                 #       if it can be reused via neblina-core commands.
-                ret = nbl.retrieve_vector(
-                    self._simul_vec, self._initial_condition.shape[0]
-                )
+                ret = nbl.retrieve_vector(self._simul_vec)
             else:
                 ret = self._simul_vec
 

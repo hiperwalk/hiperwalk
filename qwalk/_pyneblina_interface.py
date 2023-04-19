@@ -22,16 +22,21 @@ def exit_handler():
 atexit.register(exit_handler)
 ############################################
 
-class NeblinaMatrix:
-    def __init__(self, matrix, complex, sparse):
-        self.matrix = matrix
-        self.complex = complex
+# "abstract"
+class PyNeblinaObject:
+    def __init__(self, nbl_obj, shape, is_complex):
+        self.nbl_obj = nbl_obj
+        self.shape = shape
+        self.is_complex = is_complex
+
+class PyNeblinaMatrix(PyNeblinaObject):
+    def __init__(self, matrix, shape, is_complex, sparse):
+        super().__init__(matrix, shape, is_complex)
         self.sparse = sparse
 
-class NeblinaVector:
-    def __init__(self, vector, complex):
-        self.vector = vector
-        self.complex = complex
+class PyNeblinaVector(PyNeblinaObject):
+    def __init__(self, vector, shape, is_complex):
+        super().__init__(vector, shape, is_complex)
 
 
 def _init_engine():
@@ -45,7 +50,7 @@ def _init_engine():
         neblina.init_engine(0)
         __engine_initiated = True
 
-def send_vector(v, complex):
+def send_vector(v):
     r"""
     Transfers a vector (v) to Neblina-core, and moves it
     to the device to be used.
@@ -62,6 +67,15 @@ def send_vector(v, complex):
 
     _init_engine()
     # TODO: check if complex automatically?
+    is_complex = isinstance(v.dtype, complex)
+
+    if not is_complex:
+        warn(
+            "Real multiplication not implemented. "
+            + "Treating entries as complex."
+        )
+    is_complex = True
+
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
     # use next instruction (commented).
@@ -72,10 +86,10 @@ def send_vector(v, complex):
     # convert to an array of float or of complex numbers accordingly.
     # 
     # vec = (neblina.vector_new(n, NEBLINA_COMPLEX)
-    #        if complex else neblina.vector_new(n, NEBLINA_FLOAT))
+    #        if is_complex else neblina.vector_new(n, NEBLINA_FLOAT))
     vec = neblina.vector_new(n, NEBLINA_COMPLEX)
 
-    if complex:
+    if is_complex:
         for i in range(n):
             neblina.vector_set(vec, i, v[i].real, v[i].imag)
     else:
@@ -92,9 +106,9 @@ def send_vector(v, complex):
     neblina.move_vector_device(vec)
     if __debug__:
         print("Type of neblina vector obj: " + str(type(vec)))
-    return NeblinaVector(vec, complex)
+    return PyNeblinaVector(vec, is_complex, n)
 
-def retrieve_vector(v, vdim):
+def retrieve_vector(pynbl_vec):
     r"""
     Retrieves vector from the device and converts it to python array.
     By default, it is supposed that the vector is not going to be used in
@@ -109,20 +123,20 @@ def retrieve_vector(v, vdim):
         global __engine_initiated
         if not __engine_initiated: raise AssertionError
 
-    nbl_vec = neblina.move_vector_host(v)
+    nbl_vec = neblina.move_vector_host(pynbl_vec.nbl_obj)
 
-    # TODO: check type automatically, for now suppose it is only complex
+    warn("check type automatically, for now suppose it is only complex")
     py_vec = np_array(
                 [neblina.vector_get(nbl_vec, 2*i)
                  + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
-                 for i in range(vdim)]
+                 for i in range(pynbl_vec.shape)]
             )
 
     # TODO: check if vector is being deleted (or not)
 
     return py_vec
         
-def _send_sparse_matrix(M, complex):
+def _send_sparse_matrix(M, is_complex):
     r"""
     Transfers a sparse Matrix (M) stored in csr format to Neblina-core and
     moves it to the device (ready to be used).
@@ -151,7 +165,7 @@ def _send_sparse_matrix(M, complex):
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
     # smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
-    #     if complex else neblina.sparse_matrix_new(n, n, NEBLINA_FLOAT)
+    #     if is_complex else neblina.sparse_matrix_new(n, n, NEBLINA_FLOAT)
     smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
     
     # inserts elements into neblina sparse matrix
@@ -165,7 +179,7 @@ def _send_sparse_matrix(M, complex):
             j += 1
             
         col = M.indices[i]
-        if complex:
+        if is_complex:
             neblina.sparse_matrix_set(smat, row, col, M[row, col].real,
                               M[row, col].imag)
         else:
@@ -180,27 +194,29 @@ def _send_sparse_matrix(M, complex):
     if __debug__:
         print("Type of neblina matrix obj: " + str(type(smat)))
 
-    return NeblinaMatrix(smat, complex, True)
+    return PyNeblinaMatrix(smat, M.shape, is_complex, True)
 
-def _send_dense_matrix(M, complex):
+def _send_dense_matrix(M, is_complex):
     return None
 
 def send_matrix(M):
     print(M.dtype)
-    if not isinstance(M.dtype, complex):
+    is_complex = isinstance(M.dtype, complex)
+
+    if not is_complex:
         warn(
             "Real multiplication not implemented. "
             + "Treating entries as complex."
         )
+    is_complex = True
 
-    complex = True
     if scipy.sparse.issparse(M):
-        return _send_sparse_matrix(M, complex)
+        return _send_sparse_matrix(M, is_complex)
 
     warn("Dense matrix as input not supported.")
-    return _send_dense_matrix(M, complex)
+    return _send_dense_matrix(M, is_complex)
 
-def multiply_matrix_vector(mat, vec):
+def multiply_matrix_vector(pynbl_mat, pynbl_vec):
     """
     Request matrix multiplication to neblina.
 
@@ -208,9 +224,9 @@ def multiply_matrix_vector(mat, vec):
 
     Parameters
     ----------
-    mat : :class:`NeblinaMatrix`
+    mat : :class:`PyNeblinaMatrix`
         neblina matrix object
-    vec : :class:`NeblinaVector`
+    vec : :class:`PyNeblinaVector`
         neblina vector object
 
     Returns
@@ -228,8 +244,14 @@ def multiply_matrix_vector(mat, vec):
         global __engine_initiated
         if not __engine_initiated: raise AssertionError
 
-    if mat.sparse:
-        return neblina.sparse_matvec_mul(vec, smat)
+    if pynbl_mat.sparse:
+        nbl_vec = neblina.sparse_matvec_mul(pynbl_vec.nbl_obj,
+                                         pynbl_mat.nbl_obj)
+        new_vec = PyNeblinaVector(
+            nbl_vec, pynbl_mat.shape[0],
+            pynbl_mat.is_complex or pynbl_vec.is_complex
+        )
 
+        return new_vec
     warn("Dense matrix-vector multiplication not implemented.")
     return None
