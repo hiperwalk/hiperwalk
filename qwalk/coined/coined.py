@@ -335,34 +335,57 @@ class Coined(BaseWalk):
         self._shift_operator = S
         return S
 
-    def shift_operator(self, flip_flop=True):
+    def shift_operator(self, shift='default'):
         r"""
         Create the shift operator.
 
-        If ``flip_flop=True``, creates the flip flop shift operator.
-        Otherwise, the persistent shift operator is created.
+        Creates either the flip flop or the persistent shift operator.
 
         The created shift operator is saved to be used
         for generating the evolution operator.
 
         Parameters
         ----------
-        flip_flop: bool, default=True
-            Whether to create the flip flop or the persistent
-            shift operator.
+        shift: {'default', 'flip_flop', 'persistent', 'f', 'p'}
+            Whether to create the flip flop or the persistent shift.
+            By default, creates the persistent shift if it is defined;
+            otherwise creates the flip flop shift.
+            Argument ``'f'`` is an alias for ``'flip_flop'``.
+            Argument ``'p'`` is an alias for ``'persistent'``.
 
         Raises
         ------
         AttributeError
-            If ``flip_flop=True`` and
+            If ``shift='persistent'`` and
             the persistent shift operator is not implemented.
 
         Returns
         -------
         :class:`scipy.sparse.csr_matrix`
             Shift operator
+
+        See Also
+        --------
+        has_persistent_shift_operator
         """
-        S = (self.flip_flop_shift_operator() if flip_flop
+        valid_keys = ['default', 'flip_flop', 'persistent', 'f', 'p']
+        if shift not in valid_keys:
+            raise ValueError(
+                "Invalid `shift` value. Expected one of "
+                + str(valid_keys) + ". But received '"
+                + str(shift) + "' instead."
+            )
+
+        if shift == 'default':
+            shift = 'p' if self.has_persistent_shift_operator() else 'f'
+
+        if shift == 'f':
+            shift = 'flip_flop'
+        elif shift == 'p'
+            shift = 'persistent'
+
+        
+        S = (self.flip_flop_shift_operator() if shift == 'flip_flop'
              else self.persistent_shift_operator())
 
         if __debug__:
@@ -370,21 +393,33 @@ class Coined(BaseWalk):
 
         return S
 
-    def coin_operator(self, coin='grover', coin2=None, vertices2=[]):
+    def get_default_coin(self):
+        r"""
+        Returns the default coin name.
+
+        The default coin for the coined quantum walk on general
+        graphs is ``grover``.
+        """
+        return 'grover'
+
+    def coin_operator(self, coin='default', coin2=None, vertices2=[]):
         """
         Generate a coin operator based on the graph structure.
 
         Constructs coin operator depending on the degree of each vertex.
-        A single coin type may be applied to all vertices,
-        or two coins may be applied to selected vertices.
+        A single coin type may be applied to all vertices
+        (``coin2 is None``),
+        or two coins may be applied to selected vertices
+        (``coin2 is not None``).
 
         Parameters
         ----------
-        coin : {'grover', 'fourier', 'hadamard', 'minus_identity'}
+        coin : {'default', 'fourier', 'grover', 'hadamard', 'minus_identity'}
             Type of the coin to be used.
 
-        coin2 : {'grover', 'fourier', 'hadamard', 'minus_identity'}, default=None
+        coin2 : default=None
             Type of the coin to be used for ``vertices2``.
+            Accepts the same inputs as ``coin``.
 
         vertices2 :
             Vertices to use ``coin2`` instead of ``coin``.
@@ -405,6 +440,10 @@ class Coined(BaseWalk):
             If ``coin='hadamard'`` and any vertex of the graph
             has a non-power of two degree.
 
+        See Also
+        --------
+        get_default_coin
+
         Notes
         -----
         Due to the chosen computational basis
@@ -422,6 +461,11 @@ class Coined(BaseWalk):
             'hadamard': Coined._hadamard_coin,
             'minus_identity': Coined._minus_identity
         }
+
+        if coin == 'default':
+            coin = self.get_default_coin()
+        if coin2 == 'default':
+            coin2 = self.get_default_coin()
 
         if coin not in coin_funcs.keys() or (coin2 != None and
             coin2 not in coin_funcs.keys()):
