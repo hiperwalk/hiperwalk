@@ -12,9 +12,9 @@ class Line(Segment):
 
     Parameters
     ----------
-    steps : int, 2-tuple or 3-tuple
-        Number of steps to be simulated and saved.
-        Refer to :meth:`qwalk.BaseWalk.simulate_walk` for details.
+    step_range : int, 2-tuple or 3-tuple
+        Range of the states to be saved by the simulation.
+        Refer to :meth:`qwalk.BaseWalk.step` for details.
     state_entries : tuple
         Check :meth:`state` for details of valid entries.
     entry_type : {'vertex_dir', 'arc_notation', 'arc_order'}
@@ -28,14 +28,14 @@ class Line(Segment):
 
     """
 
-    def __init__(self, steps, state_entries, entry_type='vertex_dir'):
+    def __init__(self, step_range, state_entries, entry_type='vertex_dir'):
         valid_entry_types = ['vertex_dir', 'arc_notation']
         if entry_type not in valid_entry_types:
             raise ValueError("Invalid argument for entry_type."
                              + "Expected either of"
                              + str(valid_entry_types))
 
-        start, end, step = self._clean_steps(steps)
+        start, end, step = self._clean_time(step_range)
 
         self._shift, right_vert = self.__get_extreme_vertices(
             state_entries, entry_type)
@@ -49,8 +49,8 @@ class Line(Segment):
 
         super().__init__(num_vert)
 
-        self._steps = (start, end, step)
-        self._initial_condition = self.state(shifted_entries, entry_type)
+        super().time((start, end, step))
+        super().initial_condition(shifted_entries, type=entry_type)
 
 
     def __get_extreme_vertices(self, state_entries, entry_type):
