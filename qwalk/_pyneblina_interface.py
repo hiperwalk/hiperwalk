@@ -210,6 +210,7 @@ def _send_dense_matrix(M, is_complex):
     # inserts elements into neblina matrix
     warn("Check if there really is a difference between real and complex")
     warn("Check if default value is zero so we can jump setting element.")
+
     for i in range(num_rows):
         for j in range(num_cols):
             neblina.matrix_set(mat, i, j, M[i, j].real, M[i, j].imag)
@@ -256,8 +257,8 @@ def retrieve_matrix(pynbl_mat):
         for j in range(num_cols):
             if pynbl_mat.is_complex:
                 py_mat[i,j] = (
-                      neblina.matrix_get(nbl_mat, i, 2*j)
-                    + neblina.matrix_get(nbl_mat, i, 2*j + 1)*1j
+                      neblina.matrix_get(nbl_mat, 2*i, 2*j)
+                    + neblina.matrix_get(nbl_mat, 2*i, 2*j + 1)*1j
                 )
             else:
                 py_mat[i,j] = neblina.matrix_get(nbl_mat, i, j)
