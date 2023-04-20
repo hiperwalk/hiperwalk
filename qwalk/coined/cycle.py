@@ -104,6 +104,15 @@ class Cycle(Coined):
         self._shift_operator = S
         return S
 
+    def get_default_coin(self):
+        r"""
+        Returns the default coin name.
+
+        The default coin for the coined quantum walk on general
+        graphs is ``grover``.
+        """
+        return 'hadamard'
+
     def _state_vertex_dir(self, state, entries):
         r"""
         Overrides Coined model method so the directions respect
