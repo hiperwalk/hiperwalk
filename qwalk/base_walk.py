@@ -131,7 +131,7 @@ class BaseWalk(ABC):
         -------
         :class:`scipy.sparse.csr_array`
         """
-        return None
+        raise NotImplementedError()
 
     def set_oracle(self, R):
         r"""
@@ -182,7 +182,7 @@ class BaseWalk(ABC):
         oracle
         simulate
         """
-        return None
+        raise NotImplementedError()
 
     def set_evolution_operator(self, U):
         r"""
@@ -255,7 +255,7 @@ class BaseWalk(ABC):
         --------
         simulate_walk
         """
-        return None
+        raise NotImplementedError()
 
     def _clean_time(self, time_range):
         r"""
@@ -397,8 +397,7 @@ class BaseWalk(ABC):
         **kwargs : dict, optionaly
             Additional arguments for generating a valid state.
         """
-
-        return None
+        raise NotImplementedError()
 
 
     def initial_condition(self, entries, **kwargs):
