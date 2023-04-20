@@ -141,36 +141,6 @@ class Segment(Coined):
 
         return state
 
-    def state(self, entries, type='vertex_dir'):
-        r"""
-        Similar to :meth:`qwalk.Coined.state`.
-
-        However, when ``type='vertex_dir'``,
-        the default coin directions are used.
-        In other words, 0 for rightwards and 1 for leftwards.
-
-        Raises
-        ------
-        ValueError
-            If ``type='vertex_dir'`` and one of the following occurs
-            for some ``entries[i] = (vertices[i], coin_dir[i])``.
-
-            * ``coin_dir[i]`` is different from 0 and 1:
-                the only valid directions are 0 and 1.
-            * ``vertices[i]=0`` and ``coin_dir=1``:
-                0 is the leftmost vertex,
-                hence the only possible direction is rightwards.
-            * ``vertices[i]=``:math:`|V|-1` and ``coin_dir=0``:
-                :math:`|V|-1` is the rightmost vertex,
-                hence the only possible direction is leftwards.
-
-        Notes
-        -----
-        The default of :meth:`qwalk.Coined.state` is to use the
-        sorted arcs order.
-        Hence, the directions would be shifted.
-        """
-        return super().state(entries, type)
 
     def get_default_coin(self):
         r"""
