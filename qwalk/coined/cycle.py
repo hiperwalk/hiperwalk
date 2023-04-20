@@ -44,17 +44,18 @@ class Cycle(Coined):
         # upper diagonal
         row_ind = [lin for lin in range(num_vert)
                        for twice in range(2)]
-        print(row_ind)
         # lower digonal
         col_ind = [(col-shift) % num_vert for col in range(num_vert)
                              for shift in [-1, 1]]
-        print(col_ind)
         adj_matrix = csr_array((data, (row_ind, col_ind)))
     
         # initializing
         super().__init__(adj_matrix)
 
     def has_persistent_shift_operator(self):
+        r"""
+        See :meth:`Coined.has_persistent_shift_operator`.
+        """
         return True
 
     def persistent_shift_operator(self):
@@ -100,6 +101,7 @@ class Cycle(Coined):
             data, indices, indptr        
         ))
 
+        self._shift_operator = S
         return S
 
     def _state_vertex_dir(self, state, entries):
@@ -144,18 +146,3 @@ class Cycle(Coined):
             state[arc] = amplitude
 
         return state
-
-    def coin_operator(self, coin='hadamard'):
-        """
-        Same as :meth:`Coined.coin_operator`,
-        but uses Hadamard as default coin.
-        """
-        return super().coin_operator(coin)
-
-    def evolution_operator(self, persistent_shift=True, hpc=True,
-                           coin='hadamard'):
-        """
-        Same as :meth:`Coined.evolution_operator` with
-        overriden default arguments.
-        """
-        return super().evolution_operator(persistent_shift, hpc, coin)

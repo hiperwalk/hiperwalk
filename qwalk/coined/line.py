@@ -81,15 +81,39 @@ class Line(Segment):
 
         return shifted_state
 
-    def simulate_walk(self, evolution_operator, hpc=True):
+    def time(self, time_range):
         r"""
-        Starts quantum walk simulation.
+        Raise error.
 
-        Since the initial condition and number of steps must
-        passed as arguments to the constructor,
-        the respective parameters are ommited.
+        Time should be set upon object creation.
+        See :class:`Line`. 
+
+        Raises
+        ------
+        TypeError
+
+        Notes
+        -----
+        .. todo::
+            Look for more appropriate exception.
         """
-        return super().simulate_walk(
-            evolution_operator, self._initial_condition,
-            self._steps, hpc
-        )
+        raise TypeError("Time cannot be overriden.")
+
+    def initial_condition(self, entries, **kwargs):
+        r"""
+        Raise error.
+
+        Initial condition should be set upon object creation.
+        See :class:`Line`. 
+
+        Raises
+        ------
+        TypeError
+
+        Notes
+        -----
+        .. todo::
+            Look for more appropriate exception.
+        """
+        raise TypeError("Initial condition cannot be overriden.")
+

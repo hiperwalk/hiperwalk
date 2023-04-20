@@ -48,6 +48,9 @@ class Segment(Coined):
         super().__init__(adj_matrix)
 
     def has_persistent_shift_operator(self):
+        r"""
+        See :meth:`Coined.has_persistent_shift_operator`.
+        """
         return True
 
     def persistent_shift_operator(self):
@@ -94,6 +97,7 @@ class Segment(Coined):
             data, indices, indptr        
         ))
 
+        self._shift_operator = S
         return S
 
     def _state_vertex_dir(self, state, entries):
@@ -168,26 +172,11 @@ class Segment(Coined):
         """
         return super().state(entries, type)
 
-    def evolution_operator(self, persistent_shift=True, hpc=True,
-                           coin='hadamard'):
+    def get_default_coin(self):
         r"""
-        :meth:`qwalk.Coined.evolution_operator` with
-        different default parameters.
+        Returns the default coin name.
 
-        Parameters
-        ----------
-        persistent_shift : bool, default=True
-            Wheter to use persistent shift operator
-            (``persistent_shift=True``) or
-            the flip flop shift operator (``persistent_shift=False``).
-
-        hpc : bool, default=True
-            Whether or not evolution operator should be
-            constructed using nelina's high-performance computating.
-
-        coin : str, default='hadamard'
-            The coin to be used as diffusion operator.
-            See :obj:`coin_operator`'s ``coin``
-            attribute for valid options.
+        The default coin for the coined quantum walk on the
+        segment is ``'hadamard'``.
         """
-        return super().evolution_operator(persistent_shift, hpc, coin)
+        return 'hadamard'
