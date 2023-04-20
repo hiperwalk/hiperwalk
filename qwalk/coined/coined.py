@@ -381,7 +381,7 @@ class Coined(BaseWalk):
 
         if shift == 'f':
             shift = 'flip_flop'
-        elif shift == 'p'
+        elif shift == 'p':
             shift = 'persistent'
 
         
