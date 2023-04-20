@@ -10,12 +10,15 @@ seg = coined_qw.Segment(num_vert)
 # Initial condition starting in the middle vertex
 # with the coin pointing to the right (real amplitude)
 # and the left (complex amplitude).
-init_cond = seg.state([(1, mid_vert, 0),
-                       [-1j, mid_vert, 1]])
+seg.initial_condition(
+    [(1, mid_vert, 0), [-1j, mid_vert, 1]]
+)
 
-U = seg.evolution_operator(coin='hadamard')
-num_steps = int(15)
-states = seg.simulate_walk(U, init_cond, (0, num_steps))
+hpcU = seg.evolution_operator()
+
+num_steps = 15
+seg.step((0, num_steps))
+states = seg.simulate()
 
 prob = seg.probability_distribution(states)
 hplot.plot_probability_distribution(prob, animate=True, plot_type='line')
