@@ -604,30 +604,18 @@ class Coined(BaseWalk):
         return R
 
 
-    def set_evolution_operator(self, U, hpc=True):
+    def set_evolution_operator(self, U):
         r"""
         Sets ``U`` as the evolution operator.
-        It is used during the simulation.
 
-        If ``U`` is none, the evolution operator is constructed
-        from the previously set shift operator (:math:`S`),
-        coin operator (:math:`C`), and oracle (:math:`R`) by
-
-        .. math::
-            U = SCR .
-
-        If any of these matrices was not set previously,
-        the identity is used instead.
+        It is saved to be used during the simulation.
+        Since it is not known how ``U`` was constructed,
+        shift operator, coin operator and oracle are updated to not set.
 
         Parameters
         ----------
         U : :class:`scipy.sparse.csr_array`
             Evolution Operator.
-
-        hpc : bool, default=True
-            Whether or not to use hpc to construct the evolution operator
-            when ``U is None``.
-
 
         Raises
         ------
@@ -637,22 +625,8 @@ class Coined(BaseWalk):
         Notes
         -----
         .. todo::
-            Check if ``U`` is unitary and respects locality.
+            Check if ``U`` is unitary.
         """
-        if U is None:
-
-            if self._shift_operator is None:
-                self._shift_operator = scipy.sparse.identity(self.hilb_dim)
-            if self._coin_operator is None:
-                self._coin_operator = scipy.sparse.identity(self.hilb_dim)
-            if self._oracle is None:
-                self._oracle = scipy.sparse.identity(self.hilb_dim)
-
-            if hpc:
-                raise NotImplementedError()
-
-            SC = self._shift_operator @ self._coin_operator
-            self._evolution_operator = SC @ self._oracle
 
         if U.shape != (self.hilb_dim, self.hilb_dim):
             raise ValueError(
