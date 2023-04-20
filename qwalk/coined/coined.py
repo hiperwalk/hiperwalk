@@ -928,6 +928,9 @@ class Coined(BaseWalk):
 
         The state corresponds to the walker being in a superposition
         of the ``entries``.
+        Please refer to the current class documentation for the
+        expected direction and arc order --
+        for instance, click on **qwalk.coined.`current_class_name`**.
 
         The final state is normalized in order to be unitary.
 
