@@ -41,20 +41,57 @@ class Graph(BaseWalk):
 
         self.hilb_dim = self.adj_matrix.shape[0]
 
-    def oracle(self, marked_vertices=[0]):
+    def oracle(self, marked_vertices=0):
+        r"""
+        Creates the oracle matrix.
+
+        The oracle is created and set
+        to be used by other methods.
+
+        Parameters
+        ----------
+        marked_vertices = None, int, list of int, default=0
+            Vertices to be marked.
+            If ``None``, no vertex is marked and
+            the oracle is also set to ``None``
+            (which is equivalent to the zero matrix).
+
+        Notes
+        -----
+        The oracle matrix has format
+
+        .. math::
+            \sum_{m \in M} \ket{m}\bra{m}
+
+        where :math:`M` is the set of marked vertices.
+        """
         return None
 
-    def hamiltonian(self, laplacian=False, marked_vertices=None):
+    def hamiltonian(self, gamma=0, laplacian=False, **kwargs):
+        r"""
+        Creates the Hamiltonian.
+
+        Creates the Hamiltonian based on the previously set oracle.
+        If no oracle was set, it is ignored.
+        If any valid ``**kwargs`` is sent, an oracle is created and set.
+        The new oracle is then used to construct the Hamiltonian.
+
+        See Also
+        ------
+        oracle
+        """
         return None
 
-    def evolution_operator(self, hpc=True, **kwargs):
+    def evolution_operator(self, time=0, hpc=True, **kwargs):
         r"""
         Creates the evolution operator.
 
         Creates the evolution operator based on the previously
-        created Hamiltonian.
-        Or creates the evolution operator based on the
-        Hamiltonian constructed using the ``**kwargs`` values.
+        set Hamiltonian.
+        If any valid ``**kwargs`` is passed,
+        a new Hamiltonian is created and set.
+        The evolution operator is then constructed based on the
+        new Hamiltonian.
 
         Parameters
         ----------
@@ -65,7 +102,7 @@ class Graph(BaseWalk):
         **kwargs :
             Arguments to construct the Hamiltonian.
             See :meth:`hamiltonian` for the list of arguments.
-            If ``None`` is passed,
+            If no ``**kwrags`` is passed,
             the previously set Hamiltonian is used.
             
 
@@ -93,7 +130,9 @@ class Graph(BaseWalk):
     def state(self, entries):
         return None
 
-    def simulate(self, hpc=True):
+    def simulate(self, initial_time=None, final_time=None,
+                 delta_time=None, hpc=True):
+
         return super().simulate_walk(
             self._evolution_operator, initial_condition, num_steps,
             save_interval=save_interval, hpc=hpc
