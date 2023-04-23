@@ -31,7 +31,7 @@ def _binary_search(v, elem, start=0, end=None):
 
     return end if v[end] == elem else -1
 
-class Coined(BaseWalk):
+class Graph(BaseWalk):
     r"""
     Manage an instance of the coined quantum walk model
     on general unweighted graphs.
@@ -65,7 +65,7 @@ class Coined(BaseWalk):
     check Quantum Walks and Search Algorithms's
     Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
 
-    The Coined class uses the arc notation
+    The Graph class uses the arc notation
     and the Hilbert space :math:`\mathcal{H}^{2|E|}` for general Graphs.
     That is, for a given graph :math:`G(V, E)`,
     the walk occurs in the graph :math:`\vec{G}(V, A)`
@@ -217,7 +217,7 @@ class Coined(BaseWalk):
                 throw exception of convert to sparse.
 
         .. note::
-            Check :class:`Coined` Notes for details
+            Check :class:`Graph` Notes for details
             about the order and dimension of the computational basis.
 
 
@@ -246,16 +246,17 @@ class Coined(BaseWalk):
         Examples
         --------
         Consider the Graph presented in the
-        :class:`Coined` Notes Section example.
+        :class:`Graph` Notes Section example.
         The corresponding flip-flop shift operator is
 
         >>> from scipy.sparse import csr_array
-        >>> import CoinedModel as qcm
+        >>> import qwalk.coined as qcm
         >>> A = csr_array([[0, 1, 0, 0],
         ...                [1, 0, 1, 1],
         ...                [0, 1, 0, 1],
         ...                [0, 1, 1, 0]])
-        >>> S = qcm.flip_flop_shift_operator(A)
+        >>> g = qcm.Graph(A)
+        >>> S = g.flip_flop_shift_operator()
         >>> Sd = S.todense()
         >>> Sd
         array([[0, 1, 0, 0, 0, 0, 0, 0],
@@ -447,7 +448,7 @@ class Coined(BaseWalk):
         Notes
         -----
         Due to the chosen computational basis
-        (see :class:`Coined` Notes),
+        (see :class:`Graph` Notes),
         the resulting operator is a block diagonal where
         each block is the :math:`\deg(v)`-dimensional ``coin``.
         Consequently, there are :math:`|V|` blocks.
@@ -456,10 +457,10 @@ class Coined(BaseWalk):
         # dict with valid coins as keys and the respective
         # function pointers.
         coin_funcs = {
-            'fourier': Coined._fourier_coin,
-            'grover': Coined._grover_coin,
-            'hadamard': Coined._hadamard_coin,
-            'minus_identity': Coined._minus_identity
+            'fourier': Graph._fourier_coin,
+            'grover': Graph._grover_coin,
+            'hadamard': Graph._hadamard_coin,
+            'minus_identity': Graph._minus_identity
         }
 
         if coin == 'default':
@@ -564,7 +565,7 @@ class Coined(BaseWalk):
         to :math:`v \in V`, and
         :math:`G_{\deg(v)}` is the Grover matrix of
         dimension :math:`\deg(v)`.
-        See :class:`Coined` Notes for more details about
+        See :class:`Graph` Notes for more details about
         the used computational basis.
         """
 
@@ -859,7 +860,7 @@ class Coined(BaseWalk):
         # then sums the probabilities resulting in
         # the vertix final probability
         prob = np.array([[
-                Coined._elementwise_probability(
+                Graph._elementwise_probability(
                     states[i][edges_indices[j]:edges_indices[j + 1]]
                 ).sum()
                 for j in range(len(edges_indices) - 1)
