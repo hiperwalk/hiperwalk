@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.sparse import csr_array
 from sys import path as sys_path
-from .coined import Coined
+from .graph import Graph
 
-class Segment(Coined):
+class Segment(Graph):
     r"""
     Class for managing quantum walks on the segment.
     In other words, a finite one-dimensional lattice.
@@ -15,9 +15,9 @@ class Segment(Coined):
 
     Notes
     -----
-    Since :class:`Segment` is built on top of :class:`Coined`,
+    Since :class:`Segment` is built on top of :class:`Graph`,
     operators and states respect the edge order
-    (See :class:`Coined` notes for more details).
+    (See :class:`Graph` notes for more details).
     As a consequence, for any vertex :math:`v \in V`,
     the state :math:`\ket{2v - d}` for :math:`d \in \{0, 1\}`
     corresponds to the walker being on vertex :math:`v` and the
@@ -49,7 +49,7 @@ class Segment(Coined):
 
     def has_persistent_shift_operator(self):
         r"""
-        See :meth:`Coined.has_persistent_shift_operator`.
+        See :meth:`Graph.has_persistent_shift_operator`.
         """
         return True
 

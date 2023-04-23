@@ -1,7 +1,7 @@
 from scipy.sparse import csr_array
-from .coined import *
+from .graph import *
 
-class Cycle(Coined):
+class Cycle(Graph):
     r"""
     Class for managing quantum walk on the cycle.
 
@@ -54,7 +54,7 @@ class Cycle(Coined):
 
     def has_persistent_shift_operator(self):
         r"""
-        See :meth:`Coined.has_persistent_shift_operator`.
+        See :meth:`Graph.has_persistent_shift_operator`.
         """
         return True
 
