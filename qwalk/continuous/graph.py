@@ -36,8 +36,8 @@ class Graph(BaseWalk):
     Simply pass the disered Hamiltonian instead of the adjacency matrix.
     """
 
-    def __init__(self, H):
-        super().__init__(H)
+    def __init__(self, adj_matrix):
+        super().__init__(adj_matrix)
 
         self.hilb_dim = self.adj_matrix.shape[0]
 

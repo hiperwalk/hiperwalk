@@ -56,15 +56,20 @@ class BaseWalk(ABC):
 
 
         # TODO: create sparse matrix from graph or dense adjacency matrix
-        if isinstance(adj_matrix, scipy.sparse.csr_array):
-            self.adj_matrix = adj_matrix
-        else:
+        if not isinstance(adj_matrix, scipy.sparse.csr_array):
             raise TypeError(
-                "Invalid 'adj_matrix' type."
+                "Invalid `adj_matrix` type."
                 + " Expected 'scipy.sparse.csr_array',"
                 + " but received " + str(type(adj_matrix)) + '.'
             )
+        if (len(adj_matrix.shape) != 2
+            or adj_matrix.shape[0] != adj_matrix.shape[1]
+        ):
+            raise ValueError(
+                "`adj_matrix` is not a square matrix."
+            )
 
+        self.adj_matrix = adj_matrix
         self.hilb_dim = 0
 
     def uniform_state(self):
