@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.sparse
 from ..base_walk import BaseWalk
 
 class Graph(BaseWalk):
@@ -41,6 +42,19 @@ class Graph(BaseWalk):
         super().__init__(adj_matrix)
 
         self.hilb_dim = self.adj_matrix.shape[0]
+        self._hamiltonian = None
+
+        import inspect
+
+        self._valid_kwargs = dict()
+
+        self._valid_kwargs['oracle'] = inspect.getargspec(
+            self.oracle
+        )[0][1:]
+
+        self._valid_kwargs['hamiltonian'] = inspect.getargspec(
+            self.hamiltonian
+        )[0][1:]
 
     def oracle(self, marked_vertices=0):
         r"""
@@ -81,7 +95,7 @@ class Graph(BaseWalk):
 
         return R
 
-    def hamiltonian(self, gamma=0, laplacian=False, **kwargs):
+    def hamiltonian(self, gamma=None, laplacian=False, **kwargs):
         r"""
         Creates the Hamiltonian.
 
@@ -90,11 +104,73 @@ class Graph(BaseWalk):
         If any valid ``**kwargs`` is sent, an oracle is created and set.
         The new oracle is then used to construct the Hamiltonian.
 
+        Parameters
+        ----------
+        gamma : float, default : None
+            Value to be multiplied by the adjacency matrix or
+            the Laplacian.
+            If ``None``, an error is raised.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`
+
+        Raises
+        ------
+        ValueError
+            If ``gamma=None``.
+            
+        Notes
+        -----
+        The Hamiltonian is given by
+
+        .. math::
+            H = -\gamma B  - \sum_{m \in M} \ket m \bra m
+
+        where :math:`B` is either the adjacency matrix :math:`A`
+        or the Laplacian :math:`L = D - A`
+        (with :math:`D` being the degree matrix),
+        :math:`M` is the set of marked vertices.
+
         See Also
         ------
         oracle
         """
-        return None
+        if gamma is None:
+            raise ValueError(
+                "Invalid `gamma` value. It cannot be `None`."
+            )
+
+        if laplacian:
+            degrees = self.adj_matrix.sum(axis=1)
+            #H = np.array(
+            #    [[0 if i != j else deg[i] for j in range(self.hilb_dim)]
+            #     for i in range(self.hilb_dim)]
+            #)
+            H = scipy.sparse.diags(degrees)
+            del degrees
+            H -= self.adj_matrix
+            H *= -gamma
+
+        else:
+            H = -gamma*self.adj_matrix
+
+        # setting oracle
+        oracle_kwargs = self._filter_valid_kwargs(
+            kwargs, self._valid_kwargs['oracle'])
+
+        if bool(oracle_kwargs):
+            self.oracle(**oracle_kwargs)
+
+        # using previously set oracle
+        if self._oracle is not None:
+            H -= scipy.sparse.csr_array(
+                ([1]*len(self._oracle), (self._oracle, self._oracle)),
+                shape=H.shape
+            )
+
+        self._hamiltonian = H.todense()
+        return self._hamiltonian
 
     def evolution_operator(self, time=0, hpc=True, **kwargs):
         r"""
