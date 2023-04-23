@@ -1,3 +1,4 @@
+import numpy as np
 from ..base_walk import BaseWalk
 
 class Graph(BaseWalk):
@@ -65,7 +66,20 @@ class Graph(BaseWalk):
 
         where :math:`M` is the set of marked vertices.
         """
-        return None
+
+        if marked_vertices is None:
+            self._oracle = None
+            return None
+
+        if not hasattr(marked_vertices, '__iter__'):
+            marked_vertices = [marked_vertices]
+        self._oracle = np.array(marked_vertices, dtype=int)
+
+        R = np.zeros((self.hilb_dim, self.hilb_dim))
+        for m in marked_vertices:
+            R[m, m] = 1
+
+        return R
 
     def hamiltonian(self, gamma=0, laplacian=False, **kwargs):
         r"""
