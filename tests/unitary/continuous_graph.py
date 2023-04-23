@@ -10,7 +10,8 @@ import unittest
 
 num_vert = 20
 test_graph = nx.ladder_graph(num_vert)
-g = ctqw.Graph(nx.adjacency_matrix(test_graph))
+adj = nx.adjacency_matrix(test_graph)
+g = ctqw.Graph(adj)
 
 class TestContinuousGraph(unittest.TestCase):
 
@@ -40,3 +41,80 @@ class TestContinuousGraph(unittest.TestCase):
         for m in marked:
             R[m, m] -= 1
         self.assertTrue(np.all(R == 0))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_hamiltonian_default(self):
+        global g
+        prev_R = g._oracle
+        prev_H = g._hamiltonian
+
+        H = g.hamiltonian(1/2)
+
+        global adj
+        self.assertTrue(np.all(H - (-1/2)*adj == 0))
+        self.assertTrue(g._hamiltonian is not None)
+        self.assertTrue(id(prev_H) != id(g._hamiltonian))
+        self.assertTrue(id(prev_R) == id(g._oracle))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_hamiltonian_no_marked(self):
+        global g
+        prev_H = g._hamiltonian
+
+        H = g.hamiltonian(1/2, marked_vertices=None)
+
+        global adj
+        self.assertTrue(np.all(H - (-1/2)*adj == 0))
+        self.assertTrue(g._hamiltonian is not None)
+        self.assertTrue(id(prev_H) != id(g._hamiltonian))
+        self.assertTrue(g._oracle is None)
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_hamiltonian_multiple_marked(self):
+        global g
+        prev_H = g._hamiltonian
+        prev_R = g._oracle
+
+        H = g.hamiltonian(1/2, marked_vertices=[1, 2])
+
+        global adj
+        marked_matrix = np.diag([0] + [1]*2 + [0]*(adj.shape[0] - 3))
+        self.assertTrue(np.all(H - (-0.5*adj - marked_matrix) == 0))
+        self.assertTrue(g._hamiltonian is not None)
+        self.assertTrue(id(prev_H) != id(g._hamiltonian))
+        self.assertTrue(g._oracle is not None)
+        self.assertTrue(id(g._oracle) != id(prev_R))
+
+    
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_laplacian_default(self):
+        global g
+        prev_R = g._oracle
+        prev_H = g._hamiltonian
+
+
+        H = g.hamiltonian(0.25, laplacian=True)
+
+        global adj
+        D = np.diag(adj.sum(axis=1))
+        self.assertTrue(
+            np.all(H - (-1/4)*(D - adj) == 0)
+        )
+        self.assertTrue(g._hamiltonian is not None)
+        self.assertTrue(id(g._hamiltonian) != id(prev_H))
+        self.assertTrue(id(g._oracle) == id(prev_R))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_laplacian_one_marked(self):
+        global g
+        prev_R = g._oracle
+        prev_H = g._hamiltonian
+
+        H = g.hamiltonian(1/2, marked_vertices=0)
+        global adj
+        marked_matrix = np.diag([1] + [0]*(adj.shape[0] - 1))
+        self.assertTrue(np.all(H - (-adj/2 - marked_matrix == 0)))
+        self.assertTrue(g._hamiltonian is not None)
+        self.assertTrue(id(g._hamiltonian) != id(prev_H))
+        self.assertTrue(g._oracle is not None)
+        self.assertTrue(id(g._oracle) != id(prev_R))
