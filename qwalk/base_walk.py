@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
+import inspect
 from sys import modules as sys_modules
 
 class BaseWalk(ABC):
@@ -625,3 +626,10 @@ class BaseWalk(ABC):
         self._simul_vec = None
 
         return saved_states
+
+    def _get_valid_kwargs(self, method):
+        return inspect.getargspec(method)[0][1:]
+
+    def _filter_valid_kwargs(self, kwargs, valid_kwargs):
+        return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
+                #if kwargs.get(k) is not None}

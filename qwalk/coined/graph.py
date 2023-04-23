@@ -171,31 +171,25 @@ class Graph(BaseWalk):
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self.adj_matrix.sum()
 
-        import inspect
+        self._valid_kwargs = dict()
 
-        self._evol_op_kwargs = dict()
+        self._valid_kwargs['shift'] = self._get_valid_kwargs(
+            self.shift_operator)
 
-        self._evol_op_kwargs['shift'] = inspect.getargspec(
-            self.shift_operator
-        )[0][1:]
+        self._valid_kwargs['coin'] = self._get_valid_kwargs(
+            self.coin_operator)
 
-        self._evol_op_kwargs['coin'] = inspect.getargspec(
-            self.coin_operator
-        )[0][1:]
+        self._valid_kwargs['oracle'] = self._get_valid_kwargs(
+            self.oracle)
 
-        self._evol_op_kwargs['oracle'] = inspect.getargspec(
-            self.oracle
-        )[0][1:]
-
-        self._evol_op_kwargs['U_from_SCR'] = inspect.getargspec(
-            self.evolution_operator_from_SCR
-        )[0][1:]
+        self._valid_kwargs['U_from_SCR'] = self._get_valid_kwargs(
+            self.evolution_operator_from_SCR)
 
 
         if __debug__:
-            methods = list(self._evol_op_kwargs)
+            methods = list(self._valid_kwargs)
             params = [p for m in methods
-                        for p in self._evol_op_kwargs[m]]
+                        for p in self._valid_kwargs[m]]
             if len(params) != len(set(params)):
                 raise AssertionError
 
@@ -717,19 +711,15 @@ class Graph(BaseWalk):
 
         """
 
-        S_kwargs = {k : kwargs.get(k)
-                    for k in self._evol_op_kwargs['shift']
-                    if kwargs.get(k) is not None}
-        C_kwargs = {k : kwargs.get(k)
-                    for k in self._evol_op_kwargs['coin']
-                    if kwargs.get(k) is not None}
-        R_kwargs = {k : kwargs.get(k)
-                    for k in self._evol_op_kwargs['oracle']
-                    if kwargs.get(k) is not None}
+        S_kwargs = self._filter_valid_kwargs(
+            kwargs, self._valid_kwargs['shift'])
+        C_kwargs = self._filter_valid_kwargs(
+                    kwargs, self._valid_kwargs['coin'])
+        R_kwargs = self._filter_valid_kwargs(
+                    kwargs, self._valid_kwargs['oracle'])
         R_kwargs['vertices'] = vertices
-        U_kwargs = {k : kwargs.get(k)
-                    for k in self._evol_op_kwargs['U_from_SCR']
-                    if kwargs.get(k) is not None}
+        U_kwargs = self._filter_valid_kwargs(
+                    kwargs, self._valid_kwargs['U_from_SCR'])
 
         self.shift_operator(**S_kwargs)
         self.coin_operator(**C_kwargs)
