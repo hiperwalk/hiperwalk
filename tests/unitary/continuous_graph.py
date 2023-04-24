@@ -19,7 +19,7 @@ class TestContinuousGraph(unittest.TestCase):
     def test_oracle_default(self):
         global g
         R = g.oracle()
-        self.assertTrue(g._oracle == [0])
+        self.assertTrue(g._oracle is not None)
         R[0, 0] -= 1
         self.assertTrue(np.all(R == 0))
         
@@ -37,7 +37,7 @@ class TestContinuousGraph(unittest.TestCase):
         marked = random.sample(list(range(num_vert)),
                                random.randint(2, num_vert - 1))
         R = g.oracle(marked_vertices=marked)
-        self.assertTrue(np.all(g._oracle == marked))
+        self.assertTrue(g._oracle is not None)
         for m in marked:
             R[m, m] -= 1
         self.assertTrue(np.all(R == 0))
@@ -54,9 +54,7 @@ class TestContinuousGraph(unittest.TestCase):
         if prev_R is None: 
             self.assertTrue(np.all(H - (-1/2)*adj == 0))
         else:
-            R = np.diag([1 if i in prev_R else 0
-                         for i in range(adj.shape[0])])
-            self.assertTrue(np.all(H - (-1/2*adj - R) == 0))
+            self.assertTrue(len((H - (-1/2*adj - prev_R)).data) == 0)
         self.assertTrue(g._hamiltonian is not None)
         self.assertTrue(id(prev_H) != id(g._hamiltonian))
         self.assertTrue(id(prev_R) == id(g._oracle))
@@ -69,7 +67,7 @@ class TestContinuousGraph(unittest.TestCase):
         H = g.hamiltonian(1/2, marked_vertices=None)
 
         global adj
-        self.assertTrue(np.all(H - (-1/2)*adj == 0))
+        self.assertTrue(len((H - (-1/2)*adj).data) == 0)
         self.assertTrue(g._hamiltonian is not None)
         self.assertTrue(id(prev_H) != id(g._hamiltonian))
         self.assertTrue(g._oracle is None)
