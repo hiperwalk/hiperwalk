@@ -271,9 +271,6 @@ class Graph(BaseWalk):
         self._evolution_operator = U
         return U
 
-    def probability_distribution(self, states):
-        return None
-
     def state(self, entries):
         return None
 
