@@ -19,7 +19,7 @@ plt.rcParams["figure.dpi"] = 100
 # TODO: add documentation for 'fixed_probabilities' kwarg
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
-def plot_probability_distribution(
+def probability_distribution(
         probabilities, plot_type='bar', animate=False, show=True,
         filename_prefix=None, interval=250, **kwargs):
     """
