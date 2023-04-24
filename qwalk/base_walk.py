@@ -535,6 +535,12 @@ class BaseWalk(ABC):
         evolution operator to the initial condition multiple times.
         The maximum and intermediate applications
         are describred by ``time``.
+
+        Examples
+        --------
+        If ``time_range=(0, 13, 3)``, the saved states will be:
+        the initial state (0), the intermediate states (3, 6, and 9),
+        and the final state (12).
         """
         ############################################
         ### Check if simulation was set properly ###
@@ -657,7 +663,8 @@ class BaseWalk(ABC):
         __prepare_engine(self)
 
         # number of states to save
-        num_states = int((end - start)/step) + 1
+        num_states = int(end/step) + 1
+        num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
 
         # create saved states matrix
         # TODO: error: if initial condition is int and
