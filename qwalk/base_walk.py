@@ -103,9 +103,9 @@ class BaseWalk(ABC):
 
         The oracle is set to be used for constructing the
         evolution operator.
-
         If ``vertices=[]`` no oracle is created and
         ``None`` is returned.
+        For coherence, the previous evolution operator is unset.
 
         Parameters
         ----------

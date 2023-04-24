@@ -74,6 +74,10 @@ class Graph(BaseWalk):
             the oracle is also set to ``None``
             (which is equivalent to the zero matrix).
 
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+
         Notes
         -----
         The oracle matrix has format
@@ -90,8 +94,13 @@ class Graph(BaseWalk):
 
         if not hasattr(marked_vertices, '__iter__'):
             marked_vertices = [marked_vertices]
-        self._oracle = np.array(marked_vertices, dtype=int)
-        # since the oracle was set,
+        self._oracle = scipy.sparse.csr_array(
+            ([1]*len(marked_vertices),
+                (marked_vertices, marked_vertices)
+            ),
+            shape=(self.hilb_dim, self.hilb_dim)
+        )
+    # since the oracle was set,
         # the previous hamiltonian and evolution operator
         # are probably not coherent with the oracle
         self._hamiltonian = None
