@@ -63,6 +63,8 @@ class Graph(BaseWalk):
 
         The oracle is created and set
         to be used by other methods.
+        For coherence, the previously set hamiltonian and
+        evolution operator are unset.
 
         Parameters
         ----------
@@ -89,6 +91,11 @@ class Graph(BaseWalk):
         if not hasattr(marked_vertices, '__iter__'):
             marked_vertices = [marked_vertices]
         self._oracle = np.array(marked_vertices, dtype=int)
+        # since the oracle was set,
+        # the previous hamiltonian and evolution operator
+        # are probably not coherent with the oracle
+        self._hamiltonian = None
+        self._evolution_operator = None
 
         R = np.zeros((self.hilb_dim, self.hilb_dim))
         for m in marked_vertices:
@@ -104,6 +111,8 @@ class Graph(BaseWalk):
         If no oracle was set, it is ignored.
         If any valid ``**kwargs`` is sent, an oracle is created and set.
         The new oracle is then used to construct the Hamiltonian.
+
+        For coherence, the previously set evolution operator is unset.
 
         Parameters
         ----------
@@ -171,6 +180,9 @@ class Graph(BaseWalk):
             )
 
         self._hamiltonian = H.todense()
+        # since the hamiltonian was changed,
+        # the previous evolution operator may not be coherent.
+        self._evolution_operator = None
         return self._hamiltonian
 
     def evolution_operator(self, time=0, hpc=True, **kwargs):
@@ -263,8 +275,8 @@ class Graph(BaseWalk):
     def state(self, entries):
         return None
 
-    def simulate(self, time_range=None, hamiltonian=None,
-                 initial_condition=None, hpc=True):
+    def simulate(self, time_range=None, initial_condition=None,
+                 hamiltonian=None, hpc=True):
         r"""
         Simulate the Continuous Time Quantum Walk Hamiltonian.
 
@@ -275,6 +287,16 @@ class Graph(BaseWalk):
 
         Parameters
         ----------
+        time_range : float or tuple of floats
+            Analogous to the parameters of :meth:`BaseWalk.simulate`,
+            but accepts float inputs.
+            ``step`` is used to construct the evolution operator.
+            The states in the interval
+            [``start/step``, ``end/step``] are saved.
+            The values that describe this interval are
+            rounded up if the decimal part is greater than 0.5,
+            and rounded down otherwise.
+
         hamiltonian : :class:`numpy.ndarray` or None
             Hamiltonian matrix to be used for constructing
             the evolution operator.
@@ -306,14 +328,15 @@ class Graph(BaseWalk):
         if time_range is None:
             raise ValueError(
                 "Invalid `time_range`. Expected a float, 2-tuple, "
-                + "or 3-tuple of float".
+                + "or 3-tuple of float."
             )
+
         if initial_condition is None:
             raise ValueError(
                 "`initial_condition` not specified."
             )
 
-        time_range = self._clean_time(time_range)
+        time_range = np.array(self._time_range_to_tuple(time_range))
 
         if hamiltonian is not None:
             if hamiltonian.shape != (self.hilb_dim, self.hilb_dim):
@@ -325,15 +348,22 @@ class Graph(BaseWalk):
 
             prev_R = self._oracle
             prev_H = self._hamiltonian
+            prev_U = self._evolution_operator
 
             self._oracle = None
             self._hamiltonian = hamiltonian
-            U = self.evolution_operator(time_range[3])
+            U = self.evolution_operator(time_range[2], hpc=hpc)
 
             self._oracle = prev_R
             self._hamiltonian = prev_H
+            self._evolution_operator = prev_U
+        else:
+            self.evolution_operator(time_range[2], hpc=hpc)
+            U = None # use the set evolution operator
 
-        return super().simulate_walk(
-            self._evolution_operator, initial_condition, num_steps,
-            save_interval=save_interval, hpc=hpc
-        )
+        # cleaning time_range to int
+        time_range = [int(np.round(val/time_range[2]))
+                      for val in time_range]
+
+        states = super().simulate(time_range, initial_condition, U,  hpc)
+        return states

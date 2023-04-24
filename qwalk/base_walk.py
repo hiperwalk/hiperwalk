@@ -39,10 +39,8 @@ class BaseWalk(ABC):
 
     @abstractmethod
     def __init__(self, adj_matrix):
-        self._initial_condition = None
-        self._evolution_operator = None
         self._oracle = None
-        self._time = None # Accepts range-like values
+        self._evolution_operator = None
 
         ##############################
         ### Simulation attributes. ###
@@ -263,7 +261,7 @@ class BaseWalk(ABC):
         """
         raise NotImplementedError()
 
-    def _clean_time(self, time_range):
+    def _time_range_to_tuple(self, time_range):
         r"""
         Clean and format ``time_range`` to ``(start, end, step)`` format.
 
@@ -282,11 +280,18 @@ class BaseWalk(ABC):
         if not hasattr(time_range, '__iter__'):
             time_range = [time_range]
 
-        start = time_range[0]
-        end = time_range[1] if len(time_range) >= 2 else start
-        step = time_range[2] if len(time_range) >= 3 else 1
-
-        time_range = (start, end, step)
+        if len(time_range) == 1:
+            start = end = step = time_range[0]
+        elif len(time_range) == 2:
+            start = 0
+            end = time_range[0]
+            step = time_range[1]
+        else:
+            start = time_range[0]
+            end = time_range[1]
+            step = time_range[2]
+        
+        time_range = [start, end, step]
 
         if start < 0 or end < 0 or step <= 0:
             raise ValueError(
@@ -294,12 +299,10 @@ class BaseWalk(ABC):
                 + "'start' and 'end' must be non-negative"
                 + " and 'step' must be positive."
             )
-
-        if (end - start)%step != 0:
+        if start > end:
             raise ValueError(
-                "Invalid 'time_range' value."
-                + "'start' and 'end' are not a multiple of "
-                + "'step' time_range apart"
+                "Invalid `time_range` value."
+                + "`start` cannot be larger than `end`."
             )
 
         return time_range
@@ -363,7 +366,7 @@ class BaseWalk(ABC):
 
         >>> qw.time((0, 12, 3))
         """
-        self._time = self._clean_time(time_range)
+        self._time = self._time_range_to_tuple(time_range)
 
     def get_time():
         r"""
@@ -461,14 +464,47 @@ class BaseWalk(ABC):
                 and 'nbl' in locals())
 
 
-    def simulate(self, hpc=True):
+    def simulate(self, time_range=None, initial_condition=None,
+                 evolution_operator=None, hpc=True):
         r"""
-        Simulates the quantum walk using the
-        evolution operator, initial condition and
-        time previously set.
+        Simulates the quantum walk.
+
+        Simulates the quantum walk applying the evolution operator
+        multiple times to the initial condition.
+        If ``evolution_operator=None``,
+        uses the previously set evolution operator.
+        Otherwise, uses the one sent as argument.
+
+        The given (or set) evolution operator is interpreted as
+        being a single step.
 
         Parameters
         ----------
+        time_range : int, tuple of int, default=None
+            Describes at which time instants the state must be saved.
+            It can be specified in three different ways.
+            
+            * ``end``
+                Save the state at time ``end``.
+                Only the final state is saved.
+
+            * ``(end, step)``
+                Saves each state from time 0 to time ``end`` (inclusive)
+                that is multiple of ``step``.
+
+            * ``(start, end, step)``
+                Saves every state from time ``start`` (inclusive)
+                to time ``end`` (inclusive)
+                that is multiple of ``step``.
+
+        initial_condition : :class:`numpy.array`, default=None
+            The initial condition which the evolution operator
+            is going to be applied to.
+
+        evolution_operator : :class:`scipy.sparse.csr_array`, default=None
+            The evolution operator.
+            If ``None``, the previously set evolution operator is used.
+
         hpc : bool, default=True
             Whether or not to use neblina's high-performance computing
             to perform matrix multiplications.
@@ -483,14 +519,15 @@ class BaseWalk(ABC):
         Raises
         ------
         ValueError
-            If the time, evolution operator, or initial condition
-            were not set previously.
+            If any of the following occurs
+            * ``time_range=None``.
+            * ``initial_condition=None``.
+            * ``evolution_operator=None`` and it was no set previously.
 
         See Also
         --------
-        time
         evolution_operator
-        initial_condition
+        state
 
         Notes
         -----
@@ -502,18 +539,40 @@ class BaseWalk(ABC):
         ############################################
         ### Check if simulation was set properly ###
         ############################################
-        if self._time is None:
+        if time_range is None:
             raise ValueError(
-                "Time was not set."
+                "``time_range` not specified`. "
+                + "Must be an int or tuple of int."
             )
-        if self._evolution_operator is None:
+
+        if initial_condition is None:
             raise ValueError(
-                "Evolution Operator was not set."
+                "``initial_condition`` not specified. "
+                + "Expected a np.array."
             )
-        if self._initial_condition is None:
+
+        if len(initial_condition) != self.hilb_dim:
             raise ValueError(
-                "Initial condition was not set."
+                "Initial condition has invalid dimension. "
+                + "Expected an np.array with length " + str(self.hilb_dim)
             )
+
+        if self._evolution_operator is None and evolution_operator is None:
+            raise ValueError(
+                "Evolution Operator was not set. "
+                + "Did you forget to call the evolution_operator() method"
+                + " or to pass it as argument?"
+            )
+
+        if evolution_operator is not None:
+            if evolution_operator.shape != (self.hilb_dim, self.hilb_dim):
+                raise ValueError(
+                    "Evolution operator has incorret dimensions."
+                    + " Expected shape is "
+                    + str((self.hilb_dim, self.hilb_dim))
+                )
+            prev_U = self._evolution_operator
+            self._evolution_operator = evolution_operator
 
         ###########################
         ### Auxiliary functions ###
@@ -531,7 +590,7 @@ class BaseWalk(ABC):
 
             else:
                 self._simul_mat = self._evolution_operator
-                self._simul_vec = self._initial_condition
+                self._simul_vec = initial_condition
 
             if __debug__:
                 print("Done\n")
@@ -584,7 +643,11 @@ class BaseWalk(ABC):
         ### simulate_walk implemantation ###
         ####################################
 
-        start, end, step = self._time
+        for e in time_range:
+            if not isinstance(e, int):
+                raise ValueError("`time_range` has non-int entry.")
+
+        start, end, step = self._time_range_to_tuple(time_range)
         
         if hpc and not self._pyneblina_imported():
             if __debug__:
@@ -597,18 +660,20 @@ class BaseWalk(ABC):
         num_states = int((end - start)/step) + 1
 
         # create saved states matrix
-        dtype = (self._initial_condition.dtype if
-            self._initial_condition.dtype == self._evolution_operator.dtype
+        # TODO: error: if initial condition is int and
+        # evolution operator is float, dtype is complex
+        dtype = (initial_condition.dtype if
+            initial_condition.dtype == self._evolution_operator.dtype
             else complex
         )
         saved_states = np.zeros(
-            (num_states, self._initial_condition.shape[0]), dtype=dtype
+            (num_states, initial_condition.shape[0]), dtype=dtype
         )
         state_index = 0 # index of the state to be saved
 
         # if save_initial_state:
         if start == 0:
-            saved_states[0] = self._initial_condition.copy()
+            saved_states[0] = initial_condition.copy()
             state_index += 1
             num_states -= 1
 
@@ -624,6 +689,9 @@ class BaseWalk(ABC):
         # TODO: free vector from neblina core
         self._simul_mat = None
         self._simul_vec = None
+
+        if evolution_operator is not None:
+            self._evolution_operator = prev_U
 
         return saved_states
 
