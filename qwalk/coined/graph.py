@@ -193,7 +193,7 @@ class Graph(BaseWalk):
             if len(params) != len(set(params)):
                 raise AssertionError
 
-    def flip_flop_shift_operator(self):
+    def flipflop_shift_operator(self):
         r"""
         Create the flip-flop shift operator (:math:`S`) based on
         the ``adj_matrix`` attribute.
@@ -250,7 +250,7 @@ class Graph(BaseWalk):
         ...                [0, 1, 0, 1],
         ...                [0, 1, 1, 0]])
         >>> g = qcm.Graph(A)
-        >>> S = g.flip_flop_shift_operator()
+        >>> S = g.flipflop_shift_operator()
         >>> Sd = S.todense()
         >>> Sd
         array([[0, 1, 0, 0, 0, 0, 0, 0],
@@ -290,7 +290,7 @@ class Graph(BaseWalk):
         orig_dtype = self.adj_matrix.dtype
         self.adj_matrix.data = np.arange(num_edges)
 
-        # Calculating flip_flop_shift columns
+        # Calculating flipflop_shift columns
         # (to be used as indices of a csr_array)
         row = 0
         S_cols = np.zeros(num_edges)
@@ -322,9 +322,9 @@ class Graph(BaseWalk):
         # TODO: compare with old approach for creating S
 
         if __debug__:
-            print("flip_flop_shift_operator Memory: "
+            print("flipflop_shift_operator Memory: "
                   + str(hpy().heap().size))
-            print("flip_flop_shift_operator Time: "
+            print("flipflop_shift_operator Time: "
                   + str(now() - start_time))
 
         self._shift_operator = S
@@ -341,11 +341,11 @@ class Graph(BaseWalk):
 
         Parameters
         ----------
-        shift: {'default', 'flip_flop', 'persistent', 'f', 'p'}
+        shift: {'default', 'flipflop', 'persistent', 'f', 'p'}
             Whether to create the flip flop or the persistent shift.
             By default, creates the persistent shift if it is defined;
             otherwise creates the flip flop shift.
-            Argument ``'f'`` is an alias for ``'flip_flop'``.
+            Argument ``'f'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
         Raises
@@ -363,7 +363,7 @@ class Graph(BaseWalk):
         --------
         has_persistent_shift_operator
         """
-        valid_keys = ['default', 'flip_flop', 'persistent', 'f', 'p']
+        valid_keys = ['default', 'flipflop', 'persistent', 'f', 'p']
         if shift not in valid_keys:
             raise ValueError(
                 "Invalid `shift` value. Expected one of "
@@ -375,12 +375,12 @@ class Graph(BaseWalk):
             shift = 'p' if self.has_persistent_shift_operator() else 'f'
 
         if shift == 'f':
-            shift = 'flip_flop'
+            shift = 'flipflop'
         elif shift == 'p':
             shift = 'persistent'
 
         
-        S = (self.flip_flop_shift_operator() if shift == 'flip_flop'
+        S = (self.flipflop_shift_operator() if shift == 'flipflop'
              else self.persistent_shift_operator())
 
         if __debug__:
@@ -755,7 +755,7 @@ class Graph(BaseWalk):
             raise AttributeError(
                 "Shift operator was not set. "
                 + "Did you forget to call shift_operator(), "
-                + "flip_flop_shift_operator(), "
+                + "flipflop_shift_operator(), "
                 + "persistent_shift_operator(), or"
                 + "set_shift_operator()?"
             )
