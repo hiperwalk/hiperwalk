@@ -132,7 +132,7 @@ class Graph(BaseWalk):
 
         Returns
         -------
-        :class:`numpy.ndarray`
+        :class:`scipy.sparse.csr_array`
 
         Raises
         ------
@@ -162,11 +162,7 @@ class Graph(BaseWalk):
 
         if laplacian:
             degrees = self.adj_matrix.sum(axis=1)
-            #H = np.array(
-            #    [[0 if i != j else deg[i] for j in range(self.hilb_dim)]
-            #     for i in range(self.hilb_dim)]
-            #)
-            H = scipy.sparse.diags(degrees)
+            H = scipy.sparse.diags(degrees, format="csr")
             del degrees
             H -= self.adj_matrix
             H *= -gamma
@@ -183,16 +179,13 @@ class Graph(BaseWalk):
 
         # using previously set oracle
         if self._oracle is not None:
-            H -= scipy.sparse.csr_array(
-                ([1]*len(self._oracle), (self._oracle, self._oracle)),
-                shape=H.shape
-            )
+            H -= self._oracle
 
-        self._hamiltonian = H.todense()
+        self._hamiltonian = H
         # since the hamiltonian was changed,
         # the previous evolution operator may not be coherent.
         self._evolution_operator = None
-        return self._hamiltonian
+        return H
 
     def evolution_operator(self, time=0, hpc=True, **kwargs):
         r"""
