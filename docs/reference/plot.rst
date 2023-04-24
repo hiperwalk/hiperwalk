@@ -1,10 +1,10 @@
-========
-``plot``
-========
+==========
+``qwplot``
+==========
 
-.. automodule:: plot
+.. automodule:: qwplot
 
-.. currentmodule:: plot
+.. currentmodule:: qwplot
 
 Functions
 ---------
@@ -12,7 +12,7 @@ Functions
     :toctree: generated
     :nosignatures:
 
-    plot_probability_distribution
+    probability_distribution
 
 Classes
 -------
