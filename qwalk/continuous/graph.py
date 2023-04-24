@@ -263,8 +263,75 @@ class Graph(BaseWalk):
     def state(self, entries):
         return None
 
-    def simulate(self, initial_time=None, final_time=None,
-                 delta_time=None, hpc=True):
+    def simulate(self, time_range=None, hamiltonian=None,
+                 initial_condition=None, hpc=True):
+        r"""
+        Simulate the Continuous Time Quantum Walk Hamiltonian.
+
+        Analogous to the :meth:`BaseWalk.simulate`
+        but uses the Hamiltonian to construct the evolution operator.
+        The Hamiltonian may be the previously set or
+        passed in the arguments.
+
+        Parameters
+        ----------
+        hamiltonian : :class:`numpy.ndarray` or None
+            Hamiltonian matrix to be used for constructing
+            the evolution operator.
+            If ``None``, uses the previously set Hamiltonian
+
+        Other Parameters
+        ----------
+        See :meth:`BaseWalk.simulate`.
+
+        Raises
+        ------
+        ValueError
+            If ``time_range=None`` or ``initial_condition=None``,
+            or ``hamiltonian`` has invalid Hilbert space dimension.
+
+
+        Notes
+        -----
+        It is recommended to call this method with ``hamiltonian=None``
+        to guarantee that a valid Hamiltonian was used.
+        If the Hamiltonian is passed by the user,
+        there is no guarantee that the Hamiltonian is local.
+
+        See Also
+        --------
+        :meth:`BaseWalk.simulate`
+        hamiltonian
+        """
+        if time_range is None:
+            raise ValueError(
+                "Invalid `time_range`. Expected a float, 2-tuple, "
+                + "or 3-tuple of float".
+            )
+        if initial_condition is None:
+            raise ValueError(
+                "`initial_condition` not specified."
+            )
+
+        time_range = self._clean_time(time_range)
+
+        if hamiltonian is not None:
+            if hamiltonian.shape != (self.hilb_dim, self.hilb_dim):
+                raise ValueError(
+                    "Hamiltonian has invalid dimensions. "
+                    + "Expected Hamiltonian shape: "
+                    + str((self.hilb_dim, self.hilb_dim)) + '.'
+                )
+
+            prev_R = self._oracle
+            prev_H = self._hamiltonian
+
+            self._oracle = None
+            self._hamiltonian = hamiltonian
+            U = self.evolution_operator(time_range[3])
+
+            self._oracle = prev_R
+            self._hamiltonian = prev_H
 
         return super().simulate_walk(
             self._evolution_operator, initial_condition, num_steps,
