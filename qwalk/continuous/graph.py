@@ -271,9 +271,6 @@ class Graph(BaseWalk):
         self._evolution_operator = U
         return U
 
-    def state(self, entries):
-        return None
-
     def simulate(self, time_range=None, initial_condition=None,
                  hamiltonian=None, hpc=True):
         r"""

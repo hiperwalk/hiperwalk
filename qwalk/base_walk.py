@@ -231,26 +231,34 @@ class BaseWalk(ABC):
             return state
         return state / norm
 
-    @abstractmethod
-    def state(self, entries, **kwargs):
+    def state(self, entries):
         """
         Generates a valid state.
 
         The state corresponds to the walker being in a superposition
         of the ``entries`` with the given amplitudes.
 
-        The final state is normalized in order to be unitary.
+        The state is normalized in order to be unitary.
 
         Parameters
         ----------
-        entries :
-            Entries of the state to be generated.
-            Valid entries vary according to the quantum walk model.
+        entries : list of 2-tuples
+            Each entry is a 2-tuple with format ``(amplitude, vertex)``.
 
-        **kwargs : dict, optionaly
-            Additional arguments for generating a valid state.
+        Returns
+        -------
+        :class:`numpy.array`
         """
-        raise NotImplementedError()
+        # TODO benchmark with list comprehension
+
+        # checking if there is a complex entry
+        has_complex = np.any([ampl.imag != 0 for ampl, _ in entries])
+        state = np.zeros(self.hilb_dim,
+                         dtype=complex if has_complex else float)
+        for ampl, v in entries:
+            state[v] = ampl
+
+        return self._normalize(state)
 
     def _pyneblina_imported(self):
         """
@@ -346,6 +354,10 @@ class BaseWalk(ABC):
                 "``time_range` not specified`. "
                 + "Must be an int or tuple of int."
             )
+
+        for e in time_range:
+            if not isinstance(e, int):
+                raise ValueError("`time_range` has non-int entry.")
 
         if initial_condition is None:
             raise ValueError(
@@ -444,10 +456,6 @@ class BaseWalk(ABC):
         ###############################
         ### simulate implemantation ###
         ###############################
-
-        for e in time_range:
-            if not isinstance(e, int):
-                raise ValueError("`time_range` has non-int entry.")
 
         start, end, step = self._time_range_to_tuple(time_range)
         
