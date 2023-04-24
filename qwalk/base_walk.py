@@ -79,8 +79,6 @@ class BaseWalk(ABC):
         The uniform initial condition is the state where
         all entries have the same amplitude.
 
-        The state is *NOT* saved to be used for the simulation.
-
         Returns
         -------
         :obj:`numpy.ndarray`
@@ -97,23 +95,6 @@ class BaseWalk(ABC):
         """
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
-
-    def uniform_initial_condition(self):
-        """
-        Creates and sets the uniform state as the initial condition.
-
-        The uniform condition is set to be used as simulation input.
-
-        Returns
-        -------
-        :obj:`numpy.ndarray`
-
-        See Also
-        --------
-        uniform_state
-        """
-        self._initial_condition = self.uniform_state()
-        return self._initial_condition
 
     @abstractmethod
     def oracle(self, vertices=0):
@@ -136,29 +117,6 @@ class BaseWalk(ABC):
         :class:`scipy.sparse.csr_array`
         """
         raise NotImplementedError()
-
-    def set_oracle(self, R):
-        r"""
-        Sets the oracle to be used for constructing
-        the evolution operator.
-        """
-        self._oracle = R
-        # indicates that the evolution operator must be reconstructed
-        self._evolution_operator = None
-
-    def get_oracle():
-        r"""
-        Returns the oracle used to construct the evolution operator.
-
-        If ``None`` is returned,
-        no oracle was used to construct the evolution operator
-        or the oracle used is unknown.
-
-        See Also
-        --------
-        evolution_operator
-        """
-        return self._oracle
 
     @abstractmethod
     def evolution_operator(self, vertices=[], **kwargs):
@@ -188,49 +146,6 @@ class BaseWalk(ABC):
         """
         raise NotImplementedError()
 
-    def set_evolution_operator(self, U):
-        r"""
-        Sets ``U`` as the evolution operator.
-        It is used during the simulation.
-
-        Parameters
-        ----------
-        U : :class:`scipy.sparse.csr_array`
-            Evolution Operator.
-
-        Raises
-        ------
-        ValueError
-            If ``U`` has invalid dimensions.
-
-        Notes
-        -----
-        .. todo::
-            Check if ``U`` is unitary.
-        """
-        if U.shape != (self.hilb_dim, self.hilb_dim):
-            raise ValueError(
-                "Matrix `U` has invalid dimensions."
-                + " Expected " + str((self.hilb_dim, self.hilb_dim))
-                + " but received " + str(U.shape) + " instead."
-            )
-
-        self._evolution_operator = U
-        # it is not known whether the oracle was used to
-        # construct U
-        self._oracle = None
-
-    def get_evolution_operator():
-        r"""
-        Returns the evolution operator.
-
-        Returns the evolution operator set to be used in
-        the quantum walk simulation.
-        If ``None`` is returned,
-        no evolution operator was set.
-        """
-        return self._evolution_operator
-
     @staticmethod
     def _elementwise_probability(elem):
         # This is more efficient than:
@@ -257,7 +172,7 @@ class BaseWalk(ABC):
 
         See Also
         --------
-        simulate_walk
+        simulate
         """
         raise NotImplementedError()
 
@@ -265,16 +180,12 @@ class BaseWalk(ABC):
         r"""
         Clean and format ``time_range`` to ``(start, end, step)`` format.
 
-        See :meth:`simulate_walk` for valid input format options.
+        See :meth:`simulate` for valid input format options.
 
         Raises
         ------
         ValueError
             If ``time_range`` is in an invalid input format.
-
-        See Also
-        --------
-        time
         """
 
         if not hasattr(time_range, '__iter__'):
@@ -307,78 +218,6 @@ class BaseWalk(ABC):
 
         return time_range
 
-
-    def time(self, time_range):
-        r"""
-        Configures the quantum walk simulation time.
-
-        The simulation will save the states at the
-        time instants given by ``time_range``.
-
-        Parameters
-        ----------
-
-        time_range : float, 2-tuple or 3-tuple
-            Describes at which time instants the state must be saved.
-            It can be specified in three different ways.
-            
-            * ``end``
-                The evolution operator is applied
-                ``end`` times. Only the final state is saved.
-
-            * ``(start, end)``
-                Saves each state from the
-                ``start``-th to the ``end``-th application
-                of the evolution operator.
-                That is, ``[start, start + 1, ..., end - 1, end]``.
-
-            * ``(start, end, step)``
-                Saves every state from the
-                ``start``-th to the ``end``-th application
-                of the evolution operator separated by
-                ``step`` applications.
-                That is, ``[start, start + step, ..., end - step, end]``.
-
-        Raises
-        ------
-        ValueError
-            If ``time_range=(start, end, step)`` and
-            ``end`` cannot be reached from ``start`` after a
-            multiple ``step`` applications.
-            In other words, if
-            ``end - start`` is not a multiple of ``step``.
-            
-            It is also raised if any of the following occurs.
-            
-            * ``start < 0``,
-            * ``end < 0``,
-            * ``step <= 0``.
-
-        See Also
-        --------
-        simulate
-
-        Examples
-        --------
-        If ``time_range=(0, 12, 3)``, the saved states will be:
-        the initial state (0), the intermediate states (3, 6, and 9),
-        and the final state (12).
-
-        >>> qw.time((0, 12, 3))
-        """
-        self._time = self._time_range_to_tuple(time_range)
-
-    def get_time():
-        r"""
-        Returns the configured time.
-
-        Notes
-        -----
-        If ``None`` is returned, time was not configured.
-        """
-        return self._time
-
-
     def _normalize(self, state, error=1e-16):
         norm = np.linalg.norm(state)
         if 1 - error <= norm and norm <= 1 + error:
@@ -395,8 +234,6 @@ class BaseWalk(ABC):
 
         The final state is normalized in order to be unitary.
 
-        The state is not saved to be used for the simulation.
-
         Parameters
         ----------
         entries :
@@ -407,54 +244,6 @@ class BaseWalk(ABC):
             Additional arguments for generating a valid state.
         """
         raise NotImplementedError()
-
-
-    def initial_condition(self, entries, **kwargs):
-        r"""
-        Generates a valid initial condition.
-
-        The generated state is saved to be used for the simulation.
-
-        See Also
-        --------
-        state
-        """
-        self._initial_condition = self.state(entries, **kwargs)
-        return self._initial_condition
-
-    def set_initial_condition(self, state):
-        r"""
-        Sets the initial conditions.
-
-        Saves the ``state`` to be used as
-        the simulation initial condition.
-
-        Parameters
-        ----------
-        state : 
-            State to be set as initial condition.
-
-        Raises
-        ------
-        ValueError
-            If ``state`` has not the right dimension.
-        """
-        if state.shape != (self.hilb_dim, ) :
-            raise ValueError(
-                "`state` has invalid shape. "
-                + "Expected (" + str(self.hilb_dim) + ",)."
-            )
-
-        self._initial_condition = state
-
-
-    def get_initial_condition(self):
-        r"""
-        Returns the current initial condition.
-
-        If ``None``, no initial condition was set.
-        """
-        return self._initial_condition
 
     def _pyneblina_imported(self):
         """
@@ -645,9 +434,9 @@ class BaseWalk(ABC):
             return ret
 
 
-        ####################################
-        ### simulate_walk implemantation ###
-        ####################################
+        ###############################
+        ### simulate implemantation ###
+        ###############################
 
         for e in time_range:
             if not isinstance(e, int):
