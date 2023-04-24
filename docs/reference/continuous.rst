@@ -12,4 +12,4 @@ Classes
     :toctree: generated
     :nosignatures:
 
-    Continuous
+    Graph
