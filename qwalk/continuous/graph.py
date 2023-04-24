@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.sparse
+import scipy.linalg
 from ..base_walk import BaseWalk
 
 class Graph(BaseWalk):
@@ -196,6 +197,20 @@ class Graph(BaseWalk):
             the previously set Hamiltonian is used.
             
 
+        Raises
+        ------
+        ValueError
+            If `time <= 0`.
+
+        AttributeError
+            If the Hamiltonian was not set previously and
+            no ``**kwargs`` is passed.
+
+        Exception
+            If ``**kwargs`` is passed but a valid
+            Hamiltonian cannot be created.
+            See :meth:`hamiltonian` for details.
+
         See Also
         ------
         hamiltonian
@@ -205,14 +220,42 @@ class Graph(BaseWalk):
         The evolution operator is given by
 
         .. math::
-            U = e^{\text{i}tH}
+            U = e^{-\text{i}tH}
 
         where :math:`H` is a Hamiltonian matrix, and
         :math:`t` is the time.
 
         The evolution operator is constructed by Taylor Series expansion.
         """
-        return None
+        if hpc:
+            raise NotImplementedError(
+                "No pybnelina function for implementing "
+                + "Taylor series expansion available."
+            )
+
+        if time <= 0:
+            raise ValueError(
+                "Expected `time` value greater than 0."
+            )
+
+        if bool(kwargs):
+            # setting Hamiltonian
+            R_kwargs = self._filter_valid_kwargs(
+                kwargs, self._valid_kwargs['oracle'])
+            H_kwargs = self._filter_valid_kwargs(
+                kwargs, self._valid_kwargs['hamiltonian'])
+
+            self.hamiltonian(**H_kwargs, **R_kwargs)
+
+        if self._hamiltonian is None:
+            raise AttributeError(
+                "Hamiltonian not set. "
+                + "Did you forget to call the hamiltonian() method or "
+                + "to pass valid **kwargs to evolution_operator()?"
+            )
+        U = scipy.linalg.expm(-1j*time*self._hamiltonian)
+        self._evolution_operator = U
+        return U
 
     def probability_distribution(self, states):
         return None
