@@ -12,7 +12,7 @@ Classes
     :toctree: generated
     :nosignatures:
 
-    Coined
+    Graph
     Segment
     Line
     Cycle
