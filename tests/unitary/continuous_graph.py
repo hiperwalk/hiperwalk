@@ -51,7 +51,12 @@ class TestContinuousGraph(unittest.TestCase):
         H = g.hamiltonian(1/2)
 
         global adj
-        self.assertTrue(np.all(H - (-1/2)*adj == 0))
+        if prev_R is None: 
+            self.assertTrue(np.all(H - (-1/2)*adj == 0))
+        else:
+            R = np.diag([1 if i in prev_R else 0
+                         for i in range(adj.shape[0])])
+            self.assertTrue(np.all(H - (-1/2*adj - R) == 0))
         self.assertTrue(g._hamiltonian is not None)
         self.assertTrue(id(prev_H) != id(g._hamiltonian))
         self.assertTrue(id(prev_R) == id(g._oracle))
@@ -118,3 +123,80 @@ class TestContinuousGraph(unittest.TestCase):
         self.assertTrue(id(g._hamiltonian) != id(prev_H))
         self.assertTrue(g._oracle is not None)
         self.assertTrue(id(g._oracle) != id(prev_R))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_evolution_operator_no_hamiltonian(self):
+        global adj
+        g = ctqw.Graph(adj)
+        
+        R = g._oracle
+        H = g._hamiltonian
+        U = g._evolution_operator
+        self.assertRaises(AttributeError, g.evolution_operator,
+                          time=1, hpc=False)
+        self.assertTrue(id(R) == id(g._oracle))
+        self.assertTrue(id(H) == id(g._hamiltonian))
+        self.assertTrue(id(U) == id(g._evolution_operator))
+    
+        
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_evolution_operator_invalid_time(self):
+        global g
+
+        R = g._oracle
+        H = g._hamiltonian
+        U = g._evolution_operator
+
+        self.assertRaises(ValueError, g.evolution_operator,
+                          time=0, hpc=False)
+        self.assertRaises(ValueError, g.evolution_operator,
+                          time=-1, hpc=False)
+
+        self.assertTrue(id(R) == id(g._oracle))
+        self.assertTrue(id(H) == id(g._hamiltonian))
+        self.assertTrue(id(U) == id(g._evolution_operator))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_evolution_operator_set_hamiltonian_no_oracle(self):
+        global g
+
+        prev_R = g._oracle
+        prev_H = g._hamiltonian
+        prev_U = g._evolution_operator
+
+        U = g.evolution_operator(time=1, gamma=1, hpc=False)
+
+        self.assertTrue(U is not None)
+        self.assertTrue(g._evolution_operator is not None)
+        self.assertTrue(id(prev_R) == id(g._oracle))
+        self.assertTrue(id(prev_H) != id(g._hamiltonian))
+        self.assertTrue(id(prev_U) != id(g._evolution_operator))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_evolution_operator_set_hamiltonian_and_oracle(self):
+        global g
+
+        prev_R = g._oracle
+        prev_H = g._hamiltonian
+        prev_U = g._evolution_operator
+
+        U = g.evolution_operator(time=1, gamma=1, marked_vertices=0,
+                                 hpc=False)
+
+        self.assertTrue(U is not None)
+        self.assertTrue(g._evolution_operator is not None)
+        self.assertTrue(id(prev_R) != id(g._oracle))
+        self.assertTrue(id(prev_H) != id(g._hamiltonian))
+        self.assertTrue(id(prev_U) != id(g._evolution_operator))
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_evolution_unitary(self):
+        global g
+
+        U = g.evolution_operator(time=1, gamma=1, marked_vertices=0,
+                                 hpc=False)
+
+        self.assertTrue(np.allclose(
+            U@U.T.conjugate(), np.eye(U.shape[0])
+        ))
+
