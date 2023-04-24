@@ -153,7 +153,6 @@ class BaseWalk(ABC):
         # elem.real**2 + elem.imag**2
         return elem.real*elem.real + elem.imag*elem.imag
 
-    @abstractmethod
     def probability_distribution(self, states):
         """
         Compute the probability distribution of given states.
@@ -169,12 +168,20 @@ class BaseWalk(ABC):
         Returns
         -------
         probabilities : :class:`numpy.ndarray`
+            ``probabilities[i]`` is the probability of the
+            walker beign found at vertex ``i``.
 
         See Also
         --------
         simulate
         """
-        raise NotImplementedError()
+        if len(states.shape) == 1:
+            states = [states]
+
+        prob = list(map(BaseWalk._elementwise_probability, states))
+        prob = np.array(prob)
+
+        return prob
 
     def _time_range_to_tuple(self, time_range):
         r"""
