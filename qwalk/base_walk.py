@@ -288,15 +288,15 @@ class BaseWalk(ABC):
             Describes at which time instants the state must be saved.
             It can be specified in three different ways.
             
-            * ``end``
+            * end
                 Save the state at time ``end``.
                 Only the final state is saved.
 
-            * ``(end, step)``
+            * (end, step)
                 Saves each state from time 0 to time ``end`` (inclusive)
                 that is multiple of ``step``.
 
-            * ``(start, end, step)``
+            * (start, end, step)
                 Saves every state from time ``start`` (inclusive)
                 to time ``end`` (inclusive)
                 that is multiple of ``step``.

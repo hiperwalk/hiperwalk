@@ -152,7 +152,7 @@ class Graph(BaseWalk):
         :math:`M` is the set of marked vertices.
 
         See Also
-        ------
+        --------
         oracle
         """
         if gamma is None:
@@ -226,7 +226,7 @@ class Graph(BaseWalk):
             See :meth:`hamiltonian` for details.
 
         See Also
-        ------
+        --------
         hamiltonian
 
         Notes
@@ -288,7 +288,7 @@ class Graph(BaseWalk):
             but accepts float inputs.
             ``step`` is used to construct the evolution operator.
             The states in the interval
-            [``start/step``, ``end/step``] are saved.
+            ***[* ``start/step``, ``end/step`` **]** are saved.
             The values that describe this interval are
             rounded up if the decimal part is greater than 0.5,
             and rounded down otherwise.
@@ -299,8 +299,12 @@ class Graph(BaseWalk):
             If ``None``, uses the previously set Hamiltonian
 
         Other Parameters
-        ----------
-        See :meth:`BaseWalk.simulate`.
+        ----------------
+        initial_condition :
+            See :meth:`qwalk.BaseWalk.simulate`.
+        hpc :
+            See :meth:`qwalk.BaseWalk.simulate`.
+
 
         Raises
         ------
@@ -318,7 +322,7 @@ class Graph(BaseWalk):
 
         See Also
         --------
-        :meth:`BaseWalk.simulate`
+        :meth:`qwalk.BaseWalk.simulate`
         hamiltonian
         """
         if time_range is None:
