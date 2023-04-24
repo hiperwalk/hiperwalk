@@ -267,7 +267,7 @@ class Graph(BaseWalk):
                 + "Did you forget to call the hamiltonian() method or "
                 + "to pass valid **kwargs to evolution_operator()?"
             )
-        U = scipy.linalg.expm(-1j*time*self._hamiltonian)
+        U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
         self._evolution_operator = U
         return U
 
