@@ -3,6 +3,9 @@ import numpy as np
 import scipy.sparse
 import inspect
 from sys import modules as sys_modules
+from sys import path as sys_path
+sys_path.append('..')
+from constants import __DEBUG__
 
 class BaseWalk(ABC):
     """
@@ -393,7 +396,7 @@ class BaseWalk(ABC):
         ###########################
 
         def __prepare_engine(self):
-            if __debug__:
+            if __DEBUG__:
                 print("Preparing engine")
 
             if hpc:
@@ -404,7 +407,7 @@ class BaseWalk(ABC):
                 self._simul_mat = self._evolution_operator
                 self._simul_vec = initial_condition
 
-            if __debug__:
+            if __DEBUG__:
                 print("Done\n")
 
         def __simulate_step(self, step):
@@ -413,7 +416,7 @@ class BaseWalk(ABC):
             to the simulation vector.
             Simulation vector is then updated.
             """
-            if __debug__:
+            if __DEBUG__:
                 print("Simulating steps")
 
             if hpc:
@@ -429,11 +432,11 @@ class BaseWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
-            if __debug__:
+            if __DEBUG__:
                 print("Done\n")
 
         def __save_simul_vec(self):
-            if __debug__:
+            if __DEBUG__:
                 print("Saving simulated vec")
 
             ret = None
@@ -445,7 +448,7 @@ class BaseWalk(ABC):
             else:
                 ret = self._simul_vec
 
-            if __debug__:
+            if __DEBUG__:
                 print("Done\n")
 
             return ret
@@ -458,7 +461,7 @@ class BaseWalk(ABC):
         start, end, step = self._time_range_to_tuple(time_range)
         
         if hpc and not self._pyneblina_imported():
-            if __debug__:
+            if __DEBUG__:
                 print("IMPORTING PYNEBLINA")
             from . import _pyneblina_interface as nbl
 

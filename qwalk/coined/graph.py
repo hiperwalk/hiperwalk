@@ -3,17 +3,14 @@ import scipy
 import scipy.sparse
 import networkx as nx
 from ..base_walk import BaseWalk
-from sys import modules as sys_modules
 from warnings import warn
+from sys import path as sys_path
+sys_path.append('../..')
+from constants import __DEBUG__
 
-__USING_PDB__ = 'pdb' in sys_modules
-def _using_pdb():
-    return __USING_PDB__
-
-if __debug__:
+if __DEBUG__:
     from time import time as now
-    if _using_pdb():
-        from guppy import hpy # used to check memory usage
+    from guppy import hpy # used to check memory usage
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -186,7 +183,7 @@ class Graph(BaseWalk):
         self._valid_kwargs['oracle'] = self._get_valid_kwargs(
             self.oracle)
 
-        if __debug__:
+        if __DEBUG__:
             methods = list(self._valid_kwargs)
             params = [p for m in methods
                         for p in self._valid_kwargs[m]]
@@ -282,7 +279,7 @@ class Graph(BaseWalk):
         array([0., 0., 1., 0., 0., 0., 0., 0.])
         """
 
-        if __debug__:
+        if __DEBUG__:
             start_time = now()
 
         # expects weights to be 1 if adjacent
@@ -325,7 +322,7 @@ class Graph(BaseWalk):
 
         # TODO: compare with old approach for creating S
 
-        if __debug__:
+        if __DEBUG__:
             if _using_pdb():
                 print("flipflop_shift_operator Memory: "
                       + str(hpy().heap().size))
@@ -391,7 +388,7 @@ class Graph(BaseWalk):
         S = (self.flipflop_shift_operator() if shift == 'flipflop'
              else self.persistent_shift_operator())
 
-        if __debug__:
+        if __DEBUG__:
             if self._shift_operator is None: raise AssertionError
             if self._evolution_operator is not None: raise AssertionError
 
@@ -703,7 +700,7 @@ class Graph(BaseWalk):
         U = self._evolution_operator_from_SCR(hpc)
 
 
-        if __debug__:
+        if __DEBUG__:
             if (self._shift_operator is None
                 or self._coin_operator is None
                 or (self._oracle is None and len(marked_vertices) != 0)
@@ -799,7 +796,7 @@ class Graph(BaseWalk):
         """
         # TODO: test with nonregular graph
         # TODO: test with nonuniform condition
-        if __debug__:
+        if __DEBUG__:
             start = now()
 
         if len(states.shape) == 1:
@@ -823,7 +820,7 @@ class Graph(BaseWalk):
                 for j in range(len(edges_indices) - 1)
             ] for i in range(len(states)) ])
 
-        if __debug__:
+        if __DEBUG__:
             end = now()
             print("probability_distribution: " + str(end - start) + 's')
         # TODO: benchmark (time and memory usage)
