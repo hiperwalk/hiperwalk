@@ -35,7 +35,7 @@ class Line(Segment):
                              + "Expected either of"
                              + str(valid_entry_types))
 
-        start, end, step = self._clean_time(step_range)
+        start, end, step = self._time_range_to_tuple(step_range)
 
         self._shift, right_vert = self.__get_extreme_vertices(
             state_entries, entry_type)
@@ -49,8 +49,11 @@ class Line(Segment):
 
         super().__init__(num_vert)
 
-        super().time((start, end, step))
-        super().initial_condition(shifted_entries, type=entry_type)
+        #super().time((start, end, step))
+        self._time_range = (int(start), int(end), int(step))
+        self._initial_condition = self.state(shifted_entries,
+                                             type=entry_type)
+        #super().initial_condition(shifted_entries, type=entry_type)
 
 
     def __get_extreme_vertices(self, state_entries, entry_type):
@@ -81,39 +84,13 @@ class Line(Segment):
 
         return shifted_state
 
-    def time(self, time_range):
+    def simulate(self, evolution_operator=None, hpc=True):
         r"""
-        Raise error.
+        Simulate coined quantum walk on the line.
 
-        Time should be set upon object creation.
-        See :class:`Line`. 
-
-        Raises
-        ------
-        TypeError
-
-        Notes
-        -----
-        .. todo::
-            Look for more appropriate exception.
+        Analogous to :meth:`qwalk.BaseWalk.simulate` but uses the
+        ``step_range`` and ``initial_condition`` sent to the constructor.
+        See :class:`Line`.
         """
-        raise TypeError("Time cannot be overriden.")
-
-    def initial_condition(self, entries, **kwargs):
-        r"""
-        Raise error.
-
-        Initial condition should be set upon object creation.
-        See :class:`Line`. 
-
-        Raises
-        ------
-        TypeError
-
-        Notes
-        -----
-        .. todo::
-            Look for more appropriate exception.
-        """
-        raise TypeError("Initial condition cannot be overriden.")
-
+        return super().simulate(self._time_range, self._initial_condition,
+                                evolution_operator, hpc)
