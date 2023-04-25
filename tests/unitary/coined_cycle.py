@@ -14,11 +14,10 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        cycle.set_evolution_operator(S)
-        init_state = cycle.initial_condition([(1, 0, 0)])
-        cycle.step(num_steps)
+        init_state = cycle.state([(1, 0, 0)])
 
-        final_state = cycle.simulate(hpc=False)[0]
+        final_state = cycle.simulate(num_steps, init_state,
+                                     S, hpc=False)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -28,11 +27,10 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        cycle.set_evolution_operator(S)
-        init_state = cycle.initial_condition([(1, 0, 1)])
-        cycle.time(num_steps)
+        init_state = cycle.state([(1, 0, 1)])
 
-        final_state = cycle.simulate(hpc=False)[0]
+        final_state = cycle.simulate(num_steps, init_state,
+                                     S, hpc=False)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -42,11 +40,10 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_vert)
 
         cycle.evolution_operator(hpc=False)
-        init_state = cycle.initial_condition([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)])
 
         num_steps = num_vert*2
-        cycle.time((0, num_steps))
-        states = cycle.simulate(hpc=False)
+        states = cycle.simulate((num_steps, 1), init_state, hpc=False)
         states = states.real
 
         def recursive_expression():
@@ -81,11 +78,10 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        cycle.set_evolution_operator(S)
-        init_state = cycle.initial_condition([(1, 0, 0)])
-        cycle.step(num_steps)
+        init_state = cycle.state([(1, 0, 0)])
 
-        final_state = cycle.simulate(hpc=True)[0]
+        final_state = cycle.simulate(num_steps, init_state,
+                                     S, hpc=True)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -95,11 +91,10 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        cycle.set_evolution_operator(S)
-        init_state = cycle.initial_condition([(1, 0, 1)])
-        cycle.time(num_steps)
+        init_state = cycle.state([(1, 0, 1)])
 
-        final_state = cycle.simulate(hpc=True)[0]
+        final_state = cycle.simulate(num_steps, init_state,
+                                     S, hpc=True)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -109,12 +104,13 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_vert)
 
         U = cycle.evolution_operator(hpc=True)
-        init_state = cycle.initial_condition([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)])
         num_steps = num_vert*2
-        cycle.step((0, num_steps))
 
-        states = cycle.simulate(hpc=False)
-        hpc_states = cycle.simulate(hpc=True)
+        states = cycle.simulate(
+            (num_steps, 1), init_state, hpc=False)
+        hpc_states = cycle.simulate(
+            (num_steps, 1), init_state, hpc=True)
         
         self.assertTrue(np.allclose(states, hpc_states,
                                     rtol=1e-15, atol=1e-15))

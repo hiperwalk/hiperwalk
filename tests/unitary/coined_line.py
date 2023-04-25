@@ -15,7 +15,7 @@ class TestCoinedLine(unittest.TestCase):
         num_steps = 5
         entries = [[1, 0, 0]]
         line = hpcoined.Line(num_steps, entries)
-        init_state = line.get_initial_condition()
+        init_state = line._initial_condition
 
         self.assertTrue(
             np.all(init_state[:2*num_steps] == 0)
@@ -27,7 +27,7 @@ class TestCoinedLine(unittest.TestCase):
         # middle left
         entries = [[1, 0, 1]]
         line = hpcoined.Line(num_steps, entries)
-        init_state = line.get_initial_condition()
+        init_state = line._initial_condition
 
         self.assertTrue(
             np.all(init_state[:2*num_steps - 1] == 0)
@@ -45,8 +45,7 @@ class TestCoinedLine(unittest.TestCase):
         line = hpcoined.Line(num_steps, entries)
 
         S = line.persistent_shift_operator()
-        line.set_evolution_operator(S)
-        final_state = line.simulate(hpc=False)
+        final_state = line.simulate(evolution_operator=S, hpc=False)
         final_state = final_state[0]
 
         self.assertTrue(
@@ -63,8 +62,7 @@ class TestCoinedLine(unittest.TestCase):
         line = hpcoined.Line(num_steps, entries)
 
         S = line.persistent_shift_operator()
-        line.set_evolution_operator(S)
-        final_state = line.simulate(hpc=False)
+        final_state = line.simulate(evolution_operator=S, hpc=False)
         final_state = final_state[0]
 
         self.assertTrue(
@@ -76,10 +74,10 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 20
         entries = [[1, 0, 0], [-1j, 0, 1]]
-        line = hpcoined.Line((0, num_steps), entries)
+        line = hpcoined.Line(num_steps, entries)
         line.evolution_operator()
-        states = line.simulate(hpc=False)
-        hpc_states = line.simulate(hpc=True)
+        states = line.simulate((num_steps, 1), hpc=False)
+        hpc_states = line.simulate((num_steps, 1), hpc=True)
 
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
