@@ -113,7 +113,7 @@ class BaseWalk(ABC):
         Parameters
         ----------
         marked_vertices : int, array_like, default=0
-            ID(s) of the vertex (vertices) to be marked.
+            Vertex (vertices) to be marked.
 
         Returns
         -------
@@ -131,7 +131,7 @@ class BaseWalk(ABC):
         Parameters
         ----------
         marked_vertices : array_like, default=[]
-            The marked vertices IDs.
+            The marked vertices.
             See :obj:`oracle`'s ``vertices`` parameter.
 
         **kwargs : dict, optional

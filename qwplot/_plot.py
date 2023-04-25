@@ -382,7 +382,7 @@ def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
     
     fig, ax = _configure_figure(num_vert, fig_width, fig_height)
 
-    plt.xlabel("Vertex ID", size=18)
+    plt.xlabel("Vertex", size=18)
     plt.ylabel("Probability", size=18)
 
     plt.tick_params(length=7, labelsize=14)
