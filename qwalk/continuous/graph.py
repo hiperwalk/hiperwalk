@@ -130,6 +130,15 @@ class Graph(BaseWalk):
             the Laplacian.
             If ``None``, an error is raised.
 
+        laplacian : bool, default : False
+            Whether to construct the Hamiltonian using the
+            adjacency matrix or the Laplacian.
+
+        **kwargs :
+            Additional arguments.
+            Used for determining the marked vertices.
+            See :meth:`oracle` for valid keywords and values.
+
         Returns
         -------
         :class:`scipy.sparse.csr_array`
