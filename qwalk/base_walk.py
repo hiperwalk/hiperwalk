@@ -454,11 +454,10 @@ class BaseWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        time_range = self._time_range_to_tuple(time_range)
+        time_range = np.array(self._time_range_to_tuple(time_range))
 
-        for e in time_range:
-            if not isinstance(e, int):
-                raise ValueError("`time_range` has non-int entry.")
+        if not np.all([e.is_integer() for e in time_range]):
+            raise ValueError("`time_range` has non-int entry.")
 
         start, end, step = time_range
 

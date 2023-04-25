@@ -290,7 +290,7 @@ class Graph(BaseWalk):
             The states in the interval
             ***[* ``start/step``, ``end/step`` **]** are saved.
             The values that describe this interval are
-            rounded up if the decimal part is greater than 0.5,
+            rounded up if the decimal part is greater than ``1 - 1e-5``,
             and rounded down otherwise.
 
         hamiltonian : :class:`numpy.ndarray` or None
@@ -362,8 +362,13 @@ class Graph(BaseWalk):
             U = None # use the set evolution operator
 
         # cleaning time_range to int
-        time_range = [int(np.round(val/time_range[2]))
-                      for val in time_range]
+        if not np.all([e.is_integer() for e in time_range]):
+            tol = 1e-5
+            time_range = [int(val/time_range[2])
+                          if int(val/time_range[2])
+                            <= np.ceil(val/time_range[2]) - tol
+                          else int(val/time_range[2]) + 1
+                          for val in time_range]
 
         states = super().simulate(time_range, initial_condition, U,  hpc)
         return states
