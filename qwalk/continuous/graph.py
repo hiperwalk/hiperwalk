@@ -2,6 +2,8 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from ..base_walk import BaseWalk
+from constants import PYNEBLINA_IMPORT_ERROR_MSG
+from warnings import warn
 
 class Graph(BaseWalk):
     r"""
@@ -250,19 +252,6 @@ class Graph(BaseWalk):
 
         The evolution operator is constructed by Taylor Series expansion.
         """
-        if hpc:
-            try:
-                from .. import _pyneblina_interface as nbl
-            except ModuleNotFoundError:
-                from constants import PYNEBLINA_IMPORT_ERROR_MSG
-                warn(PYNEBLINA_IMPORT_ERROR_MSG)
-                hpc = False
-
-            raise NotImplementedError(
-                "No pybnelina function for implementing "
-                + "Taylor series expansion available."
-            )
-
         if time <= 0:
             raise ValueError(
                 "Expected `time` value greater than 0."
@@ -283,7 +272,22 @@ class Graph(BaseWalk):
                 + "Did you forget to call the hamiltonian() method or "
                 + "to pass valid **kwargs to evolution_operator()?"
             )
-        U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
+
+        if hpc and not self._pyneblina_imported():
+            try:
+                from .. import _pyneblina_interface as nbl
+            except ModuleNotFoundError:
+                warn(PYNEBLINA_IMPORT_ERROR_MSG)
+                hpc = False
+
+        if hpc:
+            raise NotImplementedError(
+                "No pybnelina function for implementing "
+                + "Taylor series expansion available."
+            )
+        else:
+            U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
+
         self._evolution_operator = U
         return U
 

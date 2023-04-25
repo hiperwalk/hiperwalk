@@ -5,7 +5,8 @@ import inspect
 from sys import modules as sys_modules
 from sys import path as sys_path
 sys_path.append('..')
-from constants import __DEBUG__
+from constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from warnings import warn
 
 class BaseWalk(ABC):
     """
@@ -469,7 +470,6 @@ class BaseWalk(ABC):
             try:
                 from . import _pyneblina_interface as nbl
             except ModuleNotFoundError:
-                from constants import PYNEBLINA_IMPORT_ERROR_MSG
                 warn(PYNEBLINA_IMPORT_ERROR_MSG)
                 hpc = False
 
