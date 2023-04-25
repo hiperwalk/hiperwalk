@@ -397,10 +397,8 @@ class BaseWalk(ABC):
                 print("Preparing engine")
 
             if hpc:
-                self._simul_mat = nbl.send_matrix(
-                    self._evolution_operator)
-                self._simul_vec = nbl.send_vector(
-                    self._initial_condition)
+                self._simul_mat = nbl.send_matrix(self._evolution_operator)
+                self._simul_vec = nbl.send_vector(initial_condition)
 
             else:
                 self._simul_mat = self._evolution_operator
