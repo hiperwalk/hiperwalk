@@ -358,10 +358,6 @@ class BaseWalk(ABC):
                 + "Must be an int or tuple of int."
             )
 
-        for e in time_range:
-            if not isinstance(e, int):
-                raise ValueError("`time_range` has non-int entry.")
-
         if initial_condition is None:
             raise ValueError(
                 "``initial_condition`` not specified. "
@@ -458,7 +454,14 @@ class BaseWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        start, end, step = self._time_range_to_tuple(time_range)
+        time_range = self._time_range_to_tuple(time_range)
+
+        for e in time_range:
+            if not isinstance(e, int):
+                raise ValueError("`time_range` has non-int entry.")
+
+        start, end, step = time_range
+
         
         if hpc and not self._pyneblina_imported():
             if __DEBUG__:
