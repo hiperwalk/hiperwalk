@@ -97,7 +97,7 @@ class BaseWalk(ABC):
                 / np.sqrt(self.hilb_dim))
 
     @abstractmethod
-    def oracle(self, vertices=0):
+    def oracle(self, marked_vertices=0):
         r"""
         Create the oracle that marks the given vertices.
 
@@ -109,7 +109,7 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        vertices : int, array_like, default=0
+        marked_vertices : int, array_like, default=0
             ID(s) of the vertex (vertices) to be marked.
 
         Returns
@@ -119,7 +119,7 @@ class BaseWalk(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def evolution_operator(self, vertices=[], **kwargs):
+    def evolution_operator(self, marked_vertices=[], **kwargs):
         """
         Create the standard evolution operator.
 
@@ -127,7 +127,7 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        vertices : array_like, default=[]
+        marked_vertices : array_like, default=[]
             The marked vertices IDs.
             See :obj:`oracle`'s ``vertices`` parameter.
 
