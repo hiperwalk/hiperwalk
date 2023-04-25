@@ -6,7 +6,7 @@ from ..base_walk import BaseWalk
 from warnings import warn
 from sys import path as sys_path
 sys_path.append('../..')
-from constants import __DEBUG__
+from constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 
 if __DEBUG__:
     from time import time as now
@@ -727,14 +727,14 @@ class Graph(BaseWalk):
             raise AttributeError("Coin operator was not set.")
 
         U = None
+        if hpc and not self._pyneblina_imported():
+            try:
+                from .. import _pyneblina_interface as nbl
+            except ModuleNotFoundError:
+                warn(PYNEBLINA_IMPORT_ERROR_MSG)
+                hpc = False
+
         if hpc:
-            if not self._pyneblina_imported():
-                try:
-                    from .. import _pyneblina_interface as nbl
-                except ModuleNotFoundError:
-                    from constants import PYNEBLINA_IMPORT_ERROR_MSG
-                    warn(PYNEBLINA_IMPORT_ERROR_MSG)
-                    hpc = False
 
             warn(
                 "Sparse matrix multipliation is not supported yet. "
