@@ -16,11 +16,9 @@ class TestCoinedSegment(unittest.TestCase):
         num_vert = 10
         seg = hpcoined.Segment(num_vert)
 
-        init_cond = seg.initial_condition([(1, 0, 0)])
+        init_cond = seg.state([(1, 0, 0)])
         S = seg.persistent_shift_operator()
-        seg.set_evolution_operator(S)
-        seg.step(num_vert - 1)
-        final_state = seg.simulate(hpc=False)
+        final_state = seg.simulate(num_vert - 1, init_cond, S, hpc=False)
         final_state = final_state[0]
 
         self.assertTrue(
@@ -35,11 +33,9 @@ class TestCoinedSegment(unittest.TestCase):
         num_vert = 10
         seg = hpcoined.Segment(num_vert)
 
-        init_cond = seg.initial_condition([(1, 0, 0)])
+        init_cond = seg.state([(1, 0, 0)])
         S = seg.persistent_shift_operator()
-        seg.set_evolution_operator(S)
-        seg.time(num_vert - 1)
-        final_state = seg.simulate(hpc=True)
+        final_state = seg.simulate(num_vert - 1, init_cond, S, hpc=True)
         final_state = final_state[0]
 
         self.assertTrue(
@@ -55,11 +51,16 @@ class TestCoinedSegment(unittest.TestCase):
                    [-1j, int(num_vert/2), 1]]
 
         seg = hpcoined.Segment(num_vert)
-        seg.evolution_operator()
-        init_cond = seg.initial_condition(entries)
-        seg.time((0, num_steps))
-        states = seg.simulate(hpc=False)
-        hpc_states = seg.simulate(hpc=True)
+
+        U = seg.evolution_operator(hpc=False)
+        hpc_U = seg.evolution_operator(hpc=True)
+        self.assertTrue(len((hpc_U - U).data) == 0)
+
+        init_cond = seg.state(entries)
+        states = seg.simulate(
+            (num_steps, 1), init_cond, hpc=False)
+        hpc_states = seg.simulate(
+            (num_steps, 1), init_cond, hpc=True)
 
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
