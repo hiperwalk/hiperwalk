@@ -10,6 +10,6 @@ The following is a list of modules in alphabetical order.
     :maxdepth: 1
 
     constants.rst
-    plot.rst
     qwalk.rst
+    plot.rst
 

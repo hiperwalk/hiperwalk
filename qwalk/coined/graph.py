@@ -4,12 +4,11 @@ import scipy.sparse
 import networkx as nx
 from ..base_walk import BaseWalk
 from sys import modules as sys_modules
+from warnings import warn
 
 if __debug__:
     from time import time as now
     from guppy import hpy # used to check memory usage
-    import warnings
-    warnings.warn("create gset_shift_operator and gset_coin_operator")
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -182,10 +181,6 @@ class Graph(BaseWalk):
         self._valid_kwargs['oracle'] = self._get_valid_kwargs(
             self.oracle)
 
-        self._valid_kwargs['U_from_SCR'] = self._get_valid_kwargs(
-            self.evolution_operator_from_SCR)
-
-
         if __debug__:
             methods = list(self._valid_kwargs)
             params = [p for m in methods
@@ -197,6 +192,10 @@ class Graph(BaseWalk):
         r"""
         Create the flip-flop shift operator (:math:`S`) based on
         the ``adj_matrix`` attribute.
+
+        The operator is set for future usage.
+        If an evolution operator was set previously,
+        it is unset for coherence.
 
         Returns
         -------
@@ -328,6 +327,7 @@ class Graph(BaseWalk):
                   + str(now() - start_time))
 
         self._shift_operator = S
+        self._evolution_operator = None
         return S
 
     def shift_operator(self, shift='default'):
@@ -338,6 +338,8 @@ class Graph(BaseWalk):
 
         The created shift operator is saved to be used
         for generating the evolution operator.
+        If an evolution operator was set previously,
+        it is unset for coherence.
 
         Parameters
         ----------
@@ -385,6 +387,7 @@ class Graph(BaseWalk):
 
         if __debug__:
             if self._shift_operator is None: raise AssertionError
+            if self._evolution_operator is not None: raise AssertionError
 
         return S
 
@@ -488,6 +491,7 @@ class Graph(BaseWalk):
 
         C = scipy.sparse.block_diag(blocks, format='csr')
         self._coin_operator = C
+        self._evolution_operator = None
         return C
 
     @staticmethod
@@ -508,17 +512,18 @@ class Graph(BaseWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def oracle(self, vertices=0, oracle_type="standard"):
+    def oracle(self, marked_vertices=0, oracle_type="standard"):
         r"""
         Create the oracle that marks the given vertices.
 
         The oracle is set to be used for generating the evolution operator.
-
         If ``vertices=[]`` no oracle is created and it is set to ``None``.
+        If an evolution operator was set previously,
+        it is unset for coherence.
 
         Parameters
         ----------
-        vertices : int, array_like, default=0
+        marked_vertices : int, array_like, default=0
             ID(s) of the vertex (vertices) to be marked.
             If ``vertices=[]`` no oracle is created.
 
@@ -565,23 +570,23 @@ class Graph(BaseWalk):
 
         R = None
 
-        if isinstance(vertices, int):
-            vertices = [vertices]
+        if isinstance(marked_vertices, int):
+            marked_vertices = [marked_vertices]
 
-        if len(vertices) > 0:
+        if len(marked_vertices) > 0:
 
             if oracle_type == 'standard':
                 S = self._coin_operator
                 # this changes the _coin_operator attribute
                 R = self.coin_operator('grover', 'minus_identity',
-                                          vertices)
+                                       marked_vertices)
                 # revert unexpected changes
                 self._coin_operator = S
 
             elif oracle_type == 'phase_flip':
                 R = scipy.sparse.eye(self.hilb_dim, format='csr')
 
-                for vertex_id in vertices:
+                for vertex_id in marked_vertices:
                     first_edge = self.adj_matrix.indptr[vertex_id]
                     last_edge = self.adj_matrix.indptr[vertex_id + 1]
 
@@ -596,6 +601,7 @@ class Graph(BaseWalk):
                 )
 
         self._oracle = R
+        self._evolution_operator = None
         return R
 
     def has_persistent_shift_operator(self):
@@ -610,26 +616,39 @@ class Graph(BaseWalk):
         """
         return False
 
-    def evolution_operator(self, vertices=[], **kwargs):
+    def evolution_operator(self, marked_vertices=[], hpc=True, **kwargs):
         """
         Create the standard evolution operator.
+
+        The evolution operator is created using the
+        shift operator, coin operator and oracle.
+        If an operator was set previously, it is used unless
+        ``**kwargs`` specifies arguments for creating new ones.
+        If an operator was not set previously,
+        it is created using ``**kwargs`` and ``marked_vertices``
+        accordingly.
+        In this case, if ``**kwargs`` is empty,
+        the default arguments are used.
 
         The created evolution operator is set to be used in the
         quantum walk simulation.
 
         Parameters
         ----------
-        vertices : array_like, default=[]
+        marked_vertices : array_like, default=[]
             The marked vertices IDs.
-            See :obj:`oracle`'s ``vertices`` parameter.
+            See :obj:`oracle`'s ``marked_vertices`` parameter.
+
+        hpc : bool, default=True
+            Whether or not to use neblina core to
+            generate the evolution operator.
 
         **kwargs : dict, optional
             Additional arguments for constructing the evolution operator.
             Accepts any valid keywords from
             :meth:`shift_operator`
-            :meth:`coin_operator`
-            :meth:`has_persistent_shift_operator`, and
-            :meth:`evolution_operator_from_SCR`.
+            :meth:`coin_operator`, and
+            :meth:`oracle`.
 
         Returns
         -------
@@ -638,24 +657,13 @@ class Graph(BaseWalk):
 
         See Also
         --------
+        has_persistent_shift_operator
         shift_operator
         coin_operator
-        has_persistent_shift_operator
-        evolution_operator_from_SCR
+        oracle
 
         Notes
         -----
-        This method is an alias for
-
-        >>> c.shift_operator()
-        >>> c.coin_operator()
-        >>> c.oracle()
-        >>> c.evolution_operator_from_SCR()
-
-        where the valid arguments for each method is
-        passed via ``**kwargs``.
-        If any argument is omitted, the default value is used.
-
         The evolution operator is given by
 
         .. math::
@@ -678,32 +686,35 @@ class Graph(BaseWalk):
                     kwargs, self._valid_kwargs['coin'])
         R_kwargs = self._filter_valid_kwargs(
                     kwargs, self._valid_kwargs['oracle'])
-        R_kwargs['vertices'] = vertices
-        U_kwargs = self._filter_valid_kwargs(
-                    kwargs, self._valid_kwargs['U_from_SCR'])
+        R_kwargs['marked_vertices'] = marked_vertices
 
-        self.shift_operator(**S_kwargs)
-        self.coin_operator(**C_kwargs)
-        self.oracle(**R_kwargs)
-        U = self.evolution_operator_from_SCR(**U_kwargs)
+        if self._shift_operator is None or bool(S_kwargs):
+            self.shift_operator(**S_kwargs)
+        if self._coin_operator is None or bool(C_kwargs):
+            self.coin_operator(**C_kwargs)
+        if self._oracle is None or bool(R_kwargs):
+            self.oracle(**R_kwargs)
+        U = self._evolution_operator_from_SCR(hpc)
 
 
         if __debug__:
             if (self._shift_operator is None
                 or self._coin_operator is None
-                or (self._oracle is None and len(vertices) != 0)
+                or (self._oracle is None and len(marked_vertices) != 0)
                 or self._evolution_operator is None
             ):
                 raise AssertionError
 
         return U
 
-    def evolution_operator_from_SCR(self, hpc=True):
+    def _evolution_operator_from_SCR(self, hpc=True):
         r"""
         Create evolution operator from previously set matrices.
 
         Creates evolution operator by multiplying the
         shift operator, coin operator and oracle.
+        If the oracle is not set,
+        it is substituted by the identity.
 
         Parameters
         ----------
@@ -711,28 +722,17 @@ class Graph(BaseWalk):
             Whether or not the evolution operator should be
             constructed using nelina's high-performance computating.
         """
-
         if self._shift_operator is None:
-            raise AttributeError(
-                "Shift operator was not set. "
-                + "Did you forget to call shift_operator(), "
-                + "flipflop_shift_operator(), "
-                + "persistent_shift_operator(), or"
-                + "set_shift_operator()?"
-            )
+            raise AttributeError("Shift operator was not set.")
         if self._coin_operator is None:
-            raise AttributeError(
-                "Coin operator was not set. "
-                + "Did you forget to call coin_operator() or "
-                + "set_coin_operator()?"
-            )
+            raise AttributeError("Coin operator was not set.")
 
         U = None
         if hpc:
             if not self._pyneblina_imported():
                 from .. import _pyneblina_interface as nbl
 
-            warnings.warn(
+            warn(
                 "Sparse matrix multipliation is not supported yet. "
                 + "Converting all matrices to dense. "
                 + "Then converting back to sparse. "
@@ -741,12 +741,12 @@ class Graph(BaseWalk):
             S = self._shift_operator.todense()
             C = self._coin_operator.todense()
 
-            warnings.warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
+            warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
             nbl_C = nbl.send_matrix(C)
             nbl_U = nbl.multiply_matrices(nbl_S, nbl_C)
 
-            warnings.warn("Check if matrices are deleted "
+            warn("Check if matrices are deleted "
                           + "from memory and GPU.")
             del S
             del C

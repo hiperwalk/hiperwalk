@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import sys
 sys.path.append('..')
 import qwalk.coined as coined_qw
-import plot as hplot
+import qwplot
 
 # create random graph and obtain its adjacency matrix
 num_vert = 20
@@ -19,14 +19,14 @@ random.evolution_operator()
 # Initial state at vertex 0 pointing to the first directiong possible
 #init_state = random.state([[1, 0, 0]])
 #random.set_initial_condition(init_state)
-random.initial_condition([[1, 0, 0]])
+psi0 = random.state([[1, 0, 0]])
 num_steps = num_vert
-random.time((0, num_steps))
-states = random.simulate()
+states = random.simulate((num_steps, 1), psi0)
+print(states)
 
 # Calculating probabilities and plotting
 prob = random.probability_distribution(states)
-hplot.plot_probability_distribution(
+qwplot.probability_distribution(
     prob, plot_type='graph', animate=True, adj_matrix=adj, interval=1000,
     cmap='default', fixed_probabilities=False
 )
