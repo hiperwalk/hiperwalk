@@ -598,45 +598,6 @@ class Graph(BaseWalk):
         self._oracle = R
         return R
 
-
-    def set_evolution_operator(self, U):
-        r"""
-        Sets ``U`` as the evolution operator.
-
-        It is saved to be used during the simulation.
-        Since it is not known how ``U`` was constructed,
-        shift operator, coin operator and oracle are updated to not set.
-
-        Parameters
-        ----------
-        U : :class:`scipy.sparse.csr_array`
-            Evolution Operator.
-
-        Raises
-        ------
-        ValueError
-            If ``U`` has invalid dimensions.
-
-        Notes
-        -----
-        .. todo::
-            Check if ``U`` is unitary.
-        """
-
-        if U.shape != (self.hilb_dim, self.hilb_dim):
-            raise ValueError(
-                "Matrix `U` has invalid dimensions."
-                + " Expected " + str((self.hilb_dim, self.hilb_dim))
-                + " but received " + str(U.shape) + " instead."
-            )
-
-        self._evolution_operator = U
-        # it is not known whether the shift operator, coin operator, and
-        # oracle were used to construct U
-        self._shift_operator = None
-        self._coin_operator = None
-        self._oracle = None
-
     def has_persistent_shift_operator(self):
         r"""
         Returns if the persistent shift operator is defined
@@ -1000,42 +961,3 @@ class Graph(BaseWalk):
         state = funcs[type](state, entries)
 
         return self._normalize(state)
-
-    def time(self, time_range):
-        r"""
-        Same as :meth:`qwalk.BaseWalk.time` but
-        only accepts int arguments.
-
-        Parameters
-        ----------
-        time_range : int, 2-tuple, or 3-tuple
-            Range of the states to be saved by the simulation.
-
-        Raises
-        ------
-        TypeError
-            If (any element of) ``time_range`` is not ``int``.
-
-        See Also
-        --------
-        step
-        """
-
-        if not hasattr(time_range, '__iter__'):
-            time_range = [time_range]
-
-        for i in range(len(time_range)):
-            if not isinstance(time_range[i], int):
-                raise TypeError(
-                    "`time_range` has non-int value "
-                    + str(time_range[i]) + ". "
-                    + "`time_range` = " + str(time_range) + "."
-                )
-
-        return super().time(time_range)
-
-    def step(self, step_range):
-        r"""
-        Alias for :meth:`time`.
-        """
-        return self.time(step_range)
