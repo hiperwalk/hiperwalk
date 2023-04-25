@@ -523,7 +523,7 @@ class Graph(BaseWalk):
         Parameters
         ----------
         marked_vertices : int, array_like, default=0
-            ID(s) of the vertex (vertices) to be marked.
+            Vertex (vertices) to be marked.
             If ``vertices=[]`` no oracle is created.
 
         oracle_type : {'standard', 'phase_flip'}
@@ -635,7 +635,7 @@ class Graph(BaseWalk):
         Parameters
         ----------
         marked_vertices : array_like, default=[]
-            The marked vertices IDs.
+            The marked vertices.
             See :obj:`oracle`'s ``marked_vertices`` parameter.
 
         hpc : bool, default=True
