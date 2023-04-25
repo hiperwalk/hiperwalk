@@ -51,13 +51,10 @@ class Graph(BaseWalk):
 
         self._valid_kwargs = dict()
 
-        self._valid_kwargs['oracle'] = inspect.getargspec(
-            self.oracle
-        )[0][1:]
-
-        self._valid_kwargs['hamiltonian'] = inspect.getargspec(
-            self.hamiltonian
-        )[0][1:]
+        self._valid_kwargs['oracle'] = self._get_valid_kwargs(
+            self.oracle)
+        self._valid_kwargs['hamiltonian'] = self._get_valid_kwargs(
+            self.hamiltonian)
 
     def oracle(self, marked_vertices=0):
         r"""
