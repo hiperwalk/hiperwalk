@@ -12,9 +12,8 @@ class Line(Segment):
 
     Parameters
     ----------
-    step_range : int, 2-tuple or 3-tuple
-        Range of the states to be saved by the simulation.
-        Refer to :meth:`qwalk.BaseWalk.step` for details.
+    max_steps : int
+        Maximum number of steps that can be simulated.
     state_entries : tuple
         Check :meth:`state` for details of valid entries.
     entry_type : {'vertex_dir', 'arc_notation', 'arc_order'}
@@ -28,32 +27,29 @@ class Line(Segment):
 
     """
 
-    def __init__(self, step_range, state_entries, entry_type='vertex_dir'):
+    def __init__(self, max_steps, state_entries, entry_type='vertex_dir'):
         valid_entry_types = ['vertex_dir', 'arc_notation']
         if entry_type not in valid_entry_types:
             raise ValueError("Invalid argument for entry_type."
                              + "Expected either of"
                              + str(valid_entry_types))
 
-        start, end, step = self._time_range_to_tuple(step_range)
+        self._max_steps = int(max_steps)
 
         self._shift, right_vert = self.__get_extreme_vertices(
             state_entries, entry_type)
-        self._shift -= end
+        self._shift -= self._max_steps
 
         shifted_entries = self.__shift_state_entries(
                 state_entries, entry_type
         )
 
-        num_vert = right_vert - self._shift + end + 1
+        num_vert = right_vert - self._shift + self._max_steps + 1
 
         super().__init__(num_vert)
 
-        #super().time((start, end, step))
-        self._time_range = (int(start), int(end), int(step))
         self._initial_condition = self.state(shifted_entries,
                                              type=entry_type)
-        #super().initial_condition(shifted_entries, type=entry_type)
 
 
     def __get_extreme_vertices(self, state_entries, entry_type):
@@ -84,13 +80,36 @@ class Line(Segment):
 
         return shifted_state
 
-    def simulate(self, evolution_operator=None, hpc=True):
+    def simulate(self, time_range=None, evolution_operator=None,
+                 hpc=True):
         r"""
         Simulate coined quantum walk on the line.
 
         Analogous to :meth:`qwalk.BaseWalk.simulate` but uses the
-        ``step_range`` and ``initial_condition`` sent to the constructor.
-        See :class:`Line`.
+        ``initial_condition`` sent to the constructor
+        (See :class:`Line`)
+        and the maximum number of evolution operator application is
+        limited by the ``max_steps`` value sent to the constructor.
+
+        If ``time_range=None``, uses ``time_range=max_steps``.
+
+
+        Raises
+        ------
+        ValueError
+            If ``time_range``'s ``end``  time exceeds ``max_steps``.
         """
-        return super().simulate(self._time_range, self._initial_condition,
+        if time_range is None:
+            time_range = self._max_steps
+
+        time_range = self._time_range_to_tuple(time_range)
+        if time_range[1] > self._max_steps:
+            raise ValueError(
+                "`time_range` requested more steps than allowed. "
+                + "Check if the value of ``end`` in ``time_range`` is "
+                + "less than or equal to the value of ``max_steps`` "
+                + "sent to the constructor."
+            )
+
+        return super().simulate(time_range, self._initial_condition,
                                 evolution_operator, hpc)
