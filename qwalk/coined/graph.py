@@ -6,9 +6,14 @@ from ..base_walk import BaseWalk
 from sys import modules as sys_modules
 from warnings import warn
 
+__USING_PDB__ = 'pdb' in sys_modules
+def _using_pdb():
+    return __USING_PDB__
+
 if __debug__:
     from time import time as now
-    from guppy import hpy # used to check memory usage
+    if _using_pdb():
+        from guppy import hpy # used to check memory usage
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -321,8 +326,9 @@ class Graph(BaseWalk):
         # TODO: compare with old approach for creating S
 
         if __debug__:
-            print("flipflop_shift_operator Memory: "
-                  + str(hpy().heap().size))
+            if _using_pdb():
+                print("flipflop_shift_operator Memory: "
+                      + str(hpy().heap().size))
             print("flipflop_shift_operator Time: "
                   + str(now() - start_time))
 
