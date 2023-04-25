@@ -10,7 +10,6 @@ from constants import __DEBUG__
 
 if __DEBUG__:
     from time import time as now
-    from guppy import hpy # used to check memory usage
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -323,9 +322,6 @@ class Graph(BaseWalk):
         # TODO: compare with old approach for creating S
 
         if __DEBUG__:
-            if _using_pdb():
-                print("flipflop_shift_operator Memory: "
-                      + str(hpy().heap().size))
             print("flipflop_shift_operator Time: "
                   + str(now() - start_time))
 
