@@ -74,6 +74,7 @@ class BaseWalk(ABC):
         self.adj_matrix = adj_matrix
         self.hilb_dim = 0
 
+
     def uniform_state(self):
         r"""
         Generate the uniform state.
@@ -465,7 +466,12 @@ class BaseWalk(ABC):
         if hpc and not self._pyneblina_imported():
             if __DEBUG__:
                 print("IMPORTING PYNEBLINA")
-            from . import _pyneblina_interface as nbl
+            try:
+                from . import _pyneblina_interface as nbl
+            except ModuleNotFoundError:
+                from constants import PYNEBLINA_IMPORT_ERROR_MSG
+                warn(PYNEBLINA_IMPORT_ERROR_MSG)
+                hpc = False
 
         __prepare_engine(self)
 

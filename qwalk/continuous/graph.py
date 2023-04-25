@@ -251,6 +251,13 @@ class Graph(BaseWalk):
         The evolution operator is constructed by Taylor Series expansion.
         """
         if hpc:
+            try:
+                from .. import _pyneblina_interface as nbl
+            except ModuleNotFoundError:
+                from constants import PYNEBLINA_IMPORT_ERROR_MSG
+                warn(PYNEBLINA_IMPORT_ERROR_MSG)
+                hpc = False
+
             raise NotImplementedError(
                 "No pybnelina function for implementing "
                 + "Taylor series expansion available."
