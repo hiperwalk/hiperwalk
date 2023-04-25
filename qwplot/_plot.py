@@ -519,12 +519,10 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             ax.set_xticks( list(nodes.keys()), list(nodes.values()) )
 
     else:
-        if graph is not None:
-            from matplotlib.ticker import MaxNLocator
+        from matplotlib.ticker import MaxNLocator
 
-            ax.xaxis.set_major_locator(
-                MaxNLocator(nbins=num_vert, integer=True)
-            )
+        ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+        if graph is not None:
 
             loc = ax.xaxis.get_major_locator()
             ind = loc().astype('int')
