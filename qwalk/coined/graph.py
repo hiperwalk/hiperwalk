@@ -729,7 +729,12 @@ class Graph(BaseWalk):
         U = None
         if hpc:
             if not self._pyneblina_imported():
-                from .. import _pyneblina_interface as nbl
+                try:
+                    from .. import _pyneblina_interface as nbl
+                except ModuleNotFoundError:
+                    from constants import PYNEBLINA_IMPORT_ERROR_MSG
+                    warn(PYNEBLINA_IMPORT_ERROR_MSG)
+                    hpc = False
 
             warn(
                 "Sparse matrix multipliation is not supported yet. "
