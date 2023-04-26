@@ -278,10 +278,38 @@ class Graph(BaseWalk):
                 hpc = False
 
         if hpc:
-            raise NotImplementedError(
-                "No pybnelina function for implementing "
-                + "Taylor series expansion available."
-            )
+            # determining the number of terms in power series
+            max_val = np.max(np.abs(self._hamiltonian))
+            if max_val*time <= 1:
+                nbl_U = nbl.matrix_power_series(
+                        -1j*time*self._hamiltonian, 30)
+
+            else:
+                # if the order of magnitude is very large,
+                # float point errors may occur
+                if ((isinstance(time, int) or time.is_integer())
+                    and max_val <= 1
+                ):
+                    new_time = 1
+                    num_mult = time - 1
+                else:
+                    new_time = max_val*time
+                    order = np.ceil(np.math.log(new_time, 20))
+                    new_time /= 10**order
+                    num_mult = int(np.round(time/new_time)) - 1
+                    warn("Result is approximated. It is recommended to "
+                         + "choose a small time interval and performing "
+                         + "multiple matrix multiplications to "
+                         + "mitigate uounding errors.")
+
+                new_nbl_U = nbl.matrix_power_series(
+                        -1j*new_time*self._hamiltonian, 20)
+                nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
+                for i in range(num_mult - 1):
+                    nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
+
+            U = nbl.retrieve_matrix(nbl_U)
+
         else:
             U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
 

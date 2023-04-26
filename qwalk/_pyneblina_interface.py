@@ -1,6 +1,5 @@
 import neblina
-from numpy import array as np_array
-from numpy import zeros as np_zeros
+import numpy as np
 import scipy.sparse
 from warnings import warn
 from sys import path as sys_path
@@ -131,7 +130,7 @@ def retrieve_vector(pynbl_vec):
 
     if not pynbl_vec.is_complex:
         raise NotImplementedError("Cannot retrieve real-only vectors.")
-    py_vec = np_array(
+    py_vec = np.array(
                 [neblina.vector_get(nbl_vec, 2*i)
                  + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
                  for i in range(pynbl_vec.shape)]
@@ -223,7 +222,6 @@ def _send_dense_matrix(M, is_complex):
     return PyNeblinaMatrix(mat, M.shape, is_complex, False)
 
 def send_matrix(M):
-    print(M.dtype)
     is_complex = isinstance(M.dtype, complex)
 
     if not is_complex:
@@ -248,7 +246,7 @@ def retrieve_matrix(pynbl_mat):
     nbl_mat = neblina.move_matrix_host(pynbl_mat.nbl_obj)
 
     warn("Check if using default numpy datatype.")
-    py_mat = np_zeros(pynbl_mat.shape, dtype=(
+    py_mat = np.zeros(pynbl_mat.shape, dtype=(
         complex if pynbl_mat.is_complex else float
     ))
 
@@ -298,15 +296,17 @@ def multiply_matrix_vector(pynbl_mat, pynbl_vec):
 
     if pynbl_mat.sparse:
         nbl_vec = neblina.sparse_matvec_mul(pynbl_vec.nbl_obj,
-                                         pynbl_mat.nbl_obj)
-        new_vec = PyNeblinaVector(
-            nbl_vec, pynbl_mat.shape[0],
-            pynbl_mat.is_complex or pynbl_vec.is_complex
-        )
+                                            pynbl_mat.nbl_obj)
+    else:
+        nbl_vec = neblina.matvec_mul(pynbl_vec.nbl_obj,
+                                     pynbl_mat.nbl_obj)
 
-        return new_vec
-    warn("Dense matrix-vector multiplication not implemented.")
-    return None
+    new_vec = PyNeblinaVector(
+        nbl_vec, pynbl_mat.shape[0],
+        pynbl_mat.is_complex or pynbl_vec.is_complex
+    )
+
+    return new_vec
 
 def multiply_matrices(pynbl_A, pynbl_B):
 
@@ -329,3 +329,35 @@ def multiply_matrices(pynbl_A, pynbl_B):
     )
 
     return pynbl_C
+
+def matrix_power_series(A, n):
+    r"""
+    Computes the following power series.
+    A must be a dense numpy matrix.
+
+    I + A + A^2/2 + A^3/3! + A^4/4! + ... + A^n/n!
+    """
+    if scipy.sparse.issparse(A):
+        A = np.array(A.todense())
+        warn(
+            "Sparse matrix multiplication not implemented. "
+            + "Converting to dense."
+        )
+
+    _init_engine()
+    pynbl_A = send_matrix(A)
+    pynbl_Term = send_matrix(np.eye(A.shape[0], dtype=A.dtype))
+    pynbl_M = send_matrix(np.eye(A.shape[0], dtype=A.dtype))
+
+    for i in range(1, n+1):
+        pynbl_Term.nbl_obj = neblina.mat_mul(
+                pynbl_Term.nbl_obj, pynbl_A.nbl_obj
+        )
+        pynbl_Term.nbl_obj = neblina.scalar_mat_mul(
+                1/i, pynbl_Term.nbl_obj
+        )
+        pynbl_M.nbl_obj = neblina.mat_add(
+                pynbl_M.nbl_obj, pynbl_Term.nbl_obj
+        )
+
+    return pynbl_M
