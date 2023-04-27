@@ -16,7 +16,7 @@ class Line(Segment):
         Maximum number of steps that can be simulated.
     state_entries : tuple
         Check :meth:`state` for details of valid entries.
-    entry_type : {'vertex_dir', 'arc_notation', 'arc_order'}
+    entry_type : {'arc_notation', 'vertex_dir'}
         Check :meth:`state` for details.
 
     Notes
@@ -27,7 +27,7 @@ class Line(Segment):
 
     """
 
-    def __init__(self, max_steps, state_entries, entry_type='vertex_dir'):
+    def __init__(self, max_steps, state_entries, entry_type='arc_notation'):
         valid_entry_types = ['vertex_dir', 'arc_notation']
         if entry_type not in valid_entry_types:
             raise ValueError("Invalid argument for entry_type."

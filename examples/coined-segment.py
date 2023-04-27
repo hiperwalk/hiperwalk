@@ -11,7 +11,8 @@ seg = coined_qw.Segment(num_vert)
 # with the coin pointing to the right (real amplitude)
 # and the left (complex amplitude).
 psi0 = seg.state(
-    [(1, mid_vert, 0), [-1j, mid_vert, 1]]
+    [(1, mid_vert, 0), [-1j, mid_vert, 1]],
+    type='vertex_dir'
 )
 
 hpcU = seg.evolution_operator()

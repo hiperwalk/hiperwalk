@@ -14,7 +14,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        init_state = cycle.state([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)], 'vertex_dir')
 
         final_state = cycle.simulate(num_steps, init_state,
                                      S, hpc=False)[0]
@@ -27,7 +27,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        init_state = cycle.state([(1, 0, 1)])
+        init_state = cycle.state([(1, 0, 1)], 'vertex_dir')
 
         final_state = cycle.simulate(num_steps, init_state,
                                      S, hpc=False)[0]
@@ -40,7 +40,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_vert)
 
         cycle.evolution_operator(hpc=False)
-        init_state = cycle.state([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)], 'vertex_dir')
 
         num_steps = num_vert*2
         states = cycle.simulate((num_steps, 1), init_state, hpc=False)
@@ -78,7 +78,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        init_state = cycle.state([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)], 'vertex_dir')
 
         final_state = cycle.simulate(num_steps, init_state,
                                      S, hpc=True)[0]
@@ -91,7 +91,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_steps)
 
         S = cycle.persistent_shift_operator()
-        init_state = cycle.state([(1, 0, 1)])
+        init_state = cycle.state([(1, 0, 1)], 'vertex_dir')
 
         final_state = cycle.simulate(num_steps, init_state,
                                      S, hpc=True)[0]
@@ -104,7 +104,7 @@ class TestCoinedCycle(unittest.TestCase):
         cycle = hpcoined.Cycle(num_vert)
 
         U = cycle.evolution_operator(hpc=True)
-        init_state = cycle.state([(1, 0, 0)])
+        init_state = cycle.state([(1, 0, 0)], 'vertex_dir')
         num_steps = num_vert*2
 
         states = cycle.simulate(

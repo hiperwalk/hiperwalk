@@ -14,7 +14,7 @@ class TestCoinedLine(unittest.TestCase):
         # middle right
         num_steps = 5
         entries = [[1, 0, 0]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries, 'vertex_dir')
         init_state = line._initial_condition
 
         self.assertTrue(
@@ -26,7 +26,7 @@ class TestCoinedLine(unittest.TestCase):
 
         # middle left
         entries = [[1, 0, 1]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries, 'vertex_dir')
         init_state = line._initial_condition
 
         self.assertTrue(
@@ -42,7 +42,7 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 5
         entries = [[1, 0, 0]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries, 'vertex_dir')
 
         S = line.persistent_shift_operator()
         final_state = line.simulate(evolution_operator=S, hpc=False)
@@ -59,7 +59,7 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 5
         entries = [[1, 0, 1]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries, 'vertex_dir')
 
         S = line.persistent_shift_operator()
         final_state = line.simulate(evolution_operator=S, hpc=False)
@@ -74,7 +74,7 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = 20
         entries = [[1, 0, 0], [-1j, 0, 1]]
-        line = hpcoined.Line(num_steps, entries)
+        line = hpcoined.Line(num_steps, entries, 'vertex_dir')
         line.evolution_operator()
         states = line.simulate((num_steps, 1), hpc=False)
         hpc_states = line.simulate((num_steps, 1), hpc=True)

@@ -14,15 +14,13 @@ del G
 
 # Quantum Walk preparation and simulation
 random = coined_qw.Graph(adj)
-# By default uses flip-flop shift operator and Grover coin
+# By default uses flip-flop shift operator, Grover coin and no oracle
 random.evolution_operator()
-# Initial state at vertex 0 pointing to the first directiong possible
-#init_state = random.state([[1, 0, 0]])
-#random.set_initial_condition(init_state)
-psi0 = random.state([[1, 0, 0]])
+# Initial state at vertex 0 pointing to the first direction possible
+psi0 = random.state([[1, 0, 0]], 'vertex_dir')
+# applies the evolution operator multiple times to psi0
 num_steps = num_vert
 states = random.simulate((num_steps, 1), psi0)
-print(states)
 
 # Calculating probabilities and plotting
 prob = random.probability_distribution(states)
