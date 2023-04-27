@@ -153,10 +153,10 @@ def probability_distribution(
     -----
     The core logic of the main implementation loop is more or less like follows.
 
-    >>> preconfigure()
-    >>> for prob in probabilities:
-    >>>     configure()
-    >>>     plot(prob)
+    >>> preconfigure() # doctest: +SKIP
+    >>> for prob in probabilities: # doctest: +SKIP
+    >>>     configure() # doctest: +SKIP
+    >>>     plot(prob) # doctest: +SKIP
 
     ``preconfigure()`` executes configurations that do
     not change between plots, e.g. nodes positions in graph plots.
