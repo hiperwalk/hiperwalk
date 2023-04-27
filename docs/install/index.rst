@@ -288,14 +288,27 @@ Testing
 
 The installation is finished.
 To test if it was successful,
-run any Python code in ``hiperwalk/examples/``.
+go into the ``hiperwalk/examples/`` directory 
+and execute the test accoring to you installation.
+If you performed the complete installation (with HPC support),
+execute
+
+.. code-block:: shell
+
+    ./run_all.sh
+
+If you installed the standalone version (with no HPC support),
+execute
+
+.. code-block:: shell
+
+    ./run_nonhpc.sh
+
+There are some examples in the ``hiperwalk/examples/`` directory.
+You may execute any code inside this directory.
 For instance,
 
 .. code-block:: shell
 
-    cd hiperwalk/examples/
+    cd ~/hiperwalk/examples/
     python3 non-hpc-coined-line.py
-
-Recall that the HiperWalk default is to use HPC.
-Hence, most examples will not work
-if the HPC support was not installed successfully. 
