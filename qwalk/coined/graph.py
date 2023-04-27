@@ -516,7 +516,7 @@ class Graph(BaseWalk):
         Create the oracle that marks the given vertices.
 
         The oracle is set to be used for generating the evolution operator.
-        If ``vertices=[]`` no oracle is created and it is set to ``None``.
+        If ``marked_vertices=[]`` no oracle is created and it is set to ``None``.
         If an evolution operator was set previously,
         it is unset for coherence.
 
@@ -524,7 +524,7 @@ class Graph(BaseWalk):
         ----------
         marked_vertices : int, array_like, default=0
             Vertex (vertices) to be marked.
-            If ``vertices=[]`` no oracle is created.
+            If ``marked_vertices=[]`` no oracle is created.
 
         oracle_type : {'standard', 'phase_flip'}
             Oracle type to be used.
@@ -878,7 +878,7 @@ class Graph(BaseWalk):
 
         return state
 
-    def state(self, entries, type='vertex_dir'):
+    def state(self, entries, type='arc_notation'):
         """
         Generates a valid state.
 
@@ -897,7 +897,7 @@ class Graph(BaseWalk):
             There are three types of accaptable entries:
             `(amplitude, vertex, coin_dir)`,
             `(amplitude, vertex, dst_vertex)`,
-            `(amplitude, arc)`.
+            `(amplitude, arc_number)`.
 
             amplitude :
                 The amplitudes of the given entry.
@@ -915,13 +915,13 @@ class Graph(BaseWalk):
             arc_number :
                 The arc number with respect to the sorted arcs order.
 
-        type : {'vertex_dir', 'arc_notation', 'arc_order'}
+        type : {'arc_notation', 'vertex_dir', 'arc_order'}
             The type of the ``entries`` argument.
 
-            * `'vertex_dir'` (default): corresponds to
-                the `(amplitude, vertex, coin_dir)` entry type;
             * `'arc_notation'` : corresponds to the
                 `(amplitude, vertex, dst_vertex)` entry type;
+            * `'vertex_dir'` (default): corresponds to
+                the `(amplitude, vertex, coin_dir)` entry type;
             * `arc_order` : corresponds to the
                 `(amplitude, arc)` entry type.
 
@@ -951,8 +951,8 @@ class Graph(BaseWalk):
                 (1, 0, 0) into [(1, 0, 0)]
         """
 
-        funcs = {'vertex_dir' : self._state_vertex_dir,
-                 'arc_notation' : self._state_arc_notation,
+        funcs = {'arc_notation' : self._state_arc_notation,
+                 'vertex_dir' : self._state_vertex_dir,
                  'arc_order' : self._state_arc_order}
 
         if type not in list(funcs.keys()):

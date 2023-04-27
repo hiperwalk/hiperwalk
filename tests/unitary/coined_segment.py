@@ -16,7 +16,7 @@ class TestCoinedSegment(unittest.TestCase):
         num_vert = 10
         seg = hpcoined.Segment(num_vert)
 
-        init_cond = seg.state([(1, 0, 0)])
+        init_cond = seg.state([(1, 0, 0)], 'vertex_dir')
         S = seg.persistent_shift_operator()
         final_state = seg.simulate(num_vert - 1, init_cond, S, hpc=False)
         final_state = final_state[0]
@@ -33,7 +33,7 @@ class TestCoinedSegment(unittest.TestCase):
         num_vert = 10
         seg = hpcoined.Segment(num_vert)
 
-        init_cond = seg.state([(1, 0, 0)])
+        init_cond = seg.state([(1, 0, 0)], 'vertex_dir')
         S = seg.persistent_shift_operator()
         final_state = seg.simulate(num_vert - 1, init_cond, S, hpc=True)
         final_state = final_state[0]
@@ -56,7 +56,7 @@ class TestCoinedSegment(unittest.TestCase):
         hpc_U = seg.evolution_operator(hpc=True)
         self.assertTrue(len((hpc_U - U).data) == 0)
 
-        init_cond = seg.state(entries)
+        init_cond = seg.state(entries, 'vertex_dir')
         states = seg.simulate(
             (num_steps, 1), init_cond, hpc=False)
         hpc_states = seg.simulate(
