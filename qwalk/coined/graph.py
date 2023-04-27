@@ -144,16 +144,12 @@ class Graph(BaseWalk):
     associated to the :math:`i`-th arc.
     In our example, the state
 
-    >>> psi = np.matrix([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0]).T
+    >>> psi = np.array([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0])
     >>> psi
-    matrix([[0.70710678+0.j        ],
-            [0.        +0.j        ],
-            [0.        +0.70710678j],
-            [0.        +0.j        ],
-            [0.        +0.j        ],
-            [0.        +0.j        ],
-            [0.        +0.j        ],
-            [0.        +0.j        ]])
+    array([0.70710678+0.j        , 0.        +0.j        ,
+           0.        +0.70710678j, 0.        +0.j        ,
+           0.        +0.j        , 0.        +0.j        ,
+           0.        +0.j        , 0.        +0.j        ])
 
     corresponds to the walker being at vertex 0
     and the coin pointing to vertex 1 with

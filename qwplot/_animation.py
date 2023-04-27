@@ -160,7 +160,7 @@ class Animation:
         --------
         >>> # add previous code
         >>> # saves animation in ``output.gif`` file
-        >>> anim.save_animation('output') 
+        >>> anim.save_animation('output') # doctest: +SKIP
 
         .. todo::
             Complete example
