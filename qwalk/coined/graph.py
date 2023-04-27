@@ -886,44 +886,41 @@ class Graph(BaseWalk):
         of the ``entries``.
         Please refer to the current class documentation for the
         expected direction and arc order --
-        for instance, click on **qwalk.coined.`current_class_name`**.
+        for instance, click on :meth:`qwalk.coined.Graph`.
 
         The final state is normalized in order to be unitary.
 
         Parameters
         ----------
-        entries :
+        entries : list of entry
             Each entry is a tuple (or array).
-            There are three types of accaptable entries:
-            `(amplitude, vertex, coin_dir)`,
-            `(amplitude, vertex, dst_vertex)`,
-            `(amplitude, arc_number)`.
+            An entry can be specified in three different ways:
+            ``(amplitude, vertex, dst_vertex)``,
+            ``(amplitude, vertex, coin_dir)``,
+            ``(amplitude, arc_number)``.
 
             amplitude :
                 The amplitudes of the given entry.
             vertex :
                 The vertex corresponding to the position of the walker
                 in the superposition.
-            coin_dir :
-                The direction towards which the coin is pointing.
-                A value between 0 and degree(``vertices[i]``) - 1
-                is expected, respecting the sorted arcs order.
             dst_vertex : 
                 The vertex which the coin is pointing to.
                 In other words, the tuple
                 (vertex, dst_vertex) must be a valid arc.
+            coin_dir :
+                The direction towards which the coin is pointing.
+                A value between 0 and degree(``vertices[i]``) - 1
+                is expected, respecting the sorted arcs order.
             arc_number :
                 The arc number with respect to the sorted arcs order.
 
         type : {'arc_notation', 'vertex_dir', 'arc_order'}
-            The type of the ``entries`` argument.
+            The type of each entry sent in the ``entries`` argument.
 
-            * `'arc_notation'` : corresponds to the
-                `(amplitude, vertex, dst_vertex)` entry type;
-            * `'vertex_dir'` (default): corresponds to
-                the `(amplitude, vertex, coin_dir)` entry type;
-            * `arc_order` : corresponds to the
-                `(amplitude, arc)` entry type.
+            * **'arc_notation'** : ``(amplitude, vertex, dst_vertex)``;
+            * **'vertex_dir'**: ``(amplitude, vertex, coin_dir)``;
+            * **arc_order** : ``(amplitude, arc_number)``.
 
 
         Raises
