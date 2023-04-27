@@ -84,13 +84,20 @@ class Graph(BaseWalk):
     For example, the graph :math:`G(V, E)` shown in
     Figure 1 has adjacency matrix ``adj_matrix``.
 
-    >>> import numpy as np
-    >>> adj_matrix = np.matrix([[0, 1, 0, 0], [1, 0, 1, 1], [0, 1, 0, 1], [0, 1, 1, 0]])
+    .. testsetup::
+
+        import numpy as np
+
+    >>> adj_matrix = np.array([
+    ...     [0, 1, 0, 0],
+    ...     [1, 0, 1, 1],
+    ...     [0, 1, 0, 1],
+    ...     [0, 1, 1, 0]])
     >>> adj_matrix
-    matrix([[0, 1, 0, 0],
-            [1, 0, 1, 1],
-            [0, 1, 0, 1],
-            [0, 1, 1, 0]])
+    array([[0, 1, 0, 0],
+           [1, 0, 1, 1],
+           [0, 1, 0, 1],
+           [0, 1, 1, 0]])
 
     .. graphviz:: ../../graphviz/coined-model-sample.dot
         :align: center
@@ -99,7 +106,8 @@ class Graph(BaseWalk):
 
     The corresponding arcs are
 
-    >>> arcs = [(i, j) for i in range(4) for j in range(4) if A[i,j] == 1]
+    >>> arcs = [(i, j) for i in range(4)
+    ...                for j in range(4) if adj_matrix[i,j] == 1]
     >>> arcs
     [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
 
@@ -120,8 +128,9 @@ class Graph(BaseWalk):
     we would have the matrix ``adj_labels``.
     Intuitively, the arcs are labeled in left-to-right top-to-bottom fashion.
 
-    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels else '' for j in range(4)]
-    ...             for i in range(4)]
+    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
+    ...                                   else '' for j in range(4)]
+    ...               for i in range(4)]
     >>> adj_labels = np.matrix(adj_labels)
     >>> adj_labels
     matrix([['', '0', '', ''],
@@ -243,39 +252,47 @@ class Graph(BaseWalk):
         :class:`Graph` Notes Section example.
         The corresponding flip-flop shift operator is
 
-        >>> from scipy.sparse import csr_array
-        >>> import qwalk.coined as qcm
-        >>> A = csr_array([[0, 1, 0, 0],
-        ...                [1, 0, 1, 1],
-        ...                [0, 1, 0, 1],
-        ...                [0, 1, 1, 0]])
-        >>> g = qcm.Graph(A)
-        >>> S = g.flipflop_shift_operator()
-        >>> Sd = S.todense()
-        >>> Sd
-        array([[0, 1, 0, 0, 0, 0, 0, 0],
-            [1, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 1, 0],
-            [0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 1],
-            [0, 0, 0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 1, 0, 0]], dtype=int8)
+        .. testsetup::
+
+            import numpy as np
+            import scipy.sparse
+
+        .. doctest::
+
+            >>> import qwalk.coined as cnqw
+            >>> A = scipy.sparse.csr_array([[0, 1, 0, 0],
+            ...                             [1, 0, 1, 1],
+            ...                             [0, 1, 0, 1],
+            ...                             [0, 1, 1, 0]])
+            >>> g = cnqw.Graph(A)
+            >>> S = g.flipflop_shift_operator()
+            >>> Sd = S.todense()
+            >>> Sd
+            array([[0, 1, 0, 0, 0, 0, 0, 0],
+                   [1, 0, 0, 0, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 1, 0, 0, 0],
+                   [0, 0, 0, 0, 0, 0, 1, 0],
+                   [0, 0, 1, 0, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 0, 0, 0, 1],
+                   [0, 0, 0, 1, 0, 0, 0, 0],
+                   [0, 0, 0, 0, 0, 1, 0, 0]], dtype=int8)
 
         Note that as required, :math:`S^2 = I`,
         :math:`S \ket 0 = \ket 1`, :math:`S \ket 1 = \ket 0`,
         :math:`S \ket 2 = \ket 4`, :math:`S \ket 4 = \ket 2`, etc.
 
-        >>> (Sd @ Sd == np.eye(8)).all() # True by definition
-        True
-        >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
-        array([0., 1., 0., 0., 0., 0., 0., 0.])
-        >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
-        array([1., 0., 0., 0., 0., 0., 0., 0.])
-        >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) # S|2> = |4>
-        array([0., 0., 0., 0., 1., 0., 0., 0.])
-        >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
-        array([0., 0., 1., 0., 0., 0., 0., 0.])
+        .. doctest::
+
+            >>> (Sd @ Sd == np.eye(8)).all() # True by definition
+            True
+            >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
+            array([0, 1, 0, 0, 0, 0, 0, 0])
+            >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
+            array([1, 0, 0, 0, 0, 0, 0, 0])
+            >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) # S|2> = |4>
+            array([0, 0, 0, 0, 1, 0, 0, 0])
+            >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
+            array([0, 0, 1, 0, 0, 0, 0, 0])
         """
 
         if __DEBUG__:
