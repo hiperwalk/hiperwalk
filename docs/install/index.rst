@@ -95,7 +95,8 @@ If that's the case, execute
 
 This is going to list the available drivers for your GPU.
 We recommend to install the driver tagged with ``recommended`` at the end.
-The driver name's has format ``nvidia-driver-XXX`` where ``XXX`` is some number.
+The driver name's `probably` has format ``nvidia-driver-XXX``
+where ``XXX`` is some number.
 For the remaining installation, substitute ``XXX`` accordingly when necessary.
 For installing the GPU driver, execute
 
