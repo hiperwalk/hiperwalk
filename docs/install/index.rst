@@ -210,7 +210,7 @@ Then enter the newly created ``pyneblina`` directory to install it.
    cd pyneblina
    sudo python3 setup.py install
 
-To verify if the installationg completed successfully,
+To verify if the installation completed successfully,
 run the test.
 
 .. code-block:: shell
