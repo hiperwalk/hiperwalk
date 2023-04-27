@@ -40,6 +40,7 @@ extensions = [
     'sphinx.ext.todo', #'sphinx_autodoc_typehints',
     'numpydoc',
     'sphinx.ext.graphviz',
+    'sphinx.ext.doctest',
 ]
 
 intersphinx_mapping = {
