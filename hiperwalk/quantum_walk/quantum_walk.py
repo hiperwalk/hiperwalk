@@ -5,24 +5,23 @@ import inspect
 from sys import modules as sys_modules
 from sys import path as sys_path
 sys_path.append('..')
-from constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from _constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
+from graph import graph
 
-class BaseWalk(ABC):
+class QuantumWalk(ABC):
     """
     Base class for Quantum Walks.
 
     Base methods and attributes used for implementing
     specific Quantum Walk models.
 
-    .. todo::
-        The following methods must be overwritten.
-
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`
-        Adjacency matrix of the graph on
-        which the quantum walk occurs.
+    graph
+        Graph on which the quantum walk occurs.
+        It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
+        its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
     Attributes
     ----------
@@ -30,20 +29,23 @@ class BaseWalk(ABC):
         Hilbert Space dimension.
         It must be updated by the subclass' ``__init__``.
 
-    adj_matrix : :class:`scipy.sparse.csr_array`
-        Adjacency matrix of the graph on
-        which the quantum walk occurs.
-
     Raises
     ------
     TypeError
         if ``adj_matrix`` is not an instance of
         :class:`scipy.sparse.csr_array`.
+
+    Notes
+    -----
+
+    .. todo::
+        The following methods must be overwritten.
+
     """
 
     @abstractmethod
-    def __init__(self, adj_matrix):
-        self._oracle = None
+    def __init__(self, graph=None):
+        self._marked = []
         self._evolution_operator = None
 
         ##############################
@@ -59,20 +61,28 @@ class BaseWalk(ABC):
 
 
         # TODO: create sparse matrix from graph or dense adjacency matrix
-        if not isinstance(adj_matrix, scipy.sparse.csr_array):
+        if isinstance(graph, Graph):
+            # DO STUFF
+            self._graph = graph
+
+        elif isinstance(graph, scipy.sparse.csr_array):
+            # do stuff
+            if (len(adj_matrix.shape) != 2
+                or adj_matrix.shape[0] != adj_matrix.shape[1]
+            ):
+                raise ValueError(
+                    "`adj_matrix` is not a square matrix."
+                )
+
+            self._graph = Graph(graph)
+        else:
             raise TypeError(
-                "Invalid `adj_matrix` type."
-                + " Expected 'scipy.sparse.csr_array',"
-                + " but received " + str(type(adj_matrix)) + '.'
-            )
-        if (len(adj_matrix.shape) != 2
-            or adj_matrix.shape[0] != adj_matrix.shape[1]
-        ):
-            raise ValueError(
-                "`adj_matrix` is not a square matrix."
+                "Invalid `graph` type."
+                + " Expected 'hiperwalk.Graph' or "
+                + "'scipy.sparse.csr_array', but received "
+                + str(type(adj_matrix)) + ', instead.'
             )
 
-        self.adj_matrix = adj_matrix
         self.hilb_dim = 0
 
 
@@ -101,30 +111,30 @@ class BaseWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    @abstractmethod
-    def oracle(self, marked_vertices=0):
+    def set_marked(vertices):
         r"""
-        Create the oracle that marks the given vertices.
-
-        The oracle is set to be used for constructing the
-        evolution operator.
-        If ``vertices=[]`` no oracle is created and
-        ``None`` is returned.
-        For coherence, the previous evolution operator is unset.
+        Sets marked vertices.
 
         Parameters
         ----------
-        marked_vertices : int, array_like, default=0
-            Vertex (vertices) to be marked.
+        vertices : list of int
+            List of vertices to be marked
+        """
+        raise NotImplementedError
+
+    def get_marked():
+        r"""
+        Gets marked vertices.
 
         Returns
         -------
-        :class:`scipy.sparse.csr_array`
+        List of int
+            List of marked vertices.
+            If no vertex is marked, returns the empty list.
         """
-        raise NotImplementedError()
 
     @abstractmethod
-    def evolution_operator(self, marked_vertices=[], **kwargs):
+    def set_evolution(self, **kwargs):
         """
         Create the standard evolution operator.
 
@@ -132,22 +142,19 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        marked_vertices : array_like, default=[]
-            The marked vertices.
-            See :obj:`oracle`'s ``vertices`` parameter.
-
         **kwargs : dict, optional
             Additional arguments for constructing the evolution operator
 
-        Returns
-        -------
-        U : :class:`scipy.sparse.csr_array`
-            The evolution operator.
-
         See Also
         --------
-        oracle
         simulate
+        """
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_evolution():
+        r"""
+        Returns the evolution operator in matricial form.
         """
         raise NotImplementedError()
 
@@ -188,47 +195,47 @@ class BaseWalk(ABC):
 
         return prob
 
-    def _time_range_to_tuple(self, time_range):
+    def _time_to_tuple(self, time):
         r"""
-        Clean and format ``time_range`` to ``(start, end, step)`` format.
+        Clean and format ``time`` to ``(start, end, step)`` format.
 
         See :meth:`simulate` for valid input format options.
 
         Raises
         ------
         ValueError
-            If ``time_range`` is in an invalid input format.
+            If ``time`` is in an invalid input format.
         """
 
-        if not hasattr(time_range, '__iter__'):
-            time_range = [time_range]
+        if not hasattr(time, '__iter__'):
+            time = [time]
 
-        if len(time_range) == 1:
-            start = end = step = time_range[0]
-        elif len(time_range) == 2:
+        if len(time) == 1:
+            start = end = step = time[0]
+        elif len(time) == 2:
             start = 0
-            end = time_range[0]
-            step = time_range[1]
+            end = time[0]
+            step = time[1]
         else:
-            start = time_range[0]
-            end = time_range[1]
-            step = time_range[2]
+            start = time[0]
+            end = time[1]
+            step = time[2]
         
-        time_range = [start, end, step]
+        time = [start, end, step]
 
         if start < 0 or end < 0 or step <= 0:
             raise ValueError(
-                "Invalid 'time_range' value."
+                "Invalid 'time' value."
                 + "'start' and 'end' must be non-negative"
                 + " and 'step' must be positive."
             )
         if start > end:
             raise ValueError(
-                "Invalid `time_range` value."
+                "Invalid `time` value."
                 + "`start` cannot be larger than `end`."
             )
 
-        return time_range
+        return time
 
     def _normalize(self, state, error=1e-16):
         norm = np.linalg.norm(state)
@@ -273,7 +280,7 @@ class BaseWalk(ABC):
                 and 'nbl' in locals())
 
 
-    def simulate(self, time_range=None, initial_condition=None,
+    def simulate(self, time=None, initial_condition=None,
                  evolution_operator=None, hpc=True):
         r"""
         Simulates the quantum walk.
@@ -289,7 +296,7 @@ class BaseWalk(ABC):
 
         Parameters
         ----------
-        time_range : int, tuple of int, default=None
+        time : int, tuple of int, default=None
             Describes at which time instants the state must be saved.
             It can be specified in three different ways.
             
@@ -329,7 +336,7 @@ class BaseWalk(ABC):
         ------
         ValueError
             If any of the following occurs
-            * ``time_range=None``.
+            * ``time=None``.
             * ``initial_condition=None``.
             * ``evolution_operator=None`` and it was no set previously.
 
@@ -347,16 +354,16 @@ class BaseWalk(ABC):
 
         Examples
         --------
-        If ``time_range=(0, 13, 3)``, the saved states will be:
+        If ``time=(0, 13, 3)``, the saved states will be:
         the initial state (0), the intermediate states (3, 6, and 9),
         and the final state (12).
         """
         ############################################
         ### Check if simulation was set properly ###
         ############################################
-        if time_range is None:
+        if time is None:
             raise ValueError(
-                "``time_range` not specified`. "
+                "``time` not specified`. "
                 + "Must be an int or tuple of int."
             )
 
@@ -456,12 +463,12 @@ class BaseWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        time_range = np.array(self._time_range_to_tuple(time_range))
+        time = np.array(self._time_to_tuple(time))
 
-        if not np.all([e.is_integer() for e in time_range]):
-            raise ValueError("`time_range` has non-int entry.")
+        if not np.all([e.is_integer() for e in time]):
+            raise ValueError("`time` has non-int entry.")
 
-        start, end, step = time_range
+        start, end, step = time
 
         
         if hpc and not self._pyneblina_imported():
