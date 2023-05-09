@@ -4,9 +4,7 @@ Encapsules Animation class, responsible for managing animations.
 
 import matplotlib.pyplot as plt
 from PIL import Image
-from sys import path as sys_path
-sys_path.append('..')
-from constants import __DEBUG__
+from .._constants import __DEBUG__
 from warnings import warn
 
 if __DEBUG__:

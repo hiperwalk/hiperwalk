@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from ._animation import *
-from sys import path as sys_path
-sys_path.append('..')
-from constants import __DEBUG__
+from .._constants import __DEBUG__
 
 if __DEBUG__:
     from time import time
