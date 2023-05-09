@@ -7,6 +7,7 @@ from PIL import Image
 from sys import path as sys_path
 sys_path.append('..')
 from constants import __DEBUG__
+from warnings import warn
 
 if __DEBUG__:
     from time import time
@@ -168,11 +169,14 @@ class Animation:
         # TODO: add other valid matplotlib formats
         valid_extensions = ['.gif', '.mp4']
 
-        extension = filename_prefix[:-4]
+        extension = filename_prefix[-4:]
         if extension not in valid_extensions:
             filename_prefix += '.gif'
         self.save_path = filename_prefix
 
+        print('--------------------------------')
+        print(self.save_path)
+        print('--------------------------------')
         self.plt_anim.save(self.save_path)
         plt.close()
 
@@ -199,6 +203,9 @@ class Animation:
         if not self._is_saved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
+            print('---------------------------------')
+            print(temp.name)
+            print('---------------------------------')
             self.save_animation(temp.name)
             return temp
 
@@ -248,48 +255,122 @@ class Animation:
         temp = self._save_animation_in_temp_file()
 
         from gi import require_version
-        require_version('Gtk', '3.0')
+        try:
+            require_version('Gtk', '3.0')
+        except ValueError:
+            # Namespace Gtk is already loaded with version 4.0
+            # detect which version was loaded
+            pass
 
-        from gi.repository import Gtk as gtk
+        from gi.repository import Gtk
         from gi.repository.Gdk import KEY_q
         from gi.repository.Gdk import KEY_Q
         from gi.repository.Gdk import RGBA
         
-        # creating window
-        window = gtk.ApplicationWindow(title="Animation")
-        state = window.get_state()
-        window.override_background_color(state, RGBA(1, 1, 1, 1))
-
-        def configure_gif_window(self):
-            # assign closing events
-            def on_key_press(self, event):
-                if event.keyval == KEY_q or event.keyval == KEY_Q :
-                    window.close()
-
-            window.connect("key-press-event", on_key_press)
-            window.connect("destroy", gtk.main_quit)
-
-            # exhibits animation in gtk window
-            img = gtk.Image.new()
-            img.set_from_file(self.save_path)
-            window.add(img)
-
-        def configure_video_window(self):
-            print('Warning: show video not supported.')
-
-        if self.save_path[-4:] == '.gif':
-            configure_gif_window(self)
-        else:
-            configure_video_window(self)
-
-
-        # showing window and starting gtk main loop
-        window.show_all()
-        gtk.main()
+        Gtk_version = Gtk.get_major_version()
         
-        if temp is not None:
-            self.save_path = None
-            temp.close()
+        if Gtk_version == 3:
+            # creating window
+            window = Gtk.ApplicationWindow(title="Animation")
+            state = window.get_state()
+            raise NotImplementedError(
+                "window.get_state() is deprecated. Change."
+            )
+            window.override_background_color(state, RGBA(1, 1, 1, 1))
+
+            def configure_gif_window(self):
+                # assign closing events
+                def on_key_press(self, event):
+                    if event.keyval == KEY_q or event.keyval == KEY_Q :
+                        window.close()
+
+                window.connect("key-press-event", on_key_press)
+                window.connect("destroy", Gtk.main_quit)
+
+                # exhibits animation in Gtk window
+                img = Gtk.Image.new()
+                img.set_from_file(self.save_path)
+                window.add(img)
+
+            def configure_video_window(self):
+                warn('Showing video not supported.')
+
+            if self.save_path[-4:] == '.gif':
+                configure_gif_window(self)
+            else:
+                configure_video_window(self)
+
+
+            # showing window and starting Gtk main loop
+            window.show_all()
+            Gtk.main()
+            
+            if temp is not None:
+                self.save_path = None
+                temp.close()
+
+        elif Gtk_version == 4:
+            # creating window
+            window = Gtk.ApplicationWindow(title="Animation")
+            state = window.get_state_flags()
+            # window.override_background_color(state, RGBA(1, 1, 1, 1))
+
+            def configure_gif_window(self):
+                pass
+
+            def configure_video_window(self):
+                pass
+
+            if self.save_path[-4:] == '.gif':
+                configure_gif_window(self)
+            else:
+                configure_video_window(self)
+
+            def on_activate(app, save_path):
+                print('------------------------------')
+                print(save_path)
+                print('------------------------------')
+                win = Gtk.ApplicationWindow(application=app)
+                ############################
+                from gi.repository import GdkPixbuf
+                pixbuf = GdkPixbuf.PixbufAnimation.new_from_file(save_path)
+                img = Gtk.Image()
+                img.set_from_animation(pixbuf)
+                win.set_child(img)
+                win.present()
+                ############################
+                #img = Gtk.Image.new_from_file(save_path)
+                #win.set_child(img)
+                #win.present()
+                ############################
+                #img = Gtk.Video.new_for_filename(save_path)
+                # img = Gtk.Image.new()
+                # Gtk.Image.set_from_file(img, save_path)
+                #img.set_from_file(save_path)
+                ############################
+                #stream = Gtk.MediaFile.new_for_filename(save_path)
+                #video = Gtk.Video.new_for_media_stream(stream)
+                #video.set_autoplay(True)
+                #video.set_hexpand(True)
+                #video.set_vexpand(True)
+                #win.set_child(video)
+                #win.present() 
+
+            app = Gtk.Application()
+            app.connect('activate', on_activate, self.save_path)
+            app.run(None)
+            # showing window and starting Gtk main loop
+            # window.show_all()
+            # Gtk.main()
+            
+            if temp is not None:
+                self.save_path = None
+                temp.close()
+
+        else:
+            raise ValueError(
+                "GTK version not supported."
+            )
 
     def _show_animation_notebook(self):
         from IPython import display

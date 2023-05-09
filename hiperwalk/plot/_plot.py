@@ -524,6 +524,7 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
         ax.xaxis.set_major_locator(MaxNLocator(integer=True))
         if graph is not None:
 
+            ax.set_xlim((0, num_vert - 1))
             loc = ax.xaxis.get_major_locator()
             ind = loc().astype('int')
             ind = [i for i in ind if i >=0 and i < num_vert]
@@ -531,9 +532,16 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             nodes = list(graph.nodes())
 
             ax.set_xticks(ind, [nodes[i] for i in ind])
+        else:
+            ax.set_xlim((0, num_vert - 1))
+            loc = ax.xaxis.get_major_locator()
+            ind = loc().astype('int')
+            ind = [i for i in ind if i >=0 and i < num_vert]
+
+            ax.set_xticks(ind)
 
     if min_prob is not None and max_prob is not None:
-        plt.ylim((min_prob, max_prob))
+        plt.ylim((min_prob, max_prob*1.02))
 
 
 def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
@@ -567,8 +575,6 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     if __DEBUG__:
         global start
         end = time()
-        print("_plot_probability_distribution_on_graph: "
-              + str(end - start) + 's')
         start = end
 
 
