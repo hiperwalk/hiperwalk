@@ -3,11 +3,9 @@ import numpy as np
 import scipy.sparse
 import inspect
 from sys import modules as sys_modules
-from sys import path as sys_path
-sys_path.append('..')
-from _constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
-from graph import graph
+from ..graph import graph
 
 class QuantumWalk(ABC):
     """
