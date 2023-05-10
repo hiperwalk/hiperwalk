@@ -1,3 +1,23 @@
+def _binary_search(v, elem, start=0, end=None):
+    r"""
+    expects sorted array and executes binary search in the subarray
+    v[start:end] searching for elem.
+    Return the index of the element if found, otherwise returns -1
+    Cormen's binary search implementation.
+    Used to improve time complexity
+    """
+    if end == None:
+        end = len(v)
+    
+    while start < end:
+        mid = int((start + end)/2)
+        if elem <= v[mid]:
+            end = mid
+        else:
+            start = mid + 1
+
+    return end if v[end] == elem else -1
+
 class Graph():
     r"""
     Graph on which a quantum walk occurs.
@@ -55,3 +75,13 @@ class Graph():
         it is embeddable or not.
         """
         return False
+
+    def get_arc_label(self, tail, head):
+        return _binary_search(self.adj_matrix.indices, head,
+                              start = self.adj_matrix.indptr[tail],
+                              end = self.adj_matrix.indptr[tail + 1])
+
+    def get_neighbors(self, vertex):
+        start = self.adj_matrix.indptr[vertex]
+        end = self.adj_matrix.indptr[vertex + 1]
+        return self.adj_matrix.indices[start:end]

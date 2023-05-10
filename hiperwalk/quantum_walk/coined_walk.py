@@ -199,7 +199,7 @@ class CoinedWalk(QuantumWalk):
             if len(params) != len(set(params)):
                 raise AssertionError
 
-    def _flipflop_shift(self):
+    def _old_flipflop_shift(self):
         r"""
         Create the flipflop shift operator (:math:`S`) based on
         the ``adj_matrix`` attribute.
@@ -340,6 +340,35 @@ class CoinedWalk(QuantumWalk):
         adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
 
         # TODO: compare with old approach for creating S
+
+        if __DEBUG__:
+            print("flipflop_shift Time: " + str(now() - start_time))
+
+        self._shift = S
+        return S
+
+    def _flipflop_shift(self):
+        if __DEBUG__:
+            start_time = now()
+
+        warn('query graph functions')
+        warn('benchmark with old version')
+        # expects weights to be 1 if adjacent
+        adj_matrix = self._graph.adj_matrix
+        num_vert = self._graph.adj_matrix.shape[0]
+        num_edges = adj_matrix.sum()
+
+        S_cols = [self._graph.get_arc_label(j, i)
+                  for i in range(num_vert)
+                  for j in self._graph.get_neighbors(i)]
+
+        # Using csr_array((data, indices, indptr), shape)
+        # Note that there is only one entry per row and column
+        S = scipy.sparse.csr_array(
+            ( np.ones(num_edges, dtype=np.int8),
+              S_cols, np.arange(num_edges+1) ),
+            shape=(num_edges, num_edges)
+        )
 
         if __DEBUG__:
             print("flipflop_shift Time: " + str(now() - start_time))
@@ -541,11 +570,8 @@ class CoinedWalk(QuantumWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def set_marked(self, vertices=None, change_coin='minus_identity'):
+    def set_marked(self, vertices=[], change_coin='minus_identity'):
         self._marked = vertices
-
-    def get_marked(self):
-        return self._marked
 
     def set_evolution(self, **kwargs):
         """
