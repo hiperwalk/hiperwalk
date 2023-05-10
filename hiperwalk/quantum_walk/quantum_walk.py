@@ -44,7 +44,7 @@ class QuantumWalk(ABC):
     @abstractmethod
     def __init__(self, graph=None, **kwargs):
         self._marked = []
-        self._evolution_operator = None
+        self._evolution = None
 
         ##############################
         ### Simulation attributes. ###
@@ -400,7 +400,7 @@ class QuantumWalk(ABC):
                 + "Expected an np.array with length " + str(self.hilb_dim)
             )
 
-        if self._evolution_operator is None and evolution_operator is None:
+        if self._evolution is None and evolution_operator is None:
             raise ValueError(
                 "Evolution Operator was not set. "
                 + "Did you forget to call the evolution_operator() method"
@@ -414,8 +414,8 @@ class QuantumWalk(ABC):
                     + " Expected shape is "
                     + str((self.hilb_dim, self.hilb_dim))
                 )
-            prev_U = self._evolution_operator
-            self._evolution_operator = evolution_operator
+            prev_U = self._evolution
+            self._evolution = evolution_operator
 
         ###########################
         ### Auxiliary functions ###
@@ -426,11 +426,11 @@ class QuantumWalk(ABC):
                 print("Preparing engine")
 
             if hpc:
-                self._simul_mat = nbl.send_matrix(self._evolution_operator)
+                self._simul_mat = nbl.send_matrix(self._evolution)
                 self._simul_vec = nbl.send_vector(initial_condition)
 
             else:
-                self._simul_mat = self._evolution_operator
+                self._simul_mat = self._evolution
                 self._simul_vec = initial_condition
 
             if __DEBUG__:
@@ -511,7 +511,7 @@ class QuantumWalk(ABC):
         # TODO: error: if initial condition is int and
         # evolution operator is float, dtype is complex
         dtype = (initial_condition.dtype if
-            initial_condition.dtype == self._evolution_operator.dtype
+            initial_condition.dtype == self._evolution.dtype
             else complex
         )
         saved_states = np.zeros(
@@ -539,7 +539,7 @@ class QuantumWalk(ABC):
         self._simul_vec = None
 
         if evolution_operator is not None:
-            self._evolution_operator = prev_U
+            self._evolution = prev_U
 
         return saved_states
 
