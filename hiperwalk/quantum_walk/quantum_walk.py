@@ -163,8 +163,36 @@ class QuantumWalk(ABC):
         # elem.real**2 + elem.imag**2
         return elem.real*elem.real + elem.imag*elem.imag
 
-    def probability_distribution(self, states):
+    def probability(self, states):
+        r"""
+        Compute the probability states.
+
+        The probability of each entry of the state.
+
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray`
+            The states used to compute the probabilities.
+
+        Returns
+        -------
+        probabilities : :class:`numpy.ndarray`
+            ``probabilities[i]`` is the probability of the ``i``-entry.
+
+        See Also
+        --------
+        simulate
         """
+        if len(states.shape) == 1:
+            states = [states]
+
+        prob = list(map(QuantumWalk._elementwise_probability, states))
+        prob = np.array(prob)
+
+        return prob
+
+    def probability_distribution(self, states):
+        r"""
         Compute the probability distribution of given states.
 
         The probability of the walker being found on each vertex
@@ -185,13 +213,7 @@ class QuantumWalk(ABC):
         --------
         simulate
         """
-        if len(states.shape) == 1:
-            states = [states]
-
-        prob = list(map(BaseWalk._elementwise_probability, states))
-        prob = np.array(prob)
-
-        return prob
+        return self.probability(states)
 
     def _time_to_tuple(self, time):
         r"""
