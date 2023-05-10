@@ -109,7 +109,7 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def set_marked(vertices):
+    def set_marked(vertices=[]):
         r"""
         Sets marked vertices.
 
@@ -118,7 +118,7 @@ class QuantumWalk(ABC):
         vertices : list of int
             List of vertices to be marked
         """
-        raise NotImplementedError
+        self._marked = vertices
 
     def get_marked():
         r"""
@@ -130,7 +130,7 @@ class QuantumWalk(ABC):
             List of marked vertices.
             If no vertex is marked, returns the empty list.
         """
-        raise NotImplementedError
+        return self._marked
 
     @abstractmethod
     def set_evolution(self, **kwargs):
