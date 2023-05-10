@@ -7,4 +7,5 @@ num_vert = 5
 adj_matrix = nx.adjacency_matrix(nx.cycle_graph(num_vert))
 g = hpw.Graph(adj_matrix)
 
-print(g)
+dtqw = hpw.CoinedWalk(g)
+print(dtqw)

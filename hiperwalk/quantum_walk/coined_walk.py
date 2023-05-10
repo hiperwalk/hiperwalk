@@ -2,11 +2,9 @@ import numpy as np
 import scipy
 import scipy.sparse
 import networkx as nx
-from ..base_walk import BaseWalk
+from .quantum_walk import QuantumWalk
 from warnings import warn
-from sys import path as sys_path
-sys_path.append('../..')
-from constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 
 if __DEBUG__:
     from time import time as now
@@ -175,8 +173,8 @@ class CoinedWalk(QuantumWalk):
             raise ValueError('graph is None')
 
         super().__init__(graph)
-        self._shift_operator = None
-        self._coin_operator = None
+        self._shift = None
+        self._coin = None
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.adj_matrix.sum()
@@ -184,13 +182,13 @@ class CoinedWalk(QuantumWalk):
         self._valid_kwargs = dict()
 
         self._valid_kwargs['shift'] = self._get_valid_kwargs(
-            self.shift_operator)
+            self.set_shift)
 
         self._valid_kwargs['coin'] = self._get_valid_kwargs(
-            self.coin_operator)
+            self.set_coin)
 
-        self._valid_kwargs['oracle'] = self._get_valid_kwargs(
-            self.oracle)
+        self._valid_kwargs['marked'] = self._get_valid_kwargs(
+            self.set_marked)
 
         if __DEBUG__:
             methods = list(self._valid_kwargs)
@@ -266,7 +264,7 @@ class CoinedWalk(QuantumWalk):
             ...                             [0, 1, 0, 1],
             ...                             [0, 1, 1, 0]])
             >>> g = cnqw.Graph(A)
-            >>> S = g.flipflop_shift_operator()
+            >>> S = g.flipflop_shift()
             >>> Sd = S.todense()
             >>> Sd
             array([[0, 1, 0, 0, 0, 0, 0, 0],
@@ -343,7 +341,7 @@ class CoinedWalk(QuantumWalk):
             print("flipflop_shift Time: "
                   + str(now() - start_time))
 
-        self._shift_operator = S
+        self._shift = S
         self._evolution_operator = None
         return S
 
@@ -363,7 +361,7 @@ class CoinedWalk(QuantumWalk):
         raise NotImplementedError('Inexistent or not overriden.')
 
 
-    def shift(self, shift='default'):
+    def set_shift(self, shift='default'):
         r"""
         Create the shift operator.
 
@@ -396,7 +394,7 @@ class CoinedWalk(QuantumWalk):
 
         See Also
         --------
-        has_persistent_shift_operator
+        has_persistent_shift
         """
         valid_keys = ['default', 'flipflop', 'persistent', 'ff', 'p']
         if shift not in valid_keys:
@@ -407,7 +405,7 @@ class CoinedWalk(QuantumWalk):
             )
 
         if shift == 'default':
-            shift = 'p' if self.has_persistent_shift_operator() else 'ff'
+            shift = 'p' if self.has_persistent_shift() else 'ff'
 
         if shift == 'ff':
             shift = 'flipflop'
@@ -419,12 +417,15 @@ class CoinedWalk(QuantumWalk):
              else self._persistent_shift())
 
         if __DEBUG__:
-            if self._shift_operator is None: raise AssertionError
+            if self._shift is None: raise AssertionError
             if self._evolution_operator is not None: raise AssertionError
 
         return S
 
-    def coin_operator(self, coin='default', coin2=None, vertices2=[]):
+    def get_shift(self):
+        return self._shift
+
+    def set_coin(self, coin='default', coin2=None, vertices2=[]):
         """
         Generate a coin operator based on the graph structure.
 
@@ -514,9 +515,12 @@ class CoinedWalk(QuantumWalk):
                       for v in range(num_vert)]
 
         C = scipy.sparse.block_diag(blocks, format='csr')
-        self._coin_operator = C
+        self._coin = C
         self._evolution_operator = None
         return C
+
+    def get_coin(self):
+        return self._coin
 
     @staticmethod
     def _fourier_coin(dim):
@@ -542,7 +546,7 @@ class CoinedWalk(QuantumWalk):
     def get_marked(self):
         return self._marked
 
-    def evolution_operator(self, marked_vertices=[], hpc=True, **kwargs):
+    def set_evolution(self, marked_vertices=[], hpc=True, **kwargs):
         """
         Create the standard evolution operator.
 
@@ -583,7 +587,7 @@ class CoinedWalk(QuantumWalk):
 
         See Also
         --------
-        has_persistent_shift_operator
+        has_persistent_shift
         shift_operator
         coin_operator
         oracle
@@ -614,9 +618,9 @@ class CoinedWalk(QuantumWalk):
                     kwargs, self._valid_kwargs['oracle'])
         R_kwargs['marked_vertices'] = marked_vertices
 
-        if self._shift_operator is None or bool(S_kwargs):
+        if self._shift is None or bool(S_kwargs):
             self.shift_operator(**S_kwargs)
-        if self._coin_operator is None or bool(C_kwargs):
+        if self._coin is None or bool(C_kwargs):
             self.coin_operator(**C_kwargs)
         if self._oracle is None or bool(R_kwargs):
             self.oracle(**R_kwargs)
@@ -624,8 +628,8 @@ class CoinedWalk(QuantumWalk):
 
 
         if __DEBUG__:
-            if (self._shift_operator is None
-                or self._coin_operator is None
+            if (self._shift is None
+                or self._coin is None
                 or (self._oracle is None and len(marked_vertices) != 0)
                 or self._evolution_operator is None
             ):
@@ -633,7 +637,7 @@ class CoinedWalk(QuantumWalk):
 
         return U
 
-    def _evolution_operator_from_SCR(self, hpc=True):
+    def get_evolution(self, hpc=True):
         r"""
         Create evolution operator from previously set matrices.
 
@@ -648,9 +652,9 @@ class CoinedWalk(QuantumWalk):
             Whether or not the evolution operator should be
             constructed using nelina's high-performance computating.
         """
-        if self._shift_operator is None:
+        if self._shift is None:
             raise AttributeError("Shift operator was not set.")
-        if self._coin_operator is None:
+        if self._coin is None:
             raise AttributeError("Coin operator was not set.")
 
         U = None
@@ -669,8 +673,8 @@ class CoinedWalk(QuantumWalk):
                 + "Then converting back to sparse. "
                 + "This uses unnecessary memory and computational time."
             )
-            S = self._shift_operator.todense()
-            C = self._coin_operator.todense()
+            S = self._shift.todense()
+            C = self._coin.todense()
 
             warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
@@ -694,7 +698,7 @@ class CoinedWalk(QuantumWalk):
             U = scipy.sparse.csr_array(U)
 
         else:
-            U = self._shift_operator @ self._coin_operator
+            U = self._shift @ self._coin
             if self._oracle is not None:
                 U = U @ self._oracle
 
