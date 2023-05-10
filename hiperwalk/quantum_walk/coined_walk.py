@@ -167,7 +167,7 @@ class CoinedWalk(QuantumWalk):
         Vol. 19. New York: Springer, 2013.
     """
 
-    def __init__(self, graph=None):
+    def __init__(self, graph=None, **kwargs):
 
         if graph is None:
             raise ValueError('graph is None')
@@ -189,6 +189,8 @@ class CoinedWalk(QuantumWalk):
 
         self._valid_kwargs['marked'] = self._get_valid_kwargs(
             self.set_marked)
+
+        self.set_evolution(**kwargs)
 
         if __DEBUG__:
             methods = list(self._valid_kwargs)
@@ -297,31 +299,33 @@ class CoinedWalk(QuantumWalk):
         if __DEBUG__:
             start_time = now()
 
+        warn('Query graph for arc labels')
         # expects weights to be 1 if adjacent
-        num_edges = self.adj_matrix.sum()
+        adj_matrix = self._graph.adj_matrix
+        num_edges = adj_matrix.sum()
 
         # Storing edges' indeces in data.
         # Obs.: for some reason this does not throw exception,
         #   so technically it is a sparse matrix that stores a zero entry
-        orig_dtype = self.adj_matrix.dtype
-        self.adj_matrix.data = np.arange(num_edges)
+        orig_dtype = adj_matrix.dtype
+        adj_matrix.data = np.arange(num_edges)
 
         # Calculating flipflop_shift columns
         # (to be used as indices of a csr_array)
         row = 0
         S_cols = np.zeros(num_edges)
         for edge in range(num_edges):
-            if edge >= self.adj_matrix.indptr[row + 1]:
+            if edge >= adj_matrix.indptr[row + 1]:
                 row += 1
             # Column index (in the adj_matrix struct) of the current edge
-            col_index = _binary_search(self.adj_matrix.data, edge,
-                                        start=self.adj_matrix.indptr[row],
-                                        end=self.adj_matrix.indptr[row+1])
+            col_index = _binary_search(adj_matrix.data, edge,
+                                        start=adj_matrix.indptr[row],
+                                        end=adj_matrix.indptr[row+1])
             # S[edge, S_cols[edge]] = 1
             # S_cols[edge] is the edge_id such that
             # S|edge> = |edge_id>
-            S_cols[edge] = self.adj_matrix[
-                self.adj_matrix.indices[col_index], row
+            S_cols[edge] = adj_matrix[
+                adj_matrix.indices[col_index], row
             ]
 
         # Using csr_array((data, indices, indptr), shape)
@@ -333,16 +337,14 @@ class CoinedWalk(QuantumWalk):
         )
 
         # restores original data to adj_matrix
-        self.adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
+        adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
 
         # TODO: compare with old approach for creating S
 
         if __DEBUG__:
-            print("flipflop_shift Time: "
-                  + str(now() - start_time))
+            print("flipflop_shift Time: " + str(now() - start_time))
 
         self._shift = S
-        self._evolution_operator = None
         return S
 
     def has_persistent_shift(self):
@@ -358,7 +360,7 @@ class CoinedWalk(QuantumWalk):
         return self._graph.is_embeddable()
 
     def _persistent_shift(self):
-        raise NotImplementedError('Inexistent or not overriden.')
+        raise NotImplementedError()
 
 
     def set_shift(self, shift='default'):
@@ -479,16 +481,16 @@ class CoinedWalk(QuantumWalk):
         # dict with valid coins as keys and the respective
         # function pointers.
         coin_funcs = {
-            'fourier': Graph._fourier_coin,
-            'grover': Graph._grover_coin,
-            'hadamard': Graph._hadamard_coin,
-            'minus_identity': Graph._minus_identity
+            'fourier': CoinedWalk._fourier_coin,
+            'grover': CoinedWalk._grover_coin,
+            'hadamard': CoinedWalk._hadamard_coin,
+            'minus_identity': CoinedWalk._minus_identity
         }
 
         if coin == 'default':
-            coin = self.get_default_coin()
+            coin = self._graph.get_default_coin()
         if coin2 == 'default':
-            coin2 = self.get_default_coin()
+            coin2 = self._graph.get_default_coin()
 
         if coin not in coin_funcs.keys() or (coin2 != None and
             coin2 not in coin_funcs.keys()):
@@ -498,8 +500,9 @@ class CoinedWalk(QuantumWalk):
                 + "but received '" + str(coin) + "'."
             )
 
-        num_vert = self.adj_matrix.shape[0]
-        degrees = self.adj_matrix.sum(1) # sum rows
+        warn('Query graph for necessary infos')
+        num_vert = self._graph.adj_matrix.shape[0]
+        degrees = self._graph.adj_matrix.sum(1) # sum rows
         blocks = []
 
         if coin2 is None:
@@ -516,8 +519,6 @@ class CoinedWalk(QuantumWalk):
 
         C = scipy.sparse.block_diag(blocks, format='csr')
         self._coin = C
-        self._evolution_operator = None
-        return C
 
     def get_coin(self):
         return self._coin
@@ -541,12 +542,12 @@ class CoinedWalk(QuantumWalk):
         return -np.identity(dim)
 
     def set_marked(self, vertices=None, change_coin='minus_identity'):
-        raise NotImplementedError
+        self._marked = vertices
 
     def get_marked(self):
         return self._marked
 
-    def set_evolution(self, marked_vertices=[], hpc=True, **kwargs):
+    def set_evolution(self, **kwargs):
         """
         Create the standard evolution operator.
 
@@ -615,17 +616,11 @@ class CoinedWalk(QuantumWalk):
         C_kwargs = self._filter_valid_kwargs(
                     kwargs, self._valid_kwargs['coin'])
         R_kwargs = self._filter_valid_kwargs(
-                    kwargs, self._valid_kwargs['oracle'])
-        R_kwargs['marked_vertices'] = marked_vertices
+                    kwargs, self._valid_kwargs['marked'])
 
-        if self._shift is None or bool(S_kwargs):
-            self.shift_operator(**S_kwargs)
-        if self._coin is None or bool(C_kwargs):
-            self.coin_operator(**C_kwargs)
-        if self._oracle is None or bool(R_kwargs):
-            self.oracle(**R_kwargs)
-        U = self._evolution_operator_from_SCR(hpc)
-
+        self.set_shift(**S_kwargs)
+        self.set_coin(**C_kwargs)
+        self.set_marked(**R_kwargs)
 
         if __DEBUG__:
             if (self._shift is None
@@ -634,8 +629,6 @@ class CoinedWalk(QuantumWalk):
                 or self._evolution_operator is None
             ):
                 raise AssertionError
-
-        return U
 
     def get_evolution(self, hpc=True):
         r"""

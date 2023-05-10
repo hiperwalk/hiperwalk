@@ -42,7 +42,7 @@ class QuantumWalk(ABC):
     """
 
     @abstractmethod
-    def __init__(self, graph=None):
+    def __init__(self, graph=None, **kwargs):
         self._marked = []
         self._evolution_operator = None
 
@@ -130,6 +130,7 @@ class QuantumWalk(ABC):
             List of marked vertices.
             If no vertex is marked, returns the empty list.
         """
+        raise NotImplementedError
 
     @abstractmethod
     def set_evolution(self, **kwargs):
