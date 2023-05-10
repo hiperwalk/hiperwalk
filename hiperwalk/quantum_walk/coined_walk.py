@@ -199,7 +199,8 @@ class CoinedWalk(QuantumWalk):
             if len(params) != len(set(params)):
                 raise AssertionError
 
-    def _old_flipflop_shift(self):
+
+    def _set_flipflop_shift(self):
         r"""
         Create the flipflop shift operator (:math:`S`) based on
         the ``adj_matrix`` attribute.
@@ -216,13 +217,9 @@ class CoinedWalk(QuantumWalk):
         Notes
         -----
 
-        .. todo::
-            - If `adj_matrix` parameter is not sparse,
-                throw exception of convert to sparse.
-
         .. note::
-            Check :class:`Graph` Notes for details
-            about the order and dimension of the computational basis.
+            Check :class:`CoinedWalk` Notes for details
+            about the computational basis.
 
 
         The flip-flop shift operator :math:`S` is defined such that
@@ -260,15 +257,15 @@ class CoinedWalk(QuantumWalk):
 
         .. doctest::
 
-            >>> import qwalk.coined as cnqw
+            >>> import hiperwalk as hpw
             >>> A = scipy.sparse.csr_array([[0, 1, 0, 0],
             ...                             [1, 0, 1, 1],
             ...                             [0, 1, 0, 1],
             ...                             [0, 1, 1, 0]])
-            >>> g = cnqw.Graph(A)
-            >>> S = g.flipflop_shift()
-            >>> Sd = S.todense()
-            >>> Sd
+            >>> qw = hpw.CoinedWalk(A)
+            >>> qw._flipflop_shift()
+            >>> S = qw.get_shift().todense()
+            >>> S
             array([[0, 1, 0, 0, 0, 0, 0, 0],
                    [1, 0, 0, 0, 0, 0, 0, 0],
                    [0, 0, 0, 0, 1, 0, 0, 0],
@@ -284,75 +281,22 @@ class CoinedWalk(QuantumWalk):
 
         .. doctest::
 
-            >>> (Sd @ Sd == np.eye(8)).all() # True by definition
+            >>> (S @ S == np.eye(8)).all() # True by definition
             True
-            >>> Sd @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
+            >>> S @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
             array([0, 1, 0, 0, 0, 0, 0, 0])
-            >>> Sd @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
+            >>> S @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
             array([1, 0, 0, 0, 0, 0, 0, 0])
-            >>> Sd @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) # S|2> = |4>
+            >>> S @ np.array([0, 0, 1, 0, 0, 0, 0, 0]) # S|2> = |4>
             array([0, 0, 0, 0, 1, 0, 0, 0])
-            >>> Sd @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
+            >>> S @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
             array([0, 0, 1, 0, 0, 0, 0, 0])
         """
 
         if __DEBUG__:
             start_time = now()
 
-        warn('Query graph for arc labels')
-        # expects weights to be 1 if adjacent
-        adj_matrix = self._graph.adj_matrix
-        num_edges = adj_matrix.sum()
-
-        # Storing edges' indeces in data.
-        # Obs.: for some reason this does not throw exception,
-        #   so technically it is a sparse matrix that stores a zero entry
-        orig_dtype = adj_matrix.dtype
-        adj_matrix.data = np.arange(num_edges)
-
-        # Calculating flipflop_shift columns
-        # (to be used as indices of a csr_array)
-        row = 0
-        S_cols = np.zeros(num_edges)
-        for edge in range(num_edges):
-            if edge >= adj_matrix.indptr[row + 1]:
-                row += 1
-            # Column index (in the adj_matrix struct) of the current edge
-            col_index = _binary_search(adj_matrix.data, edge,
-                                        start=adj_matrix.indptr[row],
-                                        end=adj_matrix.indptr[row+1])
-            # S[edge, S_cols[edge]] = 1
-            # S_cols[edge] is the edge_id such that
-            # S|edge> = |edge_id>
-            S_cols[edge] = adj_matrix[
-                adj_matrix.indices[col_index], row
-            ]
-
-        # Using csr_array((data, indices, indptr), shape)
-        # Note that there is only one entry per row and column
-        S = scipy.sparse.csr_array(
-            ( np.ones(num_edges, dtype=np.int8),
-              S_cols, np.arange(num_edges+1) ),
-            shape=(num_edges, num_edges)
-        )
-
-        # restores original data to adj_matrix
-        adj_matrix.data = np.ones(num_edges, dtype=orig_dtype)
-
-        # TODO: compare with old approach for creating S
-
-        if __DEBUG__:
-            print("flipflop_shift Time: " + str(now() - start_time))
-
-        self._shift = S
-        return S
-
-    def _flipflop_shift(self):
-        if __DEBUG__:
-            start_time = now()
-
         warn('query graph functions')
-        warn('benchmark with old version')
         # expects weights to be 1 if adjacent
         adj_matrix = self._graph.adj_matrix
         num_vert = self._graph.adj_matrix.shape[0]
@@ -374,7 +318,7 @@ class CoinedWalk(QuantumWalk):
             print("flipflop_shift Time: " + str(now() - start_time))
 
         self._shift = S
-        return S
+        self._evolution = None
 
     def has_persistent_shift(self):
         r"""
@@ -388,7 +332,7 @@ class CoinedWalk(QuantumWalk):
         """
         return self._graph.is_embeddable()
 
-    def _persistent_shift(self):
+    def _set_persistent_shift(self):
         raise NotImplementedError()
 
 
@@ -444,14 +388,12 @@ class CoinedWalk(QuantumWalk):
             shift = 'persistent'
 
         
-        S = (self._flipflop_shift() if shift == 'flipflop'
-             else self._persistent_shift())
+        S = (self._set_flipflop_shift() if shift == 'flipflop'
+             else self._set_persistent_shift())
 
         if __DEBUG__:
             if self._shift is None: raise AssertionError
-            if self._evolution_operator is not None: raise AssertionError
-
-        return S
+            if self._evolution is not None: raise AssertionError
 
     def get_shift(self):
         return self._shift
@@ -648,13 +590,12 @@ class CoinedWalk(QuantumWalk):
         self.set_coin(**C_kwargs)
         self.set_marked(**R_kwargs)
 
-        if __DEBUG__:
-            if (self._shift is None
-                or self._coin is None
-                or (self._oracle is None and len(marked_vertices) != 0)
-                or self._evolution_operator is None
-            ):
-                raise AssertionError
+        # if __DEBUG__:
+        #     if (self._shift is None
+        #         or self._coin is None
+        #         or self._evolution is None
+        #     ):
+        #         raise AssertionError
 
     def get_evolution(self, hpc=True):
         r"""
@@ -721,7 +662,7 @@ class CoinedWalk(QuantumWalk):
             if self._oracle is not None:
                 U = U @ self._oracle
 
-        self._evolution_operator = U
+        self._evolution = U
         return U
 
 
