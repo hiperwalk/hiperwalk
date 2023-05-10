@@ -31,7 +31,7 @@ def _binary_search(v, elem, start=0, end=None):
 
     return end if v[end] == elem else -1
 
-class Graph(BaseWalk):
+class CoinedWalk(QuantumWalk):
     r"""
     Manage an instance of the coined quantum walk model
     on general unweighted graphs.
@@ -43,9 +43,10 @@ class Graph(BaseWalk):
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`
-        Adjacency matrix of the graph on
-        which the quantum walk occurs.
+    graph
+        Graph on which the quantum walk occurs.
+        It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
+        its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
     Raises
     ------
@@ -168,13 +169,17 @@ class Graph(BaseWalk):
         Vol. 19. New York: Springer, 2013.
     """
 
-    def __init__(self, adj_matrix):
-        super().__init__(adj_matrix)
+    def __init__(self, graph=None):
+
+        if graph is None:
+            raise ValueError('graph is None')
+
+        super().__init__(graph)
         self._shift_operator = None
         self._coin_operator = None
 
         # Expects adjacency matrix with only 0 and 1 as entries
-        self.hilb_dim = self.adj_matrix.sum()
+        self.hilb_dim = self._graph.adj_matrix.sum()
 
         self._valid_kwargs = dict()
 
@@ -194,9 +199,9 @@ class Graph(BaseWalk):
             if len(params) != len(set(params)):
                 raise AssertionError
 
-    def flipflop_shift_operator(self):
+    def _flipflop_shift(self):
         r"""
-        Create the flip-flop shift operator (:math:`S`) based on
+        Create the flipflop shift operator (:math:`S`) based on
         the ``adj_matrix`` attribute.
 
         The operator is set for future usage.
@@ -335,18 +340,34 @@ class Graph(BaseWalk):
         # TODO: compare with old approach for creating S
 
         if __DEBUG__:
-            print("flipflop_shift_operator Time: "
+            print("flipflop_shift Time: "
                   + str(now() - start_time))
 
         self._shift_operator = S
         self._evolution_operator = None
         return S
 
-    def shift_operator(self, shift='default'):
+    def has_persistent_shift(self):
+        r"""
+        Returns if the persistent shift operator is defined
+        for the current graph.
+
+        The persistent shift operator is only defined for specific graphs
+        that can be embedded into the plane.
+        Hence, a direction can be inferred --
+        e.g. left, right, up, down.
+        """
+        return self._graph.is_embeddable()
+
+    def _persistent_shift(self):
+        raise NotImplementedError('Inexistent or not overriden.')
+
+
+    def shift(self, shift='default'):
         r"""
         Create the shift operator.
 
-        Creates either the flip flop or the persistent shift operator.
+        Create either the flipflop or the persistent shift operator.
 
         The created shift operator is saved to be used
         for generating the evolution operator.
@@ -355,11 +376,11 @@ class Graph(BaseWalk):
 
         Parameters
         ----------
-        shift: {'default', 'flipflop', 'persistent', 'f', 'p'}
+        shift: {'default', 'flipflop', 'persistent', 'ff', 'p'}
             Whether to create the flip flop or the persistent shift.
             By default, creates the persistent shift if it is defined;
             otherwise creates the flip flop shift.
-            Argument ``'f'`` is an alias for ``'flipflop'``.
+            Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
         Raises
@@ -377,7 +398,7 @@ class Graph(BaseWalk):
         --------
         has_persistent_shift_operator
         """
-        valid_keys = ['default', 'flipflop', 'persistent', 'f', 'p']
+        valid_keys = ['default', 'flipflop', 'persistent', 'ff', 'p']
         if shift not in valid_keys:
             raise ValueError(
                 "Invalid `shift` value. Expected one of "
@@ -386,31 +407,22 @@ class Graph(BaseWalk):
             )
 
         if shift == 'default':
-            shift = 'p' if self.has_persistent_shift_operator() else 'f'
+            shift = 'p' if self.has_persistent_shift_operator() else 'ff'
 
-        if shift == 'f':
+        if shift == 'ff':
             shift = 'flipflop'
         elif shift == 'p':
             shift = 'persistent'
 
         
-        S = (self.flipflop_shift_operator() if shift == 'flipflop'
-             else self.persistent_shift_operator())
+        S = (self._flipflop_shift() if shift == 'flipflop'
+             else self._persistent_shift())
 
         if __DEBUG__:
             if self._shift_operator is None: raise AssertionError
             if self._evolution_operator is not None: raise AssertionError
 
         return S
-
-    def get_default_coin(self):
-        r"""
-        Returns the default coin name.
-
-        The default coin for the coined quantum walk on general
-        graphs is ``grover``.
-        """
-        return 'grover'
 
     def coin_operator(self, coin='default', coin2=None, vertices2=[]):
         """
@@ -524,109 +536,11 @@ class Graph(BaseWalk):
     def _minus_identity(dim):
         return -np.identity(dim)
 
-    def oracle(self, marked_vertices=0, oracle_type="standard"):
-        r"""
-        Create the oracle that marks the given vertices.
+    def set_marked(self, vertices=None, change_coin='minus_identity'):
+        raise NotImplementedError
 
-        The oracle is set to be used for generating the evolution operator.
-        If ``marked_vertices=[]`` no oracle is created and it is set to ``None``.
-        If an evolution operator was set previously,
-        it is unset for coherence.
-
-        Parameters
-        ----------
-        marked_vertices : int, array_like, default=0
-            Vertex (vertices) to be marked.
-            If ``marked_vertices=[]`` no oracle is created.
-
-        oracle_type : {'standard', 'phase_flip'}
-            Oracle type to be used.
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
-            The oracle in matricial form or
-            ``None`` if no vertex if marked.
-
-        Notes
-        -----
-        There are two types of oracle possible.
-        The standard oracle applies Grover coin to unmarked vertices and
-        flips the phase of marked vertices.
-        The other oracle flips the phase of every entry associated
-        with the marked vertices,
-        leaving the unmarked vertices unchanged.
-
-        The standard oracle is given by
-
-        .. math::
-            R &= \sum_{v \in M^C} \sum_{u \in \text{adj}(v)}
-                G_{\deg(v)} \ketbra{(v,u)}{(v,u)} \\
-            &- \sum_{v \in M}\sum_{u \in \text{adj}(v)}
-                \ketbra{(v,u)}{(v,u)},
-
-        and the phase flip oracle is described by
-
-        .. math::
-            R = I - 2 \sum_{v \in M}\sum_{u \in \text{adj}(v)}
-                \ketbra{(v,u)}{(v,u)}
-
-        where :math:`M` is the set of marked vertices,
-        :math:`\text{adj}(v)` is the set of all vertices adjacent
-        to :math:`v \in V`, and
-        :math:`G_{\deg(v)}` is the Grover matrix of
-        dimension :math:`\deg(v)`.
-        See :class:`Graph` Notes for more details about
-        the used computational basis.
-        """
-
-        R = None
-
-        if isinstance(marked_vertices, int):
-            marked_vertices = [marked_vertices]
-
-        if len(marked_vertices) > 0:
-
-            if oracle_type == 'standard':
-                S = self._coin_operator
-                # this changes the _coin_operator attribute
-                R = self.coin_operator('grover', 'minus_identity',
-                                       marked_vertices)
-                # revert unexpected changes
-                self._coin_operator = S
-
-            elif oracle_type == 'phase_flip':
-                R = scipy.sparse.eye(self.hilb_dim, format='csr')
-
-                for vertex_id in marked_vertices:
-                    first_edge = self.adj_matrix.indptr[vertex_id]
-                    last_edge = self.adj_matrix.indptr[vertex_id + 1]
-
-                    for edge in range(first_edge, last_edge):
-                        R.data[edge] = -1
-
-            else:
-                raise ValueError(
-                    "Invalid oracle_type value. Expected one of"
-                    + "{'standard', 'phase_flip'} but received '"
-                    + str(oracle_type) + "' instead."
-                )
-
-        self._oracle = R
-        self._evolution_operator = None
-        return R
-
-    def has_persistent_shift_operator(self):
-        r"""
-        Returns if the persistent shift operator is defined
-        for the current graph.
-
-        The persistent shift operator is only defined for specific graphs
-        that can be embedded into the plane.
-        Hence, a direction can be inferred --
-        e.g. left, right, up, down.
-        """
-        return False
+    def get_marked(self):
+        return self._marked
 
     def evolution_operator(self, marked_vertices=[], hpc=True, **kwargs):
         """
@@ -845,25 +759,8 @@ class Graph(BaseWalk):
     ######### Auxiliary Methods for state() method ##########
     #########################################################
 
-    def _state_vertex_dir(self, state, entries):
-        indices = self.adj_matrix.indices
-        indptr = self.adj_matrix.indptr
-
-        for amplitude, src, coin_dir in entries:
-            arc = indptr[src] + coin_dir
-
-            if arc < indptr[src] or arc >= indptr[src+1]:
-                raise IndexError(
-                    "For vertex " + str(src) + ", "
-                    + "a coin direction value from 0 to "
-                    + str(indptr[src+1] - indptr[src] - 1)
-                    + " was expected. But the value "
-                    + str(coin_dir) + " was received instead."
-                )
-
-            state[arc] = amplitude
-
-        return state
+    def _state_position_coin(self, state, entries):
+        raise NotImplementedError
 
     def _state_arc_notation(self, state, entries):
         indices = self.adj_matrix.indices
@@ -885,7 +782,7 @@ class Graph(BaseWalk):
         return state
 
 
-    def _state_arc_order(self, state, entries):
+    def _state_arc_label(self, state, entries):
         for amplitude, arc in entries:
             state[arc] = amplitude
 
@@ -907,10 +804,11 @@ class Graph(BaseWalk):
         ----------
         entries : list of entry
             Each entry is a tuple (or array).
-            An entry can be specified in three different ways:
+            An entry can be specified in four different ways:
             ``(amplitude, vertex, dst_vertex)``,
-            ``(amplitude, vertex, coin_dir)``,
-            ``(amplitude, arc_number)``.
+            ``(amplitude, vertex, coin)``,
+            ``(amplitude, coin, vertex)``,
+            ``(amplitude, arc_label)``.
 
             amplitude :
                 The amplitudes of the given entry.
@@ -921,19 +819,20 @@ class Graph(BaseWalk):
                 The vertex which the coin is pointing to.
                 In other words, the tuple
                 (vertex, dst_vertex) must be a valid arc.
-            coin_dir :
+            coin :
                 The direction towards which the coin is pointing.
                 A value between 0 and degree(``vertices[i]``) - 1
                 is expected, respecting the sorted arcs order.
-            arc_number :
+            arc_label :
                 The arc number with respect to the sorted arcs order.
 
         type : {'arc_notation', 'vertex_dir', 'arc_order'}
             The type of each entry sent in the ``entries`` argument.
 
             * **'arc_notation'** : ``(amplitude, vertex, dst_vertex)``;
-            * **'vertex_dir'**: ``(amplitude, vertex, coin_dir)``;
-            * **arc_order** : ``(amplitude, arc_number)``.
+            * **'position_coin'**: ``(amplitude, vertex, coin)``;
+            * **'coin_position'**: ``(amplitude, coin, vertex)``;
+            * **arc_order** : ``(amplitude, arc_label)``.
 
 
         Raises
@@ -962,7 +861,7 @@ class Graph(BaseWalk):
         """
 
         funcs = {'arc_notation' : self._state_arc_notation,
-                 'vertex_dir' : self._state_vertex_dir,
+                 'position_coin' : self._state_vertex_dir,
                  'arc_order' : self._state_arc_order}
 
         if type not in list(funcs.keys()):

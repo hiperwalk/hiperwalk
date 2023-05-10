@@ -29,4 +29,29 @@ class Graph():
     """
 
     def __init__(self, adj_matrix):
-        raise NotImplementedError("Graph class")
+        self.adj_matrix = adj_matrix
+        self.coloring = None
+
+    def get_default_coin(self):
+        r"""
+        Returns the default coin for the given graph.
+
+        The default coin for the coined quantum walk on general
+        graphs is ``grover``.
+        """
+        return 'grover'
+
+    def is_embeddable(self):
+        r"""
+        Returns whether the graph can be embedded on the plane or not.
+
+        If a graph can be embedded on the plane,
+        we can assign directions to edges and arcs.
+
+        Notes
+        -----
+        The implementation is class-dependent.
+        We do not check the graph structure to determine whether
+        it is embeddable or not.
+        """
+        return False
