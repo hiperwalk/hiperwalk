@@ -296,22 +296,19 @@ class CoinedWalk(QuantumWalk):
         if __DEBUG__:
             start_time = now()
 
-        warn('query graph functions')
-        # expects weights to be 1 if adjacent
-        adj_matrix = self._graph.adj_matrix
-        num_vert = self._graph.adj_matrix.shape[0]
-        num_edges = adj_matrix.sum()
+        num_vert = self._graph.number_of_vertices()
+        num_arcs = self._graph.number_of_arcs()
 
-        S_cols = [self._graph.get_arc_label(j, i)
+        S_cols = [self._graph.arc_label(j, i)
                   for i in range(num_vert)
-                  for j in self._graph.get_neighbors(i)]
+                  for j in self._graph.neighbors(i)]
 
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
         S = scipy.sparse.csr_array(
-            ( np.ones(num_edges, dtype=np.int8),
-              S_cols, np.arange(num_edges+1) ),
-            shape=(num_edges, num_edges)
+            ( np.ones(num_arcs, dtype=np.int8),
+              S_cols, np.arange(num_arcs+1) ),
+            shape=(num_arcs, num_arcs)
         )
 
         if __DEBUG__:
@@ -330,7 +327,7 @@ class CoinedWalk(QuantumWalk):
         Hence, a direction can be inferred --
         e.g. left, right, up, down.
         """
-        return self._graph.is_embeddable()
+        return self._graph.embeddable()
 
     def _set_persistent_shift(self):
         raise NotImplementedError()
@@ -436,10 +433,6 @@ class CoinedWalk(QuantumWalk):
             If ``coin='hadamard'`` and any vertex of the graph
             has a non-power of two degree.
 
-        See Also
-        --------
-        get_default_coin
-
         Notes
         -----
         Due to the chosen computational basis
@@ -459,9 +452,9 @@ class CoinedWalk(QuantumWalk):
         }
 
         if coin == 'default':
-            coin = self._graph.get_default_coin()
+            coin = self._graph.default_coin()
         if coin2 == 'default':
-            coin2 = self._graph.get_default_coin()
+            coin2 = self._graph.default_coin()
 
         if coin not in coin_funcs.keys() or (coin2 != None and
             coin2 not in coin_funcs.keys()):

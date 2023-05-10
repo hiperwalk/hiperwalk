@@ -1,3 +1,5 @@
+from warnings import warn
+
 def _binary_search(v, elem, start=0, end=None):
     r"""
     expects sorted array and executes binary search in the subarray
@@ -49,10 +51,11 @@ class Graph():
     """
 
     def __init__(self, adj_matrix):
+        warn("Check if valid adjacency matrix")
         self.adj_matrix = adj_matrix
         self.coloring = None
 
-    def get_default_coin(self):
+    def default_coin(self):
         r"""
         Returns the default coin for the given graph.
 
@@ -61,7 +64,7 @@ class Graph():
         """
         return 'grover'
 
-    def is_embeddable(self):
+    def embeddable(self):
         r"""
         Returns whether the graph can be embedded on the plane or not.
 
@@ -76,12 +79,21 @@ class Graph():
         """
         return False
 
-    def get_arc_label(self, tail, head):
+    def arc_label(self, tail, head):
         return _binary_search(self.adj_matrix.indices, head,
                               start = self.adj_matrix.indptr[tail],
                               end = self.adj_matrix.indptr[tail + 1])
 
-    def get_neighbors(self, vertex):
+    def neighbors(self, vertex):
         start = self.adj_matrix.indptr[vertex]
         end = self.adj_matrix.indptr[vertex + 1]
         return self.adj_matrix.indices[start:end]
+
+    def number_of_vertices(self):
+        return self.adj_matrix.shape[0]
+
+    def number_of_arcs(self):
+        return self.adj_matrix.sum()
+
+    def number_of_edges(self):
+        return self.adj_matrix.sum() >> 1
