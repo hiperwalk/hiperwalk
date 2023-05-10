@@ -5,6 +5,7 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 from warnings import warn
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from scipy.linalg import hadamard, dft
 
 if __DEBUG__:
     from time import time as now
@@ -180,15 +181,25 @@ class CoinedWalk(QuantumWalk):
         self.hilb_dim = self._graph.adj_matrix.sum()
 
         self._valid_kwargs = dict()
-
         self._valid_kwargs['shift'] = self._get_valid_kwargs(
-            self.set_shift)
-
+                                              self.set_shift)
         self._valid_kwargs['coin'] = self._get_valid_kwargs(
-            self.set_coin)
-
+                                              self.set_coin)
         self._valid_kwargs['marked'] = self._get_valid_kwargs(
-            self.set_marked)
+                                              self.set_marked)
+
+        # dict with valid coins as keys and the respective
+        # function pointers.
+        self._coin_funcs = {
+            'fourier': CoinedWalk._fourier_coin,
+            'grover': CoinedWalk._grover_coin,
+            'hadamard': CoinedWalk._hadamard_coin,
+            'identity': CoinedWalk._identity_coin,
+            'minus_fourier': CoinedWalk._minus_fourier_coin,
+            'minus_grover': CoinedWalk._minus_grover_coin,
+            'minus_hadamard': CoinedWalk._minus_hadamard_coin,
+            'minus_identity': CoinedWalk._minus_identity_coin
+        }
 
         self.set_evolution(**kwargs)
 
@@ -395,102 +406,142 @@ class CoinedWalk(QuantumWalk):
     def get_shift(self):
         return self._shift
 
-    def set_coin(self, coin='default', coin2=None, vertices2=[]):
+    def set_coin(self, coin='default'):
         """
         Generate a coin operator based on the graph structure.
 
         Constructs coin operator depending on the degree of each vertex.
-        A single coin type may be applied to all vertices
-        (``coin2 is None``),
-        or two coins may be applied to selected vertices
-        (``coin2 is not None``).
+        A single coin type may be applied to all or subset of vertices.
+        The coin operator is set to be used during the
+        evolution operator generation.
 
         Parameters
         ----------
-        coin : {'default', 'fourier', 'grover', 'hadamard', 'minus_identity'}
-            Type of the coin to be used.
+        coin
+            Coin to be used.
+            Several types of arguments are acceptable.
 
-        coin2 : default=None
-            Type of the coin to be used for ``vertices2``.
-            Accepts the same inputs as ``coin``.
+            * str : coin type
+                Type of the coin to be used.
+                The following are valid entries.
 
-        vertices2 :
-            Vertices to use ``coin2`` instead of ``coin``.
-        
-        Returns
-        -------
-        :class:`scipy.sparse.csr_matrix`
+                * 'default', 'd' : default coin,
+                * 'fourier', 'F' : Fourier coin,
+                * 'grover', 'G' : Grover coin,
+                * 'hadamard', 'H' : Hadamard coin,
+                * 'identity', 'I' : Identity,
+                * 'minus_fourier', '-F' : Fourier coin with negative phase,
+                * 'minus_grover', '-G' : Grover coin with negative phase,
+                * 'minus_hadamard', '-H' : Hadamard coin with negative phase,
+                * 'minus_identity', '-I' : Identity with negative phase.
 
-        .. todo::
-            Check if return automatically changed to
-            :class:`scipy.sparse.csr_array`.
+            * list of str
+                List of the coin types to be used.
+                Expects list with 'number of vertices' entries.
 
-        Raises
-        ------
-        ValueError
-            If ``coin`` or ``coin2`` values are invalid.
+            * dict
+                A dictionary with structure
+                ``{coin_type : list_of_vertices}``.
+                That is, with any valid coin type as key and
+                the list of vertices to be applied as values.
+                If ``list_of_vertices = []``,
+                the respective ``coin_type`` is applied to all vertices
+                that were not explicitly listed.
 
-            If ``coin='hadamard'`` and any vertex of the graph
-            has a non-power of two degree.
+            * :class:`scipy.sparse.csr_array`
+                The explicit coin operator.
 
         Notes
         -----
         Due to the chosen computational basis
-        (see :class:`Graph` Notes),
+        (see :class:`CoinedWalk` Notes),
         the resulting operator is a block diagonal where
         each block is the :math:`\deg(v)`-dimensional ``coin``.
         Consequently, there are :math:`|V|` blocks.
 
         """
-        # dict with valid coins as keys and the respective
-        # function pointers.
-        coin_funcs = {
-            'fourier': CoinedWalk._fourier_coin,
-            'grover': CoinedWalk._grover_coin,
-            'hadamard': CoinedWalk._hadamard_coin,
-            'minus_identity': CoinedWalk._minus_identity
-        }
+        try:
+            if len(coin.shape) != 2:
+                raise TypeError('Explicit coin is not a matrix.')
 
-        if coin == 'default':
-            coin = self._graph.default_coin()
-        if coin2 == 'default':
-            coin2 = self._graph.default_coin()
+            # explicit coin
+            if not scipy.sparse.issparse(coin):
+                coin = scipy.sparse.csr_array(coin)
 
-        if coin not in coin_funcs.keys() or (coin2 != None and
-            coin2 not in coin_funcs.keys()):
-            raise ValueError(
-                'Invalid coin. Expected any of '
-                + str(list(coin_funcs.keys())) + ', '
-                + "but received '" + str(coin) + "'."
-            )
+            warn('TODO: Check if coin is valid')
+            self._coin = coin
+            self._evolution = None
+            return
 
-        warn('Query graph for necessary infos')
-        num_vert = self._graph.adj_matrix.shape[0]
-        degrees = self._graph.adj_matrix.sum(1) # sum rows
-        blocks = []
+        except AttributeError:
+            pass
 
-        if coin2 is None:
-            blocks = [coin_funcs[coin](degrees[v])
-                      for v in range(num_vert)]
+        def valid_coin_name(coin):
+            s = coin
+            if s == 'default' or s == 'd':
+                s = self._graph.default_coin()
+            
+            if len(s) <= 2:
+                full_name = 'minus_' if len(coin) == 2 else ''
+                abbrv = {'F': 'fourier', 'G' : 'grover',
+                         'H': 'hadamard', 'I': 'identity'}
+                s = full_name + abbrv[s[-1]]
+
+            if s not in self._coin_funcs.keys():
+                raise ValueError(
+                    'Invalid coin. Expected any of '
+                    + str(list(self._coin_funcs.keys())) + ', '
+                    + "but received '" + str(coin) + "'."
+                )
+
+            return s
+
+        num_vert = self._graph.number_of_vertices()
+        coin_list = []
+
+        if isinstance(coin, str):
+            coin_list = [valid_coin_name(coin)] * num_vert
+
+        elif isinstance(coin, dict):
+            coin_list = [''] * num_vert
+            for key in coin:
+                coin_name = valid_coin_name(key)
+                value = coin[key]
+                if value != []:
+                    if not hasattr(value, '__iter__'):
+                        value = [value]
+                    for vertex in value:
+                        coin_list[vertex] = coin_name
+                else:
+                    coin_list = [coin_name if coin_list[i] == ''
+                                 else coin_list[i]
+                                 for i in range(num_vert)]
+
+            if '' in coin_list:
+                raise ValueError('Coin was not specified for all vertices.')
+
         else:
-            not_vertex2 = [True] * num_vert
-            for v in vertices2:
-                not_vertex2[v] = False
+            #list of coins
+            coin_list = list(map(valid_coin_name, coin))
 
-            blocks = [coin_funcs[coin](degrees[v]) if not_vertex2[v]
-                      else coin_funcs[coin2](degrees[v])
-                      for v in range(num_vert)]
 
-        C = scipy.sparse.block_diag(blocks, format='csr')
-        self._coin = C
+        self._coin = coin_list
+        self._evolution = None
 
     def get_coin(self):
+        if not scipy.sparse.issparse(self._coin):
+            num_vert = self._graph.number_of_vertices()
+            coin_list = self._coin
+            degree = self._graph.degree
+            blocks = [self._coin_funcs[coin_list[v]](degree(v))
+                      for v in range(num_vert)]
+            C = scipy.sparse.block_diag(blocks, format='csr')
+            return C
         return self._coin
 
     @staticmethod
     def _fourier_coin(dim):
-        import scipy.linalg
-        return scipy.linalg.dft(dim, scale='sqrtn')
+        return dft(dim, scale='sqrtn')
 
     @staticmethod
     def _grover_coin(dim):
@@ -498,11 +549,26 @@ class CoinedWalk(QuantumWalk):
 
     @staticmethod
     def _hadamard_coin(dim):
-        import scipy.linalg
-        return scipy.linalg.hadamard(dim) / np.sqrt(dim)
+        return hadamard(dim) / np.sqrt(dim)
 
     @staticmethod
-    def _minus_identity(dim):
+    def _identity_coin(dim):
+        return np.identity(dim)
+
+    @staticmethod
+    def _minus_fourier_coin(dim):
+        return -CoinedWalk._fourier_coin(dim)
+
+    @staticmethod
+    def _minus_grover_coin(dim):
+        return -CoinedWalk._grover_coin(dim)
+
+    @staticmethod
+    def _minus_hadamard_coin(dim):
+        return -CoinedWalk._hadamard_coin(dim)
+
+    @staticmethod
+    def _minus_identity_coin(dim):
         return -np.identity(dim)
 
     def set_marked(self, vertices=[], change_coin='minus_identity'):

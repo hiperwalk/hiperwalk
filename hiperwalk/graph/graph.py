@@ -97,3 +97,7 @@ class Graph():
 
     def number_of_edges(self):
         return self.adj_matrix.sum() >> 1
+
+    def degree(self, vertex):
+        indptr = self.adj_matrix.indptr
+        return indptr[vertex + 1] - indptr[vertex]
