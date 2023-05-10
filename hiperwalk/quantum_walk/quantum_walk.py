@@ -5,7 +5,7 @@ import inspect
 from sys import modules as sys_modules
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
-from ..graph import graph
+from ..graph import Graph
 
 class QuantumWalk(ABC):
     """
