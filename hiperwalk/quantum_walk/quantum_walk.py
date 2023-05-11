@@ -543,9 +543,11 @@ class QuantumWalk(ABC):
 
         return saved_states
 
-    def _get_valid_kwargs(self, method):
+    @staticmethod
+    def _get_valid_kwargs(method):
         return inspect.getfullargspec(method)[0][1:]
 
-    def _filter_valid_kwargs(self, kwargs, valid_kwargs):
+    @staticmethod
+    def _filter_valid_kwargs(kwargs, valid_kwargs):
         return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
                 #if kwargs.get(k) is not None}
