@@ -648,19 +648,22 @@ class CoinedWalk(QuantumWalk):
         super().set_marked(marked)
         self._marked_coin = coin_list
 
+    def get_marked_coin(self):
+        r"""
+        The coins to be applied in the markd vertices.
+
+        Returns
+        -------
+        list of str
+            If empty, no coin is changed (coin operator not altered).
+            If an entry is the empty string,
+            the coin for that vertex is not substituted.
+        """
+        return self._marked_coin
+
     def set_evolution(self, **kwargs):
         """
-        Create the standard evolution operator.
-
-        The evolution operator is created using the
-        shift operator, coin operator and oracle.
-        If an operator was set previously, it is used unless
-        ``**kwargs`` specifies arguments for creating new ones.
-        If an operator was not set previously,
-        it is created using ``**kwargs`` and ``marked_vertices``
-        accordingly.
-        In this case, if ``**kwargs`` is empty,
-        the default arguments are used.
+        Set the evolution operator.
 
         The created evolution operator is set to be used in the
         quantum walk simulation.
