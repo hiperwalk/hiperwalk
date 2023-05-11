@@ -498,6 +498,10 @@ class CoinedWalk(QuantumWalk):
         self._coin = coin_list
         self._evolution = None
 
+        if __DEBUG__:
+            if self._coin is None: raise AssertionError
+            if self._evolution is not None: raise AssertionError
+
     def _coin_to_valid_name(self, coin):
         r"""
         Convert a string to its respective valid coin name.
