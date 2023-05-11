@@ -180,13 +180,13 @@ class CoinedWalk(QuantumWalk):
         if graph is None:
             raise ValueError('graph is None')
 
-        super().__init__(graph)
         self._shift = None
         self._coin = None
-        self._marked_coin = []
+        self._oracle_coin = []
+        super().__init__(graph)
 
         # Expects adjacency matrix with only 0 and 1 as entries
-        self.hilb_dim = self._graph.adj_matrix.sum()
+        self.hilb_dim = self._graph.number_of_arcs()
 
         if not bool(CoinedWalk._valid_kwargs):
             # assign static attribute
