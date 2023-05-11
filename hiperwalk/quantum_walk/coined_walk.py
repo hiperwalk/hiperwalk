@@ -877,29 +877,21 @@ class CoinedWalk(QuantumWalk):
 
             warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
+            del S
             nbl_C = nbl.send_matrix(C)
-            nbl_U = nbl.multiply_matrices(nbl_S, nbl_C)
+            del C
+            nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
 
             warn("Check if matrices are deleted "
                           + "from memory and GPU.")
-            del S
-            del C
             del nbl_S
+
+            U = nbl.retrieve_matrix(nbl_C)
             del nbl_C
-
-            if self._oracle is not None:
-                R = self._oracle.todense()
-                nbl_R = nbl.send_matrix(R)
-                nbl_U = nbl.multiply_matrices(nbl_U, nbl_R)
-                del R
-
-            U = nbl.retrieve_matrix(nbl_U)
             U = scipy.sparse.csr_array(U)
 
         else:
-            U = self._shift @ self._coin
-            if self._oracle is not None:
-                U = U @ self._oracle
+            U = S @ C
 
         self._evolution = U
         return U
