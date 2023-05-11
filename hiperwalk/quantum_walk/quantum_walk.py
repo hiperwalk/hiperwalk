@@ -43,7 +43,9 @@ class QuantumWalk(ABC):
 
     @abstractmethod
     def __init__(self, graph=None, **kwargs):
-        self._marked = []
+        self._marked = (self.set_marked(kwargs['marked'])
+                        if 'marked' in kwargs
+                        else self.set_marked([]))
         self._evolution = None
 
         ##############################
@@ -109,16 +111,17 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def set_marked(vertices=[]):
+    def set_marked(marked=[]):
         r"""
         Sets marked vertices.
 
         Parameters
         ----------
-        vertices : list of int
+        marked : list of int
             List of vertices to be marked
         """
-        self._marked = vertices
+        self._marked = marked
+        self._evolution = None
 
     def get_marked():
         r"""

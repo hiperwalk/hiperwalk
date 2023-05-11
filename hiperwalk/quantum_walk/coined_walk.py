@@ -485,36 +485,55 @@ class CoinedWalk(QuantumWalk):
         except AttributeError:
             pass
 
-        def valid_coin_name(coin):
-            s = coin
-            if s == 'default' or s == 'd':
-                s = self._graph.default_coin()
-            
-            if len(s) <= 2:
-                full_name = 'minus_' if len(coin) == 2 else ''
-                abbrv = {'F': 'fourier', 'G' : 'grover',
-                         'H': 'hadamard', 'I': 'identity'}
-                s = full_name + abbrv[s[-1]]
+        coin_list, undefined_coin = self._coin_to_list(coin)
+        if undefined_coin:
+            raise ValueError('Coin was not specified for all vertices.')
 
-            if s not in self._coin_funcs.keys():
-                raise ValueError(
-                    'Invalid coin. Expected any of '
-                    + str(list(self._coin_funcs.keys())) + ', '
-                    + "but received '" + str(coin) + "'."
-                )
+        self._coin = coin_list
+        self._evolution = None
 
-            return s
+    def _coin_to_valid_name(self, coin):
+        r"""
+        Convert a string to its respective valid coin name.
+        """
+        s = coin
+        if s == 'default' or s == 'd':
+            s = self._graph.default_coin()
+        
+        if len(s) <= 2:
+            prefix = 'minus_' if len(coin) == 2 else ''
+            abbrv = {'F': 'fourier', 'G' : 'grover',
+                     'H': 'hadamard', 'I': 'identity'}
+            s = prefix + abbrv[s[-1]]
 
+        if s not in CoinedWalk._coin_funcs.keys():
+            raise ValueError(
+                'Invalid coin. Expected any of '
+                + str(list(CoinedWalk._coin_funcs.keys())) + ', '
+                + "but received '" + str(coin) + "'."
+            )
+
+        return s
+
+    def _coin_to_list(self, coin):
+        r"""
+        Convert str, list of str or dict to valid coin list.
+
+        See Also
+        ------
+        set_coin
+        """
         num_vert = self._graph.number_of_vertices()
         coin_list = []
+        undefined_coin = False
 
         if isinstance(coin, str):
-            coin_list = [valid_coin_name(coin)] * num_vert
+            coin_list = [self._coin_to_valid_name(coin)] * num_vert
 
         elif isinstance(coin, dict):
             coin_list = [''] * num_vert
             for key in coin:
-                coin_name = valid_coin_name(key)
+                coin_name = self._coin_to_valid_name(key)
                 value = coin[key]
                 if value != []:
                     if not hasattr(value, '__iter__'):
@@ -526,26 +545,17 @@ class CoinedWalk(QuantumWalk):
                                  else coin_list[i]
                                  for i in range(num_vert)]
 
-            if '' in coin_list:
-                raise ValueError('Coin was not specified for all vertices.')
-
+            undefined_coin = '' in coin_list
         else:
             #list of coins
-            coin_list = list(map(valid_coin_name, coin))
+            if len(coin) != num_vert:
+                raise ValueError('There were ' + str(len(coin))
+                                 + ' coins specified. Expected '
+                                 + str(num_vert) + 'coins instead.')
 
+            coin_list = list(map(self._coin_to_valid_name, coin))
 
-        self._coin = coin_list
-        self._evolution = None
-
-    def _coin_to_list(self, coin):
-        r"""
-        Convert str, list of str or dict to valid coin list.
-
-        See Also
-        ------
-        set_coin
-        """
-        return coin_list
+        return coin_list, undefined_coin
 
     @staticmethod
     def _fourier_coin(dim):
@@ -591,8 +601,8 @@ class CoinedWalk(QuantumWalk):
         return self._coin
 
 
-    def set_marked(self, vertices=[], change_coin='minus_identity'):
-        self._marked = vertices
+    def set_marked(self, marked=[]):
+        self._marked = marked
 
     def set_evolution(self, **kwargs):
         """
