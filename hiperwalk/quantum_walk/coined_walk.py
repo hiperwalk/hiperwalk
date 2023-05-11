@@ -687,7 +687,79 @@ class CoinedWalk(QuantumWalk):
             If an entry is the empty string,
             the coin for that vertex is not substituted.
         """
-        return self._marked_coin
+        return self._oracle_coin
+
+    def get_final_coin(self):
+        r"""
+        Return coin to be used for creating the evolution operator.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+
+        See Also
+        --------
+        get_coin
+        get_oracle_coin
+
+        Notes
+        -----
+        The final coin :math:`C'` is obtained by multiplying the
+        coin operator :math:`C` and the oracle :math:`R`.
+        That is,
+
+        .. math::
+            
+            C' = CR .
+
+        The oracle is not explicitly saved.
+        Instead, the oracle coins are saved -- i.e.
+        which coin is going to be applied to each marked vertices.
+        To generate :math:`C'` we simply substitute the original coin
+        by the oracle coin in all marked vertices.
+
+        Examples
+        --------
+        .. todo::
+            examples
+        """
+        if scipy.sparse.issparse(self._coin):
+            if not bool(self._oracle_coin):
+                return self._coin
+
+            # if coin was explicitly set,
+            # and there are different coins for the marked vertices,
+            # change them.
+            def get_block(vertex):
+                g = self._graph
+                neighbors = g.neighbors(vertex)
+                start = g.arc_label(vertex, neighbors[0])
+                end = g.arc_label(vertex, neighbors[-1]) + 1
+
+                return scipy.sparse.csr_array(self._coin[start:end,
+                                                         start:end])
+
+            num_vert = self.number_of_vertices()
+            degree = self.degree
+            oracle_coin = self._oracle_coin
+            coin_funcs = CoinedWalk._coin_funcs
+            blocks = [coin_funcs[oracle_coin[v]](degree(v))
+                      if oracle_coin[v] != ''
+                      else get_block(v)
+                      for v in range(num_vert)]
+            C = scipy.sparse.block_diag(blocks, format='csr')
+
+            return scipy.sparse.csr_array(C)
+
+        oracle_coin = self._oracle_coin
+        if bool(oracle_coin):
+            coin = self._coin
+            coin_list = [oracle_coin[i] if oracle_coin[i] != ''
+                         else coin[i]
+                         for i in range(len(coin))]
+        else:
+            coin_list = self._coin
+        return self._coin_list_to_explicit_coin(coin_list)
 
     def set_evolution(self, **kwargs):
         """
