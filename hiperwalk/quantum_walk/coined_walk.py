@@ -224,20 +224,96 @@ class CoinedWalk(QuantumWalk):
     def _set_flipflop_shift(self):
         r"""
         Create the flipflop shift operator (:math:`S`) based on
-        the ``adj_matrix`` attribute.
+        the ``_graph`` attribute.
 
         The operator is set for future usage.
         If an evolution operator was set previously,
         it is unset for coherence.
+        """
 
-        Returns
-        -------
-        :class:`scipy.sparse.csr_matrix`
-            Flip-flop shift operator.
+        if __DEBUG__:
+            start_time = now()
+
+        num_vert = self._graph.number_of_vertices()
+        num_arcs = self._graph.number_of_arcs()
+
+        S_cols = [self._graph.arc_label(j, i)
+                  for i in range(num_vert)
+                  for j in self._graph.neighbors(i)]
+
+        # Using csr_array((data, indices, indptr), shape)
+        # Note that there is only one entry per row and column
+        S = scipy.sparse.csr_array(
+            ( np.ones(num_arcs, dtype=np.int8),
+              S_cols, np.arange(num_arcs+1) ),
+            shape=(num_arcs, num_arcs)
+        )
+
+        if __DEBUG__:
+            print("flipflop_shift Time: " + str(now() - start_time))
+
+        self._shift = S
+        self._evolution = None
+
+    def has_persistent_shift(self):
+        r"""
+        Returns if the persistent shift operator is defined
+        for the current graph.
+
+        The persistent shift operator is only defined for specific graphs
+        that can be embedded into the plane.
+        Hence, a direction can be inferred --
+        e.g. left, right, up, down.
+        """
+        return self._graph.embeddable()
+
+    def _set_persistent_shift(self):
+        r"""
+        Create the persistent shift operator (:math:`S`) based on
+        the ``_graph`` attribute.
+
+        The operator is set for future usage.
+        If an evolution operator was set previously,
+        it is unset for coherence.
+        """
+        self._shift = None
+
+        self._evolution = None
+        raise NotImplementedError()
+
+
+    def set_shift(self, shift='default'):
+        r"""
+        Set the shift operator.
+
+        Set either the flipflop or the persistent shift operator.
+
+        The created shift operator is saved to be used
+        for generating the evolution operator.
+        If an evolution operator was set previously,
+        it is unset for coherence.
+
+        Parameters
+        ----------
+        shift: {'default', 'flipflop', 'persistent', 'ff', 'p'}
+            Whether to create the flip flop or the persistent shift.
+            By default, creates the persistent shift if it is defined;
+            otherwise creates the flip flop shift.
+            Argument ``'ff'`` is an alias for ``'flipflop'``.
+            Argument ``'p'`` is an alias for ``'persistent'``.
+
+        Raises
+        ------
+        AttributeError
+            If ``shift='persistent'`` and
+            the persistent shift operator is not implemented.
+
+        See Also
+        --------
+        has_persistent_shift
 
         Notes
         -----
-
         .. note::
             Check :class:`CoinedWalk` Notes for details
             about the computational basis.
@@ -312,82 +388,10 @@ class CoinedWalk(QuantumWalk):
             array([0, 0, 0, 0, 1, 0, 0, 0])
             >>> S @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
             array([0, 0, 1, 0, 0, 0, 0, 0])
-        """
 
-        if __DEBUG__:
-            start_time = now()
-
-        num_vert = self._graph.number_of_vertices()
-        num_arcs = self._graph.number_of_arcs()
-
-        S_cols = [self._graph.arc_label(j, i)
-                  for i in range(num_vert)
-                  for j in self._graph.neighbors(i)]
-
-        # Using csr_array((data, indices, indptr), shape)
-        # Note that there is only one entry per row and column
-        S = scipy.sparse.csr_array(
-            ( np.ones(num_arcs, dtype=np.int8),
-              S_cols, np.arange(num_arcs+1) ),
-            shape=(num_arcs, num_arcs)
-        )
-
-        if __DEBUG__:
-            print("flipflop_shift Time: " + str(now() - start_time))
-
-        self._shift = S
-        self._evolution = None
-
-    def has_persistent_shift(self):
-        r"""
-        Returns if the persistent shift operator is defined
-        for the current graph.
-
-        The persistent shift operator is only defined for specific graphs
-        that can be embedded into the plane.
-        Hence, a direction can be inferred --
-        e.g. left, right, up, down.
-        """
-        return self._graph.embeddable()
-
-    def _set_persistent_shift(self):
-        raise NotImplementedError()
-
-
-    def set_shift(self, shift='default'):
-        r"""
-        Create the shift operator.
-
-        Create either the flipflop or the persistent shift operator.
-
-        The created shift operator is saved to be used
-        for generating the evolution operator.
-        If an evolution operator was set previously,
-        it is unset for coherence.
-
-        Parameters
-        ----------
-        shift: {'default', 'flipflop', 'persistent', 'ff', 'p'}
-            Whether to create the flip flop or the persistent shift.
-            By default, creates the persistent shift if it is defined;
-            otherwise creates the flip flop shift.
-            Argument ``'ff'`` is an alias for ``'flipflop'``.
-            Argument ``'p'`` is an alias for ``'persistent'``.
-
-        Raises
-        ------
-        AttributeError
-            If ``shift='persistent'`` and
-            the persistent shift operator is not implemented.
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_matrix`
-            Shift operator
-
-        See Also
-        --------
-        has_persistent_shift
+        .. todo::
+            
+            Add persistent example.
         """
         valid_keys = ['default', 'flipflop', 'persistent', 'ff', 'p']
         if shift not in valid_keys:
