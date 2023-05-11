@@ -117,10 +117,13 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        marked : list of int
-            List of vertices to be marked
+        marked : list of int or int
+            List of vertices to be marked.
+            If empty list, no vertex is marked.
         """
-        self._marked = marked
+        if not hasattr(marked, '__iter__'):
+            marked = [marked]
+        self._marked = set(marked)
         self._evolution = None
 
     def get_marked(self):
@@ -133,7 +136,7 @@ class QuantumWalk(ABC):
             List of marked vertices.
             If no vertex is marked, returns the empty list.
         """
-        return self._marked
+        return list(self._marked)
 
     @abstractmethod
     def set_evolution(self, **kwargs):
