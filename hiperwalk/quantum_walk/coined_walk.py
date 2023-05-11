@@ -413,9 +413,10 @@ class CoinedWalk(QuantumWalk):
         S = (self._set_flipflop_shift() if shift == 'flipflop'
              else self._set_persistent_shift())
 
+        self._evolution = None
+
         if __DEBUG__:
             if self._shift is None: raise AssertionError
-            if self._evolution is not None: raise AssertionError
 
     def get_shift(self):
         return self._shift
