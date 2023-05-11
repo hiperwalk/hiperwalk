@@ -183,6 +183,7 @@ class CoinedWalk(QuantumWalk):
         super().__init__(graph)
         self._shift = None
         self._coin = None
+        self._marked_coin = []
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.adj_matrix.sum()
@@ -611,6 +612,8 @@ class CoinedWalk(QuantumWalk):
         If a dictionary is passed,
         the coin of those vertices are substituted
         only for generating the evolution operator.
+        This can only be done if the set coin operator is
+        not a explicit matrix.
 
         Parameters
         ----------
@@ -631,16 +634,19 @@ class CoinedWalk(QuantumWalk):
         ------
         set_coin
         """
+        coin_list = []
+
         if isinstance(marked, dict):
             coin_list, _ = self._coin_to_list(marked)
-            num_vert = self._graph.number_of_vertices()
-            self._marked = [i for i in range(num_vert)
-                            if coin_list[i] != '']
-            self._marked_coin = [coin_list[i] for i in range(num_vert)
-                                 if coin_list[i] != '']
-            raise NotImplementedError('Manage attribute')
-        else:
-            super().set_marked(marked)
+
+            dict_values = marked.values()
+            vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
+                        for vlist in dict_values]
+            vertices = [v for vlist in vertices for v in vlist ]
+            marked = vertices
+
+        super().set_marked(marked)
+        self._marked_coin = coin_list
 
     def set_evolution(self, **kwargs):
         """
