@@ -590,14 +590,30 @@ class CoinedWalk(QuantumWalk):
     def _minus_identity_coin(dim):
         return -np.identity(dim)
 
+    def _coin_list_to_explicit_coin(self, coin_list):
+        num_vert = self._graph.number_of_vertices()
+        degree = self._graph.degree
+        blocks = [self._coin_funcs[coin_list[v]](degree(v))
+                  for v in range(num_vert)]
+        C = scipy.sparse.block_diag(blocks, format='csr')
+        return scipy.sparse.csr_array(C)
+
     def get_coin(self):
+        r"""
+        Returns the coin operator in matricial form.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+        """
         if not scipy.sparse.issparse(self._coin):
-            num_vert = self._graph.number_of_vertices()
             coin_list = self._coin
-            degree = self._graph.degree
-            blocks = [self._coin_funcs[coin_list[v]](degree(v))
-                      for v in range(num_vert)]
-            C = scipy.sparse.block_diag(blocks, format='csr')
+            C = self._coin_list_to_explicit_coin(coin_list)
+
+            if __DEBUG__:
+                if not isinstance(C, scipy.sparse.csr_array):
+                    raise AssertionError
+
             return C
         return self._coin
 
