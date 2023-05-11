@@ -284,7 +284,7 @@ class CoinedWalk(QuantumWalk):
             ...                             [0, 1, 0, 1],
             ...                             [0, 1, 1, 0]])
             >>> qw = hpw.CoinedWalk(A)
-            >>> qw._flipflop_shift()
+            >>> qw.set_shift(shift='flipflop')
             >>> S = qw.get_shift().todense()
             >>> S
             array([[0, 1, 0, 0, 0, 0, 0, 0],
