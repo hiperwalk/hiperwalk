@@ -168,6 +168,13 @@ class CoinedWalk(QuantumWalk):
         Vol. 19. New York: Springer, 2013.
     """
 
+    # static attributes.
+    # The class must instantiated once, otherwise are dicts are empty.
+    # The class must be instantiated so the interpreter knows
+    # the memory location for the function pointers.
+    _coin_funcs = dict()
+    _valid_kwargs = dict()
+
     def __init__(self, graph=None, **kwargs):
 
         if graph is None:
@@ -180,26 +187,28 @@ class CoinedWalk(QuantumWalk):
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.adj_matrix.sum()
 
-        self._valid_kwargs = dict()
-        self._valid_kwargs['shift'] = self._get_valid_kwargs(
-                                              self.set_shift)
-        self._valid_kwargs['coin'] = self._get_valid_kwargs(
-                                              self.set_coin)
-        self._valid_kwargs['marked'] = self._get_valid_kwargs(
-                                              self.set_marked)
+        if not bool(CoinedWalk._valid_kwargs):
+            # assign static attribute
+            CoinedWalk._valid_kwargs = {
+                'shift': CoinedWalk._get_valid_kwargs(self.set_shift),
+                'coin': CoinedWalk._get_valid_kwargs(self.set_coin),
+                'marked': CoinedWalk._get_valid_kwargs(self.set_marked)
+            }
 
         # dict with valid coins as keys and the respective
         # function pointers.
-        self._coin_funcs = {
-            'fourier': CoinedWalk._fourier_coin,
-            'grover': CoinedWalk._grover_coin,
-            'hadamard': CoinedWalk._hadamard_coin,
-            'identity': CoinedWalk._identity_coin,
-            'minus_fourier': CoinedWalk._minus_fourier_coin,
-            'minus_grover': CoinedWalk._minus_grover_coin,
-            'minus_hadamard': CoinedWalk._minus_hadamard_coin,
-            'minus_identity': CoinedWalk._minus_identity_coin
-        }
+        if not bool(CoinedWalk._coin_funcs):
+            # assign static attribute
+            CoinedWalk._coin_funcs = {
+                'fourier': CoinedWalk._fourier_coin,
+                'grover': CoinedWalk._grover_coin,
+                'hadamard': CoinedWalk._hadamard_coin,
+                'identity': CoinedWalk._identity_coin,
+                'minus_fourier': CoinedWalk._minus_fourier_coin,
+                'minus_grover': CoinedWalk._minus_grover_coin,
+                'minus_hadamard': CoinedWalk._minus_hadamard_coin,
+                'minus_identity': CoinedWalk._minus_identity_coin
+            }
 
         self.set_evolution(**kwargs)
 
@@ -528,16 +537,15 @@ class CoinedWalk(QuantumWalk):
         self._coin = coin_list
         self._evolution = None
 
-    def get_coin(self):
-        if not scipy.sparse.issparse(self._coin):
-            num_vert = self._graph.number_of_vertices()
-            coin_list = self._coin
-            degree = self._graph.degree
-            blocks = [self._coin_funcs[coin_list[v]](degree(v))
-                      for v in range(num_vert)]
-            C = scipy.sparse.block_diag(blocks, format='csr')
-            return C
-        return self._coin
+    def _coin_to_list(self, coin):
+        r"""
+        Convert str, list of str or dict to valid coin list.
+
+        See Also
+        ------
+        set_coin
+        """
+        return coin_list
 
     @staticmethod
     def _fourier_coin(dim):
@@ -570,6 +578,18 @@ class CoinedWalk(QuantumWalk):
     @staticmethod
     def _minus_identity_coin(dim):
         return -np.identity(dim)
+
+    def get_coin(self):
+        if not scipy.sparse.issparse(self._coin):
+            num_vert = self._graph.number_of_vertices()
+            coin_list = self._coin
+            degree = self._graph.degree
+            blocks = [self._coin_funcs[coin_list[v]](degree(v))
+                      for v in range(num_vert)]
+            C = scipy.sparse.block_diag(blocks, format='csr')
+            return C
+        return self._coin
+
 
     def set_marked(self, vertices=[], change_coin='minus_identity'):
         self._marked = vertices
@@ -638,23 +658,19 @@ class CoinedWalk(QuantumWalk):
 
         """
 
-        S_kwargs = self._filter_valid_kwargs(
-            kwargs, self._valid_kwargs['shift'])
-        C_kwargs = self._filter_valid_kwargs(
-                    kwargs, self._valid_kwargs['coin'])
-        R_kwargs = self._filter_valid_kwargs(
-                    kwargs, self._valid_kwargs['marked'])
+        S_kwargs = CoinedWalk._filter_valid_kwargs(
+                              kwargs,
+                              CoinedWalk._valid_kwargs['shift'])
+        C_kwargs = CoinedWalk._filter_valid_kwargs(
+                              kwargs,
+                              CoinedWalk._valid_kwargs['coin'])
+        R_kwargs = CoinedWalk._filter_valid_kwargs(
+                              kwargs,
+                              CoinedWalk._valid_kwargs['marked'])
 
         self.set_shift(**S_kwargs)
         self.set_coin(**C_kwargs)
         self.set_marked(**R_kwargs)
-
-        # if __DEBUG__:
-        #     if (self._shift is None
-        #         or self._coin is None
-        #         or self._evolution is None
-        #     ):
-        #         raise AssertionError
 
     def get_evolution(self, hpc=True):
         r"""
