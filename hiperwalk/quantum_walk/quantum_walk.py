@@ -111,7 +111,7 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def set_marked(marked=[]):
+    def set_marked(self, marked=[]):
         r"""
         Sets marked vertices.
 
@@ -123,7 +123,7 @@ class QuantumWalk(ABC):
         self._marked = marked
         self._evolution = None
 
-    def get_marked():
+    def get_marked(self):
         r"""
         Gets marked vertices.
 

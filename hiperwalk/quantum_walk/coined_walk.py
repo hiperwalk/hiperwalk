@@ -600,9 +600,47 @@ class CoinedWalk(QuantumWalk):
             return C
         return self._coin
 
-
     def set_marked(self, marked=[]):
-        self._marked = marked
+        r"""
+        Set marked elements (vertices).
+
+        If a list of vertices is received,
+        those vertices are considered marked.
+        The evolution operators remains unchanged.
+
+        If a dictionary is passed,
+        the coin of those vertices are substituted
+        only for generating the evolution operator.
+
+        Parameters
+        ----------
+        marked : list of int of dict
+            list of vertices to be marked and
+            how they are going to be marked.
+            
+            * list of int
+                Given vertices are set as marked but
+                the evolution operator remains unchanged.
+
+            * dict
+                A dictionary with structure
+                ``{coin_type : list_of_vertices}``.
+                Analogous to the one accepted by :meth:`set_coin`.
+
+        See Also
+        ------
+        set_coin
+        """
+        if isinstance(marked, dict):
+            coin_list, _ = self._coin_to_list(marked)
+            num_vert = self._graph.number_of_vertices()
+            self._marked = [i for i in range(num_vert)
+                            if coin_list[i] != '']
+            self._marked_coin = [coin_list[i] for i in range(num_vert)
+                                 if coin_list[i] != '']
+            raise NotImplementedError('Manage attribute')
+        else:
+            super().set_marked(marked)
 
     def set_evolution(self, **kwargs):
         """
