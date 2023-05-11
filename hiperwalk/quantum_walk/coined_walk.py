@@ -572,7 +572,7 @@ class CoinedWalk(QuantumWalk):
 
     @staticmethod
     def _identity_coin(dim):
-        return np.identity(dim)
+        return scipy.sparse.eye(dim)
 
     @staticmethod
     def _minus_fourier_coin(dim):
