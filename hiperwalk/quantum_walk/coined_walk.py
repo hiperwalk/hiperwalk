@@ -665,54 +665,22 @@ class CoinedWalk(QuantumWalk):
         """
         Set the evolution operator.
 
-        The created evolution operator is set to be used in the
-        quantum walk simulation.
+        Shorthand for setting shift, coin and marked vertices.
+        They are set using the appropriate ``**kwargs``.
+        If ``**kwargs`` is empty, the default arguments are used.
 
         Parameters
         ----------
-        marked_vertices : array_like, default=[]
-            The marked vertices.
-            See :obj:`oracle`'s ``marked_vertices`` parameter.
-
-        hpc : bool, default=True
-            Whether or not to use neblina core to
-            generate the evolution operator.
-
         **kwargs : dict, optional
-            Additional arguments for constructing the evolution operator.
+            Arguments for setting the evolution operator.
             Accepts any valid keywords from
-            :meth:`shift_operator`
-            :meth:`coin_operator`, and
-            :meth:`oracle`.
-
-        Returns
-        -------
-        U : :class:`scipy.sparse.csr_array`
-            The evolution operator.
+            :meth:`set_shift` :meth:`set_coin`, and :meth:`set_marked`.
 
         See Also
         --------
-        has_persistent_shift
-        shift_operator
-        coin_operator
-        oracle
-
-        Notes
-        -----
-        The evolution operator is given by
-
-        .. math::
-            U = SCR
-
-        where :math`S` is the shift operator,
-        :math:`C` is the coin operator, and
-        :math:`R` is the oracle [1]_.
-
-        References
-        ----------
-        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-            Vol. 19. New York: Springer, 2013.
-
+        set_shift
+        set_coin
+        set_marked
         """
 
         S_kwargs = CoinedWalk._filter_valid_kwargs(
@@ -728,21 +696,56 @@ class CoinedWalk(QuantumWalk):
         self.set_shift(**S_kwargs)
         self.set_coin(**C_kwargs)
         self.set_marked(**R_kwargs)
+        self._evolution = None
 
     def get_evolution(self, hpc=True):
         r"""
-        Create evolution operator from previously set matrices.
+        Create evolution operator from previously set attributes.
 
         Creates evolution operator by multiplying the
-        shift operator, coin operator and oracle.
-        If the oracle is not set,
-        it is substituted by the identity.
+        shift operator and coin operator.
+        If the coin operator is not an explicit matrix,
+        and the coin for marked vertices was specified,
+        the coin of each marked vertex is substituted.
 
         Parameters
         ----------
         hpc : bool, default=True
             Whether or not the evolution operator should be
-            constructed using nelina's high-performance computating.
+            constructed using nelina's high-performance computing.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+
+        Notes
+        -----
+        The evolution operator is given by
+
+        .. math::
+           U = SC'
+
+        where :math`S` is the shift operator, and
+        :math:`C'` is the coin operator (probably) altered by
+        the marked vertices [1]_.
+
+        If the coin operator was set as an explicit matrix,
+        the marked vertices to not alter it.
+        If the coin operator was not set as an explicit matrix
+        (e.g. as a list of coins),
+        the coin of each marked vertex is substituted as specified by
+        the last :meth:`set_marked` call.
+
+        References
+        ----------
+        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+            Vol. 19. New York: Springer, 2013.
+
+        Examples
+        --------
+
+        .. todo::
+            valid examples to clear behaviour
         """
         if self._shift is None:
             raise AttributeError("Shift operator was not set.")
