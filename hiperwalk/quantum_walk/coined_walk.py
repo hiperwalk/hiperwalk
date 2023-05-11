@@ -847,10 +847,10 @@ class CoinedWalk(QuantumWalk):
         .. todo::
             valid examples to clear behaviour
         """
-        if self._shift is None:
-            raise AttributeError("Shift operator was not set.")
-        if self._coin is None:
-            raise AttributeError("Coin operator was not set.")
+        if self._evolution is not None:
+            # evolution operator was not changed.
+            # No need to create it again
+            return self._evolution
 
         U = None
         if hpc and not self._pyneblina_imported():
@@ -859,6 +859,10 @@ class CoinedWalk(QuantumWalk):
             except ModuleNotFoundError:
                 warn(PYNEBLINA_IMPORT_ERROR_MSG)
                 hpc = False
+
+
+        S = self.get_shift()
+        C = self.get_final_coin()
 
         if hpc:
 
