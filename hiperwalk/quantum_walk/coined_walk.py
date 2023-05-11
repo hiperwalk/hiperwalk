@@ -872,8 +872,8 @@ class CoinedWalk(QuantumWalk):
                 + "Then converting back to sparse. "
                 + "This uses unnecessary memory and computational time."
             )
-            S = self._shift.todense()
-            C = self._coin.todense()
+            S = S.todense()
+            C = C.todense()
 
             warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
