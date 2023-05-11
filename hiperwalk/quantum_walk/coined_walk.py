@@ -662,11 +662,14 @@ class CoinedWalk(QuantumWalk):
             marked = vertices
 
         super().set_marked(marked)
-        self._marked_coin = coin_list
+        if bool(coin_list) or bool(self._oracle_coin):
+            # evolution operator was changed
+            self._evolution = None
+        self._oracle_coin = coin_list
 
-    def get_marked_coin(self):
+    def get_oracle_coin(self):
         r"""
-        The coins to be applied in the markd vertices.
+        The coins to be applied in the marked vertices.
 
         Returns
         -------
