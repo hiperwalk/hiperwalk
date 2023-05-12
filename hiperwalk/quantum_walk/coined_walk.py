@@ -951,26 +951,26 @@ class CoinedWalk(QuantumWalk):
 
         Parameters
         ----------
-        *args : entries
+        *args
             Each entry is a tuple (or array).
             An entry can be specified in three different ways:
             ``(amplitude, (vertex, dst_vertex))``,
             ``(amplitude, arc_label)``,
             ``(amplitude, vertex, coin)``.
 
-            amplitude :
+            amplitude
                 The amplitude of the given entry.
-            vertex :
+            vertex
                 The vertex corresponding to the position of the walker
                 in the superposition.
-            dst_vertex : 
+            dst_vertex 
                 The vertex which the coin is pointing to.
                 In other words, the tuple
                 ``(vertex, dst_vertex)`` must be a valid arc.
-            arc_label :
+            arc_label
                 The arc label with respect to the arc ordering
-                given by the Graph.
-            coin :
+                given by the computational basis.
+            coin
                 The direction towards which the coin is pointing.
                 It is dependabble on the Graph coloring.
 
@@ -1007,3 +1007,32 @@ class CoinedWalk(QuantumWalk):
                 state[entry[1]] = entry[0]
 
         return self._normalize(state)
+
+    def ket(self, *args):
+        r"""
+        Create a computational basis state.
+
+        Parameters
+        ----------
+        *args
+            The ket label.
+            There are two different labels acceptable.
+
+            tail, head
+                The arc notation.
+            arc_label
+                The label of the arc.
+                Its number according to the computational basis order.
+
+        Examples
+        --------
+        .. todo::
+            valid examples
+        """
+        ket = np.zeros(self.hilb_dim, dtype=complex)
+        if len(args) == 2:
+            ket[self._graph.arc_label(args[0], args[1])] = 1
+        else:
+            ket[args] = 1
+
+        return ket
