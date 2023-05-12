@@ -27,6 +27,10 @@ class CoinedWalk(QuantumWalk):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
+    Warns
+    -----
+    If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
+
     Raises
     ------
     TypeError
@@ -155,15 +159,12 @@ class CoinedWalk(QuantumWalk):
     _coin_funcs = dict()
     _valid_kwargs = dict()
 
-    def __init__(self, graph=None, **kwargs):
-
-        if graph is None:
-            raise ValueError('graph is None')
+    def __init__(self, graph=None, adjacency=None, **kwargs):
 
         self._shift = None
         self._coin = None
         self._oracle_coin = []
-        super().__init__(graph)
+        super().__init__(graph=graph, adjacency=adjacency)
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.number_of_arcs()
