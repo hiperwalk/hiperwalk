@@ -979,11 +979,6 @@ class CoinedWalk(QuantumWalk):
         If entries are repeated (except by the amplitude),
         they are overwritten by the last one.
 
-        .. todo::
-            * Allow real states (only complex allowed at the moment).
-            * More efficient implementation of
-                state construction is desirable.
-
         Examples
         --------
         .. todo::
@@ -991,7 +986,10 @@ class CoinedWalk(QuantumWalk):
             qw.state([1/np.sqrt(2), 0], [1/np.sqrt(2), (1, 0)])
         """
 
-        state = np.zeros(self.hilb_dim, dtype=complex)
+        has_complex = np.any([arg[0].imag != 0 for arg in args])
+        state = np.zeros(self.hilb_dim, dtype=complex if has_complex
+                                                      else float)
+
         for entry in args:
             print(entry)
             if len(entry) == 3:
@@ -1029,7 +1027,7 @@ class CoinedWalk(QuantumWalk):
         .. todo::
             valid examples
         """
-        ket = np.zeros(self.hilb_dim, dtype=complex)
+        ket = np.zeros(self.hilb_dim, dtype=float)
         if len(args) == 2:
             ket[self._graph.arc_label(args[0], args[1])] = 1
         else:
