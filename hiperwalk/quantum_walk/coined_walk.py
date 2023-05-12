@@ -10,26 +10,6 @@ from scipy.linalg import hadamard, dft
 if __DEBUG__:
     from time import time as now
 
-def _binary_search(v, elem, start=0, end=None):
-    r"""
-    expects sorted array and executes binary search in the subarray
-    v[start:end] searching for elem.
-    Return the index of the element if found, otherwise returns -1
-    Cormen's binary search implementation.
-    Used to improve time complexity
-    """
-    if end == None:
-        end = len(v)
-    
-    while start < end:
-        mid = int((start + end)/2)
-        if elem <= v[mid]:
-            end = mid
-        else:
-            start = mid + 1
-
-    return end if v[end] == elem else -1
-
 class CoinedWalk(QuantumWalk):
     r"""
     Manage an instance of the coined quantum walk model
@@ -960,98 +940,39 @@ class CoinedWalk(QuantumWalk):
         # TODO: benchmark (time and memory usage)
         return prob
 
-
-    #########################################################
-    ######### Auxiliary Methods for state() method ##########
-    #########################################################
-
-    def _state_position_coin(self, state, entries):
-        raise NotImplementedError
-
-    def _state_arc_notation(self, state, entries):
-        indices = self.adj_matrix.indices
-        indptr = self.adj_matrix.indptr
-
-        for amplitude, src, dst in entries:
-            
-            if self.adj_matrix[src, dst] == 0:
-                raise ValueError(
-                    "Vertices " + str(src) + " and " + str(dst)
-                    + " are not adjacent."
-                )
-
-            arc = _binary_search(indices, dst, start=indptr[src],
-                                 end=indptr[src+1])
-
-            state[arc] = amplitude
-
-        return state
-
-
-    def _state_arc_label(self, state, entries):
-        for amplitude, arc in entries:
-            state[arc] = amplitude
-
-        return state
-
-    def state(self, entries, type='arc_notation'):
+    def state(self, *args):
         """
         Generates a valid state.
 
         The state corresponds to the walker being in a superposition
         of the ``entries``.
-        Please refer to the current class documentation for the
-        expected direction and arc order --
         for instance, click on :meth:`qwalk.coined.Graph`.
-
         The final state is normalized in order to be unitary.
 
         Parameters
         ----------
-        entries : list of entry
+        *args : entries
             Each entry is a tuple (or array).
-            An entry can be specified in four different ways:
-            ``(amplitude, vertex, dst_vertex)``,
-            ``(amplitude, vertex, coin)``,
-            ``(amplitude, coin, vertex)``,
-            ``(amplitude, arc_label)``.
+            An entry can be specified in three different ways:
+            ``(amplitude, (vertex, dst_vertex))``,
+            ``(amplitude, arc_label)``,
+            ``(amplitude, vertex, coin)``.
 
             amplitude :
-                The amplitudes of the given entry.
+                The amplitude of the given entry.
             vertex :
                 The vertex corresponding to the position of the walker
                 in the superposition.
             dst_vertex : 
                 The vertex which the coin is pointing to.
                 In other words, the tuple
-                (vertex, dst_vertex) must be a valid arc.
+                ``(vertex, dst_vertex)`` must be a valid arc.
+            arc_label :
+                The arc label with respect to the arc ordering
+                given by the Graph.
             coin :
                 The direction towards which the coin is pointing.
-                A value between 0 and degree(``vertices[i]``) - 1
-                is expected, respecting the sorted arcs order.
-            arc_label :
-                The arc number with respect to the sorted arcs order.
-
-        type : {'arc_notation', 'vertex_dir', 'arc_order'}
-            The type of each entry sent in the ``entries`` argument.
-
-            * **'arc_notation'** : ``(amplitude, vertex, dst_vertex)``;
-            * **'position_coin'**: ``(amplitude, vertex, coin)``;
-            * **'coin_position'**: ``(amplitude, coin, vertex)``;
-            * **arc_order** : ``(amplitude, arc_label)``.
-
-
-        Raises
-        ------
-        ValueError
-            If ``type`` has invalid value.
-
-            If ``type='arc_notation'`` and there exists an entry such that
-            `vertex` and `dst_vertex` are not adjacent.
-
-        IndexError
-            If ``type='vertex_dir'`` and `coin_dir` is not a value in
-            the valid interval (from 0 to degree(`vertex`) - 1).
+                It is dependabble on the Graph coloring.
 
         Notes
         -----
@@ -1062,21 +983,27 @@ class CoinedWalk(QuantumWalk):
             * Allow real states (only complex allowed at the moment).
             * More efficient implementation of
                 state construction is desirable.
-            * Turn simple `entries` in iterable format. For example,
-                (1, 0, 0) into [(1, 0, 0)]
+
+        Examples
+        --------
+        .. todo::
+            
+            qw.state([1/np.sqrt(2), 0], [1/np.sqrt(2), (1, 0)])
         """
 
-        funcs = {'arc_notation' : self._state_arc_notation,
-                 'position_coin' : self._state_vertex_dir,
-                 'arc_order' : self._state_arc_order}
-
-        if type not in list(funcs.keys()):
-            raise ValueError(
-                    'Invalid `type` argument. Expected any from '
-                    + str(list(funcs.keys()))
-            )
-
         state = np.zeros(self.hilb_dim, dtype=complex)
-        state = funcs[type](state, entries)
+        for entry in args:
+            print(entry)
+            if len(entry) == 3:
+                raise NotImplementedError(
+                    'position-coin notation not implemented')
+
+            if hasattr(entry[1], '__iter__'):
+                # arc notation
+                head, tail = entry[1]
+                state[self._graph.arc_label(head, tail)] = entry[0]
+            else:
+                # arc label
+                state[entry[1]] = entry[0]
 
         return self._normalize(state)
