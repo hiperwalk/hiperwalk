@@ -305,6 +305,24 @@ class QuantumWalk(ABC):
 
         return self._normalize(state)
 
+    def ket(self, label):
+        r"""
+        Create a computational basis state.
+
+        Parameters
+        ----------
+        label : int
+            The ket label.
+
+        Examples
+        --------
+        .. todo::
+            valid examples
+        """
+        ket = np.zeros(self.hilb_dim, dtype=float)
+        ket[label] = 1
+        return ket
+
     def _pyneblina_imported(self):
         """
         Expects pyneblina interface to be imported as nbl
