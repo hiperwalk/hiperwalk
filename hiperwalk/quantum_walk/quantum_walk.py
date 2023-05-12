@@ -21,11 +21,19 @@ class QuantumWalk(ABC):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
+    adjacency : optional
+        The adjacency matrix.
+        It is deprecated. Use ``graph`` instead.
+
     Attributes
     ----------
     hilb_dim : int, default=0
         Hilbert Space dimension.
         It must be updated by the subclass' ``__init__``.
+
+    Warns
+    -----
+    If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
 
     Raises
     ------
@@ -42,7 +50,16 @@ class QuantumWalk(ABC):
     """
 
     @abstractmethod
-    def __init__(self, graph=None, **kwargs):
+    def __init__(self, graph=None, adjacency=None, **kwargs):
+        if adjacency is not None:
+            if graph is None:
+                graph = adjacency
+            warn("'adjacency' parameter is deprecated. "
+                 + "It will be removed in future versions.")
+
+        if graph is None:
+            raise ValueError('graph is None')
+
         self._marked = (self.set_marked(kwargs['marked'])
                         if 'marked' in kwargs
                         else self.set_marked([]))
@@ -66,12 +83,11 @@ class QuantumWalk(ABC):
             self._graph = graph
 
         elif isinstance(graph, scipy.sparse.csr_array):
-            # do stuff
-            if (len(adj_matrix.shape) != 2
-                or adj_matrix.shape[0] != adj_matrix.shape[1]
+            if (len(graph.shape) != 2
+                or graph.shape[0] != graph.shape[1]
             ):
                 raise ValueError(
-                    "`adj_matrix` is not a square matrix."
+                    "Adjacency matrix is not a square matrix."
                 )
 
             self._graph = Graph(graph)
