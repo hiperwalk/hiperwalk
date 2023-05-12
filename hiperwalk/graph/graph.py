@@ -1,3 +1,4 @@
+import numpy as np
 from warnings import warn
 
 def _binary_search(v, elem, start=0, end=None):
@@ -88,6 +89,10 @@ class Graph():
         start = self.adj_matrix.indptr[vertex]
         end = self.adj_matrix.indptr[vertex + 1]
         return self.adj_matrix.indices[start:end]
+
+    def arcs_with_tail(self, tail):
+        arcs_lim = self.adj_matrix.indptr
+        return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
 
     def number_of_vertices(self):
         return self.adj_matrix.shape[0]

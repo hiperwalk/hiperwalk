@@ -916,6 +916,12 @@ class CoinedWalk(QuantumWalk):
         See Also
         --------
         simulate
+
+        Notes
+        -----
+        .. note::
+            
+            benchmark performance
         """
         # TODO: test with nonregular graph
         # TODO: test with nonuniform condition
@@ -925,23 +931,28 @@ class CoinedWalk(QuantumWalk):
         if len(states.shape) == 1:
             states = [states]
 
-        # TODO: check if dimensions match and throw exception if necessary
-        # TODO: check if just creates reference (no hard copy)
-        edges_indices = self.adj_matrix.indptr 
+        #edges_indices = self.adj_matrix.indptr 
+        #
+        #prob = np.array([[
+        #        Graph._elementwise_probability(
+        #            states[i][edges_indices[j]:edges_indices[j + 1]]
+        #        ).sum()
+        #        for j in range(len(edges_indices) - 1)
+        #    ] for i in range(len(states)) ])
 
-        # TODO: check it is more efficient on demand or
-        # using extra memory (aux_prob)
-        # aux_prob = ElementwiseProbability(state)
-        # first splits state per vertex,
-        # then calculates probability of each vertex direction,
-        # then sums the probabilities resulting in
-        # the vertix final probability
-        prob = np.array([[
-                Graph._elementwise_probability(
-                    states[i][edges_indices[j]:edges_indices[j + 1]]
-                ).sum()
-                for j in range(len(edges_indices) - 1)
-            ] for i in range(len(states)) ])
+        def get_entries(state, indexes):
+            return np.array([state[i] for i in indexes])
+
+        num_vert = self._graph.number_of_vertices()
+        graph = self._graph
+        prob = np.array([[CoinedWalk._elementwise_probability(
+                              get_entries(
+                                  states[i], 
+                                  graph.arcs_with_tail(v)
+                              )
+                          ).sum()
+                          for v in range(num_vert)]
+                        for i in range(len(states))])
 
         if __DEBUG__:
             end = now()
