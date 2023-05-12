@@ -128,61 +128,6 @@ class ContinuousWalk(QuantumWalk):
         """
         return self._gamma
 
-    def oracle(self, marked_vertices=0):
-        r"""
-        Creates the oracle matrix.
-
-        The oracle is created and set
-        to be used by other methods.
-        For coherence, the previously set hamiltonian and
-        evolution operator are unset.
-
-        Parameters
-        ----------
-        marked_vertices = None, int, list of int, default=0
-            Vertices to be marked.
-            If ``None``, no vertex is marked and
-            the oracle is also set to ``None``
-            (which is equivalent to the zero matrix).
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
-
-        Notes
-        -----
-        The oracle matrix has format
-
-        .. math::
-            \sum_{m \in M} \ket{m}\bra{m}
-
-        where :math:`M` is the set of marked vertices.
-        """
-
-        if marked_vertices is None:
-            self._oracle = None
-            return None
-
-        if not hasattr(marked_vertices, '__iter__'):
-            marked_vertices = [marked_vertices]
-        self._oracle = scipy.sparse.csr_array(
-            ([1]*len(marked_vertices),
-                (marked_vertices, marked_vertices)
-            ),
-            shape=(self.hilb_dim, self.hilb_dim)
-        )
-    # since the oracle was set,
-        # the previous hamiltonian and evolution operator
-        # are probably not coherent with the oracle
-        self._hamiltonian = None
-        self._evolution_operator = None
-
-        R = np.zeros((self.hilb_dim, self.hilb_dim))
-        for m in marked_vertices:
-            R[m, m] = 1
-
-        return R
-
     def hamiltonian(self, gamma=None, laplacian=False, **kwargs):
         r"""
         Creates the Hamiltonian.
