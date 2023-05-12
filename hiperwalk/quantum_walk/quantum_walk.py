@@ -270,31 +270,37 @@ class QuantumWalk(ABC):
             return state
         return state / norm
 
-    def state(self, entries):
+    def state(self, *args):
         """
         Generates a valid state.
 
         The state corresponds to the walker being in a superposition
-        of the ``entries`` with the given amplitudes.
-
+        of the given labels with the given amplitudes.
         The state is normalized in order to be unitary.
 
         Parameters
         ----------
-        entries : list of 2-tuples
-            Each entry is a 2-tuple with format ``(amplitude, vertex)``.
+        *args
+            Each entry is a 2-tuple or array with format
+            ``(amplitude, vertex)``.
 
         Returns
         -------
         :class:`numpy.array`
+
+        Examples
+        --------
+        .. todo::
+
+            valid example
         """
         # TODO benchmark with list comprehension
 
         # checking if there is a complex entry
-        has_complex = np.any([ampl.imag != 0 for ampl, _ in entries])
+        has_complex = np.any([ampl.imag != 0 for ampl, _ in args])
         state = np.zeros(self.hilb_dim,
                          dtype=complex if has_complex else float)
-        for ampl, v in entries:
+        for ampl, v in args:
             state[v] = ampl
 
         return self._normalize(state)
