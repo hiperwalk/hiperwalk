@@ -27,6 +27,16 @@ class CoinedWalk(QuantumWalk):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
+    adjacency : :class:`scipy.sparse.csr_array`
+        .. deprecated ::
+            Use ``graph`` instead.
+
+        Adjacency matrix of the graph.
+
+    **kwargs : optional
+        Optional arguments for setting the non-default evolution operator.
+        See :meth:`set_evolution`.
+
     Warns
     -----
     If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
@@ -36,6 +46,10 @@ class CoinedWalk(QuantumWalk):
     TypeError
         if ``adj_matrix`` is not an instance of
         :class:`scipy.sparse.csr_array`.
+
+    See Also
+    --------
+    set_evolution
 
     Notes
     -----

@@ -1,11 +1,11 @@
 import numpy as np
 import scipy.sparse
 import scipy.linalg
-from ..base_walk import BaseWalk
-from constants import PYNEBLINA_IMPORT_ERROR_MSG
+from .quantum_walk import QuantumWalk
+from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
 
-class Graph(BaseWalk):
+class ContinuousWalk(QuantumWalk):
     r"""
     Manage instance of the continuous time quantum walk model
     on unweighted graphs.
@@ -14,12 +14,37 @@ class Graph(BaseWalk):
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`
-        Adjacency matrix of the graph on which the quantum occurs
-        is going to occur.
+    graph :
+        Graph on which the quantum walk occurs.
+        There are three two types acceptable.
+
+        :class:`hiperwalk.graph.Graph` :
+            The graph itself.
+
+        :class:`class:scipy.sparse.csr_array`:
+            The graph adjacency matrix.
 
         .. todo::
             * Accept other types such as numpy array
+
+
+
+    adjacency : :class:`scipy.sparse.csr_array`
+        .. deprecated ::
+            This parameter is deprecated and will be removed in
+            future versions.
+            Use ``graph`` instead.
+
+        Adjacency matrix of the graph on which the quantum occurs
+        is going to occur.
+
+    **kwargs : optional
+        Optional arguments for setting the non-default evolution operator.
+        See :meth:`set_evolution`.
+
+    See Also
+    --------
+    set_evolution
 
     Notes
     -----
@@ -41,8 +66,9 @@ class Graph(BaseWalk):
     Simply pass the disered Hamiltonian instead of the adjacency matrix.
     """
 
-    def __init__(self, adj_matrix):
-        super().__init__(adj_matrix)
+    def __init__(self, graph=None, adjacency=None, **kwargs):
+
+        super().__init__(graph=graph, adjacency=adjacency)
 
         self.hilb_dim = self.adj_matrix.shape[0]
         self._hamiltonian = None
