@@ -82,6 +82,52 @@ class ContinuousWalk(QuantumWalk):
         self._valid_kwargs['hamiltonian'] = self._get_valid_kwargs(
             self.hamiltonian)
 
+    def set_laplacian(self, laplacian=False):
+        r"""
+        Set whether or not to use Laplacian for the Hamiltonian.
+
+        Parameters
+        ----------
+        laplacian : bool, default=False
+            If ``False`` uses adjacency matrix.
+            If ``True`` uses Laplacian matrix.
+        """
+        self._laplacian = bool(laplacian)
+
+    def get_laplacian(self):
+        r"""
+        Get whether the laplacian is used for the Hamiltonian.
+
+        Returns
+        -------
+        bool
+        """
+        return self._laplacian
+
+    def set_gamma(self, gamma=1):
+        r"""
+        Set gamma used for the Hamiltonian.
+
+        Parameters
+        ----------
+        gamma : float, default = 1
+            Gamma value.
+        """
+        if gamma.imag != 0:
+            raise TypeError("Value of 'gamma' is not float.")
+
+        self._gamma = gamma
+
+    def get_gamma(self):
+        r"""
+        Get the gamma used for the Hamiltonian.
+
+        Returns
+        -------
+        float
+        """
+        return self._gamma
+
     def oracle(self, marked_vertices=0):
         r"""
         Creates the oracle matrix.
