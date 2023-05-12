@@ -58,7 +58,7 @@ class QuantumWalk(ABC):
                  + "It will be removed in future versions.")
 
         if graph is None:
-            raise ValueError('graph is None')
+            raise TypeError('graph is None')
 
         self._marked = (self.set_marked(kwargs['marked'])
                         if 'marked' in kwargs
