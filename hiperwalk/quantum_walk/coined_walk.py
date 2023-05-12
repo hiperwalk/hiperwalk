@@ -588,24 +588,24 @@ class CoinedWalk(QuantumWalk):
         C = scipy.sparse.block_diag(blocks, format='csr')
         return scipy.sparse.csr_array(C)
 
-    def get_coin(self):
-        r"""
-        Returns the coin operator in matricial form.
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
-        """
-        if not scipy.sparse.issparse(self._coin):
-            coin_list = self._coin
-            C = self._coin_list_to_explicit_coin(coin_list)
-
-            if __DEBUG__:
-                if not isinstance(C, scipy.sparse.csr_array):
-                    raise AssertionError
-
-            return C
-        return self._coin
+    #def get_coin(self):
+    #    r"""
+    #    Returns the coin operator in matricial form.
+    #
+    #    Returns
+    #    -------
+    #    :class:`scipy.sparse.csr_array`
+    #    """
+    #    if not scipy.sparse.issparse(self._coin):
+    #        coin_list = self._coin
+    #        C = self._coin_list_to_explicit_coin(coin_list)
+    #
+    #        if __DEBUG__:
+    #            if not isinstance(C, scipy.sparse.csr_array):
+    #                raise AssertionError
+    #
+    #        return C
+    #    return self._coin
 
     def set_marked(self, marked=[]):
         r"""
@@ -657,31 +657,26 @@ class CoinedWalk(QuantumWalk):
             self._evolution = None
         self._oracle_coin = coin_list
 
-    def get_oracle_coin(self):
-        r"""
-        The coins to be applied in the marked vertices.
+    #def get_oracle_coin(self):
+    #    r"""
+    #    The coins to be applied in the marked vertices.
+    #
+    #    Returns
+    #    -------
+    #    list of str
+    #        If empty, no coin is changed (coin operator not altered).
+    #        If an entry is the empty string,
+    #        the coin for that vertex is not substituted.
+    #    """
+    #    return self._oracle_coin
 
-        Returns
-        -------
-        list of str
-            If empty, no coin is changed (coin operator not altered).
-            If an entry is the empty string,
-            the coin for that vertex is not substituted.
-        """
-        return self._oracle_coin
-
-    def get_final_coin(self):
+    def get_coin(self):
         r"""
         Return coin to be used for creating the evolution operator.
 
         Returns
         -------
         :class:`scipy.sparse.csr_array`
-
-        See Also
-        --------
-        get_coin
-        get_oracle_coin
 
         Notes
         -----
@@ -740,6 +735,7 @@ class CoinedWalk(QuantumWalk):
                          for i in range(len(coin))]
         else:
             coin_list = self._coin
+
         return self._coin_list_to_explicit_coin(coin_list)
 
     def set_evolution(self, **kwargs):
@@ -843,7 +839,7 @@ class CoinedWalk(QuantumWalk):
 
 
         S = self.get_shift()
-        C = self.get_final_coin()
+        C = self.get_coin()
 
         if hpc:
 
