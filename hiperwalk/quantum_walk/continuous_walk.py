@@ -66,6 +66,8 @@ class ContinuousWalk(QuantumWalk):
     Simply pass the disered Hamiltonian instead of the adjacency matrix.
     """
 
+    _hamiltonian_kwargs = dict()
+
     def __init__(self, graph=None, adjacency=None, **kwargs):
 
         super().__init__(graph=graph, adjacency=adjacency)
@@ -75,14 +77,14 @@ class ContinuousWalk(QuantumWalk):
 
         import inspect
 
-        self._valid_kwargs = dict()
+        if not bool(CoinedWalk._valid_kwargs):
+            # assign static attribute
+            CoinedWalk._valid_kwargs = {
+                'gamma': CoinedWalk._get_valid_kwargs(self.set_gamma),
+                'marked': CoinedWalk._get_valid_kwargs(self.set_marked)
+            }
 
-        self._valid_kwargs['oracle'] = self._get_valid_kwargs(
-            self.oracle)
-        self._valid_kwargs['hamiltonian'] = self._get_valid_kwargs(
-            self.hamiltonian)
-
-    def set_gamma(self, gamma=1):
+    def set_gamma(self, gamma=None):
         r"""
         Set gamma used for the Hamiltonian.
 
@@ -91,7 +93,7 @@ class ContinuousWalk(QuantumWalk):
         gamma : float, default = 1
             Gamma value.
         """
-        if gamma.imag != 0:
+        if gamma is None or gamma.imag != 0:
             raise TypeError("Value of 'gamma' is not float.")
 
         self._gamma = gamma
@@ -106,82 +108,63 @@ class ContinuousWalk(QuantumWalk):
         """
         return self._gamma
 
-    def hamiltonian(self, gamma=None, laplacian=False, **kwargs):
+    def hamiltonian(self, **kwargs):
         r"""
         Creates the Hamiltonian.
 
-        Creates the Hamiltonian based on the previously set oracle.
-        If no oracle was set, it is ignored.
-        If any valid ``**kwargs`` is sent, an oracle is created and set.
-        The new oracle is then used to construct the Hamiltonian.
-
-        For coherence, the previously set evolution operator is unset.
 
         Parameters
         ----------
-        gamma : float, default : None
-            Value to be multiplied by the adjacency matrix or
-            the Laplacian.
-            If ``None``, an error is raised.
-
-        laplacian : bool, default : False
-            Whether to construct the Hamiltonian using the
-            adjacency matrix or the Laplacian.
-
-        **kwargs :
+        **kwargs : 
             Additional arguments.
-            Used for determining the marked vertices.
-            See :meth:`oracle` for valid keywords and values.
+            Used for determining the gamma value and marked vertices.
+            See :meth:`set_gamma` and :meth:`set_marked`.
 
         Returns
         -------
         :class:`scipy.sparse.csr_array`
-
-        Raises
-        ------
-        ValueError
-            If ``gamma=None``.
             
         Notes
         -----
         The Hamiltonian is given by
 
         .. math::
-            H = -\gamma B  - \sum_{m \in M} \ket m \bra m
+            H = -\gamma A  - \sum_{m \in M} \ket m \bra m
 
-        where :math:`B` is either the adjacency matrix :math:`A`
-        or the Laplacian :math:`L = D - A`
-        (with :math:`D` being the degree matrix),
+        where :math:`A` is the adjacency matrix, and
         :math:`M` is the set of marked vertices.
 
         See Also
         --------
-        oracle
+        set_gamma
+        set_marked
         """
-        if gamma is None:
-            raise ValueError(
-                "Invalid `gamma` value. It cannot be `None`."
-            )
 
-        if laplacian:
-            degrees = self.adj_matrix.sum(axis=1)
-            H = scipy.sparse.diags(degrees, format="csr")
-            del degrees
-            H -= self.adj_matrix
-            H *= -gamma
+        # if laplacian:
+        #     degrees = self.adj_matrix.sum(axis=1)
+        #     H = scipy.sparse.diags(degrees, format="csr")
+        #     del degrees
+        #     H -= self.adj_matrix
+        #     H *= -gamma
 
-        else:
-            H = -gamma*self.adj_matrix
+        gamma_kwargs = CoinedWalk._filter_valid_kwargs(
+                              kwargs,
+                              CoinedWalk._valid_kwargs['gamma'])
+        marked_kwargs = CoinedWalk._filter_valid_kwargs(
+                              kwargs,
+                              CoinedWalk._valid_kwargs['marked'])
 
-        # setting oracle
-        oracle_kwargs = self._filter_valid_kwargs(
-            kwargs, self._valid_kwargs['oracle'])
+        self.set_gamma(gamma_kwargs)
+        self.set_marked(marked_kwargs)
+        H = -self._gamma * self._graph.adj_matrix
 
-        if bool(oracle_kwargs):
-            self.oracle(**oracle_kwargs)
+        # creating oracle
+        if len(self._marked) > 0:
+            data = np.ones(len(self._marked), dtype=np.int8)
+            oracle = scipy.sparse.csr_array(
+                    (data, (self._marked, self._marked)),
+                    shape=(self.hilb_dim, self.hilb_dim))
 
-        # using previously set oracle
-        if self._oracle is not None:
             H -= self._oracle
 
         self._hamiltonian = H
@@ -189,6 +172,9 @@ class ContinuousWalk(QuantumWalk):
         # the previous evolution operator may not be coherent.
         self._evolution_operator = None
         return H
+
+    def get_hamiltonian(self):
+        return self._hamiltonian
 
     def evolution_operator(self, time=0, hpc=True, **kwargs):
         r"""
