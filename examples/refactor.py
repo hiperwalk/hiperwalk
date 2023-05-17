@@ -2,37 +2,22 @@ import sys
 sys.path.append('..')
 import hiperwalk as hpw
 import networkx as nx
+import numpy as np
 
-num_vert
+num_vert = 101
 adj_matrix = nx.adjacency_matrix(nx.cycle_graph(num_vert))
-graph = hpw.Graph(adj_matrix)
-qw = hpw.CoinedWalk(graph)
+#adj_matrix = scipy.sparse.csr_array(
+#            [[0, 1, 1, 1, 1],
+#             [1, 0, 1, 1, 0],
+#             [1, 1, 0, 0, 0],
+#             [1, 1, 0, 0, 0],
+#             [1, 0, 0, 0, 0]]
+#        )
+g = hpw.Graph(adj_matrix)
 
-
-
-#num_vert = 5
-#adj_matrix = nx.adjacency_matrix(nx.cycle_graph(num_vert))
-##adj_matrix = scipy.sparse.csr_array(
-##            [[0, 1, 1, 1, 1],
-##             [1, 0, 1, 1, 0],
-##             [1, 1, 0, 0, 0],
-##             [1, 1, 0, 0, 0],
-##             [1, 0, 0, 0, 0]]
-##        )
-#g = hpw.Graph(adj_matrix)
-#
-#coin = ['G'] * num_vert
-#qw = hpw.CoinedWalk(adjacency=adj_matrix, coin=coin)
-#print(not np.any(
-#    qw.get_evolution().todense()
-#    - qw.get_shift() @ qw.get_final_coin()
-#))
-#
-#num_arcs = g.number_of_arcs()
-#state = qw.uniform_state()
-#print(state)
-#print(qw.state([1, 0], [1, 1], [2, (1, 0)]))
-#print(qw.ket(0))
-#print(qw.ket(1, 0))
-#ket = qw.ket(1)*1j
-#print(ket.dtype)
+qw = hpw.ContinuousWalk(graph=adj_matrix, gamma=0.35)
+psi0 = qw.ket(num_vert//2)
+print(psi0)
+states = qw.simulate(time=num_vert//2, initial_condition=psi0)
+probs = qw.probability_distribution(states)
+hpw.plot_probability_distribution(probs)
