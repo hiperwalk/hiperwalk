@@ -110,7 +110,7 @@ class ContinuousWalk(QuantumWalk):
         """
         return self._gamma
 
-    def hamiltonian(self, **kwargs):
+    def set_hamiltonian(self, **kwargs):
         r"""
         Creates the Hamiltonian.
 
@@ -149,15 +149,15 @@ class ContinuousWalk(QuantumWalk):
         #     H -= self.adj_matrix
         #     H *= -gamma
 
-        gamma_kwargs = CoinedWalk._filter_valid_kwargs(
+        gamma_kwargs = ContinuousWalk._filter_valid_kwargs(
                               kwargs,
-                              CoinedWalk._valid_kwargs['gamma'])
-        marked_kwargs = CoinedWalk._filter_valid_kwargs(
+                              ContinuousWalk._hamiltonian_kwargs['gamma'])
+        marked_kwargs = ContinuousWalk._filter_valid_kwargs(
                               kwargs,
-                              CoinedWalk._valid_kwargs['marked'])
+                              ContinuousWalk._hamiltonian_kwargs['marked'])
 
-        self.set_gamma(gamma_kwargs)
-        self.set_marked(marked_kwargs)
+        self.set_gamma(**gamma_kwargs)
+        self.set_marked(**marked_kwargs)
         H = -self._gamma * self._graph.adj_matrix
 
         # creating oracle
