@@ -343,7 +343,7 @@ class QuantumWalk(ABC):
         """
         Expects pyneblina interface to be imported as nbl
         """
-        return ('qwalk._pyneblina_interface' in sys_modules
+        return ('quantum_walk._pyneblina_interface' in sys_modules
                 and 'nbl' in locals())
 
 
