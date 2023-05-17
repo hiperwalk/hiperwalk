@@ -178,9 +178,11 @@ class ContinuousWalk(QuantumWalk):
     def get_hamiltonian(self):
         return self._hamiltonian
 
-    def set_evolution_operator(self, **kwargs):
+    def set_evolution(self, **kwargs):
         r"""
         Alias for :meth:`set_hamiltonian`.
+        """
+        self.set_hamiltonian(**kwargs)
 
         Creates the evolution operator based on the previously
         set Hamiltonian.
