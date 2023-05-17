@@ -347,19 +347,12 @@ class QuantumWalk(ABC):
                 and 'nbl' in locals())
 
 
-    def simulate(self, time=None, initial_condition=None,
-                 evolution_operator=None, hpc=True):
+    def simulate(self, time=None, initial_condition=None, hpc=True):
         r"""
         Simulates the quantum walk.
 
         Simulates the quantum walk applying the evolution operator
         multiple times to the initial condition.
-        If ``evolution_operator=None``,
-        uses the previously set evolution operator.
-        Otherwise, uses the one sent as argument.
-
-        The given (or set) evolution operator is interpreted as
-        being a single step.
 
         Parameters
         ----------
@@ -383,10 +376,6 @@ class QuantumWalk(ABC):
         initial_condition : :class:`numpy.array`, default=None
             The initial condition which the evolution operator
             is going to be applied to.
-
-        evolution_operator : :class:`scipy.sparse.csr_array`, default=None
-            The evolution operator.
-            If ``None``, the previously set evolution operator is used.
 
         hpc : bool, default=True
             Whether or not to use neblina's high-performance computing
@@ -445,23 +434,6 @@ class QuantumWalk(ABC):
                 "Initial condition has invalid dimension. "
                 + "Expected an np.array with length " + str(self.hilb_dim)
             )
-
-        if self._evolution is None and evolution_operator is None:
-            raise ValueError(
-                "Evolution Operator was not set. "
-                + "Did you forget to call the evolution_operator() method"
-                + " or to pass it as argument?"
-            )
-
-        if evolution_operator is not None:
-            if evolution_operator.shape != (self.hilb_dim, self.hilb_dim):
-                raise ValueError(
-                    "Evolution operator has incorret dimensions."
-                    + " Expected shape is "
-                    + str((self.hilb_dim, self.hilb_dim))
-                )
-            prev_U = self._evolution
-            self._evolution = evolution_operator
 
         ###########################
         ### Auxiliary functions ###
@@ -583,9 +555,6 @@ class QuantumWalk(ABC):
         # TODO: free vector from neblina core
         self._simul_mat = None
         self._simul_vec = None
-
-        if evolution_operator is not None:
-            self._evolution = prev_U
 
         return saved_states
 
