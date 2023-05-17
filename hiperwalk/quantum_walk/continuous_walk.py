@@ -39,12 +39,11 @@ class ContinuousWalk(QuantumWalk):
         is going to occur.
 
     **kwargs : optional
-        Optional arguments for setting the non-default evolution operator.
-        See :meth:`set_evolution`.
+        Arguments for setting Hamiltonian.
 
     See Also
     --------
-    set_evolution
+    set_hamiltonian
 
     Notes
     -----
@@ -72,17 +71,19 @@ class ContinuousWalk(QuantumWalk):
 
         super().__init__(graph=graph, adjacency=adjacency)
 
-        self.hilb_dim = self.adj_matrix.shape[0]
+        self.hilb_dim = self._graph.number_of_vertices()
         self._hamiltonian = None
 
         import inspect
 
-        if not bool(CoinedWalk._valid_kwargs):
+        if not bool(ContinuousWalk._hamiltonian_kwargs):
             # assign static attribute
-            CoinedWalk._valid_kwargs = {
-                'gamma': CoinedWalk._get_valid_kwargs(self.set_gamma),
-                'marked': CoinedWalk._get_valid_kwargs(self.set_marked)
+            ContinuousWalk._hamiltonian_kwargs = {
+                'gamma': ContinuousWalk._get_valid_kwargs(self.set_gamma),
+                'marked': ContinuousWalk._get_valid_kwargs(self.set_marked)
             }
+
+        self.set_hamiltonian(**kwargs)
 
     def set_gamma(self, gamma=None):
         r"""
