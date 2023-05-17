@@ -184,43 +184,34 @@ class ContinuousWalk(QuantumWalk):
         """
         self.set_hamiltonian(**kwargs)
 
-        Creates the evolution operator based on the previously
+    def get_evolution(self, time=None, hpc=True):
+        r"""
+        Return the evolution operator.
+
+        Constructs the evolution operator based on the previously
         set Hamiltonian.
-        If any valid ``**kwargs`` is passed,
-        a new Hamiltonian is created and set.
-        The evolution operator is then constructed based on the
-        new Hamiltonian.
 
         Parameters
         ----------
+        time : float
+            Gerate the evolution operator of the given time.
+
         hpc : bool, default = True
             Whether or not to use neblina hpc functions to
             generate the evolution operator.
 
-        **kwargs :
-            Arguments to construct the Hamiltonian.
-            See :meth:`hamiltonian` for the list of arguments.
-            If no ``**kwrags`` is passed,
-            the previously set Hamiltonian is used.
-            
+        Returns
+        -------
+        :class:`numpy.ndarray`.
 
         Raises
         ------
         ValueError
-            If `time <= 0`.
-
-        AttributeError
-            If the Hamiltonian was not set previously and
-            no ``**kwargs`` is passed.
-
-        Exception
-            If ``**kwargs`` is passed but a valid
-            Hamiltonian cannot be created.
-            See :meth:`hamiltonian` for details.
+            If `time < 0`.
 
         See Also
         --------
-        hamiltonian
+        set_hamiltonian
 
         Notes
         -----
@@ -234,30 +225,17 @@ class ContinuousWalk(QuantumWalk):
 
         The evolution operator is constructed by Taylor Series expansion.
         """
-        if time <= 0:
+        if time is None or time < 0:
             raise ValueError(
-                "Expected `time` value greater than 0."
+                "Expected non-negative `time` value."
             )
-
-        if bool(kwargs):
-            # setting Hamiltonian
-            R_kwargs = self._filter_valid_kwargs(
-                kwargs, self._valid_kwargs['oracle'])
-            H_kwargs = self._filter_valid_kwargs(
-                kwargs, self._valid_kwargs['hamiltonian'])
-
-            self.hamiltonian(**H_kwargs, **R_kwargs)
 
         if self._hamiltonian is None:
-            raise AttributeError(
-                "Hamiltonian not set. "
-                + "Did you forget to call the hamiltonian() method or "
-                + "to pass valid **kwargs to evolution_operator()?"
-            )
+            raise AssertionError
 
         if hpc and not self._pyneblina_imported():
             try:
-                from .. import _pyneblina_interface as nbl
+                from . import _pyneblina_interface as nbl
             except ModuleNotFoundError:
                 warn(PYNEBLINA_IMPORT_ERROR_MSG)
                 hpc = False
@@ -298,7 +276,7 @@ class ContinuousWalk(QuantumWalk):
         else:
             U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
 
-        self._evolution_operator = U
+        self._evolution = U
         return U
 
     def simulate(self, time_range=None, initial_condition=None,
