@@ -279,20 +279,19 @@ class ContinuousWalk(QuantumWalk):
         self._evolution = U
         return U
 
-    def simulate(self, time_range=None, initial_condition=None,
-                 hamiltonian=None, hpc=True):
+    def simulate(self, time=None, initial_condition=None, hpc=True):
         r"""
         Simulate the Continuous Time Quantum Walk Hamiltonian.
 
-        Analogous to the :meth:`BaseWalk.simulate`
+        Analogous to the :meth:`QuantumWalk.simulate`
         but uses the Hamiltonian to construct the evolution operator.
         The Hamiltonian may be the previously set or
         passed in the arguments.
 
         Parameters
         ----------
-        time_range : float or tuple of floats
-            Analogous to the parameters of :meth:`BaseWalk.simulate`,
+        time : float or tuple of floats
+            Analogous to the parameters of :meth:`QuantumWalk.simulate`,
             but accepts float inputs.
             ``step`` is used to construct the evolution operator.
             The states in the interval
@@ -309,9 +308,9 @@ class ContinuousWalk(QuantumWalk):
         Other Parameters
         ----------------
         initial_condition :
-            See :meth:`qwalk.BaseWalk.simulate`.
+            See :meth:`QuantumWalk.simulate`.
         hpc :
-            See :meth:`qwalk.BaseWalk.simulate`.
+            See :meth:`QuantumWalk.simulate`.
 
 
         Raises
@@ -330,10 +329,10 @@ class ContinuousWalk(QuantumWalk):
 
         See Also
         --------
-        :meth:`qwalk.BaseWalk.simulate`
+        :meth:`QuantumWalk.simulate`
         hamiltonian
         """
-        if time_range is None:
+        if time is None:
             raise ValueError(
                 "Invalid `time_range`. Expected a float, 2-tuple, "
                 + "or 3-tuple of float."
@@ -344,38 +343,17 @@ class ContinuousWalk(QuantumWalk):
                 "`initial_condition` not specified."
             )
 
-        time_range = np.array(self._time_range_to_tuple(time_range))
+        time = np.array(self._time_to_tuple(time))
 
-        if hamiltonian is not None:
-            if hamiltonian.shape != (self.hilb_dim, self.hilb_dim):
-                raise ValueError(
-                    "Hamiltonian has invalid dimensions. "
-                    + "Expected Hamiltonian shape: "
-                    + str((self.hilb_dim, self.hilb_dim)) + '.'
-                )
-
-            prev_R = self._oracle
-            prev_H = self._hamiltonian
-            prev_U = self._evolution_operator
-
-            self._oracle = None
-            self._hamiltonian = hamiltonian
-            U = self.evolution_operator(time_range[2], hpc=hpc)
-
-            self._oracle = prev_R
-            self._hamiltonian = prev_H
-            self._evolution_operator = prev_U
-        else:
-            self.evolution_operator(time_range[2], hpc=hpc)
-            U = None # use the set evolution operator
+        self.get_evolution(time=time[2], hpc=hpc)
 
         # cleaning time_range to int
         tol = 1e-5
-        time_range = [int(val/time_range[2])
-                      if int(val/time_range[2])
-                         <= np.ceil(val/time_range[2]) - tol
-                      else int(np.ceil(val/time_range[2]))
-                      for val in time_range]
+        time = [int(val/time[2])
+                if int(val/time[2])
+                   <= np.ceil(val/time[2]) - tol
+                else int(np.ceil(val/time[2]))
+                for val in time]
 
-        states = super().simulate(time_range, initial_condition, U,  hpc)
+        states = super().simulate(time, initial_condition,  hpc)
         return states
