@@ -4,6 +4,10 @@ import scipy.linalg
 from .quantum_walk import QuantumWalk
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
+try:
+    from . import _pyneblina_interface as nbl
+except:
+    pass
 
 class ContinuousWalk(QuantumWalk):
     r"""
@@ -234,11 +238,8 @@ class ContinuousWalk(QuantumWalk):
             raise AssertionError
 
         if hpc and not self._pyneblina_imported():
-            try:
-                from . import _pyneblina_interface as nbl
-            except ModuleNotFoundError:
-                warn(PYNEBLINA_IMPORT_ERROR_MSG)
-                hpc = False
+            warn(PYNEBLINA_IMPORT_ERROR_MSG)
+            hpc = False
 
         if hpc:
             # determining the number of terms in power series

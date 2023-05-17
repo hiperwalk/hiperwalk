@@ -2,8 +2,8 @@ import neblina
 import numpy as np
 import scipy.sparse
 from warnings import warn
-from ._constants import *
-from ._constants import __DEBUG__
+from .._constants import *
+from .._constants import __DEBUG__
 
 ############################################
 # used for automatically stopping the engine

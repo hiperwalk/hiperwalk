@@ -6,6 +6,10 @@ from .quantum_walk import QuantumWalk
 from warnings import warn
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
+try:
+    from . import _pyneblina_interface as nbl
+except:
+    pass
 
 if __DEBUG__:
     from time import time as now
@@ -845,11 +849,8 @@ class CoinedWalk(QuantumWalk):
 
         U = None
         if hpc and not self._pyneblina_imported():
-            try:
-                from .. import _pyneblina_interface as nbl
-            except ModuleNotFoundError:
-                warn(PYNEBLINA_IMPORT_ERROR_MSG)
-                hpc = False
+            warn(PYNEBLINA_IMPORT_ERROR_MSG)
+            hpc = False
 
 
         S = self.get_shift()

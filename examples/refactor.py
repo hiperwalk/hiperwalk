@@ -17,7 +17,8 @@ g = hpw.Graph(adj_matrix)
 
 qw = hpw.ContinuousWalk(graph=adj_matrix, gamma=0.35)
 psi0 = qw.ket(num_vert//2)
-print(psi0)
 states = qw.simulate(time=num_vert//2, initial_condition=psi0)
 probs = qw.probability_distribution(states)
 hpw.plot_probability_distribution(probs)
+
+print(qw._pyneblina_imported())

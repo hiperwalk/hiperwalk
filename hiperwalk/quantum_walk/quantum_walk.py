@@ -6,6 +6,10 @@ from sys import modules as sys_modules
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
 from ..graph import Graph
+try:
+    from . import _pyneblina_interface as nbl
+except ModuleNotFoundError:
+    warn(PYNEBLINA_IMPORT_ERROR_MSG)
 
 class QuantumWalk(ABC):
     """
@@ -343,9 +347,8 @@ class QuantumWalk(ABC):
         """
         Expects pyneblina interface to be imported as nbl
         """
-        return ('quantum_walk._pyneblina_interface' in sys_modules
-                and 'nbl' in locals())
-
+        return ('hiperwalk.quantum_walk._pyneblina_interface'
+                in sys_modules)
 
     def simulate(self, time=None, initial_condition=None, hpc=True):
         r"""
@@ -513,11 +516,8 @@ class QuantumWalk(ABC):
         if hpc and not self._pyneblina_imported():
             if __DEBUG__:
                 print("IMPORTING PYNEBLINA")
-            try:
-                from . import _pyneblina_interface as nbl
-            except ModuleNotFoundError:
-                warn(PYNEBLINA_IMPORT_ERROR_MSG)
-                hpc = False
+            warn(PYNEBLINA_IMPORT_ERROR_MSG)
+            hpc = False
 
         __prepare_engine(self)
 
