@@ -97,6 +97,7 @@ class ContinuousWalk(QuantumWalk):
             raise TypeError("Value of 'gamma' is not float.")
 
         self._gamma = gamma
+        self._evolution = None
 
     def get_gamma(self):
         r"""
@@ -176,9 +177,9 @@ class ContinuousWalk(QuantumWalk):
     def get_hamiltonian(self):
         return self._hamiltonian
 
-    def evolution_operator(self, time=0, hpc=True, **kwargs):
+    def set_evolution_operator(self, **kwargs):
         r"""
-        Creates the evolution operator.
+        Alias for :meth:`set_hamiltonian`.
 
         Creates the evolution operator based on the previously
         set Hamiltonian.
