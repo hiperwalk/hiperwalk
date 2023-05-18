@@ -94,6 +94,9 @@ class Graph():
                 break
         return (tail, head)
 
+    def next_arc(self, arc):
+        # implemented only if is embeddable
+        raise AttributeError
     def neighbors(self, vertex):
         start = self.adj_matrix.indptr[vertex]
         end = self.adj_matrix.indptr[vertex + 1]
