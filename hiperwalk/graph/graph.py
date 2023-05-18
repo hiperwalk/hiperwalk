@@ -85,6 +85,15 @@ class Graph():
                               start = self.adj_matrix.indptr[tail],
                               end = self.adj_matrix.indptr[tail + 1])
 
+    def arc(self, label):
+        adj_matrix = self.adj_matrix
+        head = adj_matrix.indices[label]
+        # TODO: binary search
+        for tail in range(len(adj_matrix.indptr)):
+            if adj_matrix.indptr[tail + 1] > label:
+                break
+        return (tail, head)
+
     def neighbors(self, vertex):
         start = self.adj_matrix.indptr[vertex]
         end = self.adj_matrix.indptr[vertex + 1]
