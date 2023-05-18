@@ -275,11 +275,26 @@ class CoinedWalk(QuantumWalk):
         If an evolution operator was set previously,
         it is unset for coherence.
         """
-        self._shift = None
+        if __DEBUG__:
+            start_time = now()
 
+        num_arcs = self._graph.number_of_arcs()
+
+        S_cols = [self._graph.previous_arc(i) for i in range(num_arcs)]
+
+        # Using csr_array((data, indices, indptr), shape)
+        # Note that there is only one entry per row and column
+        S = scipy.sparse.csr_array(
+            ( np.ones(num_arcs, dtype=np.int8),
+              S_cols, np.arange(num_arcs+1) ),
+            shape=(num_arcs, num_arcs)
+        )
+
+        if __DEBUG__:
+            print("persistent shift Time: " + str(now() - start_time))
+
+        self._shift = S
         self._evolution = None
-        raise NotImplementedError()
-
 
     def set_shift(self, shift='default'):
         r"""
