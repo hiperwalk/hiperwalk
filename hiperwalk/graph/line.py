@@ -51,100 +51,11 @@ class Line(Graph):
         # initializing
         super().__init__(adj_matrix)
 
-    def has_persistent_shift_operator(self):
+    def embeddable(self):
         r"""
         See :meth:`Graph.has_persistent_shift_operator`.
         """
         return True
-
-    def persistent_shift_operator(self):
-        r"""
-        Create the persistent shift operator (:math:`S`) based on the
-        ``adj_matrix`` atribute.
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_matrix`
-            Shift operator.
-
-        Notes
-        -----
-        The persistent shift operator :math:`S`
-        for any vertex :math:`v \in V` is defined by
-
-        .. math::
-            \begin{align*}
-                S \ket{2v} &= \ket{\min(2v + 2, 2|V| - 1)} \\
-                S \ket{2v-1} &= \ket{\max(2v - 1 - 2, 0)}. 
-            \end{align*}
-
-        Hence, if the walker reaches a boundary vertex
-        :math:`u \in \{0, |V| - 1\}`,
-        the coin starts pointing in the opposite direction.
-
-        .. todo::
-            Add option to implement boundary vertices as sinks.
-        """
-
-        num_edges = 2*self.adj_matrix.shape[0] - 2
-
-        data = np.ones(num_edges, np.int8)
-        indptr = np.arange(num_edges + 1)
-        indices = np.zeros(num_edges)
-
-        indices = [i + 2 if i % 2 == 1 else i - 2
-                   for i in range(num_edges)]
-        indices[0] = 1
-        indices[num_edges - 1] = num_edges - 2
-
-        S = csr_array((
-            data, indices, indptr        
-        ))
-
-        self._shift_operator = S
-        return S
-
-    def _state_vertex_dir(self, state, entries):
-        r"""
-        Overrides Coined model method so the directions respect
-        the default coin directions.
-        In other words:
-        0 pointing rightwards and 1 pointing leftwards.
-        """
-        indices = self.adj_matrix.indices
-        indptr = self.adj_matrix.indptr
-        num_vert = self.adj_matrix.shape[0]
-
-        for amplitude, src, coin_dir in entries:
-            if coin_dir != 0 and coin_dir != 1:
-                raise ValueError(
-                    "Invalid entry coin direction for vertex " + str(src)
-                    + ". Expected either 0 (rightwards) or 1 (leftwards),"
-                    + " but received " + str(coin_dir) + " instead."
-                )
-
-            # bound conditions
-            if src == 0 and coin_dir != 0:
-                raise ValueError(
-                    "Invalid entry coin direction for vertex 0."
-                    + "Since 0 is the leftmost vertex, "
-                    + "the only available direction is 0 (rightwards). "
-                    + "But received " + str(coin_dir) + " instead."
-                )
-            if src == num_vert - 1 and coin_dir != 1:
-                raise ValueError(
-                    "Invalid entry coin direction for vertex " + str(src)
-                    + ". Since " + str(src) + " is the rightmost vertex, "
-                    + "the only available direction is 1 (leftwards). "
-                    + "But received " + str(coin_dir) + " instead."
-                )
-
-            arc = indptr[src] + 1 - coin_dir if src != 0 else 0
-
-            state[arc] = amplitude
-
-        return state
-
 
     def get_default_coin(self):
         r"""
@@ -154,3 +65,57 @@ class Line(Graph):
         segment is ``'hadamard'``.
         """
         return 'hadamard'
+
+    def arc_label(self, tail, head):
+        diff = head - tail
+        if diff != 1 and diff != -1:
+            raise ValueError('Invalid arc.')
+
+        return tail*2 if diff == 1 else tail*2 - 1 
+
+    def arc(self, label):
+        tail = (label + 1)//2
+        head = tail + (-1)**(label % 2)
+        return (tail, head)
+
+    def next_arc(self, arc):
+        # implemented only if is embeddable
+        try:
+            tail, head = arc
+            diff = head - tail
+            if diff != 1 and diff != -1:
+                raise ValueError('Invalid arc')
+
+            if head == 0 or head == self.number_of_vertices() - 1:
+                return (head, tail)
+            
+            return ((tail + 1, head + 1) if diff == 1
+                    else (tail - 1, head - 1))
+        except TypeError:
+            if arc == 1:
+                return 0
+            num_arcs = self.number_of_arcs() 
+            if arc == num_arcs - 2:
+                return num_arcs - 1
+            return arc + 2 if arc % 2 == 0 else arc - 2
+
+    def previous_arc(self, arc):
+        # implemented only if is embeddable
+        try:
+            tail, head = arc
+            diff = head - tail
+            if diff != 1 and diff != -1:
+                raise ValueError('Invalid arc')
+
+            if tail == 0 or tail == self.number_of_vertices() - 1:
+                return (head, tail)
+            
+            return ((tail - 1, head - 1) if diff == 1
+                    else (tail + 1, head + 1))
+        except TypeError:
+            if arc == 0:
+                return 1
+            num_arcs = self.number_of_arcs() 
+            if arc == num_arcs - 1:
+                return num_arcs - 2
+            return arc - 2 if arc % 2 == 0 else arc + 2

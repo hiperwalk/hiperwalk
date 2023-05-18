@@ -4,21 +4,20 @@ import hiperwalk as hpw
 import networkx as nx
 import numpy as np
 
-num_vert = 101
-adj_matrix = nx.adjacency_matrix(nx.cycle_graph(num_vert))
-#adj_matrix = scipy.sparse.csr_array(
-#            [[0, 1, 1, 1, 1],
-#             [1, 0, 1, 1, 0],
-#             [1, 1, 0, 0, 0],
-#             [1, 1, 0, 0, 0],
-#             [1, 0, 0, 0, 0]]
-#        )
-g = hpw.Graph(adj_matrix)
+num_vert = 4
+l = hpw.Line(num_vert)
+for i in range(l.number_of_arcs()):
+    a = l.arc(i)
+    #print(str(a) + ' -> ' + str(l.next_arc(a)))
+    #print(str(l.arc(i)) + ' -> ' + str(l.arc(l.next_arc(i))))
+    if (a != l.next_arc(l.previous_arc(a))
+        or a != l.previous_arc(l.next_arc(a))
+        or i != l.next_arc(l.previous_arc(i))
+        or i != l.previous_arc(l.next_arc(i))):
 
-qw = hpw.ContinuousWalk(graph=adj_matrix, gamma=0.35)
-psi0 = qw.ket(num_vert//2)
-states = qw.simulate(time=num_vert//2, initial_condition=psi0)
-probs = qw.probability_distribution(states)
-hpw.plot_probability_distribution(probs)
+        raise ValueError
 
-print(qw._pyneblina_imported())
+print("OK")
+
+qw = hpw.CoinedWalk(graph = l)
+print(qw._shift.todense())
