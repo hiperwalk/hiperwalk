@@ -506,6 +506,8 @@ class QuantumWalk(ABC):
         ###############################
 
         time = np.array(self._time_to_tuple(time))
+        if self._evolution is None:
+            self._evolution = self.get_evolution()
 
         if not np.all([e.is_integer() for e in time]):
             raise ValueError("`time` has non-int entry.")
