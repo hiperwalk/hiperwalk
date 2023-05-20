@@ -6,8 +6,15 @@ import numpy as np
 
 dim = 4
 l = hpw.Lattice(dim, periodic=True, diagonal=True)
-print(np.all(l.adj_matrix.todense() == l.adj_matrix.T.todense()))
-print(l.adj_matrix)
-print(l.adj_matrix.todense())
-print(l.adj_matrix.indices)
-print(l.adj_matrix.indptr)
+
+qw = hpw.CoinedWalk(graph=l, coin='I')
+
+for arc in [(0, 5), (0, 13), (0, 7), (0, 15)]:
+    psi0 = qw.ket(arc[0], arc[1])
+    print(psi0)
+    states = qw.simulate((0, 4, 1), psi0, False)
+    probs = qw.probability_distribution(states)
+    vertices = [np.where(prob == 1)[0][0] for prob in probs]
+    print(vertices)
+    print()
+

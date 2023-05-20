@@ -87,3 +87,166 @@ class Lattice(Graph):
         adj_matrix = scipy.sparse.csr_array((data, indices, indptr),
                                             shape=(num_vert, num_vert))
         super().__init__(adj_matrix)
+        self.x_dim = x_dim
+        self.y_dim = y_dim
+        self.periodic = periodic
+        self.diagonal = diagonal
+
+    def embeddable(self):
+        return True
+
+    def vertex_coordinates(self, label):
+        return (label % self.x_dim, label // self.x_dim)
+
+
+    def vertex_label(self, x, y):
+        return (x + self.x_dim*y) % self.number_of_vertices()
+
+    def arc_direction(self, arc):
+        try:
+            tail, head = arc
+            if not hasattr(tail, '__iter__'):
+                tail = self.vertex_coordinates(tail)
+            if not hasattr(head, '__iter__'):
+                head = self.vertex_coordinates(head)
+        except TypeError:
+            tail, head = self.arc(arc)
+
+        # dealing with coordinates
+        x_diff = head[0] - tail[0]
+        y_diff = head[1] - tail[1]
+
+        if self.periodic:
+            if self.diagonal:
+                x = 0 if (x_diff == 1 or x_diff == -self.x_dim + 1) else 1
+                y = 0 if (y_diff == 1 or y_diff == -self.y_dim + 1) else 1
+                return (x << 1) + y
+            else:
+                raise NotImplementedError
+        else:
+            raise NotImplementedError
+
+    def arc_label(self, tail, head):
+        try:
+            tail = self.vertex_label(tail[0], tail[1])
+            head = self.vertex_label(head[0], head[1])
+        except TypeError:
+            pass
+        except IndexError:
+            pass
+
+        if not self.periodic:
+            raise NotImplementedError
+        if not self.diagonal:
+            raise NotImplementedError
+
+        return 4*tail + self.arc_direction((tail, head)) 
+
+    def arc(self, label, coordinates=True):
+        if not self.periodic:
+            raise NotImplementedError
+        if not self.diagonal:
+            raise NotImplementedError
+
+        tail = label // 4
+        coin = label % 4
+        num_vert = self.number_of_vertices()
+        x_dim = self.x_dim
+        head = ((tail % x_dim + (-1)**(coin // 2)) % x_dim
+                 + x_dim*(tail // x_dim + (-1)**(coin % 2))) % num_vert
+        arc = (tail, head)
+
+        if not coordinates:
+            return arc
+        return (self.vertex_coordinates(arc[0]),
+                self.vertex_coordinates(arc[1]))
+
+    def neighbors(self, vertex):
+        iterable = hasattr(vertex, '__iter__')
+        if iterable:
+            vertex = self.vertex_label(vertex[0], vertex[1])
+
+        neigh = super().neighbors(vertex)
+
+        if iterable:
+            return list(map(self.vertex_coordinates, neigh))
+        return neigh
+
+    def arcs_with_tail(self, tail):
+        try:
+            tail = self.vertex_label(tail[0], tail[1])
+        except TypeError:
+            pass
+
+        return super().arcs_with_tail(tail)
+
+    def degree(self, vertex):
+        try:
+            vertex = self.vertex_label(vertex[0], vertex[1])
+        except TypeError:
+            pass
+
+        return super().degree(vertex)
+
+    def next_arc(self, arc):
+        if not self.periodic:
+            raise NotImplementedError
+
+        try:
+            tail, head = arc
+            iterable = hasattr(tail, '__iter__')
+            
+            if not iterable:
+                tail = self.vertex_coordinates(tail)
+                head = self.vertex_coordinates(head)
+
+            # get direction
+            direction = self.arc_direction(arc)
+            if self.diagonal:
+                x = direction // 2
+                y = direction % 2
+                tail = head
+                head = ((head[0] + (-1)**x) % self.x_dim,
+                        (head[1] + (-1)**y) % self.y_dim)
+
+                if iterable:
+                    return (tail, head)
+                return (self.vertex_label(tail[0], tail[1]),
+                        self.vertex_label(head[0], head[1]))
+            else:
+                raise NotImplementedError
+
+        except TypeError:
+            # arc label
+            raise NotImplementedError
+
+    def previous_arc(self, arc):
+        if not self.periodic:
+            raise NotImplementedError
+
+        arc_iterable = hasattr(arc, '__iter__')
+        if arc_iterable:
+            tail, head = arc
+        else:
+            tail, head = self.arc(arc)
+        vertex_iterable = hasattr(tail, '__iter__')
+        if not vertex_iterable:
+            tail = self.vertex_coordinates(tail)
+            head = self.vertex_coordinates(head)
+
+        direction = self.arc_direction(arc)
+        if self.diagonal:
+            x = direction // 2
+            y = direction % 2
+            head = tail
+            tail = ((tail[0] - (-1)**x) % self.x_dim,
+                    (tail[1] - (-1)**y) % self.y_dim)
+        else:
+            raise NotImplementedError
+
+        if not arc_iterable:
+            return self.arc_label(tail, head)
+        if vertex_iterable:
+            return (tail, head)
+        return (self.vertex_label(tail[0], tail[1]),
+                self.vertex_label(head[0], head[1]))
