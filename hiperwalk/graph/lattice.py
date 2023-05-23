@@ -1,20 +1,21 @@
 import numpy as np
 import scipy.sparse
 from .graph import Graph
+from warnings import warn
 
 class Lattice(Graph):
-    def __init__(self, dimension, periodic=True, diagonal=False):
+    def __init__(self, dimensions, periodic=True, diagonal=False):
         r"""
-        Two-dimensional lattice.
+        Two-dimensionsal lattice.
 
         The lattice may have boundary conditions or not.
         Its adjacency may be either natural or diagonal.
 
         Parameters
         ----------
-        dimension : int or tuple of int
-            Lattice dimension in ``(x_dim, y_dim)`` format.
-            If ``dimension`` is an integer, creates a square lattice.
+        dimensions : int or tuple of int
+            Lattice dimensions in ``(x_dim, y_dim)`` format.
+            If ``dimensions`` is an integer, creates a square lattice.
 
 
         periodic : bool, default=True
@@ -26,9 +27,9 @@ class Lattice(Graph):
         """
 
         try:
-            x_dim, y_dim = dimension
+            x_dim, y_dim = dimensions
         except TypeError:
-            x_dim = y_dim = dimension
+            x_dim = y_dim = dimensions
 
         num_vert = x_dim * y_dim
         num_arcs = (4*num_vert if periodic
@@ -250,3 +251,20 @@ class Lattice(Graph):
             return (tail, head)
         return (self.vertex_label(tail[0], tail[1]),
                 self.vertex_label(head[0], head[1]))
+
+    def dimensions(self):
+        return (self.x_dim, self.y_dim)
+
+    def get_central_vertex(self):
+        warn('`get_central_vertex` is deprecated. '
+             + 'Use `central_vertex` instead.',
+             DeprecationWarning)
+        return self.central_vertex()
+
+    def central_vertex(self):
+        if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
+            raise ValueError(
+                "One of lattice dimensions is even. "
+                + "Hence it does not have a single central vertex."
+            )
+        return np.array([self.x_dim // 2, self.y_dim // 2])

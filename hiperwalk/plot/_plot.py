@@ -8,12 +8,13 @@ import numpy as np
 from PIL import Image
 from ._animation import *
 from .._constants import __DEBUG__
+from ..graph import *
 
 if __DEBUG__:
     from time import time
 
 # TODO: move to constants
-plt.rcParams["figure.figsize"] = (10, 8)
+plt.rcParams["figure.figsize"] = (12, 10)
 plt.rcParams["figure.dpi"] = 100
 
 
@@ -21,8 +22,8 @@ plt.rcParams["figure.dpi"] = 100
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
-        probabilities, plot_type='bar', animate=False, show=True,
-        filename_prefix=None, interval=250, **kwargs):
+        probabilities, plot=None, animate=False, show=True,
+        filename=None, interval=250, **kwargs):
     """
     Plots probability distribution of quantum walk.
 
@@ -37,11 +38,12 @@ def plot_probability_distribution(
         The probabilities of the walker to be found on each step
         of the quantum walk.
         Columns represent vertices and rows represent the walk steps.
-    plot_type : str, default='bar'
-        The type of graph to be plotted.
+    plot : str, default=None
+        The plot type.
         The valid options are
-        ``{'bar', 'line', 'graph', 'hist', 'histogram'}`` where
-        ``'hist'`` is an alias for ``'histogram'``.
+        ``{'bar', 'line', 'graph', 'histogram', 'grid'}``.
+        If ``None``, uses default plotting. Usually ``bar``,
+        but default plotting changes according to ``graph``.
     animate : bool, default=False
         Whether or not to animate multiple plots.
         If ``False``, each quantum walk step generates an image.
@@ -60,23 +62,34 @@ def plot_probability_distribution(
         all the quantum walk steps are shown at once.
         If ``animate==True``,
         the entire animation is shown as a html video.
-    filename_prefix : str, default=None
+    filename : str, default=None
         The filename path (with no format) where
         the plot(s) will be saved.
         If ``None`` no file is saved.
         Otherwise, if ``animate==False``,
-        the j-step is saved in the ``filename_prefix-j.png`` file;
+        the j-step is saved in the ``filename-j.png`` file;
         if ``animate==True``,
-        the entire walk is saved in the ``filename_prefix.fig`` file.
+        the entire walk is saved in the ``filename.fig`` file.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
-    graph : :class:`networkx.classes.graph`, optional
+    graph : optional
         The structure of the graph on which the walk occurs.
         The graph labels are used as plotting labels.
         **Important**: check Graph Plots subsection in other parameters.
+
+        The following types are acceptable.
+        
+        * :class:`hiperwalk.Graph`
+            Hiperwalk Graph.
+            It is used to generate default plotting for specific graphs.
+            Does not override values explicited by the user.
+        * :class:`networkx.classes.graph`,
+            NetworkX Graph
+        * :class:`scipy.sparse.csr_matrix`
+            Adjacency matrix.
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
-        Valid arguments depend on ``plot_type``.
+        Valid arguments depend on ``plot``.
         Check Other Parameters Section for details.
 
     Other Parameters
@@ -101,12 +114,8 @@ def plot_probability_distribution(
         See :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
         for more optional keywords.
 
-        graph : :class:`networkx.classes.graph`, optional
-            Either ``graph`` or ``adj_matrix`` must be set.
-            If both are set, ``adj_matrix`` is discarded.
-        adj_matrix : :class:`scipy.sparse.csr_matrix`, optional
-            Adjacency matrix of the graph on which the walk occurs.
-            Either ``graph`` or ``adj_matrix`` must be set.
+        graph :
+            Graph structure.
         min_node_size, max_node_size : scalar, default=(300, 3000)
             By default, nodes sizes depend on the probability.
             ``min_node_size`` and ``max_node_size`` describe the
@@ -121,7 +130,7 @@ def plot_probability_distribution(
             ``min_node_size`` and ``max_node_size`` are set.
         cmap : str, optional
             A colormap for representing vertices probabilities.
-            if ``cmap='default'``, uses the ``'YlOrRd_r'`` colormap.
+            if ``cmap='default'``, uses the ``'viridis'`` colormap.
             For more colormap options, check
             `Matplolib's Colormap reference <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
 
@@ -132,14 +141,17 @@ def plot_probability_distribution(
     Line Plots
         See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
+    Grid Plots
+        dimensions: 2-tuple of int
+            grid dimensions in ``(x_dim, y_dim)`` format.
+
 
     Raises
     ------
     ValueError
-        If ``plot_type`` has an invalid value.
+        If ``plot`` has an invalid value.
     KeyError
-        If ``plot_type == True`` and neither of the keywords
-        ``graph`` or ``adj_matrix`` is set.
+        If ``plot == 'graph' `` and keyword ``graph`` is not set.
 
     Warnings
     --------
@@ -180,44 +192,53 @@ def plot_probability_distribution(
             are needed.
         - Implement ``transparency`` parameter:
             change nodes transparency depending on probability.
-
-    .. todo::
-        Implement GTK 4.0 support.
+        - Implement GTK 4.0 support.
 
     Examples
     --------
     .. todo::
         probabilities expects numpy array or matrix
     """
-    plot_type = plot_type.lower()
-    if plot_type == 'hist':
-        plot_type = 'histogram'
-    valid_plot_types = ['bar', 'line', 'graph', 'histogram']
+    # passes kwargs by reference to be updated accordingly
 
-    if plot_type not in valid_plot_types:
+    if 'graph' in kwargs:
+        if plot is None:
+            plot = _default_graph_kwargs(kwargs)
+        else:
+            _default_graph_kwargs(kwargs)
+    if plot is None:
+        plot = 'bar'
+
+    plot = plot.lower()
+    valid_plots = ['bar', 'line', 'graph', 'histogram', 'grid']
+
+    if plot not in valid_plots:
         raise ValueError(
-            'Unexpected value for plot_type:' + str(plot_type) +
-            '. One of the following was expected: ' + str(valid_plot_types)
+            'Unexpected value for plot:' + str(plot) +
+            '. One of the following was expected: ' + str(valid_plots)
         )
 
     # dictionaries for function pointers
     # preconfiguration: executed once before the loop starts
-    preconfigs = {valid_plot_types[0]: _preconfigure_plot,
-            valid_plot_types[1]: _preconfigure_plot,
-            valid_plot_types[2]: _preconfigure_graph_plot,
-            valid_plot_types[3]: _preconfigure_plot}
+    preconfigs = {valid_plots[0]: _preconfigure_plot,
+            valid_plots[1]: _preconfigure_plot,
+            valid_plots[2]: _preconfigure_graph_plot,
+            valid_plots[3]: _preconfigure_plot,
+            valid_plots[4]: _preconfigure_plot}
     # configuration: executed every iteration before plotting
     # expects return of fig, ax to be used for animations
-    configs = {valid_plot_types[0]: _configure_plot_figure,
-            valid_plot_types[1]: _configure_plot_figure,
-            valid_plot_types[2]: _configure_graph_figure,
-            valid_plot_types[3]: _configure_plot_figure}
+    configs = {valid_plots[0]: _configure_plot_figure,
+            valid_plots[1]: _configure_plot_figure,
+            valid_plots[2]: _configure_graph_figure,
+            valid_plots[3]: _configure_plot_figure,
+            valid_plots[4]: _configure_grid_figure}
     # plot functions: code for plotting the graph accordingly
     plot_funcs = {
-        valid_plot_types[0]: _plot_probability_distribution_on_bars,
-        valid_plot_types[1]: _plot_probability_distribution_on_line,
-        valid_plot_types[2]: _plot_probability_distribution_on_graph,
-        valid_plot_types[3]: _plot_probability_distribution_on_histogram
+        valid_plots[0]: _plot_probability_distribution_on_bars,
+        valid_plots[1]: _plot_probability_distribution_on_line,
+        valid_plots[2]: _plot_probability_distribution_on_graph,
+        valid_plots[3]: _plot_probability_distribution_on_histogram,
+        valid_plots[4]: _plot_probability_distribution_on_grid
     }
 
     # preparing probabilities to shape requested by called functions
@@ -225,29 +246,29 @@ def plot_probability_distribution(
         probabilities = [probabilities]
 
     # passes kwargs by reference to be updated accordingly
-    preconfigs[plot_type](probabilities, kwargs)
+    preconfigs[plot](probabilities, kwargs)
 
     if animate:
         anim = Animation()
 
     for i in range(len(probabilities)):
-        # TODO: set figure size according to graph dimension
+        # TODO: set figure size according to graph dimensions
         # TODO: check for kwargs
-        fig, ax = configs[plot_type](probabilities.shape[1]) 
+        fig, ax = configs[plot](probabilities.shape[1]) 
 
-        plot_funcs[plot_type](probabilities[i], ax, **kwargs)
+        plot_funcs[plot](probabilities[i], ax, **kwargs)
 
         plt.tight_layout()
 
         # saves or shows image (or both)
         if not animate:
-            if filename_prefix is not None:
+            if filename is not None:
                 # enumarating the plot
                 filename_suffix = (
                     '-' + (len(probabilities)-1)//10 * '0' + str(i)
                     if len(probabilities) > 1 else ''
                 )
-                plt.savefig(filename_prefix + filename_suffix)
+                plt.savefig(filename + filename_suffix)
                 if not show:
                     plt.close()
             if show:
@@ -259,10 +280,30 @@ def plot_probability_distribution(
     if animate:
         anim.create_animation(interval)
 
-        if filename_prefix is not None:
-            anim.save_animation(filename_prefix)
+        if filename is not None:
+            anim.save_animation(filename)
         if show:
             anim.show_animation()
+
+def _default_graph_kwargs(kwargs):
+    if not 'cmap' in kwargs:
+        kwargs['cmap'] = 'default'
+
+    if 'cmap' in kwargs:
+        if kwargs['cmap'] == 'default':
+            kwargs['cmap'] = 'viridis'
+
+    graph = kwargs['graph']
+    if not isinstance(graph, Graph):
+        return None
+
+    # hiperwalk graph
+    if isinstance(graph, Lattice):
+        if 'dimensions' not in kwargs:
+            kwargs['dimensions'] = graph.dimensions()
+        return 'grid'
+
+    return 'bar'
 
 
 def _preconfigure_plot(probabilities, kwargs):
@@ -318,11 +359,13 @@ def _preconfigure_graph_plot(probabilities, kwargs):
         kwargs['vmax'] = probabilities.max() #max_prob
 
     if 'graph' not in kwargs:
-        if 'adj_matrix' not in kwargs:
-            raise KeyError('One of the following keys must be provided:'
-                           + str(['graph', 'adj_matrix']))
-        adj_matrix = kwargs.pop('adj_matrix')
-        kwargs['graph'] = nx.from_scipy_sparse_array(adj_matrix)
+        raise KeyError("'graph' kwarg not provided.")
+        graph = kwargs['graph']
+        if isinstance(graph, scipy.sparse.csr_array):
+            kwargs['graph'] = nx.from_scipy_sparse_array(graph)
+        elif isinstance(graph, Graph):
+            kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
+
     if 'adj_matrix' in kwargs:
         # Pops adj_matrix if both graph and adj_matrix keywords are set;
         # otherwise invalid keyword may be raisen by networkx
@@ -361,7 +404,7 @@ def _configure_figure(num_vert, fig_width=None, fig_height=None):
     ax : current figure axes
     """
 
-    #TODO: set figure size according to graph dimension
+    #TODO: set figure size according to graph dimensions
     if fig_width is None:
         fig_width = plt.rcParams["figure.figsize"][0]
     if fig_height is None:
@@ -391,6 +434,24 @@ def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
 def _configure_graph_figure(num_vert=None, fig_width=None,
                             fig_height=None):
     return _configure_figure(num_vert, fig_width, fig_height)
+
+def _configure_grid_figure(num_vert=None, fig_width=None,
+                           fig_height=None):
+    if fig_width is None:
+        fig_width = plt.rcParams["figure.figsize"][0]
+    if fig_height is None:
+        fig_height = plt.rcParams["figure.figsize"][1]
+
+    #fig, ax =_configure_figure(num_vert, fig_width, fig_height) 
+    #ax = fig.add_subplot(projection='3d')
+    fig, ax = plt.subplots(figsize=(fig_width, fig_height),
+                           subplot_kw={"projection": "3d"})
+
+    ax.tick_params(length=10, width=1, labelsize=16, pad=10)
+    ax.set_xlabel('Vertex X ID', labelpad=15, fontsize=18)
+    ax.set_ylabel('Vertex Y ID', labelpad=15, fontsize=18)
+    ax.set_zlabel('Probability', labelpad=30, fontsize=18)
+    return fig, ax
 
 
 def _plot_probability_distribution_on_bars(
@@ -479,7 +540,6 @@ def _plot_probability_distribution_on_line(
     _posconfigure_plot_figure(
         ax, len(probabilities), labels, graph, min_prob, max_prob
     )
-
 
 def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
                               min_prob=None, max_prob=None):
@@ -596,7 +656,7 @@ def _configure_nodes(G, probabilities, kwargs):
     # setting colormap related attributes
     if 'cmap' in kwargs:
         if kwargs['cmap'] == 'default':
-            kwargs['cmap'] = 'YlOrRd_r'
+            kwargs['cmap'] = 'viridis'
 
     # setting node attributes
     if 'edgecolors' not in kwargs:
@@ -702,6 +762,31 @@ def _configure_colorbar(ax, kwargs):
 
     cbar.ax.tick_params(labelsize=14, length=7)
 
+
+def _plot_probability_distribution_on_grid(
+        probabilities, ax, labels=None, graph=None,
+        min_prob=None, max_prob=None, dimensions=None, **kwargs
+    ):
+    """
+    Plots probability distribution on the grid.
+    """
+    x_dim, y_dim = dimensions
+
+    X = np.arange(0, x_dim, 1)
+    Y = np.arange(0, y_dim, 1)
+    X, Y = np.meshgrid(X, Y)
+    Z = np.reshape(probabilities, (x_dim, y_dim))
+
+    #mappable = plt.cm.ScalarMappable(cmap=plt.cm.viridis)
+    mappable = plt.cm.ScalarMappable(cmap=kwargs['cmap'])
+    mappable.set_array(Z)
+    mappable.set_clim(0, Z.max()) # optional
+
+    ax.plot_surface(X, Y, Z, cmap=mappable.cmap, linewidth=0, antialiased=False,
+                    cstride=1, rstride=1, alpha=0.5)
+
+    cbar = plt.colorbar(mappable, shrink=0.4, aspect=20, pad=0.15)
+    cbar.ax.tick_params(length=10, width=1, labelsize=16)
 
 #########################################################################################
 
