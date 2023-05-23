@@ -132,13 +132,13 @@ class Animation:
     # ffmpeg is necessary for saving video and better quality gifs.
     # Pillow is sufficient for saving gifs,
     # although colorbar may be discretized.
-    def save_animation(self, filename_prefix):
+    def save_animation(self, filename):
         """
         Saves animation as a gif if it is already created.
 
         Parameters
         ----------
-        filename_prefix : str
+        filename : str
             Filename (with no format) where the animation will be saved.
 
         See Also
@@ -167,10 +167,10 @@ class Animation:
         # TODO: add other valid matplotlib formats
         valid_extensions = ['.gif', '.mp4']
 
-        extension = filename_prefix[-4:]
+        extension = filename[-4:]
         if extension not in valid_extensions:
-            filename_prefix += '.gif'
-        self.save_path = filename_prefix
+            filename += '.gif'
+        self.save_path = filename
 
         print('--------------------------------')
         print(self.save_path)
