@@ -107,6 +107,12 @@ class Lattice(Graph):
         return (x + self.x_dim*y) % self.number_of_vertices()
 
     def arc_direction(self, arc):
+        r"""
+        Notes
+        -----
+        Does not check if arc exists.
+        """
+        # dealing with coordinates
         try:
             tail, head = arc
             if not hasattr(tail, '__iter__'):
@@ -116,19 +122,20 @@ class Lattice(Graph):
         except TypeError:
             tail, head = self.arc(arc)
 
-        # dealing with coordinates
-        x_diff = head[0] - tail[0]
-        y_diff = head[1] - tail[1]
+        if self.diagonal:
+            x_diff = head[0] - tail[0]
+            y_diff = head[1] - tail[1]
+            x = 0 if (x_diff == 1 or x_diff == -self.x_dim + 1) else 1
+            y = 0 if (y_diff == 1 or y_diff == -self.y_dim + 1) else 1
+            return (x << 1) + y
 
-        if self.periodic:
-            if self.diagonal:
-                x = 0 if (x_diff == 1 or x_diff == -self.x_dim + 1) else 1
-                y = 0 if (y_diff == 1 or y_diff == -self.y_dim + 1) else 1
-                return (x << 1) + y
-            else:
-                raise NotImplementedError
-        else:
-            raise NotImplementedError
+        y = tail[1] != head[1]
+        x = ((tail[1] - head[1]) % self.y_dim == 1
+             if y else
+             (tail[0] - head[0]) % self.x_dim == 1)
+
+        return (y << 1) + x
+
 
     def arc_label(self, tail, head):
         try:
