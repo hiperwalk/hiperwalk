@@ -239,46 +239,62 @@ class Lattice(Graph):
         return super().degree(vertex)
 
     def next_arc(self, arc):
-        if not self.periodic:
-            raise NotImplementedError
-
         try:
             tail, head = arc
-            iterable = hasattr(tail, '__iter__')
-            
-            if not iterable:
-                tail = self.vertex_coordinates(tail)
-                head = self.vertex_coordinates(head)
+        except TypeError:
+            tail, head = self.arc(arc)
 
-            # get direction
-            direction = self.arc_direction(arc)
-            if self.diagonal:
-                x = direction // 2
-                y = direction % 2
-                tail = head
-                head = ((head[0] + (-1)**x) % self.x_dim,
-                        (head[1] + (-1)**y) % self.y_dim)
+        iterable = hasattr(tail, '__iter__')
+        
+        if not iterable:
+            tail = self.vertex_coordinates(tail)
+            head = self.vertex_coordinates(head)
 
-                if iterable:
-                    return (tail, head)
-                return (self.vertex_label(tail[0], tail[1]),
-                        self.vertex_label(head[0], head[1]))
-            else:
+        # get direction
+        direction = self.arc_direction(arc)
+
+        if self.diagonal:
+            if not self.periodic:
                 raise NotImplementedError
 
-        except TypeError:
-            # arc label
-            raise NotImplementedError
+            tail = head
+            x = direction // 2
+            y = direction % 2
+            head = ((head[0] + (-1)**x) % self.x_dim,
+                    (head[1] + (-1)**y) % self.y_dim)
+        else:
+            y_axis = direction // 2
+            exp = direction % 2
+            if self.periodic:
+                tail = head
+                head = ((head[0], (head[1] + (-1)**exp) % self.x_dim)
+                        if y_axis else
+                        ((head[0] + (-1)**exp) % self.y_dim, head[1]))
+            else:
+                new_head = ((head[0], head[1] + (-1)**exp) if y_axis
+                            else (head[0] + (-1)**exp, head[1]))
+
+                if (new_head[0] < 0 or new_head[0] >= self.x_dim
+                    or new_head[1] < 0 or new_head[1] >= self.y_dim
+                ):
+                    # out of bounds. Rebound
+                    new_head = tail
+
+                tail = head
+                head = new_head
+
+        if not iterable:
+            tail = self.vertex_label(tail[0], tail[1])
+            head = self.vertex_label(head[0], head[1]) 
+        return (tail, head)
 
     def previous_arc(self, arc):
-        if not self.periodic:
-            raise NotImplementedError
-
         arc_iterable = hasattr(arc, '__iter__')
         if arc_iterable:
             tail, head = arc
         else:
             tail, head = self.arc(arc)
+
         vertex_iterable = hasattr(tail, '__iter__')
         if not vertex_iterable:
             tail = self.vertex_coordinates(tail)
@@ -286,25 +302,51 @@ class Lattice(Graph):
 
         direction = self.arc_direction(arc)
         if self.diagonal:
+            if not self.periodic:
+                raise NotImplementedError
+
             x = direction // 2
             y = direction % 2
             head = tail
             tail = ((tail[0] - (-1)**x) % self.x_dim,
                     (tail[1] - (-1)**y) % self.y_dim)
         else:
-            raise NotImplementedError
+            y_axis = direction // 2
+            exp = direction % 2
+            if self.periodic:
+                head = tail
+                tail = ((tail[0], (tail[1] - (-1)**exp) % self.x_dim)
+                        if y_axis else
+                        ((tail[0] - (-1)**exp) % self.y_dim, tail[1]))
+            else:
+                new_tail = ((tail[0], tail[1] - (-1)**exp) if y_axis
+                            else (tail[0] - (-1)**exp, tail[1]))
+
+                if (new_tail[0] < 0 or new_tail[0] >= self.x_dim
+                    or new_tail[1] < 0 or new_tail[1] >= self.y_dim
+                ):
+                    # out of bounds. Rebound
+                    new_tail = head
+
+                head = tail
+                tail = new_tail
+
+        if not vertex_iterable:
+            tail = self.vertex_label(tail[0], tail[1]),
+            head = self.vertex_label(head[0], head[1])
 
         if not arc_iterable:
             return self.arc_label(tail, head)
-        if vertex_iterable:
-            return (tail, head)
-        return (self.vertex_label(tail[0], tail[1]),
-                self.vertex_label(head[0], head[1]))
+        return (tail, head)
 
     def dimensions(self):
         return (self.x_dim, self.y_dim)
 
     def get_central_vertex(self):
+        r"""
+        Central vertex is different from center vertex.
+        In the sense that...
+        """
         warn('`get_central_vertex` is deprecated. '
              + 'Use `central_vertex` instead.',
              DeprecationWarning)
