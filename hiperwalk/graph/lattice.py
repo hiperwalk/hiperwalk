@@ -71,8 +71,11 @@ class Lattice(Graph):
 
             for v in range(num_vert):
                 cols = (np.array(
-                            [(v + (-1)**(coin % 2) * x_dim**(coin // 2))
-                             % num_vert for coin in range(4)])
+                            [v - v % x_dim
+                             + (v % x_dim + (-1)**(coin % 2)) % x_dim
+                             if coin < 2 else
+                             (v + x_dim*(-1)**(coin % 2)) % num_vert
+                             for coin in range(4)])
                         if not diagonal
                         else np.array(
                             [((v % x_dim + (-1)**(coin // 2)) % x_dim
