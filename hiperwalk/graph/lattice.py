@@ -169,17 +169,41 @@ class Lattice(Graph):
         return label + direction - sub_x - sub_y
 
     def arc(self, label, coordinates=True):
-        if not self.periodic:
-            raise NotImplementedError
-        if not self.diagonal:
+        if not self.periodic and self.diagonal:
             raise NotImplementedError
 
-        tail = label // 4
-        coin = label % 4
-        num_vert = self.number_of_vertices()
-        x_dim = self.x_dim
-        head = ((tail % x_dim + (-1)**(coin // 2)) % x_dim
-                 + x_dim*(tail // x_dim + (-1)**(coin % 2))) % num_vert
+        if self.periodic:
+            tail = label // 4
+            coin = label % 4
+            num_vert = self.number_of_vertices()
+            x_dim = self.x_dim
+            if self.diagonal:
+                head = (((tail % x_dim + (-1)**(coin // 2)) % x_dim
+                          + x_dim*(tail // x_dim + (-1)**(coin % 2)))
+                        % num_vert)
+            else:
+                head = (tail - tail % x_dim
+                        + (tail % x_dim + (-1)**(coin % 2)) % x_dim
+                        if coin < 2 else
+                        (tail + x_dim*(-1)**(coin % 2)) % num_vert)
+
+        else:
+            # not diagonal
+            tail, _ = super().arc(label)
+            diff = label - self.adj_matrix.indptr[tail]
+            num_vert = self.number_of_vertices()
+
+            for coin in range(4):
+                head = tail + (-1)**(coin % 2) * self.x_dim**(coin // 2)
+
+                if (head >= 0 and head < num_vert
+                    and not (head % self.x_dim == 0 and head - tail == 1)
+                    and not (tail % self.x_dim == 0 and tail - head == 1)
+                ):
+                    if diff == 0:
+                        break
+                    diff -= 1
+
         arc = (tail, head)
 
         if not coordinates:
