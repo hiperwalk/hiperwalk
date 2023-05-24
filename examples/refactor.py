@@ -6,8 +6,16 @@ import numpy as np
 
 dim = 4
 l = hpw.Lattice(dim, periodic=False, diagonal=False)
-print(l.adj_matrix.indptr)
-print(l.adj_matrix.indices)
+
+print(l.arc_direction((5, 6)))
+print(l.arc_direction((5, 4)))
+print(l.arc_direction((5, 9)))
+print(l.arc_direction((5, 1)))
+print()
+print(l.arc_direction((0, 1)))
+print(l.arc_direction((0, 3)))
+print(l.arc_direction((0, 4)))
+print(l.arc_direction((0, 12)))
 
 #qw = hpw.CoinedWalk(graph=l, coin='I')
 #
