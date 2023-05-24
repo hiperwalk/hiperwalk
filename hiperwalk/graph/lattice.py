@@ -146,12 +146,27 @@ class Lattice(Graph):
         except IndexError:
             pass
 
-        if not self.periodic:
-            raise NotImplementedError
-        if not self.diagonal:
+        if self.adj_matrix[tail, head] == 0:
+            raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
+
+        if self.periodic:
+            return 4*tail + self.arc_direction((tail, head))  
+
+        label = self.adj_matrix.indptr[tail]
+        direction = self.arc_direction((tail, head))
+        if self.diagonal:
             raise NotImplementedError
 
-        return 4*tail + self.arc_direction((tail, head)) 
+        sub_x = (1 if ((tail % self.x_dim == 0
+                        or tail % self.x_dim == self.x_dim - 1)
+                       and direction > 0)
+                 else 0)
+            
+        sub_y = (1 if ((tail // self.x_dim == 0
+                        or tail // self.x_dim == self.x_dim - 1)
+                       and direction > 2)
+                 else 0)
+        return label + direction - sub_x - sub_y
 
     def arc(self, label, coordinates=True):
         if not self.periodic:
