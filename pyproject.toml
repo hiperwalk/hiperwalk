@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hiperwalk"
+version = "2.0a0"
+description = "High-Performance Quantum Walk Simulator"
+license = {file="LICENSE"}
+readme = "README.md"
+authors = [
+  { name="Gustavo Bezerra", email="gbezerra@posgrad.lncc.br" },
+  { name="Paulo Motta", email="prmottajr@gmail.com" },
+  { name="Renato Portugal", email="portugal@lncc.br" },
+]
+maintainers = [
+  { name="Hiperwalk Organization", email="hiperwalk@gmail.com"},
+]
+requires-python = ">=3.7"
+dependencies = [
+	"numpy>=1.24",
+	"scipy>=1.10",
+	"networkx>=3.1",
+	"matplotlib>=3.7",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+	"License :: OSI Approved :: GNU Lesser General Public License v2 or later (LGPLv2+)",
+	"Operating System :: POSIX :: Linux",
+]
+
+
+[project.optional-dependencies]
+test = [
+	"pytest",
+]
+doc = [
+	"sphinx>=6.1",
+	"numpydoc>=1.2",
+	"sphinx-autodoc-typehints",
+	"pydata_sphinx_theme>=0.11",
+]
+
+[project.urls]
+homepage = "http://qubit.lncc.br/qwalk/"
+documentation = "https://hiperwalk.readthedocs.io/"
+source = "https://github.com/hiperwalk/hiperwalk"
