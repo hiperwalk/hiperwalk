@@ -1,12 +1,12 @@
 [
     {
-        "name": "2.0a0 (stable)",
-        "version": "2.0a0",
+        "name": "stable (2.0a0)",
+        "version": "stable",
         "url": "https://hiperwalk.readthedocs.io/en/stable/"
     },
     {
-        "name": "2.0a1 (latest)",
-        "version": "2.0a1",
+        "name": "latest",
+        "version": "latest",
         "url": "https://hiperwalk.readthedocs.io/en/latest/"
     }
 ]
