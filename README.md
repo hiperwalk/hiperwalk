@@ -1,4 +1,5 @@
-# hpwalk
+# Hiperwalk 2.0a0
+
 Source code of Hiperwalk project
 http://qubit.lncc.br/qwalk/
 
