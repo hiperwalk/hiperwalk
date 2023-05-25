@@ -1,10 +1,8 @@
-==========
-``qwplot``
-==========
+========
+Plotting
+========
 
-.. automodule:: qwplot
-
-.. currentmodule:: qwplot
+.. currentmodule:: hiperwalk
 
 Functions
 ---------
@@ -12,7 +10,7 @@ Functions
     :toctree: generated
     :nosignatures:
 
-    probability_distribution
+    plot_probability_distribution
 
 Classes
 -------

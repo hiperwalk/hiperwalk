@@ -1,7 +1,3 @@
-"""
-Module for plotting a probability distribution.
-"""
-
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np

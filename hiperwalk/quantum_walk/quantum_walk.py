@@ -13,9 +13,9 @@ except ModuleNotFoundError:
 
 class QuantumWalk(ABC):
     """
-    Base class for Quantum Walks.
+    Basic (abstract) class for Quantum Walks.
 
-    Base methods and attributes used for implementing
+    Basic methods and attributes used for implementing
     specific Quantum Walk models.
 
     Parameters

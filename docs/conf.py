@@ -17,7 +17,7 @@ sys.path.append(os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'HiPerWalk'
+project = 'Hiperwalk'
 copyright = '2023'
 author = 'Gustavo Bezerra'
 
@@ -77,6 +77,10 @@ exclude_patterns = []
 html_theme = 'pydata_sphinx_theme'
 
 html_theme_options = {
+    "logo" : {
+        "text": "Hiperwalk",
+        "alt_text": "Hiperwalk",
+    },
     "switcher": {
         "json_url": "https://hiperwalk.readthedocs.io/en/latest/_static/switcher.json",
         "version_match": version,

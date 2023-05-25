@@ -1,12 +1,12 @@
-.. HiPerWalk documentation master file, created by
+.. Hiperwalk documentation master file, created by
    sphinx-quickstart on Wed May 11 11:03:45 2022.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to HiPerWalk's documentation!
-=====================================
+Welcome to Hiperwalk!
+=====================
 
-**HiPerWalk** (High-performance Quantum Walk Simulator) is a freeware open-source program that
+**Hiperwalk** (High-performance Quantum Walk Simulator) is a freeware open-source program that
 allows the user to perform simulations of quantum walks on graphs using HPC.
 The user can use the parallel resources of the computer,
 such as accelerator cards, multicore CPU and GPGPU to
@@ -19,7 +19,7 @@ It is under development and employs C, Python, and OpenCL.
 
    install/index
    tutorial/index
-   reference/index
+   documentation/index
    development/index
 
 
