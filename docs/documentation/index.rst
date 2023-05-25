@@ -1,5 +1,5 @@
-Reference
-=========
+Documentation
+=============
 
 .. automodule:: hiperwalk
 
