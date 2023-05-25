@@ -59,7 +59,7 @@ If everything went right,
 the recently compiled documentation is available locally.
 To view (and test) it,
 open the file ``hiperwalk/docs/build/html/index.html``
-in the browser of your preference --
+in the browser of your reference --
 e.g. by double clicking it.
 
 Todo
