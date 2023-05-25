@@ -544,7 +544,7 @@ class CoinedWalk(QuantumWalk):
         Convert str, list of str or dict to valid coin list.
 
         See Also
-        ------
+        --------
         set_coin
         """
         num_vert = self._graph.number_of_vertices()
@@ -670,7 +670,7 @@ class CoinedWalk(QuantumWalk):
                 Analogous to the one accepted by :meth:`set_coin`.
 
         See Also
-        ------
+        --------
         set_coin
         """
         coin_list = []
@@ -1018,7 +1018,6 @@ class CoinedWalk(QuantumWalk):
                                                       else float)
 
         for entry in args:
-            print(entry)
             if len(entry) == 3:
                 raise NotImplementedError(
                     'position-coin notation not implemented')
