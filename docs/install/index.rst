@@ -2,19 +2,19 @@
 Install
 =======
 
-HiperWalk is built on top of some Python libraries.
+Hiperwalk is built on top of some Python libraries.
 By just installing the Python libraries,
-HiperWalk does not make use of High-Performance Computing (HPC).
+Hiperwalk does not make use of High-Performance Computing (HPC).
 If an installating without support for HPC is desired,
 you can jump to :ref:`docs_install_hiperwalk`.
 
 For supporting HPC,
-HiperWalk uses 
+Hiperwalk uses 
 `neblina-core <https://github.com/paulomotta/neblina-core>`_,
 and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
 Although a computer with a **GPU compatible with CUDA** is necessary.
 
-In this page we describe the process of installing HiperWalk in a
+In this page we describe the process of installing Hiperwalk in a
 freshly installed Ubuntu 20.04 operating system.
 We will describe the process of identifying the GPU, and
 installing the GPU drivers, neblina-core, pyneblina, and
@@ -219,18 +219,14 @@ run the test.
 
 .. _docs_install_hiperwalk:
 
-HiperWalk
+Hiperwalk
 =========
 
-As stated previously,
-HiperWalk is built on top of some Python libraries.
-Before installing HiperWalk,
-we must install these libraries.
-
+Hiperwalk can be easily installed via pip.
 
 .. note::
 
-   If you are installing HiperWalk with no HPC support,
+   If you are installing Hiperwalk with no HPC support,
    you probably did not install ``pip`` as mentioned in
    :ref:`docs_install_prerequisites`.
    If that's the case, run the following command.
@@ -239,76 +235,14 @@ we must install these libraries.
 
        sudo apt install python3-pip
 
-
-HiperWalk requires
-`numpy <https://numpy.org/>`_,
-`scipy <https://scipy.org/>`_,
-`networkx <https://networkx.org/>`_, and
-`matplotlib <https://matplotlib.org/>`_.
-To install these libraries run
+Simply issue the command
 
 .. code-block:: shell
 
-   pip3 install numpy
-   pip3 install scipy
-   pip3 install networkx
-   pip3 install matplotlib
-
-Then, choose which version you are going to install.
-The stable version or
-the latest version (under development).
-
-Stable
-------
-
-Clone the HiperWalk repository branch tagged as stable.
-For example, run the following command
-in the directory where neblina-core and pyneblina are --
-most likely the home directory.
-
-.. code-block:: shell
-
-   cd ~
-   git clone -b stable https://github.com/hiperwalk/hiperwalk.git
-
-Latest
-------
-
-Clone the HiperWalk repository --
-e.g. in the home directory where neblina-core and pyneblina are.
-
-.. code-block:: shell
-
-   cd ~
-   git clone https://github.com/hiperwalk/hiperwalk.git
-
-
-Testing
--------
+   pip3 install hiperwalk
 
 The installation is finished.
-To test if it was successful,
-go into the ``hiperwalk/examples/`` directory 
-and execute the test accoring to you installation.
-If you performed the complete installation (with HPC support),
-execute
-
-.. code-block:: shell
-
-    ./run_all.sh
-
-If you installed the standalone version (with no HPC support),
-execute
-
-.. code-block:: shell
-
-    ./run_nonhpc.sh
-
-There are some examples in the ``hiperwalk/examples/`` directory.
-You may execute any code inside this directory.
-For instance,
-
-.. code-block:: shell
-
-    cd ~/hiperwalk/examples/
-    python3 non-hpc-coined-line.py
+To test if it was successful, you can execute any code in
+`repository examples directory
+<https://`https://github.com/hiperwalk/hiperwalk/tree/2.0.x/examples>`_
+or go to the :ref:`docs_tutorial`.
