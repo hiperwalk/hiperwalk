@@ -444,8 +444,8 @@ def _configure_grid_figure(num_vert=None, fig_width=None,
                            subplot_kw={"projection": "3d"})
 
     ax.tick_params(length=10, width=1, labelsize=16, pad=10)
-    ax.set_xlabel('Vertex X ID', labelpad=15, fontsize=18)
-    ax.set_ylabel('Vertex Y ID', labelpad=15, fontsize=18)
+    ax.set_xlabel('Vertex X', labelpad=15, fontsize=18)
+    ax.set_ylabel('Vertex Y', labelpad=15, fontsize=18)
     ax.set_zlabel('Probability', labelpad=30, fontsize=18)
     return fig, ax
 
