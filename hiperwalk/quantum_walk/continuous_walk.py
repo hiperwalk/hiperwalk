@@ -174,6 +174,13 @@ class ContinuousWalk(QuantumWalk):
         return H
 
     def get_hamiltonian(self):
+        r"""
+        Returns Hamiltonian.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+        """
         return self._hamiltonian
 
     def set_evolution(self, **kwargs):
