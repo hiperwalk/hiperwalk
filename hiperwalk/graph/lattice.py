@@ -100,14 +100,81 @@ class Lattice(Graph):
         return True
 
     def vertex_coordinates(self, label):
+        r"""
+        Returns vertex (x, y)-coordinates given its label.
+
+        Parameters
+        ----------
+        label : int
+            Vertex label.
+
+        Returns
+        -------
+        x : int
+            Vertex X-coordinate.
+        y : int
+            Vertex Y-coordinate.
+
+        See Also
+        --------
+        vertex_label
+        """
         return (label % self.x_dim, label // self.x_dim)
 
 
     def vertex_label(self, x, y):
+        r"""
+        Returns vertex label (number) given its coordinates.
+
+        Parameters
+        ----------
+        x : int
+            Vertex X-coordinate.
+        y : int
+            Vertex Y-coordinate.
+
+        Returns
+        -------
+        int
+            Vertex label.
+
+        See Also
+        --------
+        vertex_coordinates
+        """
         return (x + self.x_dim*y) % self.number_of_vertices()
 
     def arc_direction(self, arc):
         r"""
+        Return arc direction.
+
+        Parameters
+        ----------
+        arc
+            Any of the following notations are acceptable.
+            
+            * ((int, int), (int, int))
+                Arc notation with vertices' coordinates.
+            * (int, int)
+                Arc notation with vertices' labels.
+            * int
+                Arc label.
+
+        Returns
+        -------
+        int
+            If natural (not diagonal) lattice:
+                * 0: right
+                * 1: left
+                * 2: up
+                * 3: down
+
+            If diagonal lattice:
+                * 0: right, up
+                * 1: right, down
+                * 2: left, up
+                * 3: left, down
+
         Notes
         -----
         Does not check if arc exists.
@@ -169,6 +236,29 @@ class Lattice(Graph):
         return label + direction - sub_x - sub_y
 
     def arc(self, label, coordinates=True):
+        r"""
+        Arc in arc notation.
+
+        Given the arc label, returns it in the ``(tail, head)`` notation.
+
+        Parameters
+        ----------
+        label : int
+            Arc label (number)
+        coordinates : bool, default=True
+            Whether the vertices are returned as coordinates or as labels.
+
+        Returns
+        -------
+        (tail, head)
+            There are two possibile formats for the vertices
+            ``tail`` and ``head``.
+
+            (vertex_x, vertex_y) : (int, int)
+                If ``coordinates=True``.
+            label : int
+                If ``coordinates=False``.
+        """
         if not self.periodic and self.diagonal:
             raise NotImplementedError
 
@@ -340,6 +430,16 @@ class Lattice(Graph):
         return (tail, head)
 
     def dimensions(self):
+        r"""
+        Lattice dimensions.
+
+        Returns
+        -------
+        x_dim : int
+            Dimension alongside de X axis.
+        y_dim : int
+            Dimension alongside de Y axis.
+        """
         return (self.x_dim, self.y_dim)
 
     def get_central_vertex(self):
