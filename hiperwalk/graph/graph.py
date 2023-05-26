@@ -81,11 +81,43 @@ class Graph():
         return False
 
     def arc_label(self, tail, head):
+        r"""
+        Returns arc label (number).
+
+        Parameters
+        ----------
+        tail: int
+            Tail of the arc.
+
+        head: int
+            Head of the arc.
+
+        Returns
+        -------
+        label: int
+            Arc label.
+        """
         return _binary_search(self.adj_matrix.indices, head,
                               start = self.adj_matrix.indptr[tail],
                               end = self.adj_matrix.indptr[tail + 1])
 
     def arc(self, label):
+        r"""
+        Arc in arc notation.
+
+        Given the arc label,
+        returns it in the ``(tail, head)`` notation.
+
+        Parameters
+        ----------
+        label: int
+            Arc label (number)
+
+        Returns
+        -------
+        (int, int)
+            Arc in the arc notation ``(tail, head)``.
+        """
         adj_matrix = self.adj_matrix
         head = adj_matrix.indices[label]
         # TODO: binary search
@@ -95,31 +127,97 @@ class Graph():
         return (tail, head)
 
     def next_arc(self, arc):
+        r"""
+        Next arc in an embeddable graph.
+
+        Parameters
+        ----------
+        arc
+            The arc in any of the following notations.
+
+            * arc notation: tuple of vertices
+                In ``(tail, head)`` format where
+                ``tail`` and ``head`` must be valid vertices.
+            * arc label: int.
+                The arc label (number).
+
+        Returns
+        -------
+        Next arc in the same notation as the ``arc`` argument.
+
+        See Also
+        --------
+        arc
+        arc_label
+        """
         # implemented only if is embeddable
         raise AttributeError
 
     def previous_arc(self, arc):
+        r"""
+        Previous arc in an embeddable graph.
+
+        Parameters
+        ----------
+        arc
+            The arc in any of the following notations.
+
+            * arc notation: tuple of vertices
+                In ``(tail, head)`` format where
+                ``tail`` and ``head`` must be valid vertices.
+            * arc label: int.
+                The arc label (number).
+
+        Returns
+        -------
+        Previous arc in the same notation as the ``arc`` argument.
+
+        See Also
+        --------
+        arc
+        arc_label
+        """
         # implemented only if is embeddable
         raise AttributeError
 
     def neighbors(self, vertex):
+        r"""
+        Returns all neighbors of the given vertex.
+        """
         start = self.adj_matrix.indptr[vertex]
         end = self.adj_matrix.indptr[vertex + 1]
         return self.adj_matrix.indices[start:end]
 
     def arcs_with_tail(self, tail):
+        r"""
+        Returns all arcs that have the given tail.
+        """
         arcs_lim = self.adj_matrix.indptr
         return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
 
     def number_of_vertices(self):
+        r"""
+        Cardinality of vertex set.
+        """
         return self.adj_matrix.shape[0]
 
     def number_of_arcs(self):
+        r"""
+        Cardinality of arc set.
+
+        For simple graphs, this is twice the number of edges.
+        """
         return self.adj_matrix.sum()
 
     def number_of_edges(self):
+        r"""
+        Cardinality of edge set.
+        """
         return self.adj_matrix.sum() >> 1
 
     def degree(self, vertex):
+        r"""
+        Degree of given vertex.
+        """
         indptr = self.adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]

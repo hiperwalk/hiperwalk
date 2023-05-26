@@ -52,9 +52,6 @@ class Line(Graph):
         super().__init__(adj_matrix)
 
     def embeddable(self):
-        r"""
-        See :meth:`Graph.has_persistent_shift_operator`.
-        """
         return True
 
     def get_default_coin(self):
