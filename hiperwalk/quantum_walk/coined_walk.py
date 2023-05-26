@@ -31,10 +31,8 @@ class CoinedWalk(QuantumWalk):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
-    adjacency : :class:`scipy.sparse.csr_array`
-        .. deprecated ::
-            Use ``graph`` instead.
-
+    adjacency : :class:`scipy.sparse.csr_array`, optional
+        Use ``graph`` instead.
         Adjacency matrix of the graph.
 
     **kwargs : optional

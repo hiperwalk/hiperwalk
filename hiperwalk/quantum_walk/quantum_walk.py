@@ -25,9 +25,8 @@ class QuantumWalk(ABC):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
-    adjacency : optional
+    adjacency : :class:`scipy.sparse.csr_array`, optional
         The adjacency matrix.
-        It is deprecated. Use ``graph`` instead.
 
     Attributes
     ----------
@@ -49,7 +48,8 @@ class QuantumWalk(ABC):
     -----
 
     .. todo::
-        The following methods must be overwritten.
+        * List the that methods must be overwritten.
+        * Accept other types as ``graph`` such as numpy array
 
     """
 
