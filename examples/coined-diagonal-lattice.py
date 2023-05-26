@@ -1,5 +1,3 @@
-from sys import path as sys_path
-sys_path.append('..')
 import hiperwalk as hpw
 
 dim = 121
