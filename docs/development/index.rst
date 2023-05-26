@@ -2,6 +2,23 @@
 Development
 ===========
 
+HiperWalk is built on top of some Python libraries.
+Before developing for HiperWalk,
+we must install these libraries.
+HiperWalk requires
+`numpy <https://numpy.org/>`_,
+`scipy <https://scipy.org/>`_,
+`networkx <https://networkx.org/>`_, and
+`matplotlib <https://matplotlib.org/>`_.
+To install these libraries run
+
+.. code-block:: shell
+
+   pip3 install numpy
+   pip3 install scipy
+   pip3 install networkx
+   pip3 install matplotlib
+
 The ``main`` branch is where the new features are developed.
 To contribute, clone the repository.
 
@@ -12,9 +29,23 @@ To contribute, clone the repository.
 Then, make the desired alterations.
 And make a pull request.
 
-.. todo::
+Testing
+=======
 
-   Continuous model must be implemented.
+Tests are located into the ``hiperwalk/tests/`` directory.
+If you performed the complete installation (with HPC support),
+execute
+
+.. code-block:: shell
+
+    ./run_all.sh
+
+If you installed the standalone version (with no HPC support),
+execute
+
+.. code-block:: shell
+
+    ./run_nonhpc.sh
 
 Documentation
 =============
