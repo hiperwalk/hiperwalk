@@ -348,11 +348,9 @@ class Lattice(Graph):
         In the sense that...
         """
         warn('`get_central_vertex` is deprecated. '
-             + 'Use `central_vertex` instead.',
+             + 'It will be removed in version 2.1.',
              DeprecationWarning)
-        return self.central_vertex()
 
-    def central_vertex(self):
         if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
             raise ValueError(
                 "One of lattice dimensions is even. "
