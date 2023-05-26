@@ -22,8 +22,8 @@ copyright = '2023'
 author = 'Gustavo Bezerra'
 
 # The full version, including alpha/beta/rc tags
-release = '2.0a1'
-version = 'stable'
+release = '2.0a0'
+version = 'latest'
 
 
 # -- General configuration ---------------------------------------------------
