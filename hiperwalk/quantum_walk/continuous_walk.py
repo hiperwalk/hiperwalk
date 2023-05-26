@@ -28,15 +28,8 @@ class ContinuousWalk(QuantumWalk):
         :class:`class:scipy.sparse.csr_array`:
             The graph adjacency matrix.
 
-        .. todo::
-            * Accept other types such as numpy array
-
-
-
-    adjacency : :class:`scipy.sparse.csr_array`
-        .. deprecated ::
-            This parameter is deprecated and will be removed in
-            future versions.
+    adjacency : :class:`scipy.sparse.csr_array`, optional
+        .. deprecated-removed:: 2.0 2.1
             Use ``graph`` instead.
 
         Adjacency matrix of the graph on which the quantum occurs
