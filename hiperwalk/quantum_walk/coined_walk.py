@@ -32,6 +32,10 @@ class CoinedWalk(QuantumWalk):
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
     adjacency : :class:`scipy.sparse.csr_array`, optional
+        .. deprecated:: 2.0
+            It will be removed in version 2.1.
+            Use ``graph`` instead.
+
         Use ``graph`` instead.
         Adjacency matrix of the graph.
 
