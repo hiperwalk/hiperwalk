@@ -1,3 +1,5 @@
+__version__ = '2.0a1'
+
 #Declares data types according to neblina-core
 #TODO: make it so it is not hardcoded
 NEBLINA_FLOAT = 2
