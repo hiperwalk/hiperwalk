@@ -5,7 +5,6 @@ Encapsules Animation class, responsible for managing animations.
 import matplotlib.pyplot as plt
 from PIL import Image
 from .._constants import __DEBUG__
-from warnings import warn
 
 if __DEBUG__:
     from time import time
@@ -291,7 +290,7 @@ class Animation:
                 window.add(img)
 
             def configure_video_window(self):
-                warn('Showing video not supported.')
+                raise NotImplementedError('Showing video not supported.')
 
             if self.save_path[-4:] == '.gif':
                 configure_gif_window(self)

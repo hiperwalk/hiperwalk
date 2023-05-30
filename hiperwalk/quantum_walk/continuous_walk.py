@@ -3,7 +3,6 @@ import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
-from warnings import warn
 try:
     from . import _pyneblina_interface as nbl
 except:
@@ -229,6 +228,13 @@ class ContinuousWalk(QuantumWalk):
         :math:`t` is the time.
 
         The evolution operator is constructed by Taylor Series expansion.
+
+        .. warning::
+            For floating time (not integer),
+            the result is approximated. It is recommended to
+             choose a small time interval and performing
+             multiple matrix multiplications to
+             mitigate uounding errors.
         """
         if time is None or time < 0:
             raise ValueError(
@@ -239,7 +245,6 @@ class ContinuousWalk(QuantumWalk):
             raise AssertionError
 
         if hpc and not self._pyneblina_imported():
-            warn(PYNEBLINA_IMPORT_ERROR_MSG)
             hpc = False
 
         if hpc:
@@ -262,10 +267,6 @@ class ContinuousWalk(QuantumWalk):
                     order = np.ceil(np.math.log(new_time, 20))
                     new_time /= 10**order
                     num_mult = int(np.round(time/new_time)) - 1
-                    warn("Result is approximated. It is recommended to "
-                         + "choose a small time interval and performing "
-                         + "multiple matrix multiplications to "
-                         + "mitigate uounding errors.")
 
                 new_nbl_U = nbl.matrix_power_series(
                         -1j*new_time*self._hamiltonian, 20)

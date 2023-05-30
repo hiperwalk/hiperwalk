@@ -3,7 +3,6 @@ import scipy
 import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
-from warnings import warn
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
 try:
@@ -490,6 +489,10 @@ class CoinedWalk(QuantumWalk):
         each block is the :math:`\deg(v)`-dimensional ``coin``.
         Consequently, there are :math:`|V|` blocks.
 
+        .. todo::
+
+            Check if explicit coin is valid.
+
         """
         try:
             if len(coin.shape) != 2:
@@ -499,7 +502,6 @@ class CoinedWalk(QuantumWalk):
             if not scipy.sparse.issparse(coin):
                 coin = scipy.sparse.csr_array(coin)
 
-            warn('TODO: Check if coin is valid')
             self._coin = coin
             self._evolution = None
             return
@@ -848,6 +850,17 @@ class CoinedWalk(QuantumWalk):
         the coin of each marked vertex is substituted as specified by
         the last :meth:`set_marked` call.
 
+        Notes
+        -----
+
+        .. todo::
+            * Sparse matrix multipliation is not supported yet.
+              Converting all matrices to dense.
+              Then converting back to sparse.
+              This uses unnecessary memory and computational time.
+            * Check if matrix is sparse in pynelibna interface
+            * Check if matrices are deleted from memory and GPU.
+
         References
         ----------
         .. [1] Portugal, Renato. "Quantum walks and search algorithms".
@@ -866,7 +879,6 @@ class CoinedWalk(QuantumWalk):
 
         U = None
         if hpc and not self._pyneblina_imported():
-            warn(PYNEBLINA_IMPORT_ERROR_MSG)
             hpc = False
 
 
@@ -875,24 +887,15 @@ class CoinedWalk(QuantumWalk):
 
         if hpc:
 
-            warn(
-                "Sparse matrix multipliation is not supported yet. "
-                + "Converting all matrices to dense. "
-                + "Then converting back to sparse. "
-                + "This uses unnecessary memory and computational time."
-            )
             S = S.todense()
             C = C.todense()
 
-            warn("CHECK IF MATRIX IS SPARSE IN PYNELIBNA INTERFACE")
             nbl_S = nbl.send_matrix(S)
             del S
             nbl_C = nbl.send_matrix(C)
             del C
             nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
 
-            warn("Check if matrices are deleted "
-                          + "from memory and GPU.")
             del nbl_S
 
             U = nbl.retrieve_matrix(nbl_C)
