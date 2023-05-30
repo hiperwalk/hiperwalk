@@ -1,5 +1,4 @@
 import numpy as np
-from warnings import warn
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -49,10 +48,13 @@ class Graph():
 
     This class may be passed as argument to plotting methods.
     Then the default representation for the specific graph will be shown.
+
+    .. todo::
+        Check if valid adjacency matrix
+        
     """
 
     def __init__(self, adj_matrix):
-        warn("Check if valid adjacency matrix")
         self.adj_matrix = adj_matrix
         self.coloring = None
 

@@ -520,9 +520,6 @@ class QuantumWalk(ABC):
 
         
         if hpc and not self._pyneblina_imported():
-            if __DEBUG__:
-                print("IMPORTING PYNEBLINA")
-            warn(PYNEBLINA_IMPORT_ERROR_MSG)
             hpc = False
 
         __prepare_engine(self)

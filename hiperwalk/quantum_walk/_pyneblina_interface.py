@@ -156,7 +156,6 @@ def _send_sparse_matrix(M, is_complex):
     _init_engine()
 
     # TODO: check if complex automatically?
-    warn("Only working for square matrices")
     n = M.shape[0]
 
     # creates neblina sparse matrix structure
@@ -208,8 +207,8 @@ def _send_dense_matrix(M, is_complex):
            else neblina.matrix_new(num_rows, num_cols, NEBLINA_FLOAT))
     
     # inserts elements into neblina matrix
-    warn("Check if there really is a difference between real and complex")
-    warn("Check if default value is zero so we can jump setting element.")
+    # TODO: Check if there really is a difference between real and complex
+    # TODO: Check if default value is zero so we can jump setting element. 
 
     for i in range(num_rows):
         for j in range(num_cols):
@@ -243,15 +242,15 @@ def retrieve_matrix(pynbl_mat):
 
     nbl_mat = neblina.move_matrix_host(pynbl_mat.nbl_obj)
 
-    warn("Check if using default numpy datatype.")
+    # TODO: Check if using default numpy datatype.
     py_mat = np.zeros(pynbl_mat.shape, dtype=(
         complex if pynbl_mat.is_complex else float
     ))
 
     num_rows, num_cols = pynbl_mat.shape
-    warn("Not vectorized. Implement with list comprehension. "
-         + "This may require the double memory usage. "
-         + "Check memory usage before choosing which method to use.")
+    # TODO: Not vectorized. Implement with list comprehension. 
+    #       This may require the double memory usage. 
+    #       Check memory usage before choosing which method to use.
     for i in range(num_rows):
         for j in range(num_cols):
             if pynbl_mat.is_complex:
