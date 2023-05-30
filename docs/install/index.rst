@@ -5,14 +5,9 @@ Install
 Hiperwalk is built on top of some Python libraries.
 By just installing the Python libraries,
 Hiperwalk does not make use of High-Performance Computing (HPC).
-If an installating without support for HPC is desired,
-you can jump to :ref:`docs_install_hiperwalk`.
-
-For supporting HPC,
-Hiperwalk uses 
-`neblina-core <https://github.com/paulomotta/neblina-core>`_,
-and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
-Although a computer with a **GPU compatible with CUDA** is necessary.
+If an installating with HPC support is desired,
+you can jump to :ref:`docs_install_hpc_prerequisites`
+before installing Hiperwalk.
 
 In this page we describe the process of installing Hiperwalk in a
 freshly installed Ubuntu 20.04 operating system.
@@ -27,10 +22,48 @@ the necessary Python libraries.
    Support for Ubuntu 22.04 is under development.
    Contributions are welcomed.
 
-.. _docs_install_prerequisites:
+.. _docs_install_hiperwalk:
 
-Prerequisites
-=============
+Hiperwalk
+=========
+
+Hiperwalk can be easily installed via pip.
+First of all, install pip.
+
+.. code-block:: shell
+
+   sudo apt install python3-pip
+
+The following command
+install Hiperwalk and all its Python dependencies.
+Namely
+`numpy <https://numpy.org/>`_,
+`scipy <https://scipy.org/>`_,
+`networkx <https://networkx.org/>`_, and
+`matplotlib <https://matplotlib.org/>`_.
+
+.. warning::
+
+   If you have an old version of these packages,
+   it will be probably updated.
+   If you do not wish this to happen, we recommend you to
+   `create a virtual environment
+   <https://docs.python.org/3/library/venv.html>`_.
+
+.. code-block:: shell
+
+   pip3 install hiperwalk
+
+To test if it the installation was successful,
+you can execute any code in
+`repository examples directory
+<https://`https://github.com/hiperwalk/hiperwalk/tree/2.0.x/examples>`_
+or go to the :ref:`docs_tutorial`.
+
+.. _docs_install_hpc_prerequisites:
+
+HPC Prerequisites
+=================
 
 Beforehand, it is recommended to update and upgrade the Ubuntu packages.
 Execute
@@ -143,6 +176,13 @@ This can be done simply by running the command
 Installing neblina-core And pyneblina
 =====================================
 
+For HPC support,
+Hiperwalk uses 
+`neblina-core <https://github.com/paulomotta/neblina-core>`_,
+and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
+Although a computer with a **GPU compatible with CUDA** is necessary.
+
+
 We compile the information in
 `Paulo Motta's blog <https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/>`_,
 `neblina-core github <https://github.com/paulomotta/neblina-core>`_,
@@ -216,33 +256,3 @@ run the test.
 .. code-block:: shell
 
    python3 test.py
-
-.. _docs_install_hiperwalk:
-
-Hiperwalk
-=========
-
-Hiperwalk can be easily installed via pip.
-
-.. note::
-
-   If you are installing Hiperwalk with no HPC support,
-   you probably did not install ``pip`` as mentioned in
-   :ref:`docs_install_prerequisites`.
-   If that's the case, run the following command.
-
-   .. code-block:: shell
-
-       sudo apt install python3-pip
-
-Simply issue the command
-
-.. code-block:: shell
-
-   pip3 install hiperwalk
-
-The installation is finished.
-To test if it was successful, you can execute any code in
-`repository examples directory
-<https://`https://github.com/hiperwalk/hiperwalk/tree/2.0.x/examples>`_
-or go to the :ref:`docs_tutorial`.
