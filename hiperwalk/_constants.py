@@ -1,4 +1,4 @@
-__version__ = '2.0a1'
+__version__ = '2.0a2'
 
 #Declares data types according to neblina-core
 #TODO: make it so it is not hardcoded
