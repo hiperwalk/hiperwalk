@@ -444,8 +444,23 @@ class Lattice(Graph):
 
     def get_central_vertex(self):
         r"""
-        Central vertex is different from center vertex.
-        In the sense that...
+        Vertex with label in the center of the graph as grid.
+
+        .. deprecated:: 2.0a1
+            ``get_central_vertex`` will be removed in Python 2.1 because
+            the user can calculate the central vertex easily using
+            :meth:`dimensions`.
+
+        The central vertex is the vertex that would be located at the
+        grid center after mapping every vertex ``(x, y)`` to its
+        respetive grid point.
+        
+        This is not the center vertex.
+
+        Raises
+        ------
+        ValueError
+            If any lattice dimension is even.
         """
         warn('`get_central_vertex` is deprecated. '
              + 'It will be removed in version 2.1.',
