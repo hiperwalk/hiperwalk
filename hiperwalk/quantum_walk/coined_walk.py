@@ -838,9 +838,6 @@ class CoinedWalk(QuantumWalk):
         the coin of each marked vertex is substituted as specified by
         the last :meth:`set_marked` call.
 
-        Notes
-        -----
-
         .. todo::
             * Sparse matrix multipliation is not supported yet.
               Converting all matrices to dense.
@@ -848,6 +845,7 @@ class CoinedWalk(QuantumWalk):
               This uses unnecessary memory and computational time.
             * Check if matrix is sparse in pynelibna interface
             * Check if matrices are deleted from memory and GPU.
+
 
         References
         ----------
@@ -858,7 +856,7 @@ class CoinedWalk(QuantumWalk):
         --------
 
         .. todo::
-            valid examples to clear behaviour
+            Valid examples to clear behaviour.
         """
         if self._evolution is not None:
             # evolution operator was not changed.
