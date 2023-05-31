@@ -232,9 +232,9 @@ class ContinuousWalk(QuantumWalk):
         .. warning::
             For floating time (not integer),
             the result is approximated. It is recommended to
-             choose a small time interval and performing
-             multiple matrix multiplications to
-             mitigate uounding errors.
+            choose a small time interval and performing
+            multiple matrix multiplications to
+            mitigate uounding errors.
         """
         if time is None or time < 0:
             raise ValueError(
