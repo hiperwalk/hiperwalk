@@ -447,9 +447,6 @@ class QuantumWalk(ABC):
         ###########################
 
         def __prepare_engine(self):
-            if __DEBUG__:
-                print("Preparing engine")
-
             if hpc:
                 self._simul_mat = nbl.send_matrix(self._evolution)
                 self._simul_vec = nbl.send_vector(initial_condition)
@@ -458,18 +455,12 @@ class QuantumWalk(ABC):
                 self._simul_mat = self._evolution
                 self._simul_vec = initial_condition
 
-            if __DEBUG__:
-                print("Done\n")
-
         def __simulate_step(self, step):
             """
             Apply the simulation evolution operator ``step`` times
             to the simulation vector.
             Simulation vector is then updated.
             """
-            if __DEBUG__:
-                print("Simulating steps")
-
             if hpc:
                 # TODO: request multiple multiplications at once
                 #       to neblina-core
@@ -483,13 +474,7 @@ class QuantumWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
-            if __DEBUG__:
-                print("Done\n")
-
         def __save_simul_vec(self):
-            if __DEBUG__:
-                print("Saving simulated vec")
-
             ret = None
 
             if hpc:
@@ -498,9 +483,6 @@ class QuantumWalk(ABC):
                 ret = nbl.retrieve_vector(self._simul_vec)
             else:
                 ret = self._simul_vec
-
-            if __DEBUG__:
-                print("Done\n")
 
             return ret
 
