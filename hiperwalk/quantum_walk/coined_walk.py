@@ -231,9 +231,6 @@ class CoinedWalk(QuantumWalk):
         it is unset for coherence.
         """
 
-        if __DEBUG__:
-            start_time = now()
-
         num_vert = self._graph.number_of_vertices()
         num_arcs = self._graph.number_of_arcs()
 
@@ -248,9 +245,6 @@ class CoinedWalk(QuantumWalk):
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
-
-        if __DEBUG__:
-            print("flipflop_shift Time: " + str(now() - start_time))
 
         self._shift = S
         self._evolution = None
@@ -276,9 +270,6 @@ class CoinedWalk(QuantumWalk):
         If an evolution operator was set previously,
         it is unset for coherence.
         """
-        if __DEBUG__:
-            start_time = now()
-
         num_arcs = self._graph.number_of_arcs()
 
         S_cols = [self._graph.previous_arc(i) for i in range(num_arcs)]
@@ -290,9 +281,6 @@ class CoinedWalk(QuantumWalk):
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
-
-        if __DEBUG__:
-            print("persistent shift Time: " + str(now() - start_time))
 
         self._shift = S
         self._evolution = None
@@ -966,9 +954,6 @@ class CoinedWalk(QuantumWalk):
                           for v in range(num_vert)]
                         for i in range(len(states))])
 
-        if __DEBUG__:
-            end = now()
-            print("probability_distribution: " + str(end - start) + 's')
         # TODO: benchmark (time and memory usage)
         return prob
 

@@ -14,11 +14,7 @@ __engine_initiated = False
 def exit_handler():
     global __engine_initiated
     if __engine_initiated:
-        if __DEBUG__:
-            print("Stop engine")
         neblina.stop_engine()
-    elif __DEBUG__:
-        print("Engine not initiated. Not needed to stop engine.")
 
 atexit.register(exit_handler)
 ############################################
@@ -105,8 +101,6 @@ def send_vector(v):
     # immediately after being transferred
     # TODO: check if this is the case
     neblina.move_vector_device(vec)
-    if __DEBUG__:
-        print("Type of neblina vector obj: " + str(type(vec)))
     return PyNeblinaVector(vec, is_complex, n)
 
 def retrieve_vector(pynbl_vec):
@@ -192,9 +186,6 @@ def _send_sparse_matrix(M, is_complex):
 
     neblina.sparse_matrix_pack(smat) # TODO: is this needed?
     neblina.move_sparse_matrix_device(smat)
-
-    if __DEBUG__:
-        print("Type of neblina matrix obj: " + str(type(smat)))
 
     return PyNeblinaMatrix(smat, M.shape, is_complex, True)
 
