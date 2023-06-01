@@ -60,7 +60,7 @@ class Cycle(Graph):
     def embeddable(self):
         return True
 
-    def get_default_coin(self):
+    def default_coin(self):
         r"""
         Returns the default coin name.
         """
