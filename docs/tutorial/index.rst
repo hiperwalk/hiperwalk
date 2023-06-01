@@ -20,96 +20,101 @@ We just illustrate the steps.
    from sys import path as sys_path
    sys_path.append("../..")
 
-#. Import Hiperwalk.
+Import Hiperwalk
+----------------
 
-   >>> import hiperwalk as hpw
+>>> import hiperwalk as hpw
 
-#. Create the graph.
+Create the graph
+----------------
 
-   Here we create a line with 11 vertices.
-   The result is an object of the :class:`hiperwalk.Line` class.
+Here we create a line with 11 vertices.
+The result is an object of the :class:`hiperwalk.Line` class.
 
-   >>> N = 11
-   >>> line = hpw.Line(N)
-   >>> line #doctest: +SKIP
-   <hiperwalk.graph.line.Line object at 0x7ff59f1900d0>
+>>> N = 11
+>>> line = hpw.Line(N)
+>>> line #doctest: +SKIP
+<hiperwalk.graph.line.Line object at 0x7ff59f1900d0>
 
-#. Create the quantum walk based on the previous graph.
+Create the quantum walk based on the previous graph
+---------------------------------------------------
 
-   We create a coined quantum walk on the line with
-   11 vertices by passing the created graph as an
-   argument to the quantum walk constructor.
-   This results in an object of the :class:`hiperwalk.CoinedWalk` class.
+We create a coined quantum walk on the line with
+11 vertices by passing the created graph as an
+argument to the quantum walk constructor.
+This results in an object of the :class:`hiperwalk.CoinedWalk` class.
 
-   >>> qw = hpw.CoinedWalk(line)
-   >>> qw #doctest: +SKIP
-   <hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f2691de9840>
+>>> qw = hpw.CoinedWalk(line)
+>>> qw #doctest: +SKIP
+<hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f2691de9840>
 
-#. Simulate the walk.
+Simulate the walk
+-----------------
 
-   Before simulating the walk,
-   To simulate the walk we need to specify the initial condition.
-   One way to create the initial condition is by using the
-   :meth:`hiperwalk.CoinedWalk.ket` method,
-   which creates a valid state of the computational basis.
+Before simulating the walk,
+To simulate the walk we need to specify the initial condition.
+One way to create the initial condition is by using the
+:meth:`hiperwalk.CoinedWalk.ket` method,
+which creates a valid state of the computational basis.
 
-   >>> vertex = N // 2
-   >>> initial_condition = qw.ket(vertex, vertex + 1)
-   >>> initial_condition
-   array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,
-          0., 0., 0.])
+>>> vertex = N // 2
+>>> initial_condition = qw.ket(vertex, vertex + 1)
+>>> initial_condition
+array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0.])
 
-   This state corresponds to the walker being on
-   vertex 5 pointing to vertex 6
-   (the labels of the vertices go from 0 to 10).
+This state corresponds to the walker being on
+vertex 5 pointing to vertex 6
+(the labels of the vertices go from 0 to 10).
 
-   To simulate the walk we must specify the number of steps
-   (number of applications of the evolution operator)
-   and the initial condition.
-   By specifying only the final time,
-   the result is the final state.
-   If everything was installed properly,
-   the :meth:`hiperwalk.CoinedWalk.simulate` method automatically uses
-   high-performance computing to perform the matrix-vector multiplications.
+To simulate the walk we must specify the number of steps
+(number of applications of the evolution operator)
+and the initial condition.
+By specifying only the final time,
+the result is the final state.
+If everything was installed properly,
+the :meth:`hiperwalk.CoinedWalk.simulate` method automatically uses
+high-performance computing to perform the matrix-vector multiplications.
 
-   >>> final_state = qw.simulate(time=N//2,
-   ...                           initial_condition=initial_condition)
+>>> final_state = qw.simulate(time=N//2,
+...                           initial_condition=initial_condition)
 
 
 
-#. Exhibit the results.
+Exhibit the results
+-------------------
 
-   The results exhibition may be a simple print
+The results exhibition may be a simple print
 
-   >>> final_state
-   array([[ 0.1767767 ,  0.        ,  0.        ,  0.35355339,  0.1767767 ,
-            0.        ,  0.        , -0.35355339,  0.        ,  0.        ,
-            0.        ,  0.35355339,  0.        ,  0.        ,  0.        ,
-            0.1767767 , -0.70710678,  0.        ,  0.        , -0.1767767 ]])
+>>> final_state
+array([[ 0.1767767 ,  0.        ,  0.        ,  0.35355339,  0.1767767 ,
+         0.        ,  0.        , -0.35355339,  0.        ,  0.        ,
+         0.        ,  0.35355339,  0.        ,  0.        ,  0.        ,
+         0.1767767 , -0.70710678,  0.        ,  0.        , -0.1767767 ]])
 
-   or a more sofisticated output.
-   Frequently, we are interested in the probability of the walker being
-   found on each vertex.
-   This can be done via the
-   :meth:`hiperwalk.CoinedWalk.probability_distribution` method
-   by passing the final state as argument.
+or a more sofisticated output.
+Frequently, we are interested in the probability of the walker being
+found on each vertex.
+This can be done via the
+:meth:`hiperwalk.CoinedWalk.probability_distribution` method
+by passing the final state as argument.
 
-   >>> probability = qw.probability_distribution(final_state)
-   >>> probability
-   array([[0.03125, 0.     , 0.15625, 0.     , 0.125  , 0.     , 0.125  ,
-           0.     , 0.53125, 0.     , 0.03125]])
+>>> probability = qw.probability_distribution(final_state)
+>>> probability
+array([[0.03125, 0.     , 0.15625, 0.     , 0.125  , 0.     , 0.125  ,
+        0.     , 0.53125, 0.     , 0.03125]])
 
-   It is also possible to plot the probability distribution
-   with a simple command.
+It is also possible to plot the probability distribution
+with a simple command.
 
-   >>> hpw.plot_probability_distribution(probability) #doctest: +SKIP
+>>> hpw.plot_probability_distribution(probability) #doctest: +SKIP
 
-   Resulting in the following plot.
+Resulting in the following plot.
 
-   .. figure:: probability_distribution.png
-       :alt: Plot of the probability distribution.
+.. figure:: probability_distribution.png
+    :alt: Plot of the probability distribution.
 
-       Probability distribution of a quantum walk on a line.
+    Probability distribution of a quantum walk on a line.
 
 Next Steps
 ----------
