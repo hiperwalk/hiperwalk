@@ -83,7 +83,7 @@ However, this is not recommended specifically when dealing with
 the Coined Quantum Walk model
 because it may result on undesirable behavior.
 
-To see why, let us take a Line with 10 vertices as example.
+For example, let us take a Line with 10 vertices as example.
 First, create the line using the :class:`hiperwalk.Graph` class.
 
 >>> path = nx.path_graph(10)
@@ -105,11 +105,6 @@ We have
 >>> specific_line.arc_label(1, 2)
 1
 
-From the available specific graphs,
-the Lattice deserves a special attention.
-
-Lattice
-=======
-
-.. todo::
-   stuff
+For more details on the arc labels on each graph,
+refer to the Notes section of each graph class --
+in this case, :class:`hiperwalk.Graph` and :class:`hiperwalk.Line`.
