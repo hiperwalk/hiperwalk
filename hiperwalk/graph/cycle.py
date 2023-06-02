@@ -14,26 +14,12 @@ class Cycle(Graph):
     -----
     The cycle may be interpreted as being embedded on the line
     with cyclic boundary condition.
-
-
-    .. todo::
-        
-        update below
-
-    The edge order respects the default vertex-coin notation.
-    In other words, 0 corresponds to the coin pointing rightwards,
-    and 1 to the coin pointing leftwards.
-    Therefore, the arcs are sorted with respect to this order
-    (vertex has precedence over direction and
-    right has precedence over left):
-
-    .. math::
-        \begin{align*}
-            \ket{(v, c)} = \ket{2v + c}
-        \end{align*}
-
-    where :math:`v \in V` and :math:`c \in \{0, 1\}`.
-    Figure 1 illustrates the arcs of a 3 vertices cycle.
+    Then, we assign 0 the right direction and 1 with the left direction.
+    This changes the arc order.
+    Any arc with tail :math:`v`
+    has label :math:`2v` if pointing rightwards,
+    and label :math:`2v + 1` if pointing leftwards.
+    Figure 1 illustrates the arc labels of a 3 vertices cycle.
 
     .. graphviz:: ../../graphviz/cycle-arcs.dot
         :align: center
