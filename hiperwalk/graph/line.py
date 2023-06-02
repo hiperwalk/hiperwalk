@@ -14,25 +14,39 @@ class Line(Graph):
 
     Notes
     -----
-    .. todo::
+    On the Line,
+    we can assign directions to the arcs.
+    If an arc is pointing rightwards it has direction 0 --
+    i.e., (1, 2).
+    If an arc is pointing leftwards, it has direction 1 --
+    i.e., (2, 1).
 
-        update
+    We use the arc directions to define the arcs order.
+    Hence, for a vertex :math:`v \in V`,
+    the arcs :math:`(v, v + 1)` and :math:`(v, v - 1)`
+    have labels :math:`a_0` and :math:`a_1` (respectively)
+    such that  :math:`a_0 < a_1`.
+    This order is coherent with the Coined Quantum Walk on the line [1]_.
+    The only exceptions to this rule are the extreme vertices
+    0 and :math:`|V| - 1`.
+    Since they only have one arc.
+    Besides that,
+    for any two vertices :math:`v_1 < v_2`,
+    any arc with tail :math:`v_1` has label smaller than
+    any arc with tail :math:`v_2`.
 
-
-    Since :class:`Segment` is built on top of :class:`Graph`,
-    operators and states respect the edge order
-    (See :class:`Graph` notes for more details).
-    As a consequence, for any vertex :math:`v \in V`,
-    the state :math:`\ket{2v - d}` for :math:`d \in \{0, 1\}`
-    corresponds to the walker being on vertex :math:`v` and the
-    coin pointing rightwars (:math:`d = 0`) or leftwards (:math:`d = 1`).
-    For example, the edges labels of the 4-vertices :class:`Segment`
+    For example, the arc labels of the 4-vertices Line
     are represented in Figure 1.
     
     .. graphviz:: ../../graphviz/line-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 1.
+
+    References
+    ----------
+    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
+        Vol. 19. New York: Springer, 2013.
     """
 
     def __init__(self, num_vert):
