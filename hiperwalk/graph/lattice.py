@@ -447,7 +447,7 @@ class Lattice(Graph):
         Vertex with label in the center of the graph as grid.
 
         .. deprecated:: 2.0a1
-            ``get_central_vertex`` will be removed in Python 2.1 because
+            ``get_central_vertex`` will be removed in Hiperwalk 2.0 because
             the user can calculate the central vertex easily using
             :meth:`dimensions`.
 
@@ -463,7 +463,7 @@ class Lattice(Graph):
             If any lattice dimension is even.
         """
         warn('`get_central_vertex` is deprecated. '
-             + 'It will be removed in version 2.1.',
+             + 'It will be removed in version 2.0.',
              DeprecationWarning)
 
         if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
