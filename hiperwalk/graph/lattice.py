@@ -42,15 +42,16 @@ class Lattice(Graph):
         * 10 = 2: up;
         * 11 = 3: down.
 
-        The first bit corresponds to the axis,
+        The most significant bit corresponds to the axis,
         0 for the X-axis and 1 for the Y-axis.
-        The second bit indicates whether to
+        The less significant bit indicates whether to
         move forward (0) or backward (1) in the given axis.
 
         The arcs order respect vertices order and these directions.
         For example, let :math:`(x, y)` be a vertex where
-        :math:`(x \pm 1, y \pm 1)` are also valid vertices.
-        The directions give that
+        :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
+        are also valid vertices.
+        The directions give
 
         .. math::
             ((x, y), (x + 1, y)) &< ((x, y), (x - 1, y)) \\
@@ -66,28 +67,94 @@ class Lattice(Graph):
             :caption: Figure: Natural lattice directions.
 
         For example, the arcs labels for
-        the periodic natural :math:`4 \times 4`-lattice are
+        the periodic natural :math:`3 \times 3`-lattice are
         illustrated in :ref:`fig-periodic-natural-lattice`.
 
         .. graphviz:: ../../graphviz/lattice/periodic-natural.dot
             :align: center
             :layout: neato
             :name: fig-periodic-natural-lattice
-            :caption: Figure: Periodic natural 4x4-lattice.
+            :caption: Figure: Periodic natural 3x3-lattice.
 
         For the natural lattice with boundary condition,
         the arcs labels follow the same order.
         But the labels are shifted when a given arc does not exist.
-        See :ref:`fig-bounded-natural-Lattice`.
+        See :ref:`fig-bounded-natural-Lattice`
 
         .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
             :align: center
             :layout: neato
             :name: fig-bounded-natural-lattice
-            :caption: Figure: Bounded natural 4x4-lattice.
+            :caption: Figure: Bounded natural 3x3-lattice.
 
     Diagonal Lattice:
-        Hello
+        In the diagonal lattice,
+        we have four directions possible.
+
+        * 00 = 0: right, up;
+        * 01 = 1: right, down;
+        * 10 = 2: left, up;
+        * 11 = 3: left, down.
+
+        Each binary value describes whether to move
+        forward (0) or backward (1).
+        The most significant bit describes the X-axis movement and
+        the less significant bit describes the Y-axis movement.
+
+        The arcs order respect vertices order and these directions.
+        For example, let :math:`(x, y)` be a vertex where
+        :math:`(x \pm 1, y \pm 1)` are also valid vertices.
+        The directions give
+
+        .. math::
+            ((x, y), (x + 1, y + 1)) &< ((x, y), (x + 1, y - 1)) \\
+                                     &< ((x, y), (x - 1, y + 1)) \\
+                                     &< ((x, y), (x - 1, y - 1)).
+
+        The directions are depicted in :ref:`fig-diagonal-dir`.
+
+        .. graphviz:: ../../graphviz/lattice/diagonal-directions.dot
+            :align: center
+            :layout: neato
+            :name: fig-diagonal-dir
+            :caption: Figure: Diagonal lattice directions.
+
+        For example, the arcs labels for
+        the periodic diagonal :math:`3 \times 3`-lattice are
+        illustrated in :ref:`fig-periodic-diagonal-lattice`
+
+        .. graphviz:: ../../graphviz/lattice/periodic-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-periodic-diagonal-lattice
+            :caption: Figure: Periodic diagonal 3x3-lattice.
+
+        For the diagonal lattice with boundary condition,
+        the arcs labels follow the same order.
+        But the labels are shifted when a given arc does not exist.
+        See :ref:`fig-bounded-diagonal-Lattice`
+
+        .. graphviz:: ../../graphviz/lattice/bounded-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-bounded-diagonal-lattice
+            :caption: Figure: Bounded diagonal 3x3-lattice.
+
+        Note that in this case, there are two independent sublattices.
+        That is, a vertex in one sublattice is not reacheable from
+        a vertex in the other sublattice.
+        This also occurs if the diagonal lattice is periodic and
+        both dimensions are even.
+        See :ref:`fig-even-dim-diagonal`
+
+        .. graphviz:: ../../graphviz/lattice/even-dim-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-even-dim-diagonal
+            :caption: Figure: Periodic diagonal 4x4-lattice.
+
+        .. note::
+            If the diagonal lattice 
     """
     def __init__(self, dimensions, periodic=True, diagonal=False):
         try:

@@ -9,8 +9,6 @@ for y in range(-1, dim + 1):
     for x in range(-1, dim + 1):
         out_x = out_of_bounds(x)
         out_y = out_of_bounds(y)
-        if out_x and out_y:
-            continue
 
         node_str = ('\t"' + str((x, y)) + '" ['
                     + 'pos="' + str(1.75*x) + ',' + str(1.75*y) + '!" '
@@ -29,15 +27,14 @@ for y in range(dim):
     for x in range(dim):
         tail = str((x, y))
         for d in range(4):
-            y_axis = d // 2
-            shift = 1 if d % 2 == 0 else -1
-            head = (str((x + shift, y)) if not y_axis else
-                    str((x, y + shift)))
+            x_shift = 1 if d // 2 == 0 else -1
+            y_shift = 1 if d % 2 == 0 else -1
+            head = str((x + x_shift, y + y_shift))
 
             arc_str = '\t "' + tail + '" -> "' + head + '"'
             arc_str += '[headlabel=' + str(arc_count)
-            arc_str += ' labeldistance=4'
-            arc_str += ' labelangle=-20'
+            arc_str += ' labeldistance=2'
+            arc_str += ' labelangle=-50'
             arc_str += '];'
 
             print(arc_str)

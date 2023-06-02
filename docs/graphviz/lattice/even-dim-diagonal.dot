@@ -1,0 +1,103 @@
+digraph {
+	"(-1, -1)" [pos="-1.75,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 3)"]
+	"(0, -1)" [pos="0.0,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 3)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(1, -1)" [pos="1.75,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(1, 3)"]
+	"(2, -1)" [pos="3.5,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(2, 3)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(3, -1)" [pos="5.25,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 3)"]
+	"(4, -1)" [pos="7.0,-1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 3)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(-1, 0)" [pos="-1.75,0.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 0)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(0, 0)" [pos="0.0,0.0!" width=0.75 height=0.75 fixedsize=True]
+	"(1, 0)" [pos="1.75,0.0!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(2, 0)" [pos="3.5,0.0!" width=0.75 height=0.75 fixedsize=True]
+	"(3, 0)" [pos="5.25,0.0!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(4, 0)" [pos="7.0,0.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 0)"]
+	"(-1, 1)" [pos="-1.75,1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 1)"]
+	"(0, 1)" [pos="0.0,1.75!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(1, 1)" [pos="1.75,1.75!" width=0.75 height=0.75 fixedsize=True]
+	"(2, 1)" [pos="3.5,1.75!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(3, 1)" [pos="5.25,1.75!" width=0.75 height=0.75 fixedsize=True]
+	"(4, 1)" [pos="7.0,1.75!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 1)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(-1, 2)" [pos="-1.75,3.5!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 2)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(0, 2)" [pos="0.0,3.5!" width=0.75 height=0.75 fixedsize=True]
+	"(1, 2)" [pos="1.75,3.5!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(2, 2)" [pos="3.5,3.5!" width=0.75 height=0.75 fixedsize=True]
+	"(3, 2)" [pos="5.25,3.5!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(4, 2)" [pos="7.0,3.5!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 2)"]
+	"(-1, 3)" [pos="-1.75,5.25!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 3)"]
+	"(0, 3)" [pos="0.0,5.25!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(1, 3)" [pos="1.75,5.25!" width=0.75 height=0.75 fixedsize=True]
+	"(2, 3)" [pos="3.5,5.25!" width=0.75 height=0.75 fixedsize=True fontcolor="white" fillcolor="red" style="filled"]
+	"(3, 3)" [pos="5.25,5.25!" width=0.75 height=0.75 fixedsize=True]
+	"(4, 3)" [pos="7.0,5.25!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 3)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(-1, 4)" [pos="-1.75,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 0)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(0, 4)" [pos="0.0,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 0)"]
+	"(1, 4)" [pos="1.75,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(1, 0)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(2, 4)" [pos="3.5,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(2, 0)"]
+	"(3, 4)" [pos="5.25,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(3, 0)" fontcolor="white" fillcolor="red" style="filled,dashed" penwidth=2]
+	"(4, 4)" [pos="7.0,7.0!" width=0.75 height=0.75 fixedsize=True style="dashed" label="(0, 0)"]
+
+	 "(0, 0)" -> "(1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 0)" -> "(1, -1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 0)" -> "(-1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 0)" -> "(-1, -1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 0)" -> "(2, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 0)" -> "(2, -1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 0)" -> "(0, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 0)" -> "(0, -1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 0)" -> "(3, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 0)" -> "(3, -1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 0)" -> "(1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 0)" -> "(1, -1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 0)" -> "(4, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 0)" -> "(4, -1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 0)" -> "(2, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 0)" -> "(2, -1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 1)" -> "(1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 1)" -> "(1, 0)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 1)" -> "(-1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 1)" -> "(-1, 0)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 1)" -> "(2, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 1)" -> "(2, 0)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 1)" -> "(0, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 1)" -> "(0, 0)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 1)" -> "(3, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 1)" -> "(3, 0)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 1)" -> "(1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 1)" -> "(1, 0)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 1)" -> "(4, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 1)" -> "(4, 0)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 1)" -> "(2, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 1)" -> "(2, 0)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 2)" -> "(1, 3)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 2)" -> "(1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 2)" -> "(-1, 3)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 2)" -> "(-1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 2)" -> "(2, 3)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 2)" -> "(2, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 2)" -> "(0, 3)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 2)" -> "(0, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 2)" -> "(3, 3)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 2)" -> "(3, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 2)" -> "(1, 3)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 2)" -> "(1, 1)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 2)" -> "(4, 3)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 2)" -> "(4, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 2)" -> "(2, 3)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 2)" -> "(2, 1)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 3)" -> "(1, 4)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 3)" -> "(1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 3)" -> "(-1, 4)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(0, 3)" -> "(-1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 3)" -> "(2, 4)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 3)" -> "(2, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 3)" -> "(0, 4)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(1, 3)" -> "(0, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 3)" -> "(3, 4)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 3)" -> "(3, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 3)" -> "(1, 4)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(2, 3)" -> "(1, 2)"[ color="red" style="dashed" labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 3)" -> "(4, 4)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 3)" -> "(4, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 3)" -> "(2, 4)"[ labeldistance=2 labelangle=-50 penwidth=2];
+	 "(3, 3)" -> "(2, 2)"[ labeldistance=2 labelangle=-50 penwidth=2];
+}
