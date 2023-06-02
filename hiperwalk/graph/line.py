@@ -29,7 +29,7 @@ class Line(Graph):
     For example, the edges labels of the 4-vertices :class:`Segment`
     are represented in Figure 1.
     
-    .. graphviz:: ../../graphviz/coined-segment-edges-labels.dot
+    .. graphviz:: ../../graphviz/line-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 1.
