@@ -68,11 +68,18 @@ class Line(Graph):
         if diff != 1 and diff != -1:
             raise ValueError('Invalid arc.')
 
-        return tail*2 if diff == 1 else tail*2 - 1 
+        num_vert = self.number_of_vertices()
+        return (2*tail - 1 if (diff == 1 and tail != 0
+                               or head == num_vert - 1)
+                else tail*2)
 
     def arc(self, label):
-        tail = (label + 1)//2
-        head = tail + (-1)**(label % 2)
+        label += 1
+        tail = label//2
+        num_vert = self.number_of_vertices()
+        head = (tail + (-1)**(label % 2)
+                if tail != 0 and tail != num_vert - 1
+                else tail - (-1)**(label % 2))
         return (tail, head)
 
     def next_arc(self, arc):
@@ -89,12 +96,12 @@ class Line(Graph):
             return ((tail + 1, head + 1) if diff == 1
                     else (tail - 1, head - 1))
         except TypeError:
-            if arc == 1:
-                return 0
+            if arc == 0:
+                return 1
             num_arcs = self.number_of_arcs() 
-            if arc == num_arcs - 2:
-                return num_arcs - 1
-            return arc + 2 if arc % 2 == 0 else arc - 2
+            if arc == num_arcs - 1:
+                return num_arcs - 2
+            return arc + 2 if arc % 2 == 1 else arc - 2
 
     def previous_arc(self, arc):
         # implemented only if is embeddable
@@ -110,9 +117,14 @@ class Line(Graph):
             return ((tail - 1, head - 1) if diff == 1
                     else (tail + 1, head + 1))
         except TypeError:
-            if arc == 0:
-                return 1
-            num_arcs = self.number_of_arcs() 
-            if arc == num_arcs - 1:
-                return num_arcs - 2
-            return arc - 2 if arc % 2 == 0 else arc + 2
+            num_arcs = self.number_of_arcs()
+            if arc < 0 or arc >= num_arcs:
+                raise ValueError('Invalid arc')
+
+            arc = arc + 2 if arc % 2 == 0 else arc - 2
+            if arc < 0:
+                arc += 1
+            elif arc >= num_arcs:
+                arc -= 1
+
+            return arc
