@@ -4,28 +4,92 @@ from .graph import Graph
 from warnings import warn
 
 class Lattice(Graph):
+    r"""
+    Two-dimensionsal lattice.
+
+    The lattice may have boundary conditions or not.
+    Its adjacency may be either natural or diagonal.
+
+    Parameters
+    ----------
+    dimensions : int or tuple of int
+        Lattice dimensions in ``(x_dim, y_dim)`` format.
+        If ``dimensions`` is an integer, creates a square lattice.
+
+    periodic : bool, default=True
+        Whether the lattice has boundary conditions or not.
+
+    diagonal : bool, default=False
+        If ``False`` the natural adjacency is used.
+        Otherwise, diagonal adjacency is used.
+
+    Notes
+    -----
+    For defining the arc order, we must first define the vertices order.
+    The vertices are sorted with respect to the Y-axis first,
+    and then with respect to the X-axis.
+    That is,
+    if :math:`(x_1, y_1)` and :math:`(x_2, y_2)` are two valid vertices,
+    we say that :math:`(x_1, y_1) < (x_2, y_2)` if :math:`y_1 < y_2` or
+    if :math:`y_1 = y_2` and :math:`x_1 < x_2`.
+
+    Natural Lattice:
+        In the natural lattice,
+        we have four directions possible.
+
+        * 00 = 0: right;
+        * 01 = 1: left;
+        * 10 = 2: up;
+        * 11 = 3: down.
+
+        The first bit corresponds to the axis,
+        0 for the X-axis and 1 for the Y-axis.
+        The second bit indicates whether to
+        move forward (0) or backward (1) in the given axis.
+
+        The arcs order respect vertices order and these directions.
+        For example, let :math:`(x, y)` be a vertex where
+        :math:`(x \pm 1, y \pm 1)` are also valid vertices.
+        The directions give that
+
+        .. math::
+            ((x, y), (x + 1, y)) &< ((x, y), (x - 1, y)) \\
+                                 &< ((x, y), (x, y + 1)) \\
+                                 &< ((x, y), (x, y - 1)).
+
+        The directions are depicted in :ref:`fig-natural-dir`.
+
+        .. graphviz:: ../../graphviz/lattice/natural-directions.dot
+            :align: center
+            :layout: neato
+            :name: fig-natural-dir
+            :caption: Figure: Natural lattice directions.
+
+        For example, the arcs labels for
+        the periodic natural :math:`4 \times 4`-lattice are
+        illustrated in :ref:`fig-periodic-natural-lattice`.
+
+        .. graphviz:: ../../graphviz/lattice/periodic-natural.dot
+            :align: center
+            :layout: neato
+            :name: fig-periodic-natural-lattice
+            :caption: Figure: Periodic natural 4x4-lattice.
+
+        For the natural lattice with boundary condition,
+        the arcs labels follow the same order.
+        But the labels are shifted when a given arc does not exist.
+        See :ref:`fig-bounded-natural-Lattice`.
+
+        .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
+            :align: center
+            :layout: neato
+            :name: fig-bounded-natural-lattice
+            :caption: Figure: Bounded natural 4x4-lattice.
+
+    Diagonal Lattice:
+        Hello
+    """
     def __init__(self, dimensions, periodic=True, diagonal=False):
-        r"""
-        Two-dimensionsal lattice.
-
-        The lattice may have boundary conditions or not.
-        Its adjacency may be either natural or diagonal.
-
-        Parameters
-        ----------
-        dimensions : int or tuple of int
-            Lattice dimensions in ``(x_dim, y_dim)`` format.
-            If ``dimensions`` is an integer, creates a square lattice.
-
-
-        periodic : bool, default=True
-            Whether the lattice has boundary conditions or not.
-
-        diagonal : bool, default=False
-            If ``False`` the natural adjacency is used.
-            Otherwise, diagonal adjacency is used.
-        """
-
         try:
             x_dim, y_dim = dimensions
         except TypeError:
