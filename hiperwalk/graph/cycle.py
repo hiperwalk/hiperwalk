@@ -35,7 +35,7 @@ class Cycle(Graph):
     where :math:`v \in V` and :math:`c \in \{0, 1\}`.
     Figure 1 illustrates the arcs of a 3 vertices cycle.
 
-    .. graphviz:: ../../graphviz/coined-cycle-edges-labels.dot
+    .. graphviz:: ../../graphviz/cycle-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 1.
