@@ -60,7 +60,7 @@ which creates a valid state of the computational basis.
 >>> vertex = N // 2
 >>> initial_condition = qw.ket(vertex, vertex + 1)
 >>> initial_condition
-array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,
+array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
        0., 0., 0.])
 
 This state corresponds to the walker being on
@@ -87,10 +87,11 @@ Exhibit the results
 The results exhibition may be a simple print
 
 >>> final_state
-array([[ 0.1767767 ,  0.        ,  0.        ,  0.35355339,  0.1767767 ,
-         0.        ,  0.        , -0.35355339,  0.        ,  0.        ,
-         0.        ,  0.35355339,  0.        ,  0.        ,  0.        ,
-         0.1767767 , -0.70710678,  0.        ,  0.        , -0.1767767 ]])
+array([[ 0.1767767 ,  0.        ,  0.        , -0.1767767 ,  0.35355339,
+         0.        ,  0.        ,  0.        , -0.35355339,  0.        ,
+         0.        ,  0.        ,  0.35355339,  0.        ,  0.        ,
+         0.70710678,  0.1767767 ,  0.        ,  0.        ,  0.1767767 ]])
+         
 
 or a more sofisticated output.
 Frequently, we are interested in the probability of the walker being
@@ -124,4 +125,6 @@ The remainder of the tutorial is subdivided into the following sections.
 .. toctree::
     :maxdepth: 1
 
+    graphs.rst
+    quantum_walk_models.rst
     plotting_customization.rst
