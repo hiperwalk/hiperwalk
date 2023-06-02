@@ -26,8 +26,8 @@ class QuantumWalk(ABC):
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
     adjacency : :class:`scipy.sparse.csr_array`, optional
-        .. deprecated:: 2.0
-            It will be removed in version 2.1.
+        .. deprecated:: 2.0a1
+            It will be removed in version 2.0.
             Use ``graph`` instead.
 
         The adjacency matrix.
