@@ -43,15 +43,99 @@ class Graph():
     Makes a plethora of methods available.
     These methods may be used by a Quantum Walk model for
     generating a valid walk.
-    The default arguments for a given model are given by the graph.
-    The Quantum Walk model is ignorant with this regard.
 
     This class may be passed as argument to plotting methods.
     Then the default representation for the specific graph will be shown.
 
+    The recommended parameter type is
+    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``
+    with 1 denoting adjacency and 0 denoting non-adjacency.
+    If any entry is different from 0 or 1,
+    some methods may not work as expected.
+
+    Each edge of a given graph :math:`G(V, E)`
+    is associated with two arcs in the graph :math:`\vec{G}(V, A)`
+    where
+
+    .. math::
+        \begin{align*}
+            A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
+        \end{align*}
+
+    Each arc has a label (number).
+    The labels are ordered as follows.
+    Let :math:`(v_1, u_1)` and :math:`(v_2, u_2')`
+    be arcs with labels :math:`a_1` and :math:`a_2`, respectively.
+    Then :math:`a_1 < a_2` if and only if
+    if either :math:`v_1 < v_2` or
+    :math:`v_1 = v_2` and :math:`u_1 < u_2`.
+
+    .. note::
+        The arc ordering may change for specific graphs.
+
+    For example, the graph :math:`G(V, E)` shown in
+    Figure 1 has adjacency matrix ``adj_matrix``.
+
+    .. testsetup::
+
+        import numpy as np
+
+    >>> adj_matrix = np.array([
+    ...     [0, 1, 0, 0],
+    ...     [1, 0, 1, 1],
+    ...     [0, 1, 0, 1],
+    ...     [0, 1, 1, 0]])
+    >>> adj_matrix
+    array([[0, 1, 0, 0],
+           [1, 0, 1, 1],
+           [0, 1, 0, 1],
+           [0, 1, 1, 0]])
+
+    .. graphviz:: ../../graphviz/graph-example.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1
+
+    The corresponding arcs are
+
+    >>> arcs = [(i, j) for i in range(4)
+    ...                for j in range(4) if adj_matrix[i,j] == 1]
+    >>> arcs
+    [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+
+    Note that ``arcs`` is already sorted, hence the labels are
+
+    >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
+    >>> arcs_labels
+    {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
+
+    The arcs labels are illustrated in Figure 2.
+
+    .. graphviz:: ../../graphviz/graph-arcs.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 2
+
+    If we substitute the arcs labels into the adjacency matrix,
+    we obtain the matrix ``adj_labels``.
+
+    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
+    ...                                   else '' for j in range(4)]
+    ...               for i in range(4)]
+    >>> adj_labels = np.matrix(adj_labels)
+    >>> adj_labels
+    matrix([['', '0', '', ''],
+            ['1', '', '2', '3'],
+            ['', '4', '', '5'],
+            ['', '6', '7', '']], dtype='<U21')
+
+    Note that, intuitively,
+    the arcs are labeled in left-to-right top-to-bottom fashion.
+
     .. todo::
-        Check if valid adjacency matrix
-        
+        * Check if valid adjacency matrix
+        * Add option: numpy dense matrix as parameters.
+        * Add option: networkx graph as parameter.
     """
 
     def __init__(self, adj_matrix):
