@@ -1,6 +1,6 @@
 print('digraph {')
 
-dim = 4
+dim = 3
 
 def out_of_bounds(axis):
     return axis < 0 or axis >= dim 
