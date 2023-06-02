@@ -59,29 +59,14 @@ class CoinedWalk(QuantumWalk):
     Notes
     -----
 
-    For more information about the general general Coined Quantum Walk Model,
+    The Hilbert space of the general Coined Quantum Walk model is
+    :math:`\mathcal{H}^{2|E|}`.
+    The computational basis is given by the graph arcs.
+    Refer to each graph for more information about the arcs order.
+
+    For more information about the general Coined Quantum Walk Model,
     check Quantum Walks and Search Algorithms's
     Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
-
-    For consistency, any state :math:`\ket\psi \in \mathcal{H}^{2|E|}`
-    is such that :math:`\ket\psi = \sum_{i = 0}^{2|E| - 1} \psi_i \ket{i}`
-    where :math:`\ket{i}` is the computational basis state
-    associated to the :math:`i`-th arc.
-    In our example, the state
-
-    >>> psi = np.array([1/np.sqrt(2), 0, 1j/np.sqrt(2), 0, 0, 0, 0, 0])
-    >>> psi
-    array([0.70710678+0.j        , 0.        +0.j        ,
-           0.        +0.70710678j, 0.        +0.j        ,
-           0.        +0.j        , 0.        +0.j        ,
-           0.        +0.j        , 0.        +0.j        ])
-
-    corresponds to the walker being at vertex 0
-    and the coin pointing to vertex 1 with
-    associated amplitude of :math:`\frac{1}{\sqrt 2}`, and
-    to the walker being at vertex 1
-    and the coin pointing to vertex 2 with
-    associated amplitude of :math:`\frac{\text{i}}{\sqrt 2}`.
 
     References
     ----------
