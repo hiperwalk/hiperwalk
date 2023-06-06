@@ -32,12 +32,6 @@ class QuantumWalk(ABC):
 
         The adjacency matrix.
 
-    Attributes
-    ----------
-    hilb_dim : int, default=0
-        Hilbert Space dimension.
-        It must be updated by the subclass' ``__init__``.
-
     Warns
     -----
     If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
@@ -551,3 +545,9 @@ class QuantumWalk(ABC):
     def _filter_valid_kwargs(kwargs, valid_kwargs):
         return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
                 #if kwargs.get(k) is not None}
+
+    def hilbert_space_dimension(self):
+        """
+        Returns dimension of the Hilbert space.
+        """
+        return self.hilb_dim
