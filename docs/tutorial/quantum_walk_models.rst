@@ -51,6 +51,7 @@ For creating the Coined Quantum Walk we execute
 
 The Hilbert space of the Coined Quantum Walk has dimension
 :math`2|E|`:, i.e. the number of arcs.
+
 >>> coined.hilbert_space_dimension() == cycle.number_of_arcs()
 True
 
@@ -65,7 +66,8 @@ no default ``gamma`` value exists in the literature.
 
 The Hilbert space of the Continuous Quantum Walk has dimension
 :math`|V|`:, i.e. the number of verties.
->>> coined.hilbert_space_dimension() == cycle.number_of_vertices()
+
+>>> continuous.hilbert_space_dimension() == cycle.number_of_vertices()
 True
 
 Creating a State
@@ -266,6 +268,7 @@ True
 
 The following are valid ways of generating a con that applies
 Grover to even vertices and Hadamard to odd vertices.
+
 >>> coined.set_coin(coin=['grover' if i % 2 == 0 else 'hadamard'
 ...                       for i in range(11)])
 >>> C1 = coined.get_coin()
