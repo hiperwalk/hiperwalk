@@ -52,14 +52,14 @@ Simulate the walk
 -----------------
 
 Before simulating the walk,
-To simulate the walk we need to specify the initial condition.
-One way to create the initial condition is by using the
+To simulate the walk we need to specify the initial state.
+One way to create the initial state is by using the
 :meth:`hiperwalk.CoinedWalk.ket` method,
 which creates a valid state of the computational basis.
 
 >>> vertex = N // 2
->>> initial_condition = qw.ket(vertex, vertex + 1)
->>> initial_condition
+>>> initial_state = qw.ket(vertex, vertex + 1)
+>>> initial_state
 array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
        0., 0., 0.])
 
@@ -69,7 +69,7 @@ vertex 5 pointing to vertex 6
 
 To simulate the walk we must specify the number of steps
 (number of applications of the evolution operator)
-and the initial condition.
+and the initial state.
 By specifying only the final time,
 the result is the final state.
 If everything was installed properly,
@@ -77,7 +77,7 @@ the :meth:`hiperwalk.CoinedWalk.simulate` method automatically uses
 high-performance computing to perform the matrix-vector multiplications.
 
 >>> final_state = qw.simulate(time=N//2,
-...                           initial_condition=initial_condition)
+...                           initial_state=initial_state)
 
 
 

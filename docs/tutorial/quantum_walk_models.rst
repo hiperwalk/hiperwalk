@@ -350,6 +350,3 @@ Calculating Probability
 -----------------------
 
 probability vs probability distribution
-
-.. todo::
-    change initial_condition to initial_state everywhere
