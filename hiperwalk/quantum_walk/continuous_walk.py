@@ -284,14 +284,11 @@ class ContinuousWalk(QuantumWalk):
         self._evolution = U
         return U
 
-    def simulate(self, time=None, initial_condition=None, hpc=True):
+    def simulate(self, time=None, initial_state=None,
+                 initial_condition=None, hpc=True):
         r"""
-        Simulate the Continuous Time Quantum Walk Hamiltonian.
-
-        Analogous to the :meth:`QuantumWalk.simulate`
-        but uses the Hamiltonian to construct the evolution operator.
-        The Hamiltonian may be the previously set or
-        passed in the arguments.
+        Analogous to :meth:`QuantumWalk.simulate`
+        accepting float entries for ``time``.
 
         Parameters
         ----------
@@ -305,37 +302,14 @@ class ContinuousWalk(QuantumWalk):
             rounded up if the decimal part is greater than ``1 - 1e-5``,
             and rounded down otherwise.
 
-        hamiltonian : :class:`numpy.ndarray` or None
-            Hamiltonian matrix to be used for constructing
-            the evolution operator.
-            If ``None``, uses the previously set Hamiltonian
-
         Other Parameters
         ----------------
-        initial_condition :
-            See :meth:`QuantumWalk.simulate`.
-        hpc :
-            See :meth:`QuantumWalk.simulate`.
-
-
-        Raises
-        ------
-        ValueError
-            If ``time_range=None`` or ``initial_condition=None``,
-            or ``hamiltonian`` has invalid Hilbert space dimension.
-
-
-        Notes
-        -----
-        It is recommended to call this method with ``hamiltonian=None``
-        to guarantee that a valid Hamiltonian was used.
-        If the Hamiltonian is passed by the user,
-        there is no guarantee that the Hamiltonian is local.
+        See :meth:`QuantumWalk.simulate`.
 
         See Also
         --------
-        :meth:`QuantumWalk.simulate`
-        hamiltonian
+        set_evolution
+        get_evolution
         """
         if time is None:
             raise ValueError(
@@ -343,9 +317,9 @@ class ContinuousWalk(QuantumWalk):
                 + "or 3-tuple of float."
             )
 
-        if initial_condition is None:
+        if initial_state is None:
             raise ValueError(
-                "`initial_condition` not specified."
+                "`initial_state` not specified."
             )
 
         time = np.array(self._time_to_tuple(time))
@@ -360,5 +334,6 @@ class ContinuousWalk(QuantumWalk):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        states = super().simulate(time, initial_condition,  hpc)
+        states = super().simulate(time, initial_state,
+                                  initial_condition, hpc)
         return states
