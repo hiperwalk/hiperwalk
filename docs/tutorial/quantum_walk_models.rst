@@ -186,11 +186,170 @@ array([0.5, 0.5, 0.5, 0.5, 0. , 0. , 0. , 0. , 0. , 0. , 0. ])
 Simulating
 ----------
 
-Details about the time parameter
+Once a quantum walk is created,
+a valid evolution operator is associated with it.
+The user may change the evolution operator
+upon the quantum walk creation or afterwards.
+After defining the evolution operator,
+the user invokes the simulation process,
+determining which intermediate states are of interest.
 
-change initial_condition to initial_state everywhere
+Configuring the evolution operator
+``````````````````````````````````
+To configure the evolution operator,
+check the :meth:`hiperwalk.QuantumWalk.set_evolution` method.
+This method parameters are model-dependent.
+
+Regardless of the method,
+:meth:`hiperwalk.QuantumWalk.set_evolution` is invoked upon the
+Quantum Walk instantiation.
+Hence, the constructors accept any parameter valid for ``set_evolution``.
+To illustrate this,
+let us analyze the explicit evolution operator of two Coined Walks
+(which can be obtained by :meth:`hiperwalk.QuantumWalk.get_evolution`).
+
+>>> U = coined.get_evolution()
+>>> coined.set_evolution(shift='flipflop', coin='grover')
+>>> U2 = coined.get_evolution()
+>>> (U != U2).nnz == 0 # efficient way of comparing sparse arrays
+False
+>>> coined2 = hpw.CoinedWalk(graph=cycle, shift='flipflop', coin='grover')
+>>> U3 = coined.get_evolution()
+>>> (U2 != U3).nnz == 0
+True
+
+Coined Model
+''''''''''''
+The :meth:`hiperwalk.CoinedWalk.set_evolution`
+accepts three key arguments:
+``shift``, ``coin``, and ``marked``.
+Respectively,
+they are the arguments of
+:meth:`hiperwalk.CoinedWalk.set_shift`,
+:meth:`hiperwalk.CoinedWalk.set_coin`, and
+:meth:`hiperwalk.CoinedWalk.set_oracle`.
+
+The ``shift`` key must have either a string value
+(``'persistent'`` or ``'flipflop'``) or
+the explicit operator.
+
+The ``coin`` key accepts four types of entries.
+* The explicit coin.
+* A string with the coin name to be applied to all vertices.
+* A list of strings of size :math:`|V|` with the coin names
+  where the :math:`i`-th coin will be applied to the :math:`i`-th vertex.
+* A dictionary with the coin name as key and
+  the list of vertices as values.
+  The coin depicted as key will be applied to
+  the vertices depicted as values.
+  If the list of vertices is the empty list ``[]``,
+  that coin is going to be applied to all remaining vertices.
+There are eight possible coin names:
+``'fourier'``, ``'grover'``, ``'hadamard'``, ``'identity'``, and
+its variants with the ``'minus_'`` prefix to it.
+
+The following are equivalent ways of generating a coin
+that applies Grover to all vertices.
+>>> coined.set_coin(coin='grover')
+>>> C1 = coined.get_coin()
+>>> coined.set_coin(coin=['grover'] * 11)
+>>> C2 = coined.get_coin()
+>>> coined.set_coin(coin={'grover' : list(range(11))})
+>>> C3 = coined.get_coin()
+>>> (C1 != C2).nnz == 0
+True
+>>> (C2 != C3).nnz == 0
+True
+
+The following are valid ways of generating a con that applies
+Grover to even vertices and Hadamard to odd vertices.
+>>> coined.set_coin(coin=['grover' if i % 2 == 0 else 'hadamard'
+...                       for i in range(11)])
+>>> C1 = coined.get_coin()
+>>> coined.set_coin(coin={'grover': list(range(0, 11, 2)),
+...                       'hadamard': []})
+>>> C2 = coined.get_coin()
+>>> (C1 != C2).nnz == 0
+True
+
+The ``marked`` key accepts two types of entries.
+* A list of the marked vertices.
+  The vertices are just set as marked,
+  but the coin operator remains unchanged.
+* A dictionary with the coin name as key and
+  the list of vertices as values.
+  This is analogous to the dictionary accepted by
+  :meth:`hiperwalk.CoinedWalk.set_coin`.
+  The vertices are set as marked and
+  *the coin operator is changed* accordingly.
+
+The following are two ways of generating the same evolution operator
+with the same set of marked vertices.
+>>> coined.set_coin(coin={'grover': list(range(0, 11, 2)),
+...                       'minus_identity': []})
+>>> coined.set_marked(marked=list(range(1, 11, 2)))
+>>> C1 = coined.get_coin()
+>>> M1 = coined.get_marked()
+>>> coined.set_coin(coin='grover')
+>>> coined.set_marked(marked={'minus_identity': list(range(1, 11, 2))})
+>>> C2 = coined.get_coin()
+>>> M2 = coined.get_marked()
+>>> (C1 != C2).nnz == 0
+True
+>>> np.all(M1 == M2)
+True
+
+We may combine all these keys in a single
+:meth:`hiperwalk.CoinedWalk.set_evolution` call
+or object instantiation.
+
+Continuous Model
+''''''''''''''''
+The dynamics of the Continuous Quantum Walk is
+completely described by the Hamiltonian.
+Hence, :meth:`hiperwalk.ContinuousWalk.set_evolution`
+is equivalent to :meth:`hiperwalk.ContinuousWalk.set_hamiltonian`.
+The Hamiltonian is given by
+
+.. math::
+
+   H = -\gamma A - \sum_{m \in M} \ket m \bra m
+
+where :math:`A` is the graph adjacency matrix and
+:math:`M` is the set of marked vertices.
+Hence ``set_hamiltonian`` accepts two arguments.
+* ``gamma``: the value of gamma.
+* ``marked``: the list of marked vertices.
+For example,
+
+>>> continuous2 = hpw.ContinuousWalk(graph=cycle, gamma=0.35, marked=0)
+>>> continuous2 #doctest: +SKIP
+<hiperwalk.quantum_walk.continuous_walk.ContinuousWalk object at 0x7ffad2de9510>
+
+The evolution operator is calculated by
+
+.. math::
+
+   U = e^{-\text{i} t H}.
+
+Since the Continuous Walk evolution operator is time-dependent,
+it must be generated by demand given the last timestamp.
+
+>>> U = continuous.get_evolution(time=1)
+>>> continuous.set_marked(marked=0)
+>>> U2 = continuous.get_evolution(time=1)
+>>> np.any(U != U2)
+True
+
+Simulation Invocation
+`````````````````````
+
+Details about the time parameter
 
 Calculating Probability
 -----------------------
 
 probability vs probability distribution
+
+.. todo::
+    change initial_condition to initial_state everywhere
