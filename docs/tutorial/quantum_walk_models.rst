@@ -227,13 +227,14 @@ Respectively,
 they are the arguments of
 :meth:`hiperwalk.CoinedWalk.set_shift`,
 :meth:`hiperwalk.CoinedWalk.set_coin`, and
-:meth:`hiperwalk.CoinedWalk.set_oracle`.
+:meth:`hiperwalk.CoinedWalk.set_marked`.
 
 The ``shift`` key must have either a string value
 (``'persistent'`` or ``'flipflop'``) or
 the explicit operator.
 
 The ``coin`` key accepts four types of entries.
+
 * The explicit coin.
 * A string with the coin name to be applied to all vertices.
 * A list of strings of size :math:`|V|` with the coin names
@@ -244,12 +245,14 @@ The ``coin`` key accepts four types of entries.
   the vertices depicted as values.
   If the list of vertices is the empty list ``[]``,
   that coin is going to be applied to all remaining vertices.
+
 There are eight possible coin names:
 ``'fourier'``, ``'grover'``, ``'hadamard'``, ``'identity'``, and
 its variants with the ``'minus_'`` prefix to it.
 
 The following are equivalent ways of generating a coin
 that applies Grover to all vertices.
+
 >>> coined.set_coin(coin='grover')
 >>> C1 = coined.get_coin()
 >>> coined.set_coin(coin=['grover'] * 11)
@@ -273,6 +276,7 @@ Grover to even vertices and Hadamard to odd vertices.
 True
 
 The ``marked`` key accepts two types of entries.
+
 * A list of the marked vertices.
   The vertices are just set as marked,
   but the coin operator remains unchanged.
@@ -285,6 +289,7 @@ The ``marked`` key accepts two types of entries.
 
 The following are two ways of generating the same evolution operator
 with the same set of marked vertices.
+
 >>> coined.set_coin(coin={'grover': list(range(0, 11, 2)),
 ...                       'minus_identity': []})
 >>> coined.set_marked(marked=list(range(1, 11, 2)))
@@ -344,7 +349,93 @@ True
 Simulation Invocation
 `````````````````````
 
-Details about the time parameter
+After setting the evolution operator,
+the :meth:`hiperwalk.QuantumWalk.simulate` method must be invoked
+to perform the simulation.
+There are two key arguments for this method:
+``time`` and ``initial_state``.
+The ``time`` describes when the simulation stops
+and which intermediate states must be saved.
+The evolution operator will be applied to the ``initial_state``
+as many times as needed.
+The simulation returns a list of states such that
+the ``i``-th entry corresponds to the ``i``-th saved state.
+
+Coined Model
+''''''''''''
+In the Coined Walk model,
+the ``time`` is discrete.
+Thus, only integer entries are accepted.
+There are three argument types for ``time``.
+
+* integer: ``stop``.
+  The final simulation time.
+
+  >>> states = coined.simulate(time=10,
+  ...                          initial_state=coined.ket(0))
+  >>> len(states)
+  1
+  >>> len(states[0]) == coined.hilbert_space_dimension()
+  True
+  >>> U = coined.get_evolution().todense()
+  >>> state = np.linalg.matrix_power(U, 10) @ coined.ket(0)
+  >>> np.allclose(state, states[0])
+  True
+
+* 2-tuple of integer: ``(stop, step)``.
+  Save every state from time ``0`` to time ``stop``
+  separated by ``step`` applications of the evolution operator.
+  For example,
+  if ``time=(10, 2)``, returns the states obtained at times
+  ``[0, 2, 4, 6, 8, 10]``.
+
+  >>> states = coined.simulate(time=(10, 2),
+  ...                          initial_state=coined.ket(0))
+  >>> # single state returned
+  >>> len(states)
+  6
+  >>> len(states[0]) == coined.hilbert_space_dimension()
+  True
+
+* 3-tuple of integer: ``(start, stop, step)``.
+  Save every state from time ``start`` to time ``stop``
+  separated by ``step`` application of the evolution operator.
+  For example,
+  if ``time=(1, 10, 2)``, returns the states at times
+  ``[1, 3, 5, 7, 9]``.
+
+  >>> states = coined.simulate(time=(1, 10, 2),
+  ...                          initial_state=coined.ket(0))
+  >>> # single state returned
+  >>> len(states)
+  5
+  >>> len(states[0]) == coined.hilbert_space_dimension()
+  True
+
+Continuous Model
+''''''''''''''''
+In the Continuous Walk model,
+the ``time`` is continuous.
+Thus, float entries are accepted.
+It works analogous to the Coined Model,
+but ``step`` is used to rescale all values.
+
+* float : ``stop``. Unchanged.
+* 2-tuple of float : ``(stop, step)``.
+  The evolution operator ``continuous.get_evolution(time=step)`` is
+  considered a single step and the ``time`` is converted to
+  ``(stop/step, 1)``.
+  The value ``stop/step`` is rounded up if it is within
+  a ``1e-05`` value of the next integer
+  and rounded down otherwise.
+
+* 3-tuple of float : ``(start, stop, step)``.
+  The evolution operator ``continuous.get_evolution(time=step)`` is
+  considered a single step and the ``time`` is converted to
+  ``(start/step, stop/step, 1)``.
+  The values ``start/step`` and ``stop/step`` are rounded up
+  if it is within a ``1e-05`` value of the next integer
+  and rounded down otherwise.
 
 Calculating Probability
 -----------------------
