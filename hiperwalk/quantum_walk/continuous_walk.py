@@ -95,7 +95,12 @@ class ContinuousWalk(QuantumWalk):
             raise TypeError("Value of 'gamma' is not float.")
 
         self._gamma = gamma
+        self._hamiltonian = None
         self._evolution = None
+
+    def set_marked(self, marked=[]):
+        super().set_marked(marked)
+        self._hamiltonian = None
 
     def get_gamma(self):
         r"""
@@ -119,10 +124,6 @@ class ContinuousWalk(QuantumWalk):
             Used for determining the gamma value and marked vertices.
             See :meth:`set_gamma` and :meth:`set_marked`.
 
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
-            
         Notes
         -----
         The Hamiltonian is given by
@@ -155,22 +156,6 @@ class ContinuousWalk(QuantumWalk):
 
         self.set_gamma(**gamma_kwargs)
         self.set_marked(**marked_kwargs)
-        H = -self._gamma * self._graph.adj_matrix
-
-        # creating oracle
-        if len(self._marked) > 0:
-            data = np.ones(len(self._marked), dtype=np.int8)
-            oracle = scipy.sparse.csr_array(
-                    (data, (self._marked, self._marked)),
-                    shape=(self.hilb_dim, self.hilb_dim))
-
-            H -= self._oracle
-
-        self._hamiltonian = H
-        # since the hamiltonian was changed,
-        # the previous evolution operator may not be coherent.
-        self._evolution_operator = None
-        return H
 
     def get_hamiltonian(self):
         r"""
@@ -180,7 +165,25 @@ class ContinuousWalk(QuantumWalk):
         -------
         :class:`scipy.sparse.csr_array`
         """
-        return self._hamiltonian
+        if self._hamiltonian is not None:
+            return self._hamiltonian
+
+        H = -self._gamma * self._graph.adj_matrix
+
+        # creating oracle
+        if len(self._marked) > 0:
+            data = np.ones(len(self._marked), dtype=np.int8)
+            oracle = scipy.sparse.csr_array(
+                    (data, (self._marked, self._marked)),
+                    shape=(self.hilb_dim, self.hilb_dim))
+
+            H -= oracle
+
+        self._hamiltonian = H
+        # since the hamiltonian was changed,
+        # the previous evolution operator may not be coherent.
+        self._evolution_operator = None
+        return H
 
     def set_evolution(self, **kwargs):
         r"""
@@ -211,7 +214,7 @@ class ContinuousWalk(QuantumWalk):
         Raises
         ------
         ValueError
-            If `time < 0`.
+            If ``time < 0``.
 
         See Also
         --------
@@ -241,18 +244,17 @@ class ContinuousWalk(QuantumWalk):
                 "Expected non-negative `time` value."
             )
 
-        if self._hamiltonian is None:
-            raise AssertionError
+        H = self.get_hamiltonian()
 
         if hpc and not self._pyneblina_imported():
             hpc = False
 
         if hpc:
             # determining the number of terms in power series
-            max_val = np.max(np.abs(self._hamiltonian))
+            max_val = np.max(np.abs(H))
             if max_val*time <= 1:
                 nbl_U = nbl.matrix_power_series(
-                        -1j*time*self._hamiltonian, 30)
+                        -1j*time*H, 30)
 
             else:
                 # if the order of magnitude is very large,
@@ -269,7 +271,7 @@ class ContinuousWalk(QuantumWalk):
                     num_mult = int(np.round(time/new_time)) - 1
 
                 new_nbl_U = nbl.matrix_power_series(
-                        -1j*new_time*self._hamiltonian, 20)
+                        -1j*new_time*H, 20)
                 nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
                 for i in range(num_mult - 1):
                     nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
@@ -277,7 +279,7 @@ class ContinuousWalk(QuantumWalk):
             U = nbl.retrieve_matrix(nbl_U)
 
         else:
-            U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
+            U = scipy.linalg.expm(-1j*time*H.todense())
 
         self._evolution = U
         return U

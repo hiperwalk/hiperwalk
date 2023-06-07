@@ -141,7 +141,7 @@ class QuantumWalk(ABC):
         """
         if not hasattr(marked, '__iter__'):
             marked = [marked]
-        self._marked = set(marked)
+        self._marked = list(set(marked))
         self._evolution = None
 
     def get_marked(self):
