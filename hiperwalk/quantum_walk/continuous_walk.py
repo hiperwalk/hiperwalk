@@ -317,11 +317,6 @@ class ContinuousWalk(QuantumWalk):
                 + "or 3-tuple of float."
             )
 
-        if initial_state is None:
-            raise ValueError(
-                "`initial_state` not specified."
-            )
-
         time = np.array(self._time_to_tuple(time))
 
         self.get_evolution(time=time[2], hpc=hpc)
