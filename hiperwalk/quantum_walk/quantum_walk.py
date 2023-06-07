@@ -439,10 +439,9 @@ class QuantumWalk(ABC):
                 )
             else:
                 initial_state = initial_condition
-                warn('`initial_condition` is deprecated. '
+                warn('\n`initial_condition` is deprecated. '
                      + 'It will be removed in version 2.0. '
-                     + 'Use `initial_state` instead',
-                     DeprecationWarning)
+                     + 'Use `initial_state` instead.')
 
         if len(initial_state) != self.hilb_dim:
             raise ValueError(

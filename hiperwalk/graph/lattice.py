@@ -594,8 +594,7 @@ class Lattice(Graph):
             If any lattice dimension is even.
         """
         warn('`get_central_vertex` is deprecated. '
-             + 'It will be removed in version 2.0.',
-             DeprecationWarning)
+             + 'It will be removed in version 2.0.')
 
         if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
             raise ValueError(
