@@ -440,7 +440,54 @@ but ``step`` is used to rescale all values.
   if it is within a ``1e-05`` value of the next integer
   and rounded down otherwise.
 
+For example, if ``time=(10, 0.51)`` --
+which is equivalent to ``time=(0, 10, 0.51)`` --
+it is converted to ``(19, 1)``.
+Hence the states coresponding to timestamps
+``[0.   , 0.501, 1.002, 1.503, ..., 9.018, 9.519]`` wil be saved.
+On the other hand, if ``time=(10, 0.5000001)``,
+it is converted to ``(20, 1)``.
+Resulting in the states corresponding to the timestamps
+``[ 0.       ,  0.5000001,  1.0000002,  ...,  9.5000019, 10.000002 ])``.
+
 Calculating Probability
 -----------------------
 
-probability vs probability distribution
+There are two ways of calculating probability:
+:meth:`hiperwalk.QuantumWalk.probability` and
+:meth:`hiperwalk.QuantumWalk.probability_distribution`.
+:meth:`hiperwalk.QuantumWalk.probability` computes
+the probability of each state entry.
+
+>>> probs = coined.probability(states)
+>>> len(probs) == len(states)
+True
+>>> len(probs[0]) == len(states[0])
+True
+
+:meth:`hiperwalk.QuantumWalk.probability_distribution`
+calculates the probability of each vertex.
+Basically, the probability of vertex ``v`` is
+the sum of the probabilities of each entry
+corresponding to an arc with tail in ``v``.
+
+>>> prob_dist = coined.probability_distribution(states)
+>>> len(prob_dist) == len(states)
+True
+>>> len(prob_dist[0]) != len(states[0])
+True
+>>> # Since each vertex on a cycle has degree 2, the following is True
+>>> len(prob_dist[0]) == len(states[0]) / 2
+True
+
+.. note::
+   For the Continuous model,
+   :meth:`hiperwalk.ContinuousWalk.probability` and
+   :meth:`hiperwalk.ContinuousWalk.probability_distribution` yield
+   the same result.
+
+Now that a probability distribution was obtained,
+the user may wish to visualize it graphically to
+have additional insights.
+For more information about plotting and its customization,
+see next section.
