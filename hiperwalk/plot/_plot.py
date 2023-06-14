@@ -735,29 +735,47 @@ def _configure_colorbar(ax, kwargs):
     ax : :class:`matplotlib.axes.Axes`
         Ax on which the plot was drawn.
     kwargs : dict
-        Dictionary containing the keys 'cmap', 'vmin' and 'vmax'.
-        'vmin' and 'vmax' describe the inferior and superior limit for
-        colorbar values, respectively.
+        Dictionary containing the keys 'cmap', 'min_prob' and 'max_prob'.
+        'min_prob' and 'max_prob' describe
+        the inferior and superior limit for colorbar values, respectively.
         'cmap' describes a valid matplotlib colormap
     """
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     sm = plt.cm.ScalarMappable(
         cmap=kwargs['cmap'],
-        norm=plt.Normalize(vmin=kwargs['vmin'],
-                           vmax=kwargs['vmax'])
+        norm=plt.Normalize(vmin=kwargs['min_prob'],
+                           vmax=kwargs['max_prob'])
     )
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='2.5%', pad=0.01)
     cbar = plt.colorbar(
         sm,
-        ticks=np.linspace(kwargs['vmin'], kwargs['vmax'], num=5),
+        ticks=np.linspace(kwargs['min_prob'], kwargs['max_prob'], num=5),
         cax=cax
     )
 
     cbar.ax.tick_params(labelsize=14, length=7)
 
+def _default_grid_kwargs(kwargs):
+    if not 'cmap' in kwargs:
+        kwargs['cmap'] = 'default'
+
+    if 'cmap' in kwargs:
+        if kwargs['cmap'] == 'default':
+            kwargs['cmap'] = 'viridis'
+
+    if 'linewidth' not in kwargs:
+        kwargs['linewidth'] = 0
+    if 'antialiased' not in kwargs:
+        kwargs['antialiased'] = False
+    if 'cstride' not in kwargs:
+        kwargs['cstride'] = 1
+    if 'rstride' not in kwargs:
+        kwargs['rstride'] = 1
+    if 'alpha' not in kwargs:
+        kwargs['alpha'] = 0.5
 
 def _plot_probability_distribution_on_grid(
         probabilities, ax, labels=None, graph=None,
@@ -773,13 +791,25 @@ def _plot_probability_distribution_on_grid(
     X, Y = np.meshgrid(X, Y)
     Z = np.reshape(probabilities, (x_dim, y_dim))
 
-    #mappable = plt.cm.ScalarMappable(cmap=plt.cm.viridis)
-    mappable = plt.cm.ScalarMappable(cmap=kwargs['cmap'])
-    mappable.set_array(Z)
-    mappable.set_clim(0, Z.max()) # optional
+    _default_grid_kwargs(kwargs)
 
-    ax.plot_surface(X, Y, Z, cmap=mappable.cmap, linewidth=0, antialiased=False,
-                    cstride=1, rstride=1, alpha=0.5)
+    cmap = kwargs.pop('cmap')
+    mappable = plt.cm.ScalarMappable(cmap=cmap)
+    mappable.set_array(Z)
+    if min_prob is not None and max_prob is not None:
+        vmin = min_prob
+        vmax = max_prob
+    else: #rescale
+        vmin = 0
+        vmax = Z.max()
+    mappable.set_clim(vmin, vmax)
+
+    # division by 4 apparently normalize the colors
+    ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
+                    vmin=vmin/4, vmax=vmax/4,
+                    **kwargs)
+    ax.set_zlim(vmin, vmax)
+    kwargs['cmap'] = cmap # reinserts into kwargs
 
     cbar = plt.colorbar(mappable, shrink=0.4, aspect=20, pad=0.15)
     cbar.ax.tick_params(length=10, width=1, labelsize=16)
