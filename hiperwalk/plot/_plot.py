@@ -199,10 +199,8 @@ def plot_probability_distribution(
     # passes kwargs by reference to be updated accordingly
 
     if 'graph' in kwargs:
-        if plot is None:
-            plot = _default_graph_kwargs(kwargs)
-        else:
-            _default_graph_kwargs(kwargs)
+        plot = _default_graph_kwargs(kwargs, plot)
+
     if plot is None:
         plot = 'bar'
 
@@ -282,8 +280,10 @@ def plot_probability_distribution(
         if show:
             anim.show_animation()
 
-def _default_graph_kwargs(kwargs):
-    if not 'cmap' in kwargs:
+def _default_graph_kwargs(kwargs, plot):
+    if ((plot is None or plot == 'graph' or plot == 'grid')
+        and not 'cmap' in kwargs
+    ):
         kwargs['cmap'] = 'default'
 
     if 'cmap' in kwargs:
@@ -291,16 +291,14 @@ def _default_graph_kwargs(kwargs):
             kwargs['cmap'] = 'viridis'
 
     graph = kwargs['graph']
-    if not isinstance(graph, Graph):
-        return None
 
     # hiperwalk graph
     if isinstance(graph, Lattice):
         if 'dimensions' not in kwargs:
             kwargs['dimensions'] = graph.dimensions()
-        return 'grid'
+        return 'grid' if plot is None else plot
 
-    return 'bar'
+    return 'graph' if plot is None else plot
 
 
 def _preconfigure_plot(probabilities, kwargs):
@@ -347,17 +345,19 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes
     """
 
-    if ('rescale' not in kwargs or not kwargs.pop(['rescale'])):
+    if ('rescale' not in kwargs or not kwargs['rescale']):
         kwargs['min_prob'] = 0 #min_prob
         kwargs['max_prob'] = probabilities.max() #max_prob
+        kwargs['rescale'] = False
 
     if 'graph' not in kwargs:
         raise KeyError("'graph' kwarg not provided.")
-        graph = kwargs['graph']
-        if isinstance(graph, scipy.sparse.csr_array):
-            kwargs['graph'] = nx.from_scipy_sparse_array(graph)
-        elif isinstance(graph, Graph):
-            kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
+
+    graph = kwargs['graph']
+    if isinstance(graph, scipy.sparse.csr_array):
+        kwargs['graph'] = nx.from_scipy_sparse_array(graph)
+    elif isinstance(graph, Graph):
+        kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
 
     if 'adj_matrix' in kwargs:
         # Pops adj_matrix if both graph and adj_matrix keywords are set;
@@ -580,7 +580,7 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             ind = loc().astype('int')
             ind = [i for i in ind if i >=0 and i < num_vert]
 
-            nodes = list(graph.nodes())
+            nodes = list(range(0, graph.number_of_vertices()))
 
             ax.set_xticks(ind, [nodes[i] for i in ind])
         else:
@@ -610,11 +610,12 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     # UpdateNodes may create kwargs['node_size']
     # min_node_size and max_node_size are not valid keys
     # for nx.draw kwargs
+    print('rescale' in kwargs)
     _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
-    vmin = kwargs.pop['min_prob']
-    vmax = kwargs.pop['max_prob']
+    vmin = kwargs.pop('min_prob')
+    vmax = kwargs.pop('max_prob')
     nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
             vmin=vmin, vmax=vmax, **kwargs)
@@ -720,7 +721,7 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
         # as a function f(x) = ax + b where b = min_size and
         # max_size = a*(max_prob-min_prob) + min_size
         a = ((max_node_size - min_node_size)
-             / (kwargs['vmax'] - kwargs['vmin']))
+             / (kwargs['max_prob'] - kwargs['min_prob']))
         kwargs['node_size'] = list(map(
             lambda x: a*x + min_node_size, probabilities
         ))
