@@ -14,7 +14,6 @@ plt.rcParams["figure.figsize"] = (12, 10)
 plt.rcParams["figure.dpi"] = 100
 
 
-# TODO: add documentation for 'fixed_probabilities' kwarg
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
@@ -90,17 +89,18 @@ def plot_probability_distribution(
 
     Other Parameters
     ----------------
-    fixed_probabilities : bool, optional
-        If ``True`` or omitted, the reference maximum probability
+    rescale : bool, optional
+        If ``False`` or omitted, the reference maximum probability
         is the global one.
-        If ``False``, the reference maximum probability depends on
+        If ``True``, the reference maximum probability depends on
         the current step, changing every image or frame.
         For example, if the global maximum probability is 1,
         ``min_node_size, max_node_size = (300, 3000)``,
         and the maximum probability of a given step is 0.5;
-        then for ``fixed_probabilities=True``,
-        the step maximum node size shown is halfway betweeen 300 and 3000,
-        while for ``fixed_probabilities=False``,
+        then for ``rescale=False``,
+        the step maximum node size shown is 1650
+        (halfway betweeen 300 and 3000),
+        while for ``rescale=True``,
         the step maximum node size shown is 3000.
 
     Bar Plots
@@ -128,7 +128,8 @@ def plot_probability_distribution(
             A colormap for representing vertices probabilities.
             if ``cmap='default'``, uses the ``'viridis'`` colormap.
             For more colormap options, check
-            `Matplolib's Colormap reference <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
+            `Matplolib's Colormap reference
+            <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
 
     Histogram Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
@@ -318,8 +319,7 @@ def _preconfigure_plot(probabilities, kwargs):
         Reference of kwargs containing all extra keywords.
     """
 
-    if ('fixed_probabilities' not in kwargs
-            or kwargs.pop('fixed_probabilities')):
+    if ('rescale' not in kwargs or not kwargs.pop('rescale')):
         kwargs['min_prob'] = 0
         kwargs['max_prob'] = probabilities.max()
 
@@ -347,12 +347,9 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes
     """
 
-    # vmin and vmax are default keywords used by networkx_draw.
-    # if an invalid keyword is passed to nx.draw(), it does not execute
-    if ('fixed_probabilities' not in kwargs
-            or kwargs['fixed_probabilities']):
-        kwargs['vmin'] = 0 #min_prob
-        kwargs['vmax'] = probabilities.max() #max_prob
+    if ('rescale' not in kwargs or not kwargs.pop(['rescale'])):
+        kwargs['min_prob'] = 0 #min_prob
+        kwargs['max_prob'] = probabilities.max() #max_prob
 
     if 'graph' not in kwargs:
         raise KeyError("'graph' kwarg not provided.")
@@ -616,11 +613,15 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
+    vmin = kwargs.pop['min_prob']
+    vmax = kwargs.pop['max_prob']
     nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
-            **kwargs)
+            vmin=vmin, vmax=vmax, **kwargs)
     # Note: nx.draw_networkx_labels dramatically increases plotting time.
     # It is called by nx.draw
+    kwargs['min_prob'] = vmin
+    kwargs['max_prob'] = vmax
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
@@ -711,10 +712,9 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
             max_node_size = 3000
 
     if min_node_size is not None and max_node_size is not None:
-        if ('fixed_probabilities' in kwargs
-                and not kwargs.pop('fixed_probabilities')):
-            kwargs['vmin'] = 0
-            kwargs['vmax'] = probabilities.max()
+        if ('rescale' in kwargs and kwargs.pop('rescale')):
+            kwargs['min_prob'] = 0
+            kwargs['max_prob'] = probabilities.max()
 
         # calculating size of each node acording to probability 
         # as a function f(x) = ax + b where b = min_size and
