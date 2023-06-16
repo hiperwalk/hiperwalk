@@ -3,7 +3,7 @@ from .graph import *
 
 class Cycle(Graph):
     r"""
-    Cycle Graph.
+    Cycle graph.
 
     Parameters
     ----------
@@ -12,14 +12,15 @@ class Cycle(Graph):
 
     Notes
     -----
-    The cycle may be interpreted as being embedded on the line
-    with cyclic boundary condition.
-    Then, we assign 0 the right direction and 1 with the left direction.
-    This changes the arc order.
-    Any arc with tail :math:`v`
-    has label :math:`2v` if pointing rightwards,
-    and label :math:`2v + 1` if pointing leftwards.
-    Figure 1 illustrates the arc labels of a 3 vertices cycle.
+    The cycle can be interpreted as being embedded on the line
+    with a cyclic boundary condition.
+    In this context,
+    we assign the direction ``0`` to the right and ``1`` to the left.
+    This assignment alters the order of the arcs.
+    Any arc with a tail denoted by :math:`v`
+    has the label :math:`2v` if it points to the right,
+    and the label :math:`2v + 1` if pointing to the left.
+    Figure 1 illustrates the arc labels of a cycle with 3 vertices.
 
     .. graphviz:: ../../graphviz/cycle-arcs.dot
         :align: center
