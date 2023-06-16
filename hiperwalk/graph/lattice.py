@@ -7,8 +7,11 @@ class Lattice(Graph):
     r"""
     Two-dimensionsal lattice.
 
-    The lattice may have boundary conditions or not.
-    Its adjacency may be either natural or diagonal.
+    The lattice can either have cyclic boundary conditions,
+    which results in a finite graph, or it can be borderless.
+    The lattice's representation can be either natural or diagonal,
+    indicating that neighboring vertices lie along the x and y axes or
+    along the diagonals, respectively.
 
     Parameters
     ----------
@@ -17,21 +20,23 @@ class Lattice(Graph):
         If ``dimensions`` is an integer, creates a square lattice.
 
     periodic : bool, default=True
-        Whether the lattice has boundary conditions or not.
+        ``True`` if the lattice has cyclic boundary condictions,
+        ``False`` if it is borderless.
 
     diagonal : bool, default=False
-        If ``False`` the natural adjacency is used.
-        Otherwise, diagonal adjacency is used.
+        ``True if the lattice has the diagonal representation,
+        ``False`` if it has the natural representation.
 
     Notes
     -----
-    For defining the arc order, we must first define the vertices order.
-    The vertices are sorted with respect to the Y-axis first,
-    and then with respect to the X-axis.
-    That is,
+    The order of the arcs is determined according to
+    the order of the vertices.
+    The order of the vertices is defined as follows:
     if :math:`(x_1, y_1)` and :math:`(x_2, y_2)` are two valid vertices,
     we say that :math:`(x_1, y_1) < (x_2, y_2)` if :math:`y_1 < y_2` or
     if :math:`y_1 = y_2` and :math:`x_1 < x_2`.
+    The order of the arcs also depends on the lattice representation,
+    natural or diagonal.
 
     Natural Lattice:
         In the natural lattice,
@@ -152,9 +157,6 @@ class Lattice(Graph):
             :layout: neato
             :name: fig-even-dim-diagonal
             :caption: Figure: Periodic diagonal 4x4-lattice.
-
-        .. note::
-            If the diagonal lattice 
     """
     def __init__(self, dimensions, periodic=True, diagonal=False):
         try:
