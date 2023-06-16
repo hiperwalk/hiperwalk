@@ -22,15 +22,15 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Graph on which a quantum walk occurs.
+    Arbitrary graph.
 
-    Used for generic graphs.
+    The graph on which a quantum walk takes place.
 
     Parameters
     ----------
     adj_matrix : :class:`scipy.sparse.csr_array`
         Adjacency matrix of the graph on
-        which the quantum walk occurs.
+        which the quantum walk takes place.
 
     Raises
     ------
@@ -40,21 +40,21 @@ class Graph():
 
     Notes
     -----
-    Makes a plethora of methods available.
-    These methods may be used by a Quantum Walk model for
-    generating a valid walk.
+    A plethora of methods are available.
+    These methods can be used by a quantum walk model to
+    generate a valid walk.
 
-    This class may be passed as argument to plotting methods.
-    Then the default representation for the specific graph will be shown.
+    This class can be passed as argument to plotting functions.
+    Then, the default representation for the graph will be displayed.
 
     The recommended parameter type is
-    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``
-    with 1 denoting adjacency and 0 denoting non-adjacency.
-    If any entry is different from 0 or 1,
-    some methods may not work as expected.
+    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``,
+    where 1 denotes adjacency and 0 denotes non-adjacency.
+    If any entry differs from 0 or 1,
+    some methods may not operate as expected.
 
     Each edge of a given graph :math:`G(V, E)`
-    is associated with two arcs in the graph :math:`\vec{G}(V, A)`
+    is associated with two arcs in the graph :math:`\vec{G}(V, A)`,
     where
 
     .. math::
@@ -62,11 +62,11 @@ class Graph():
             A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
         \end{align*}
 
-    Each arc has a label (number).
-    The labels are ordered as follows.
-    Let :math:`(v_1, u_1)` and :math:`(v_2, u_2')`
-    be arcs with labels :math:`a_1` and :math:`a_2`, respectively.
-    Then :math:`a_1 < a_2` if and only if
+    Each arc is assigned a label (number).
+    These labels are ordered as follows:
+    consider two arcs, :math:`(v_1, u_1)` and :math:`(v_2, u_2')`,
+    with labels :math:`a_1` and :math:`a_2`, respectively.
+    Then, :math:`a_1 < a_2` if and only if
     if either :math:`v_1 < v_2` or
     :math:`v_1 = v_2` and :math:`u_1 < u_2`.
 
@@ -130,15 +130,14 @@ class Graph():
             ['', '6', '7', '']], dtype='<U21')
 
     Note that, intuitively,
-    the arcs are labeled in left-to-right top-to-bottom fashion.
-
-    .. todo::
-        * Check if valid adjacency matrix
-        * Add option: numpy dense matrix as parameters.
-        * Add option: networkx graph as parameter.
+    the arcs are labeled in left-to-right and top-to-bottom fashion.
     """
 
     def __init__(self, adj_matrix):
+        # TODO:
+        # * Check if valid adjacency matrix
+        # * Add option: numpy dense matrix as parameters.
+        # * Add option: networkx graph as parameter.
         self.adj_matrix = adj_matrix
         self.coloring = None
 
