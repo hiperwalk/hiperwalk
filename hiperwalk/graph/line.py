@@ -16,27 +16,27 @@ class Line(Graph):
     -----
     On the Line,
     we can assign directions to the arcs.
-    If an arc is pointing rightwards it has direction 0 --
-    i.e., (1, 2).
-    If an arc is pointing leftwards, it has direction 1 --
+    An arc pointing rightward has direction 0 --
+    i.e., (1, 2), and
+    an arc pointing leftward has direction 1 --
     i.e., (2, 1).
 
-    We use the arc directions to define the arcs order.
-    Hence, for a vertex :math:`v \in V`,
+    We use the directions of the arcs to define their order.
+    Thus, for a vertex :math:`v \in V`,
     the arcs :math:`(v, v + 1)` and :math:`(v, v - 1)`
     have labels :math:`a_0` and :math:`a_1` (respectively)
     such that  :math:`a_0 < a_1`.
-    This order is coherent with the Coined Quantum Walk on the line [1]_.
+    This order is aligned with the description of coined quantum walks on the line in Reference [1]_.
     The only exceptions to this rule are the extreme vertices
-    0 and :math:`|V| - 1`.
-    Since they only have one arc.
-    Besides that,
+    0 and :math:`|V| - 1` because
+    they only have one arc.
+    Aside from these exceptions,
     for any two vertices :math:`v_1 < v_2`,
-    any arc with tail :math:`v_1` has label smaller than
-    any arc with tail :math:`v_2`.
+    any arc with tail :math:`v_1` has a label smaller than
+    the label of any arc with tail :math:`v_2`.
 
-    For example, the arc labels of the 4-vertices Line
-    are represented in Figure 1.
+    For example, Figure 1 depicts the labels of the arcs of a path graph
+    with 4 vertices.
     
     .. graphviz:: ../../graphviz/line-arcs.dot
         :align: center
@@ -45,8 +45,8 @@ class Line(Graph):
 
     References
     ----------
-    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-        Vol. 19. New York: Springer, 2013.
+    .. [1] R. Portugal. "Quantum walks and search algorithms",
+        2nd edition, Springer, 2018.
     """
 
     def __init__(self, num_vert):
