@@ -10,7 +10,7 @@ class Lattice(Graph):
     The lattice can either have cyclic boundary conditions,
     which results in a finite graph, or it can be borderless.
     The lattice's representation can be either natural or diagonal,
-    indicating that neighboring vertices lie along the x and y axes or
+    indicating that neighboring vertices lie along the X and Y axes or
     along the diagonals, respectively.
 
     Parameters
@@ -35,28 +35,30 @@ class Lattice(Graph):
     if :math:`(x_1, y_1)` and :math:`(x_2, y_2)` are two valid vertices,
     we say that :math:`(x_1, y_1) < (x_2, y_2)` if :math:`y_1 < y_2` or
     if :math:`y_1 = y_2` and :math:`x_1 < x_2`.
-    The order of the arcs also depends on the lattice representation,
-    natural or diagonal.
+    The order of the arcs also depends on the lattice representation
+    (natural or diagonal).
 
     Natural Lattice:
         In the natural lattice,
-        we have four directions possible.
+        the directions are described as follows:
 
         * 00 = 0: right;
         * 01 = 1: left;
         * 10 = 2: up;
         * 11 = 3: down.
+        
+        The most significant bit corresponds to the axis: 
+        0 represents the X-axis and 1 represents the Y-axis. 
+        The least significant bit indicates the direction of 
+        movement along the given axis, with 0 signifying 
+        forward movement and 1 signifying backward movement.
 
-        The most significant bit corresponds to the axis,
-        0 for the X-axis and 1 for the Y-axis.
-        The less significant bit indicates whether to
-        move forward (0) or backward (1) in the given axis.
-
-        The arcs order respect vertices order and these directions.
-        For example, let :math:`(x, y)` be a vertex where
+        The order of arcs corresponds with the order of vertices 
+        and their respective directions. For example, 
+        consider a vertex :math:`(x, y)`. Then,
         :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
-        are also valid vertices.
-        The directions give
+        are adjacent vertices.
+        The order of these arcs is
 
         .. math::
             ((x, y), (x + 1, y)) &< ((x, y), (x - 1, y)) \\
@@ -69,21 +71,22 @@ class Lattice(Graph):
             :align: center
             :layout: neato
             :name: fig-natural-dir
-            :caption: Figure: Natural lattice directions.
+            :caption: Figure: Directions in the natural representation.
 
-        For example, the arcs labels for
-        the periodic natural :math:`3 \times 3`-lattice are
-        illustrated in :ref:`fig-periodic-natural-lattice`.
+        For example, the labels of the arcs for
+        the :math:`3 \times 3`-lattice with periodic boundary 
+        conditions are depicted in :ref:`fig-periodic-natural-lattice`.
 
         .. graphviz:: ../../graphviz/lattice/periodic-natural.dot
             :align: center
             :layout: neato
             :name: fig-periodic-natural-lattice
-            :caption: Figure: Periodic natural 3x3-lattice.
+            :caption: Figure: 3x3-lattice with cyclic boundary conditions.
 
-        For the natural lattice with boundary condition,
-        the arcs labels follow the same order.
-        But the labels are shifted when a given arc does not exist.
+        For the natural lattice with cyclic boundary conditions, 
+        the labels of the arcs maintain the same order. 
+        However, these labels are shifted when a particular arc
+        does not exist.
         See :ref:`fig-bounded-natural-Lattice`
 
         .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
