@@ -15,18 +15,17 @@ if __DEBUG__:
 
 class CoinedWalk(QuantumWalk):
     r"""
-    Manage an instance of the coined quantum walk model
-    on general unweighted graphs.
+    Manage an instance of a coined quantum walk on an arbitrary simple graph.
 
-    Methods for managing, simulating and generating operators of
-    the coined quantum walk model for general graphs are available.
-
-    For implementation details, see the Notes Section.
+    This class provides methods for handling, simulating, and generating 
+    operators within the coined quantum walk model for various types of graphs.
+    
+    For additional details about coined quantum walks, refer to the Notes Section.
 
     Parameters
     ----------
     graph
-        Graph on which the quantum walk occurs.
+        Graph on which the quantum walk takes place.
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
@@ -59,23 +58,26 @@ class CoinedWalk(QuantumWalk):
     Notes
     -----
 
-    The Hilbert space of the general Coined Quantum Walk model is
-    :math:`\mathcal{H}^{2|E|}`.
-    The computational basis is given by the graph arcs.
-    Refer to each graph for more information about the arcs order.
+    The computational basis is spanned by the set of arcs.
+    The cardinality is :math:`2|E|`, where :math:`E` 
+    represents the edge set of the graph.
+    For further information regarding the order of the arcs, 
+    consult the respective graph descriptions.
+    The Hilbert space of a coined quantum walk is denoted by
+    :math:`\mathcal{H}^{2|E|}`. 
 
-    For more information about the general Coined Quantum Walk Model,
-    check Quantum Walks and Search Algorithms's
-    Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
+    For a more detailed understanding of coined quantum walks, 
+    refer to Section 7.2: Coined Walks on Arbitrary Graphs, found in the book 
+    'Quantum Walks and Search Algorithms' [1]_.
 
     References
     ----------
-    .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-        Vol. 19. New York: Springer, 2013.
+    .. [1] R. Portugal. "Quantum walks and search algorithms", 2nd edition,
+        Springer, 2018.
     """
 
     # static attributes.
-    # The class must instantiated once, otherwise are dicts are empty.
+    # The class must be instantiated once, otherwise are dicts are empty.
     # The class must be instantiated so the interpreter knows
     # the memory location for the function pointers.
     _coin_funcs = dict()
@@ -129,9 +131,8 @@ class CoinedWalk(QuantumWalk):
         Create the flipflop shift operator (:math:`S`) based on
         the ``_graph`` attribute.
 
-        The operator is set for future usage.
-        If an evolution operator was set previously,
-        it is unset for coherence.
+        The operator is configured for future use. If an evolution 
+        operator was set earlier, it will be unset to maintain coherence.
         """
 
         num_vert = self._graph.number_of_vertices()
@@ -154,13 +155,14 @@ class CoinedWalk(QuantumWalk):
 
     def has_persistent_shift(self):
         r"""
-        Returns if the persistent shift operator is defined
-        for the current graph.
+        Checks whether the persistent shift operator is defined 
+        for the current graph and returns the result.
 
-        The persistent shift operator is only defined for specific graphs
-        that can be embedded into the plane.
-        Hence, a direction can be inferred --
-        e.g. left, right, up, down.
+        The persistent shift operator can only be defined in a 
+        meaningful way for certain specific graphs. For instance, 
+        for graphs that can be embedded onto a plane, 
+        directions such as left, right, up, and down 
+        can be referred to naturally.
         """
         return self._graph.embeddable()
 
@@ -192,12 +194,11 @@ class CoinedWalk(QuantumWalk):
         r"""
         Set the shift operator.
 
-        Set either the flipflop or the persistent shift operator.
+        Sets either the flipflop or the persistent shift operator.
 
-        The created shift operator is saved to be used
-        for generating the evolution operator.
-        If an evolution operator was set previously,
-        it is unset for coherence.
+        The generated shift operator is stored for future use in 
+        creating the evolution operator. If an evolution operator 
+        had been previously set, it is unset to maintain coherence.
 
         Parameters
         ----------
@@ -237,15 +238,15 @@ class CoinedWalk(QuantumWalk):
         :math:`j` is the label of the edge :math:`(u, v)`.
 
 
-        For more information about the general flip-flop shift operator,
-        check "Quantum Walks and Search Algorithms"
-        Section 7.2: Coined Walks on Arbitrary Graphs [1]_.
+        For a more comprehensive understanding of the flipflop 
+        shift operator, refer to Section 7.2: Coined Walks on Arbitrary 
+        Graphs in the book "Quantum Walks and Search Algorithms" [1]_.
         
 
         References
         ----------
-        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-            Vol. 19. New York: Springer, 2013.
+        .. [1] R. Portugal. "Quantum walks and search algorithms",
+            2nd edition, Springer, 2018.
 
         Examples
         --------
@@ -331,10 +332,10 @@ class CoinedWalk(QuantumWalk):
         """
         Generate a coin operator based on the graph structure.
 
-        Constructs coin operator depending on the degree of each vertex.
-        A single coin type may be applied to all or subset of vertices.
-        The coin operator is set to be used during the
-        evolution operator generation.
+        Constructs a coin operator based on the degree of each vertex. 
+        A single type of coin may be applied to all vertices or a subset thereof. 
+        The coin operator is then established to be used in the generation 
+        of the evolution operator.
 
         Parameters
         ----------
@@ -374,11 +375,11 @@ class CoinedWalk(QuantumWalk):
 
         Notes
         -----
-        Due to the chosen computational basis
-        (see :class:`CoinedWalk` Notes),
-        the resulting operator is a block diagonal where
-        each block is the :math:`\deg(v)`-dimensional ``coin``.
-        Consequently, there are :math:`|V|` blocks.
+        Owing to the selected computational basis (refer to the
+        Notes in the :class:`CoinedWalk`),
+        the outcome is a block diagonal operator.
+        Each block is a :math:`\deg(v)`-dimensional ``coin``.
+        As a result, there are :math:`|V|` blocks in total.
 
         .. todo::
 
@@ -537,17 +538,22 @@ class CoinedWalk(QuantumWalk):
 
     def set_marked(self, marked=[]):
         r"""
-        Set marked elements (vertices).
+        Set marked vertices.
 
-        If a list of vertices is received,
-        those vertices are considered marked.
-        The evolution operators remains unchanged.
+        If a list of vertices is provided, those vertices are
+        deemed as marked. However, the associated evolution operator
+        remains unaffected.
 
         If a dictionary is passed,
         the coin of those vertices are substituted
         only for generating the evolution operator.
         This can only be done if the set coin operator is
         not a explicit matrix.
+
+        If a dictionary is provided, the coins associated with those vertices 
+        are replaced, but only for generating the evolution operator. 
+        Note that this can only be done if the coin operator 
+        is not set as an explicit matrix.
 
         Parameters
         ----------
@@ -731,7 +737,7 @@ class CoinedWalk(QuantumWalk):
            U = SC'
 
         where :math`S` is the shift operator, and
-        :math:`C'` is the coin operator (probably) altered by
+        :math:`C'` is the coin operator (probably) modified by
         the marked vertices [1]_.
 
         If the coin operator was set as an explicit matrix,
@@ -752,14 +758,14 @@ class CoinedWalk(QuantumWalk):
 
         References
         ----------
-        .. [1] Portugal, Renato. "Quantum walks and search algorithms".
-            Vol. 19. New York: Springer, 2013.
+        .. [1] R. Portugal. "Quantum walks and search algorithms",
+            2nd edition, Springer, 2018.
 
         Examples
         --------
 
         .. todo::
-            Valid examples to clear behaviour.
+            Valid examples to clear behavior.
         """
         if self._evolution is not None:
             # evolution operator was not changed.
@@ -800,9 +806,9 @@ class CoinedWalk(QuantumWalk):
 
     def probability_distribution(self, states):
         """
-        Compute the probability distribution of given states.
+        Compute the probability distribution of the given states.
 
-        The probability of the walker being found on each vertex
+        The probability of finding the walker at each vertex
         for the given states.
 
         Parameters
@@ -864,8 +870,8 @@ class CoinedWalk(QuantumWalk):
 
         The state corresponds to the walker being in a superposition
         of the ``entries``.
-        for instance, click on :meth:`qwalk.coined.Graph`.
-        The final state is normalized in order to be unitary.
+        For instance, click on :meth:`qwalk.coined.Graph`.
+        The final state is normalized in order to be a unit vector.
 
         Parameters
         ----------
@@ -882,7 +888,7 @@ class CoinedWalk(QuantumWalk):
                 The vertex corresponding to the position of the walker
                 in the superposition.
             dst_vertex 
-                The vertex which the coin is pointing to.
+                The vertex to which the coin is pointing.
                 In other words, the tuple
                 ``(vertex, dst_vertex)`` must be a valid arc.
             arc_label
@@ -890,7 +896,7 @@ class CoinedWalk(QuantumWalk):
                 given by the computational basis.
             coin
                 The direction towards which the coin is pointing.
-                It is dependabble on the Graph coloring.
+                It is dependable on the Graph coloring.
 
         Notes
         -----
