@@ -19,7 +19,7 @@ class Cycle(Graph):
     This assignment alters the order of the arcs.
     Any arc with a tail denoted by :math:`v`
     has the label :math:`2v` if it points to the right,
-    and the label :math:`2v + 1` if pointing to the left.
+    and the label :math:`2v + 1` if it points to the left.
     Figure 1 illustrates the arc labels of a cycle with 3 vertices.
 
     .. graphviz:: ../../graphviz/cycle-arcs.dot
