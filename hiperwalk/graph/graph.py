@@ -43,7 +43,7 @@ class Graph():
     -----
     Makes a plethora of methods available.
     These methods may be used by a Quantum Walk model for
-    generating a valid walk.
+    generating a valid quantum walk.
     The default arguments for a given model are given by the graph.
     The Quantum Walk model is ignorant with this regard.
 
