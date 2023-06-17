@@ -45,7 +45,7 @@ class Graph():
     generate a valid quantum walk.
 
     This class can be passed as argument to plotting functions.
-    Then, the default representation for the graph will be displayed.
+    In this case, the default representation for the graph will be displayed.
 
     The recommended parameter type is
     :class:`scipy.sparse.csr_array` using ``dtype=np.int8``,
@@ -54,7 +54,7 @@ class Graph():
     some methods may not operate as expected.
 
     Each edge of a given graph :math:`G(V, E)`
-    is associated with two arcs in the graph :math:`\vec{G}(V, A)`,
+    is associated with two arcs in the symmetric digraph :math:`\vec{G}(V, A)`,
     where
 
     .. math::
@@ -109,15 +109,15 @@ class Graph():
     >>> arcs_labels
     {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
 
-    The arcs labels are illustrated in Figure 2.
+    The labels of the arcs are depicted in Figure 2.
 
     .. graphviz:: ../../graphviz/graph-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 2
 
-    If we substitute the arcs labels into the adjacency matrix,
-    we obtain the matrix ``adj_labels``.
+    If we insert the labels of the arcs into the adjacency matrix,
+    we obtain matrix ``adj_labels`` as follows:
 
     >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
     ...                                   else '' for j in range(4)]
@@ -145,22 +145,23 @@ class Graph():
         r"""
         Returns the default coin for the given graph.
 
-        The default coin for the coined quantum walk on general
+        The default coin for the coined quantum walk on arbitrary
         graphs is ``grover``.
         """
         return 'grover'
 
     def embeddable(self):
         r"""
-        Returns whether the graph can be embedded on the plane or not.
+        Returns True if the graph can be embedded on the plane, and False otherwise.
 
-        If a graph can be embedded on the plane,
-        we can assign directions to edges and arcs.
+        If a graph can be embedded on the plane, 
+        we can assign meaningful right or left directions, 
+        and clockwise or counter-clockwise rotations to edges and arcs
 
         Notes
         -----
         The implementation is class-dependent.
-        We do not check the graph structure to determine whether
+        We do not inspect the structure of the graph to determine whether
         it is embeddable or not.
         """
         return False
@@ -190,8 +191,8 @@ class Graph():
         r"""
         Arc in arc notation.
 
-        Given the arc label,
-        returns it in the ``(tail, head)`` notation.
+        Given the arc label as a number,
+        returns the arc in the ``(tail, head)`` notation.
 
         Parameters
         ----------
@@ -290,7 +291,7 @@ class Graph():
         r"""
         Cardinality of arc set.
 
-        For simple graphs, this is twice the number of edges.
+        For simple graphs, the cardinality is twice the number of edges.
         """
         return self.adj_matrix.sum()
 
