@@ -13,15 +13,15 @@ except ModuleNotFoundError:
 
 class QuantumWalk(ABC):
     """
-    Basic (abstract) class for Quantum Walks.
+    Abstract class for Quantum Walks.
 
     Basic methods and attributes used for implementing
-    specific Quantum Walk models.
+    specific quantum walk models.
 
     Parameters
     ----------
     graph
-        Graph on which the quantum walk occurs.
+        Graph on which the quantum walk takes place.
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
@@ -106,11 +106,11 @@ class QuantumWalk(ABC):
 
     def uniform_state(self):
         r"""
-        Generate the uniform state.
+        Creates a uniform state.
 
         The state is constructed based on the ``hilb_dim`` attribute.
-        The uniform initial state is the state where
-        all entries have the same amplitude.
+        The uniform initial state is a unit vector with entries 
+        that have the same real amplitude.
 
         Returns
         -------
@@ -177,7 +177,7 @@ class QuantumWalk(ABC):
     @abstractmethod
     def get_evolution():
         r"""
-        Returns the evolution operator in matricial form.
+        Returns the evolution operator in matrix form.
         """
         raise NotImplementedError()
 
@@ -190,7 +190,7 @@ class QuantumWalk(ABC):
 
     def probability(self, states):
         r"""
-        Compute the probability states.
+        Computes the probability distribution of each state.
 
         The probability of each entry of the state.
 
