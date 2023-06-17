@@ -20,8 +20,8 @@ class Lattice(Graph):
         If ``dimensions`` is an integer, creates a square lattice.
 
     periodic : bool, default=True
-        ``True`` if the lattice has cyclic boundary condictions,
-        ``False`` if it is borderless.
+        ``True`` if the lattice has cyclic boundary conditions,
+        ``False`` if it has borders.
 
     diagonal : bool, default=False
         ``True if the lattice has the diagonal representation,
@@ -83,11 +83,11 @@ class Lattice(Graph):
             :name: fig-periodic-natural-lattice
             :caption: Figure: 3x3-lattice with cyclic boundary conditions.
 
-        For the natural lattice with cyclic boundary conditions, 
-        the labels of the arcs maintain the same order. 
-        However, these labels are shifted when a particular arc
-        does not exist.
-        See :ref:`fig-bounded-natural-Lattice`
+        In the case of a natural lattice with borders, the labels of the 
+        arcs maintain the same sequence but with some modifications 
+        due to the presence of vertices with degrees 2 and 3. 
+        Figure :ref:fig-bounded-natural-Lattice provides an illustration 
+        of a bounded natural lattice.
 
         .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
             :align: center
@@ -97,23 +97,26 @@ class Lattice(Graph):
 
     Diagonal Lattice:
         In the diagonal lattice,
-        we have four directions possible.
+        the directions are described as follows:
 
         * 00 = 0: right, up;
         * 01 = 1: right, down;
         * 10 = 2: left, up;
         * 11 = 3: left, down.
 
-        Each binary value describes whether to move
-        forward (0) or backward (1).
-        The most significant bit describes the X-axis movement and
-        the less significant bit describes the Y-axis movement.
+        Each binary value indicates the direction of movement, 
+        with 0 representing forward motion and 1 representing 
+        backward motion. The most significant bit corresponds to 
+        movement along the X-axis, while the least significant bit 
+        corresponds to movement along the Y-axis.
 
-        The arcs order respect vertices order and these directions.
-        For example, let :math:`(x, y)` be a vertex where
-        :math:`(x \pm 1, y \pm 1)` are also valid vertices.
-        The directions give
-
+        The order of arcs corresponds with the order of vertices 
+        and their respective directions. For example, 
+        consider a vertex :math:`(x, y)`. Then,
+        :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
+        are adjacent vertices.
+        The order of these arcs is
+        
         .. math::
             ((x, y), (x + 1, y + 1)) &< ((x, y), (x + 1, y - 1)) \\
                                      &< ((x, y), (x - 1, y + 1)) \\
@@ -125,11 +128,11 @@ class Lattice(Graph):
             :align: center
             :layout: neato
             :name: fig-diagonal-dir
-            :caption: Figure: Diagonal lattice directions.
+            :caption: Figure: Directions in the diagonal representation.
 
-        For example, the arcs labels for
-        the periodic diagonal :math:`3 \times 3`-lattice are
-        illustrated in :ref:`fig-periodic-diagonal-lattice`
+        For example, the labels of the arcs for
+        the :math:`3 \times 3`-lattice with periodic boundary 
+        conditions are depicted in :ref:`fig-periodic-diagonal-lattice`
 
         .. graphviz:: ../../graphviz/lattice/periodic-diagonal.dot
             :align: center
@@ -137,29 +140,29 @@ class Lattice(Graph):
             :name: fig-periodic-diagonal-lattice
             :caption: Figure: Periodic diagonal 3x3-lattice.
 
-        For the diagonal lattice with boundary condition,
-        the arcs labels follow the same order.
-        But the labels are shifted when a given arc does not exist.
-        See :ref:`fig-bounded-diagonal-Lattice`
+        In the case of a diagonal lattice with borders, the labels of the 
+        arcs maintain the same sequence but with some modifications. 
+        Figure :ref:`fig-bounded-diagonal-Lattice` provides an illustration 
+        of a bounded diagonal lattice.
 
         .. graphviz:: ../../graphviz/lattice/bounded-diagonal.dot
             :align: center
             :layout: neato
             :name: fig-bounded-diagonal-lattice
-            :caption: Figure: Bounded diagonal 3x3-lattice.
+            :caption: Figure: Bounded 3x3-lattice in the diagonal representation.
 
-        Note that in this case, there are two independent sublattices.
-        That is, a vertex in one sublattice is not reacheable from
-        a vertex in the other sublattice.
-        This also occurs if the diagonal lattice is periodic and
-        both dimensions are even.
-        See :ref:`fig-even-dim-diagonal`
+        Note that in this context, there exist two independent sublattices. 
+        In other words, a vertex in one sublattice is not accessible from 
+        a vertex in the other sublattice. This situation also arises 
+        if the diagonal lattice has periodic boundary conditions and both 
+        dimensions are even.
+        Figure :ref:`fig-even-dim-diagonal` illustrates an example of this case.
 
         .. graphviz:: ../../graphviz/lattice/even-dim-diagonal.dot
             :align: center
             :layout: neato
             :name: fig-even-dim-diagonal
-            :caption: Figure: Periodic diagonal 4x4-lattice.
+            :caption: Figure: 4x4-lattice with cyclic boundary conditions.
     """
     def __init__(self, dimensions, periodic=True, diagonal=False):
         try:
@@ -375,7 +378,7 @@ class Lattice(Graph):
         r"""
         Arc in arc notation.
 
-        Given the arc label, returns it in the ``(tail, head)`` notation.
+        Given the arc label (a number), returns the arc in the ``(tail, head)`` notation.
 
         Parameters
         ----------
@@ -387,7 +390,7 @@ class Lattice(Graph):
         Returns
         -------
         (tail, head)
-            There are two possibile formats for the vertices
+            There are two possible formats for the vertices
             ``tail`` and ``head``.
 
             (vertex_x, vertex_y) : (int, int)
