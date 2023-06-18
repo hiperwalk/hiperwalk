@@ -42,7 +42,7 @@ Python dependencies, which include
 
 .. warning::
 
-f you have older versions of these packages, they will likely be 
+If you have older versions of these packages, they will likely be 
 updated. If you prefer not to have them updated, we recommend 
 `creating a virtual environment 
 <https://docs.python.org/3/library/venv.html>`_.   
