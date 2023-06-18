@@ -5,7 +5,7 @@ from .graph import Graph
 
 class Line(Graph):
     r"""
-    Finite Line Graph (Path Graph).
+    Finite line graph (path graph).
 
     Parameters
     ----------
