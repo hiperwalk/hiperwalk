@@ -3,59 +3,58 @@
 Tutorial
 ========
 
-Every Hiperwalk-based code follows up to five steps.
+Every code based on Hiperwalk follows up to five distinct steps.
 
-#. Import Hiperwalk.
-#. Create the graph.
-#. Create the quantum walk based on the previous graph.
-#. Simulate the walk.
-#. Exhibit the results.
+#. Import the Hiperwalk package.
+#. Define a graph.
+#. Construct the quantum walk using the previously defined graph.
+#. Run the simulation of the quantum walk.
+#. Display the results.
 
-A simple example is the coined walk on the line.
-Do not struggle with the details for now.
-We just illustrate the steps.
+An easy-to-understand example is the coined walk on the line. 
+Don't worry about the specifics for the time being; we are 
+merely illustrating the steps.
 
 .. testsetup::
 
    from sys import path as sys_path
    sys_path.append("../..")
 
-Import Hiperwalk
+Import the Hiperwalk package
 ----------------
 
 >>> import hiperwalk as hpw
 
-Create the graph
+Define a graph
 ----------------
 
-Here we create a line with 11 vertices.
-The result is an object of the :class:`hiperwalk.Line` class.
+n this step, we generate a line comprising 11 vertices. 
+The output is an object from the :class:`hiperwalk.Line` class.
 
 >>> N = 11
 >>> line = hpw.Line(N)
 >>> line #doctest: +SKIP
 <hiperwalk.graph.line.Line object at 0x7ff59f1900d0>
 
-Create the quantum walk based on the previous graph
+Construct the quantum walk using the previously defined graph
 ---------------------------------------------------
 
-We create a coined quantum walk on the line with
-11 vertices by passing the created graph as an
-argument to the quantum walk constructor.
-This results in an object of the :class:`hiperwalk.CoinedWalk` class.
+We now create a coined quantum walk on the line with 11 vertices. 
+We achieve this by passing the previously created graph as an 
+argument to the quantum walk constructor. 
+The outcome is an object from the :class:`hiperwalk.CoinedWalk` class.
 
 >>> qw = hpw.CoinedWalk(line)
 >>> qw #doctest: +SKIP
 <hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f2691de9840>
 
-Simulate the walk
+Simulate the quantum walk
 -----------------
 
-Before simulating the walk,
-To simulate the walk we need to specify the initial state.
-One way to create the initial state is by using the
+Before running the simulation, we need to specify the initial state. 
+One way to accomplish this is by using the
 :meth:`hiperwalk.CoinedWalk.ket` method,
-which creates a valid state of the computational basis.
+which generates a state of the computational basis.
 
 >>> vertex = N // 2
 >>> initial_state = qw.ket(vertex, vertex + 1)
@@ -63,17 +62,17 @@ which creates a valid state of the computational basis.
 array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
        0., 0., 0.])
 
-This state corresponds to the walker being on
-vertex 5 pointing to vertex 6
-(the labels of the vertices go from 0 to 10).
+This state corresponds to the walker on
+vertex 5 with the coin pointing to vertex 6
+(keep in mind that the vertex labels range from 0 to 10).
 
-To simulate the walk we must specify the number of steps
-(number of applications of the evolution operator)
-and the initial state.
-By specifying only the final time,
-the result is the final state.
-If everything was installed properly,
-the :meth:`hiperwalk.CoinedWalk.simulate` method automatically uses
+To run the simulation, we must specify the initial state and
+the number of steps
+(i.e., the number of applications of the evolution operator).
+When specifying only the final time,
+the output will be the final state.
+If everything was installed correctly,
+the :meth:`hiperwalk.CoinedWalk.simulate` method will automatically use
 high-performance computing to perform the matrix-vector multiplications.
 
 >>> final_state = qw.simulate(time=N//2,
@@ -81,10 +80,10 @@ high-performance computing to perform the matrix-vector multiplications.
 
 
 
-Exhibit the results
+Display the results
 -------------------
 
-The results exhibition may be a simple print
+Presenting the results can be as straightforward as printing them.
 
 >>> final_state
 array([[ 0.1767767 ,  0.        ,  0.        , -0.1767767 ,  0.35355339,
@@ -93,24 +92,23 @@ array([[ 0.1767767 ,  0.        ,  0.        , -0.1767767 ,  0.35355339,
          0.70710678,  0.1767767 ,  0.        ,  0.        ,  0.1767767 ]])
          
 
-or a more sofisticated output.
-Frequently, we are interested in the probability of the walker being
-found on each vertex.
-This can be done via the
+Or, the output could be more sophisticated. Often, we are interested 
+in the probability of the walker being found at each vertex. 
+This can be accomplished via the 
 :meth:`hiperwalk.CoinedWalk.probability_distribution` method
-by passing the final state as argument.
+by passing the final state as an argument.
 
 >>> probability = qw.probability_distribution(final_state)
 >>> probability
 array([[0.03125, 0.     , 0.15625, 0.     , 0.125  , 0.     , 0.125  ,
         0.     , 0.53125, 0.     , 0.03125]])
 
-It is also possible to plot the probability distribution
-with a simple command.
+It's also feasible to plot the probability distribution 
+using a simple command.
 
 >>> hpw.plot_probability_distribution(probability) #doctest: +SKIP
 
-Resulting in the following plot.
+This command generates the following plot:
 
 .. figure:: probability_distribution.png
     :alt: Plot of the probability distribution.
@@ -120,7 +118,7 @@ Resulting in the following plot.
 Next Steps
 ----------
 
-The remainder of the tutorial is subdivided into the following sections.
+The remainder of the tutorial is split into the following sections.
 
 .. toctree::
     :maxdepth: 1
