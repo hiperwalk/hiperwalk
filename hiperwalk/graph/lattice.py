@@ -7,11 +7,10 @@ class Lattice(Graph):
     r"""
     Two-dimensionsal lattice.
 
-    The lattice can either have cyclic boundary conditions,
-    which results in a finite graph, or it can be borderless.
-    The lattice's representation can be either natural or diagonal,
-    indicating that neighboring vertices lie along the X and Y axes or
-    along the diagonals, respectively.
+    The lattice can be designed with either cyclic boundary conditions or borders. 
+    Moreover, the lattice's representation can be either 'natural' or 'diagonal.' 
+    In the 'natural' representation, neighboring vertices lie along the X and Y axes, 
+    while in the 'diagonal' representation, they lie along the diagonals.
 
     Parameters
     ----------
