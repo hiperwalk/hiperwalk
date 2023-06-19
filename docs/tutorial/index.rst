@@ -21,12 +21,12 @@ merely illustrating the steps.
    sys_path.append("../..")
 
 Import the Hiperwalk package
-----------------
+----------------------------
 
 >>> import hiperwalk as hpw
 
 Define a graph
-----------------
+--------------
 
 n this step, we generate a line comprising 11 vertices. 
 The output is an object from the :class:`hiperwalk.Line` class.
@@ -37,7 +37,7 @@ The output is an object from the :class:`hiperwalk.Line` class.
 <hiperwalk.graph.line.Line object at 0x7ff59f1900d0>
 
 Construct the quantum walk using the previously defined graph
----------------------------------------------------
+-------------------------------------------------------------
 
 We now create a coined quantum walk on the line with 11 vertices. 
 We achieve this by passing the previously created graph as an 
@@ -49,7 +49,7 @@ The outcome is an object from the :class:`hiperwalk.CoinedWalk` class.
 <hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f2691de9840>
 
 Simulate the quantum walk
------------------
+-------------------------
 
 Before running the simulation, we need to specify the initial state. 
 One way to accomplish this is by using the
@@ -125,4 +125,4 @@ The remainder of the tutorial is split into the following sections.
 
     graphs.rst
     quantum_walk_models.rst
-    plotting_customization.rst
+    plotting.rst

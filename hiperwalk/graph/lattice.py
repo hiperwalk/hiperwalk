@@ -7,10 +7,14 @@ class Lattice(Graph):
     r"""
     Two-dimensionsal lattice.
 
-    The lattice can be designed with either cyclic boundary conditions or borders. 
-    Moreover, the lattice's representation can be either 'natural' or 'diagonal.' 
-    In the 'natural' representation, neighboring vertices lie along the X and Y axes, 
-    while in the 'diagonal' representation, they lie along the diagonals.
+    The lattice can be designed with either
+    cyclic boundary conditions or borders.
+    Moreover, the lattice's representation can be either
+    *natural* or *diagonal*.
+    In the *natural* representation,
+    neighboring vertices lie along the X and Y axes,
+    while in the *diagonal* representation,
+    they lie along the diagonals.
 
     Parameters
     ----------
@@ -23,7 +27,7 @@ class Lattice(Graph):
         ``False`` if it has borders.
 
     diagonal : bool, default=False
-        ``True if the lattice has the diagonal representation,
+        ``True`` if the lattice has the diagonal representation,
         ``False`` if it has the natural representation.
 
     Notes
@@ -46,14 +50,14 @@ class Lattice(Graph):
         * 10 = 2: up;
         * 11 = 3: down.
         
-        The most significant bit corresponds to the axis: 
-        0 represents the X-axis and 1 represents the Y-axis. 
-        The least significant bit indicates the direction of 
-        movement along the given axis, with 0 signifying 
+        The most significant bit corresponds to the axis:
+        0 represents the X-axis and 1 represents the Y-axis.
+        The least significant bit indicates the direction of
+        movement along the given axis, with 0 signifying
         forward movement and 1 signifying backward movement.
 
-        The order of arcs corresponds with the order of vertices 
-        and their respective directions. For example, 
+        The order of arcs corresponds with the order of vertices
+        and their respective directions. For example,
         consider a vertex :math:`(x, y)`. Then,
         :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
         are adjacent vertices.
@@ -73,7 +77,7 @@ class Lattice(Graph):
             :caption: Figure: Directions in the natural representation.
 
         For example, the labels of the arcs for
-        the :math:`3 \times 3`-lattice with periodic boundary 
+        the :math:`3 \times 3`-lattice with periodic boundary
         conditions are depicted in :ref:`fig-periodic-natural-lattice`.
 
         .. graphviz:: ../../graphviz/lattice/periodic-natural.dot
@@ -82,10 +86,10 @@ class Lattice(Graph):
             :name: fig-periodic-natural-lattice
             :caption: Figure: 3x3-lattice with cyclic boundary conditions.
 
-        In the case of a natural lattice with borders, the labels of the 
-        arcs maintain the same sequence but with some modifications 
-        due to the presence of vertices with degrees 2 and 3. 
-        Figure :ref:fig-bounded-natural-Lattice provides an illustration 
+        In the case of a natural lattice with borders, the labels of the
+        arcs maintain the same sequence but with some modifications
+        due to the presence of vertices with degrees 2 and 3.
+        Figure :ref:fig-bounded-natural-Lattice provides an illustration
         of a bounded natural lattice.
 
         .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
@@ -103,14 +107,14 @@ class Lattice(Graph):
         * 10 = 2: left, up;
         * 11 = 3: left, down.
 
-        Each binary value indicates the direction of movement, 
-        with 0 representing forward motion and 1 representing 
-        backward motion. The most significant bit corresponds to 
-        movement along the X-axis, while the least significant bit 
+        Each binary value indicates the direction of movement,
+        with 0 representing forward motion and 1 representing
+        backward motion. The most significant bit corresponds to
+        movement along the X-axis, while the least significant bit
         corresponds to movement along the Y-axis.
 
-        The order of arcs corresponds with the order of vertices 
-        and their respective directions. For example, 
+        The order of arcs corresponds with the order of vertices
+        and their respective directions. For example,
         consider a vertex :math:`(x, y)`. Then,
         :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
         are adjacent vertices.
@@ -130,7 +134,7 @@ class Lattice(Graph):
             :caption: Figure: Directions in the diagonal representation.
 
         For example, the labels of the arcs for
-        the :math:`3 \times 3`-lattice with periodic boundary 
+        the :math:`3 \times 3`-lattice with periodic boundary
         conditions are depicted in :ref:`fig-periodic-diagonal-lattice`
 
         .. graphviz:: ../../graphviz/lattice/periodic-diagonal.dot
@@ -139,10 +143,10 @@ class Lattice(Graph):
             :name: fig-periodic-diagonal-lattice
             :caption: Figure: Periodic diagonal 3x3-lattice.
 
-        In the case of a diagonal lattice with borders, the labels of the 
-        arcs maintain the same sequence but with some modifications. 
-        Figure :ref:`fig-bounded-diagonal-Lattice` provides an illustration 
-        of a bounded diagonal lattice.
+        In the case of a diagonal lattice with borders, the labels of the
+        arcs maintain the same sequence but with some modifications.
+        Figure :ref:`fig-bounded-diagonal-Lattice` provides
+        an illustration of a bounded diagonal lattice.
 
         .. graphviz:: ../../graphviz/lattice/bounded-diagonal.dot
             :align: center
@@ -150,12 +154,14 @@ class Lattice(Graph):
             :name: fig-bounded-diagonal-lattice
             :caption: Figure: Bounded 3x3-lattice in the diagonal representation.
 
-        Note that in this context, there exist two independent sublattices. 
-        In other words, a vertex in one sublattice is not accessible from 
-        a vertex in the other sublattice. This situation also arises 
-        if the diagonal lattice has periodic boundary conditions and both 
+        Note that in this context,
+        there exist two independent sublattices.
+        In other words, a vertex in one sublattice is not accessible from
+        a vertex in the other sublattice. This situation also arises
+        if the diagonal lattice has periodic boundary conditions and both
         dimensions are even.
-        Figure :ref:`fig-even-dim-diagonal` illustrates an example of this case.
+        Figure :ref:`fig-even-dim-diagonal` illustrates
+        an example of this case.
 
         .. graphviz:: ../../graphviz/lattice/even-dim-diagonal.dot
             :align: center
@@ -355,7 +361,7 @@ class Lattice(Graph):
             raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
 
         if self.periodic:
-            return 4*tail + self.arc_direction((tail, head))  
+            return 4*tail + self.arc_direction((tail, head))
 
         label = self.adj_matrix.indptr[tail]
         direction = self.arc_direction((tail, head))
@@ -377,7 +383,8 @@ class Lattice(Graph):
         r"""
         Arc in arc notation.
 
-        Given the arc label (a number), returns the arc in the ``(tail, head)`` notation.
+        Given the arc label (a number),
+        returns the arc in the ``(tail, head)`` notation.
 
         Parameters
         ----------
@@ -513,7 +520,7 @@ class Lattice(Graph):
 
         if not iterable:
             tail = self.vertex_label(tail[0], tail[1])
-            head = self.vertex_label(head[0], head[1]) 
+            head = self.vertex_label(head[0], head[1])
         return (tail, head)
 
     def previous_arc(self, arc):

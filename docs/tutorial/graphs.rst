@@ -2,20 +2,20 @@
 Graphs
 ======
 
-You have the option to either generate arbitrary graphs or create specific, 
+You have the option to either generate arbitrary graphs or create specific,
 well-known graphs.
 
 ----------------
 Arbitrary Graphs
 ----------------
 
-Currently, Hiperwalk supports only simple graphs. 
+Currently, Hiperwalk supports only simple graphs.
 You can create any graph by passing the adjacency matrix to
 the :class:`hiperwalk.Graph` constructor.
 
 You can obtain the adjacency matrix using `NetworkX
 <https://networkx.org/>`_.
-For instance, to generate the adjacency matrix of a ladder graph, 
+For instance, to generate the adjacency matrix of a ladder graph,
 you would execute the following commands:
 
 >>> import networkx as nx
@@ -26,7 +26,7 @@ you would execute the following commands:
     with 56 stored elements in Compressed Sparse Row format>
 
 
-Once you have the adjacency matrix, you can then generate a 
+Once you have the adjacency matrix, you can then generate a
 Hiperwalk graph.
 
 .. testsetup::
@@ -39,8 +39,8 @@ Hiperwalk graph.
 >>> hpw_ladder #doctest: +SKIP
 <hiperwalk.graph.graph.Graph object at 0x7f3bd0627eb0>
 
-After accomplishing this, it's advisable to delete the NetworkX graph. 
-This step is particularly important when dealing with large graphs, 
+After accomplishing this, it's advisable to delete the NetworkX graph.
+This step is particularly important when dealing with large graphs,
 as it helps prevent memory overload.
 
 >>> del ladder
@@ -58,14 +58,19 @@ Following this, we can use ``hpw_ladder`` to simulate a quantum walk.
 Specific Graphs
 ---------------
 
-Hiperwalk includes classes for well-known specific graphs, such as Line, Cycle, and Lattice. 
-For a complete list of specific graphs, refer to :ref:`docs_documentation_graph`.
+Hiperwalk includes classes for well-known specific graphs,
+such as Line, Cycle, and Lattice.
+For a complete list of specific graphs,
+refer to :ref:`docs_documentation_graph`.
 
-The key difference between creating an arbitrary graph and a specific graph is 
-that for the former, you must explicitly provide the adjacency matrix. 
-However, for the latter, the adjacency matrix is automatically generated 
-based on the number of vertices. Consequently, you can create a line with 10 vertices, 
-a cycle with 10 vertices, and a lattice of dimensions :math:`10 \times 10` using
+The key difference between creating an
+arbitrary graph and a specific graph is
+that for the former, you must explicitly provide the adjacency matrix.
+However, for the latter, the adjacency matrix is automatically generated
+based on the number of vertices.
+Consequently, you can create a line with 10 vertices,
+a cycle with 10 vertices,
+and a lattice of dimensions :math:`10 \times 10` using
 valid commands, respectively.
 
 >>> hpw.Line(10) #doctest: +SKIP
@@ -75,12 +80,12 @@ valid commands, respectively.
 >>> hpw.Lattice(10) #doctest: +SKIP
 <hiperwalk.graph.lattice.Lattice object at 0x7f0a6bbb2da0>
 
-Naturally, you can create specific graphs using NetworkX and 
+Naturally, you can create specific graphs using NetworkX and
 the :class:`hiperwalk.Graph` class.
-However, this approach is not recommended, especially when dealing with 
+However, this approach is not recommended, especially when dealing with
 coined quantum walks, as it may result in undesirable behavior.
 
-As an example, let's consider a Line with 10 vertices. 
+As an example, let's consider a Line with 10 vertices.
 First, we create the line using the :class:`hiperwalk.Graph` class.
 
 >>> path = nx.path_graph(10)
@@ -91,8 +96,8 @@ Next, we create the line using the :class:`hiperwalk.Line` class.
 
 >>> specific_line = hpw.Line(10)
 
-In a simple graph, we associate each edge with two arcs. Suppose we wish 
-to know the label of the arc that links vertex 1 to 2. This information 
+In a simple graph, we associate each edge with two arcs. Suppose we wish
+to know the label of the arc that links vertex 1 to 2. This information
 can be obtained using the :meth:`hiperwalk.Graph.arc_label` method.
 Observe the following results:
 
@@ -101,5 +106,6 @@ Observe the following results:
 >>> specific_line.arc_label(1, 2)
 1
 
-For further details on arc labels for each graph, refer to the Notes 
-section of each graph class, in this case, :class:`hiperwalk.Graph` and :class:`hiperwalk.Line`.
+For further details on arc labels for each graph, refer to the Notes
+section of each graph class, in this case,
+:class:`hiperwalk.Graph` and :class:`hiperwalk.Line`.
