@@ -26,7 +26,8 @@ class Line(Graph):
     the arcs :math:`(v, v + 1)` and :math:`(v, v - 1)`
     have labels :math:`a_0` and :math:`a_1` (respectively)
     such that  :math:`a_0 < a_1`.
-    This order is aligned with the description of coined quantum walks on the line in Reference [1]_.
+    This order is aligned with the description of
+    coined quantum walks on the line in Reference [1]_.
     The only exceptions to this rule are the extreme vertices
     0 and :math:`|V| - 1` because
     they only have one arc.
@@ -112,7 +113,7 @@ class Line(Graph):
         except TypeError:
             if arc == 0:
                 return 1
-            num_arcs = self.number_of_arcs() 
+            num_arcs = self.number_of_arcs()
             if arc == num_arcs - 1:
                 return num_arcs - 2
             return arc + 2 if arc % 2 == 1 else arc - 2

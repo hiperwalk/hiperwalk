@@ -32,7 +32,8 @@ class ContinuousWalk(QuantumWalk):
             It will be removed in version 2.0.
             Use ``graph`` instead.
 
-        Adjacency matrix of the graph on which the quantum walk takes place.
+        Adjacency matrix of the graph on which
+        the quantum walk takes place.
 
     **kwargs : optional
         Arguments to set the Hamiltonian.
@@ -56,8 +57,8 @@ class ContinuousWalk(QuantumWalk):
     :math:`0 \leq i < |V|`, where
     :math:`\ket i` is associated with the :math:`i`-th vertex.
 
-    This class can also facilitate the simulation of any Hamiltonian 
-    evolution. To do this, simply pass the desired Hamiltonian in place 
+    This class can also facilitate the simulation of any Hamiltonian
+    evolution. To do this, simply pass the desired Hamiltonian in place
     of the adjacency matrix.
     """
 
@@ -103,7 +104,8 @@ class ContinuousWalk(QuantumWalk):
 
     def get_gamma(self):
         r"""
-        Retrieves the gamma value used in the definition of the Hamiltonian.
+        Retrieves the gamma value used in
+        the definition of the Hamiltonian.
 
         Returns
         -------
@@ -118,7 +120,7 @@ class ContinuousWalk(QuantumWalk):
 
         Parameters
         ----------
-        **kwargs : 
+        **kwargs :
             Additional arguments.
             Used for determining the gamma value and marked vertices.
             See :meth:`set_gamma` and :meth:`set_marked`.
@@ -229,7 +231,8 @@ class ContinuousWalk(QuantumWalk):
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
 
-        The evolution operator is constructed using Taylor Series expansion.
+        The evolution operator is constructed using
+        Taylor Series expansion.
 
         .. warning::
             For floating time (not integer),

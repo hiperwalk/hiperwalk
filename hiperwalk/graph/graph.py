@@ -45,7 +45,8 @@ class Graph():
     generate a valid quantum walk.
 
     This class can be passed as argument to plotting functions.
-    In this case, the default representation for the graph will be displayed.
+    In this case,
+    the default representation for the graph will be displayed.
 
     The recommended parameter type is
     :class:`scipy.sparse.csr_array` using ``dtype=np.int8``,
@@ -53,8 +54,8 @@ class Graph():
     If any entry differs from 0 or 1,
     some methods may not operate as expected.
 
-    Each edge of a given graph :math:`G(V, E)`
-    is associated with two arcs in the symmetric digraph :math:`\vec{G}(V, A)`,
+    Each edge of a given graph :math:`G(V, E)` is associated with
+    two arcs in the symmetric digraph :math:`\vec{G}(V, A)`,
     where
 
     .. math::
@@ -152,10 +153,11 @@ class Graph():
 
     def embeddable(self):
         r"""
-        Returns True if the graph can be embedded on the plane, and False otherwise.
+        Returns ``True`` if the graph can be embedded on the plane,
+        and ``False`` otherwise.
 
-        If a graph can be embedded on the plane, 
-        we can assign meaningful right or left directions, 
+        If a graph can be embedded on the plane,
+        we can assign meaningful right or left directions,
         and clockwise or counter-clockwise rotations to edges and arcs
 
         Notes
