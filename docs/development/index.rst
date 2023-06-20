@@ -4,15 +4,14 @@
 Development
 ===========
 
-HiperWalk is built on top of some Python libraries.
-Before developing for HiperWalk,
-we must install these libraries.
-HiperWalk requires
+HiperWalk is built upon several Python libraries. 
+Before developing for HiperWalk, these libraries need to be installed. 
+The required libraries include
 `numpy <https://numpy.org/>`_,
 `scipy <https://scipy.org/>`_,
 `networkx <https://networkx.org/>`_, and
 `matplotlib <https://matplotlib.org/>`_.
-To install these libraries run
+To install these libraries, use the following commands:
 
 .. code-block:: shell
 
@@ -21,15 +20,14 @@ To install these libraries run
    pip3 install networkx
    pip3 install matplotlib
 
-The ``main`` branch is where the new features are developed.
-To contribute, clone the repository.
+The ``main`` branch is the main development area for new features. 
+To contribute, first clone the repository.
 
 .. code-block:: shell
 
     git clone https://github.com/hiperwalk/hiperwalk.git
 
-Then, make the desired alterations.
-And make a pull request.
+Next, make the desired modifications and submit a pull request.
 
 Testing
 =======
