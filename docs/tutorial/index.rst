@@ -28,7 +28,7 @@ Import the Hiperwalk package
 Define a graph
 --------------
 
-n this step, we generate a line comprising 11 vertices. 
+In this step, we generate a line comprising 11 vertices. 
 The output is an object from the :class:`hiperwalk.Line` class.
 
 >>> N = 11
