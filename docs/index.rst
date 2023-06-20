@@ -14,7 +14,7 @@ CPUs, General-Purpose GPUs, and accelerator cards, for substantial speed enhance
 This high-level optimization is made user-friendly as it doesn't require a parallel 
 programming background. Hiperwalk is an ongoing project, using 
 the capabilities of Python, C, OpenCL, among other languages, to provide a robust 
-and efficient environment for the simulation of quantum walks and quantum algorithms.
+and efficient environment for the simulation of quantum walks and spatial search algorithms.
 
 .. toctree::
    :maxdepth: 3
