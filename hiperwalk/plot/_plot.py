@@ -39,10 +39,6 @@ def plot_probability_distribution(
         ``{'bar', 'line', 'graph', 'histogram', 'grid'}``.
         If ``None``, uses default plotting. Usually ``bar``,
         but default plotting changes according to ``graph``.
-    animate : bool, default=False
-        Whether or not to animate multiple plots.
-        If ``False``, each quantum walk step generates an image.
-        If ``True``, each quantum walk step is used as an animation frame.
     show : bool, default=True
         Whether or not to show plots or animation.
         With ``show=True`` we have:
@@ -65,8 +61,6 @@ def plot_probability_distribution(
         the j-step is saved in the ``filename-j.png`` file;
         if ``animate==True``,
         the entire walk is saved in the ``filename.fig`` file.
-    interval : int, default=250
-        Time in milliseconds that each frame is shown if ``animate==True``.
     graph : optional
         The structure of the graph on which the walk occurs.
         The graph labels are used as plotting labels.
@@ -82,13 +76,6 @@ def plot_probability_distribution(
             NetworkX Graph
         * :class:`scipy.sparse.csr_matrix`
             Adjacency matrix.
-    **kwargs : dict, optional
-        Extra arguments to further customize plotting.
-        Valid arguments depend on ``plot``.
-        Check Other Parameters Section for details.
-
-    Other Parameters
-    ----------------
     rescale : bool, optional
         If ``False`` or omitted, the reference maximum probability
         is the global one.
@@ -102,7 +89,19 @@ def plot_probability_distribution(
         (halfway betweeen 300 and 3000),
         while for ``rescale=True``,
         the step maximum node size shown is 3000.
+    animate : bool, default=False
+        Whether or not to animate multiple plots.
+        If ``False``, each quantum walk step generates an image.
+        If ``True``, each quantum walk step is used as an animation frame.
+    interval : int, default=250
+        Time in milliseconds that each frame is shown if ``animate==True``.
+    **kwargs : dict, optional
+        Extra arguments to further customize plotting.
+        Valid arguments depend on ``plot``.
+        Check Other Parameters Section for details.
 
+    Other Parameters
+    ----------------
     Bar Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
 
@@ -610,7 +609,6 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     # UpdateNodes may create kwargs['node_size']
     # min_node_size and max_node_size are not valid keys
     # for nx.draw kwargs
-    print('rescale' in kwargs)
     _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 

@@ -12,7 +12,7 @@ To plot the probability distribution given the probabilities,
 simply pass the probabilities as arguments to the
 :meth:`hiperwalk.plot_probability_distribution` function.
 
->>> import hiperwalk as hpw
+>>> import hiperwalk as hpw #doctest: +SKIP
 >>> # create graph, quantum walk, simulate
 >>> # compute the probability distribution
 >>> hpw.plot_probability_distribution(prob_dist) #doctest: +SKIP
@@ -28,7 +28,7 @@ before showing the next one.
 Customization
 =============
 
-Albeit plotting was simple,
+Albeit plotting is simple,
 configuring the plot to behave as the user wishes may be a bit tricky.
 We antecipate that the plotting was built on top of
 `Matplotlib <https://matplotlib.org/>`_ and
@@ -42,13 +42,102 @@ a bar plot is being request.
 Plot Types
 ----------
 
-#. TODO
-#. TODO
+There are five plot types:
+bar, histogram, line, grid and graph.
+The difference between the plots are explained and illustrated in
+the following subsections.
+All plots correspond to the following quantum walk simulation on
+the :math:`7 \times 7`-dimensional natural lattice.
 
-Hiperwalk-Specific Arguments
+>>> import hiperwalk as hpw
+>>> dim = 7
+>>> lat = hpw.Lattice(dim)
+>>> center = (dim//2, dim//2)
+>>> right = (center[0] + 1, center[1])
+>>> qw = hpw.CoinedWalk(lat, shift='persistent', coin='grover')
+>>> psi0 = qw.state([0.5, (center, right)],
+>>>                 [0.5, (right, center)])
+>>> psi = qw.simulate(time=dim//2, initial_state=psi0)
+>>> prob = qw.probability_distribution(psi)
+>>> prob
+array([[0.       , 0.       , 0.       , 0.0078125, 0.0078125, 0.       ,
+        0.       , 0.       , 0.       , 0.0078125, 0.0390625, 0.0390625,
+        0.0078125, 0.       , 0.       , 0.0078125, 0.0390625, 0.0390625,
+        0.0390625, 0.0390625, 0.0078125, 0.015625 , 0.0078125, 0.1953125,
+        0.0078125, 0.0078125, 0.1953125, 0.0078125, 0.       , 0.0078125,
+        0.0390625, 0.0390625, 0.0390625, 0.0390625, 0.0078125, 0.       ,
+        0.       , 0.0078125, 0.0390625, 0.0390625, 0.0078125, 0.       ,
+        0.       , 0.       , 0.       , 0.0078125, 0.0078125, 0.       ,
+        0.       ]])
+
+Bar Plot
+''''''''
+
+The vertices are represented on the x-axis.
+The respective probabilities are represented on the y-axis.
+Each vertex is associated with a bar.
+
+>>> hpw.plot_probability_distribution(prob, plot='bar') #doctest: +SKIP
+
+.. image:: bar.png
+
+It is built on top of :obj:`matplotlib.pyplot.bar`.
+The respective valid matplotlib keywords can be used to customize the plot.
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='bar', color='red', edgecolor='black', linewidth=3,
+...     tick_label=[str((x, y)) for x in range(dim) for y in range(dim)]
+... ) #doctest: +SKIP
+
+.. image:: custom_bar.png
+
+
+Histogram Plot
+''''''''''''''
+
+This is essentially the same as the bar plot
+but the ``width`` kwarg is *overriden* so the bars are not separated.
+
+.. image:: histogram.png
+
+Line Plot
+'''''''''
+
+The vertices are represented on the x-axis.
+The respective probabilities are represented on the y-axis.
+The probability of each vertex is highlighted by a marker.
+A line is drawn between adjacent markers.
+
+>>> hpw.plot_probability_distribution(prob, plot='line') #doctest: +SKIP
+
+.. image:: line.png
+
+It is built on top of :obj:`matplotlib.pyplot.plot`.
+The respective valid matplotlib keywords can be used to customize the plot.
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='bar', color='red', edgecolor='black', linewidth=3,
+...     tick_label=[str((x, y)) for x in range(dim) for y in range(dim)]
+... ) #doctest: +SKIP
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='line', linewidth=3, color='black', linestyle='--',
+...     marker='X', markerfacecolor='yellow', markersize=15,
+...     markeredgewidth=2, markeredgecolor='red') #doctest: +SKIP
+
+.. image:: custom_line.png
+
+Grid Plot
+'''''''''
+
+Graph Plot
+''''''''''
+
+Hiperwalk Specific Arguments
 ----------------------------
-show
-filename
-animate
-interval
-rescale
+
+* show
+* filename
+* animate
+* interval
+* rescale
