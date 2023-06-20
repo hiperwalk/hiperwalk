@@ -36,7 +36,7 @@ def plot_probability_distribution(
     plot : str, default=None
         The plot type.
         The valid options are
-        ``{'bar', 'line', 'graph', 'histogram', 'grid'}``.
+        ``{'bar', 'line', 'graph', 'histogram', 'plane'}``.
         If ``None``, uses default plotting. Usually ``bar``,
         but default plotting changes according to ``graph``.
     show : bool, default=True
@@ -137,9 +137,9 @@ def plot_probability_distribution(
     Line Plots
         See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
-    Grid Plots
+    Plane Plots
         dimensions: 2-tuple of int
-            grid dimensions in ``(x_dim, y_dim)`` format.
+            plane dimensions in ``(x_dim, y_dim)`` format.
 
 
     Raises
@@ -204,7 +204,7 @@ def plot_probability_distribution(
         plot = 'bar'
 
     plot = plot.lower()
-    valid_plots = ['bar', 'line', 'graph', 'histogram', 'grid']
+    valid_plots = ['bar', 'line', 'graph', 'histogram', 'plane']
 
     if plot not in valid_plots:
         raise ValueError(
@@ -225,14 +225,14 @@ def plot_probability_distribution(
             valid_plots[1]: _configure_plot_figure,
             valid_plots[2]: _configure_graph_figure,
             valid_plots[3]: _configure_plot_figure,
-            valid_plots[4]: _configure_grid_figure}
+            valid_plots[4]: _configure_plane_figure}
     # plot functions: code for plotting the graph accordingly
     plot_funcs = {
         valid_plots[0]: _plot_probability_distribution_on_bars,
         valid_plots[1]: _plot_probability_distribution_on_line,
         valid_plots[2]: _plot_probability_distribution_on_graph,
         valid_plots[3]: _plot_probability_distribution_on_histogram,
-        valid_plots[4]: _plot_probability_distribution_on_grid
+        valid_plots[4]: _plot_probability_distribution_on_plane
     }
 
     # preparing probabilities to shape requested by called functions
@@ -280,7 +280,7 @@ def plot_probability_distribution(
             anim.show_animation()
 
 def _default_graph_kwargs(kwargs, plot):
-    if ((plot is None or plot == 'graph' or plot == 'grid')
+    if ((plot is None or plot == 'graph' or plot == 'plane')
         and not 'cmap' in kwargs
     ):
         kwargs['cmap'] = 'default'
@@ -295,7 +295,7 @@ def _default_graph_kwargs(kwargs, plot):
     if isinstance(graph, Lattice):
         if 'dimensions' not in kwargs:
             kwargs['dimensions'] = graph.dimensions()
-        return 'grid' if plot is None else plot
+        return 'plane' if plot is None else plot
 
     return 'graph' if plot is None else plot
 
@@ -427,7 +427,7 @@ def _configure_graph_figure(num_vert=None, fig_width=None,
                             fig_height=None):
     return _configure_figure(num_vert, fig_width, fig_height)
 
-def _configure_grid_figure(num_vert=None, fig_width=None,
+def _configure_plane_figure(num_vert=None, fig_width=None,
                            fig_height=None):
     if fig_width is None:
         fig_width = plt.rcParams["figure.figsize"][0]
@@ -739,7 +739,7 @@ def _configure_colorbar(ax, kwargs):
         the inferior and superior limit for colorbar values, respectively.
         'cmap' describes a valid matplotlib colormap
     """
-    from mpl_toolkits.axes_grid1 import make_axes_locatable
+    from mpl_toolkits.axes_plane1 import make_axes_locatable
 
     sm = plt.cm.ScalarMappable(
         cmap=kwargs['cmap'],
@@ -757,7 +757,7 @@ def _configure_colorbar(ax, kwargs):
 
     cbar.ax.tick_params(labelsize=14, length=7)
 
-def _default_grid_kwargs(kwargs):
+def _default_plane_kwargs(kwargs):
     if not 'cmap' in kwargs:
         kwargs['cmap'] = 'default'
 
@@ -776,12 +776,12 @@ def _default_grid_kwargs(kwargs):
     if 'alpha' not in kwargs:
         kwargs['alpha'] = 0.5
 
-def _plot_probability_distribution_on_grid(
+def _plot_probability_distribution_on_plane(
         probabilities, ax, labels=None, graph=None,
         min_prob=None, max_prob=None, dimensions=None, **kwargs
     ):
     """
-    Plots probability distribution on the grid.
+    Plots probability distribution on the plane.
     """
     x_dim, y_dim = dimensions
 
@@ -790,7 +790,7 @@ def _plot_probability_distribution_on_grid(
     X, Y = np.meshgrid(X, Y)
     Z = np.reshape(probabilities, (x_dim, y_dim))
 
-    _default_grid_kwargs(kwargs)
+    _default_plane_kwargs(kwargs)
 
     cmap = kwargs.pop('cmap')
     mappable = plt.cm.ScalarMappable(cmap=cmap)

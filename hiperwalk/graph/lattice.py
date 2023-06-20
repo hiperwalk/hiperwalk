@@ -589,7 +589,7 @@ class Lattice(Graph):
 
     def get_central_vertex(self):
         r"""
-        Vertex with label in the center of the graph as grid.
+        Vertex with label in the center of the graph as plane.
 
         .. deprecated:: 2.0a1
             ``get_central_vertex`` will be removed in Hiperwalk 2.0 because
@@ -597,8 +597,8 @@ class Lattice(Graph):
             :meth:`dimensions`.
 
         The central vertex is the vertex that would be located at the
-        grid center after mapping every vertex ``(x, y)`` to its
-        respetive grid point.
+        plane center after mapping every vertex ``(x, y)`` to its
+        respetive plane point.
         
         This is not the center vertex.
 
