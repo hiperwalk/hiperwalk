@@ -43,7 +43,7 @@ Plot Types
 ----------
 
 There are five plot types:
-bar, histogram, line, grid and graph.
+bar, histogram, line, plane and graph.
 The difference between the plots are explained and illustrated in
 the following subsections.
 All plots correspond to the following quantum walk simulation on
@@ -127,8 +127,30 @@ The respective valid matplotlib keywords can be used to customize the plot.
 
 .. image:: custom_line.png
 
-Grid Plot
-'''''''''
+Plane Plot
+''''''''''
+
+If a graph is embeddable on the plane,
+each vertex can be assigned a cartesian coordinate and
+the probability can be shown on the z-axis.
+To obtain the correct cartesian coordinates,
+the graph *must* be specified.
+
+>>> hpw.plot_probability_distribution(prob, plot='plane',
+...                                   graph=lat) #doctest: +SKIP
+
+.. image:: plane.png
+
+The plotting is built on top of...
+:obj:`mpl_toolkits.mplot3d.axes3d.Axes3D.plot_surface`.
+Any optional keywords accepted by the matplotlib function can
+be passed to the Hiperwalk function.
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='plane', graph=lat, cmap='YlOrRd_r', alpha=1
+... ) #doctest: +SKIP
+
+.. image:: custom_plane.png
 
 Graph Plot
 ''''''''''
