@@ -56,7 +56,7 @@ the :math:`7 \times 7`-dimensional natural lattice.
 >>> right = (center[0] + 1, center[1])
 >>> qw = hpw.CoinedWalk(lat, shift='persistent', coin='grover')
 >>> psi0 = qw.state([0.5, (center, right)],
->>>                 [0.5, (right, center)])
+...                 [0.5, (right, center)])
 >>> psi = qw.simulate(time=dim//2, initial_state=psi0)
 >>> prob = qw.probability_distribution(psi)
 >>> prob
@@ -87,7 +87,7 @@ The respective valid matplotlib keywords can be used to customize the plot.
 >>> hpw.plot_probability_distribution(
 ...     prob, plot='bar', color='red', edgecolor='black', linewidth=3,
 ...     tick_label=[str(lat.vertex_coordinates(i))
-                    for i in range(lat.number_of_vertices())]
+...                 for i in range(lat.number_of_vertices())]
 ... ) #doctest: +SKIP
 
 .. image:: custom_bar.png
@@ -175,7 +175,7 @@ accepts any valid keywords associated with it.
 ...     cmap='copper', node_shape='s',
 ...     font_color='white', font_weight='bold',
 ...     edge_color='red', width=2, style=':',
-... )
+... ) #doctest: +SKIP
 
 
 .. image:: custom_graph.png
@@ -188,15 +188,61 @@ Hence, it is sufficient to specify the probabilities and the graph
 to obtain the default plot.
 For instance, the default lattice plot is the plane plot.
 
->>> hpw.plot_probability_distribution(prob, graph=lat)
+>>> hpw.plot_probability_distribution(prob, graph=lat) #doctest: +SKIP
 
 .. image:: plane.png
 
-Hiperwalk Specific Arguments
+Hiperwalk Specific Keyworkds
 ----------------------------
 
-* show
-* filename
-* animate
-* interval
-* rescale
+There are some keywords specific to Hiperwalk.
+These keywords are detailed on the
+:obj:`hiperwalk.plot_probability_distribution` documentation.
+The following is a list of specific Hiperwalk keywords.
+
+* ``plot``
+* ``show``
+* ``filename``
+* ``graph``
+* ``rescale``
+* ``animate``
+* ``interval``
+* ``min_node_size``
+* ``max_node_size``
+
+In this tutorial, only two keywords are detailed:
+``animate`` and ``rescale``.
+For better comprehension and visualization,
+the probabilities of the intermediate simulation steps are saved.
+
+>>> psi = qw.simulate(time=(dim//2, 1), initial_state=psi0)
+>>> prob = qw.probability_distribution(psi)
+
+``animate``
+'''''''''''
+
+If multiple probabilites are stored,
+the ``animate`` keyword can be used to generate an animation.
+The ``animate`` keyword accepts a boolean value.
+If ``animate = False`` an image for each probability is generated.
+If ``animate = True`` an animation is generated.
+
+>>> hpw.plot_probability_distribution(
+...     prob, graph=lat, animate=True) #doctest: +SKIP
+
+.. image:: animate.gif
+
+
+``rescale``
+'''''''''''
+
+In the previous section plot, the probability axis was fixed.
+As the graph size and number of simulation steps increases,
+the walker (and the probabilities) tend to spread.
+Consequently, in later simulation steps,
+it may be hard to visualize the probabilities.
+If ``rescale`` is set to ``True``, each plot is rescaled such that
+the maximum probability of the current plot corresponds to
+the maximum value on the axis.
+
+.. image:: rescale.gif
