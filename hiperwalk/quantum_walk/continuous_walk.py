@@ -45,11 +45,12 @@ class ContinuousWalk(QuantumWalk):
     Notes
     -----
     Let :math:`A` be the adjacency matrix of graph :math:`G(V, E)`.
-    :math:`A` is a :math:`|V| \times |V|`-dimensional matrix such that
+    :math:`A` is the :math:`|V| \times |V|`-dimensional matrix
+    
     .. math::
         A_{i,j} = \begin{cases}
             1, \text{ if } (i,j) \in E(G),\\
-            0, \text{ otherwise}
+            0, \text{ otherwise.}
         \end{cases}
 
     The Hamiltonian, which depends on the adjacency matrix and the location of 
