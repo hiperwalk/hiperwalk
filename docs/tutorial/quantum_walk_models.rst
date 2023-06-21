@@ -276,20 +276,20 @@ Grover to even vertices and Hadamard to odd vertices.
 >>> (C1 != C2).nnz == 0
 True
 
-The ``marked`` key accepts two types of entries.
+The ``marked`` key can accept two types of inputs:
 
-* A list of the marked vertices.
-  The vertices are just set as marked,
+* A list of the marked vertices: In this case,
+  the vertices are simply set as marked,
   but the coin operator remains unchanged.
 * A dictionary with the coin name as key and
-  the list of vertices as values.
-  This is analogous to the dictionary accepted by
-  :meth:`hiperwalk.CoinedWalk.set_coin`.
+  the list of vertices as values:
+  This operates similarly to the dictionary accepted by the
+  :meth:`hiperwalk.CoinedWalk.set_coin` method.
   The vertices are set as marked and
-  *the coin operator is changed* accordingly.
+  *the coin operator is modified* accordingly.
 
-Here are valid methods to create a coin that applies the Grover operator 
-to even vertices and the Hadamard operator to odd vertices:
+Here are examples of how to create a coin that applies the Grover 
+operator to even vertices and the Hadamard operator to odd vertices:
 
 >>> coined.set_coin(coin={'grover': list(range(0, 11, 2)),
 ...                       'minus_identity': []})
@@ -305,11 +305,11 @@ True
 >>> np.all(M1 == M2)
 True
 
-All these keys can be combined in a single call to the
-:meth:`hiperwalk.CoinedWalk.set_evolution` method during
-object instantiation.
+All these keys can be integrated into a single call to the
+:meth:`hiperwalk.CoinedWalk.set_evolution` method when creating 
+an instance of the object.
 
-Continuous Model
+Continuous-time Model
 ''''''''''''''''
 The dynamics of the continuous-time quantum walk is
 fully defined by the Hamiltonian.
@@ -365,7 +365,7 @@ the ``i``-th entry corresponds to the ``i``-th saved state.
 
 Coined Model
 ''''''''''''
-In the Coined Walk model,
+In the coined quantum walk model,
 the ``time`` is discrete.
 Thus, only integer entries are accepted.
 There are three argument types for ``time``.
@@ -414,18 +414,19 @@ There are three argument types for ``time``.
   >>> len(states[0]) == coined.hilbert_space_dimension()
   True
 
-Continuous Model
+Continuous-time Model
 ''''''''''''''''
-In the Continuous Walk model,
-the ``time`` is continuous.
-Thus, float entries are accepted.
-It works analogous to the Coined Model,
-but ``step`` is used to rescale all values.
+In the continuous-time quantum walk model,
+the ``time`` parameter is continuous, which means it can accept 
+float values. The operation is similar to the coined model, but here, 
+the ``step`` parameter is used to rescale all values. 
+This means the ``step`` parameter adjusts the scale of time, 
+accommodating the continuous nature of time in this model.
 
 * float : ``stop``. Unchanged.
 * 2-tuple of float : ``(stop, step)``.
   The evolution operator ``continuous.get_evolution(time=step)`` is
-  considered a single step and the ``time`` is converted to
+  considered a single step and the ``time`` parameter is converted to
   ``(stop/step, 1)``.
   The value ``stop/step`` is rounded up if it is within
   a ``1e-05`` value of the next integer
@@ -435,24 +436,25 @@ but ``step`` is used to rescale all values.
   The evolution operator ``continuous.get_evolution(time=step)`` is
   considered a single step and the ``time`` is converted to
   ``(start/step, stop/step, 1)``.
-  The values ``start/step`` and ``stop/step`` are rounded up
-  if it is within a ``1e-05`` value of the next integer
-  and rounded down otherwise.
+  The values ``start/step`` and ``stop/step`` are subjected to rounding. 
+  If it's within a 1e-05 value of the next integer, it's rounded up; 
+  otherwise, it's rounded down. This ensures a more accurate representation 
+  of time within the model's continuous framework.
 
 For example, if ``time=(10, 0.51)`` --
 which is equivalent to ``time=(0, 10, 0.51)`` --
 it is converted to ``(19, 1)``.
-Hence the states corresponding to timestamps
-``[0.   , 0.501, 1.002, 1.503, ..., 9.018, 9.519]`` wil be saved.
+Thus, the states corresponding to timestamps
+``[0.   , 0.501, 1.002, 1.503, ..., 9.018, 9.519]`` wil be stored.
 On the other hand, if ``time=(10, 0.5000001)``,
-it is converted to ``(20, 1)``.
-Resulting in the states corresponding to the timestamps
+it is converted to ``(20, 1)``, which
+results in the states corresponding to the timestamps
 ``[ 0.       ,  0.5000001,  1.0000002,  ...,  9.5000019, 10.000002 ])``.
 
 Calculating Probability
 -----------------------
 
-There are two ways of calculating probability:
+There are two ways of calculating probabilities:
 :meth:`hiperwalk.QuantumWalk.probability` and
 :meth:`hiperwalk.QuantumWalk.probability_distribution`.
 :meth:`hiperwalk.QuantumWalk.probability` computes
@@ -468,7 +470,7 @@ True
 calculates the probability of each vertex.
 Basically, the probability of vertex ``v`` is
 the sum of the probabilities of each entry
-corresponding to an arc with tail in ``v``.
+corresponding to arcs with tail ``v``.
 
 >>> prob_dist = coined.probability_distribution(states)
 >>> len(prob_dist) == len(states)
@@ -485,8 +487,12 @@ True
    :meth:`hiperwalk.ContinuousWalk.probability_distribution` yield
    the same result.
 
-Now that a probability distribution was obtained,
-the user may wish to visualize it graphically to
-have additional insights.
-For more information about plotting and its customization,
-see next section.
+Having obtained a probability distribution, the user may find it helpful to 
+visualize this data graphically to gain further insights. Graphical 
+representation can make complex data more understandable, reveal underlying 
+patterns, and support more effective data analysis.
+
+For more information about how to create plots and customize them to best 
+represent your data, please refer to the following section. This will cover 
+the specifics of data visualization, including various plotting techniques 
+and customization options.
