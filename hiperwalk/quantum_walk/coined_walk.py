@@ -16,7 +16,7 @@ if __DEBUG__:
 class CoinedWalk(QuantumWalk):
     r"""
     Manage an instance of a coined quantum walk on
-    an arbitrary simple graph.
+    any simple graph.
 
     This class provides methods for handling, simulating, and generating
     operators within the coined quantum walk model for
