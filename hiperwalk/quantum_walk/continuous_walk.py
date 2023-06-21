@@ -10,8 +10,8 @@ except:
 
 class ContinuousWalk(QuantumWalk):
     r"""
-    Manage an instance of the continuous-time quantum walk
-    on an arbitrary simple graph.
+    Manage an instance of a continuous-time quantum walk
+    on any simple graph.
 
     For further implementation details, refer to the Notes Section.
 
@@ -45,13 +45,16 @@ class ContinuousWalk(QuantumWalk):
     Notes
     -----
     Let :math:`A` be the adjacency matrix of graph :math:`G(V, E)`.
-    :math:`A` is a :math:`|V| \times |V|`-dimensional matrix such that
-
+    :math:`A` is the :math:`|V| \times |V|`-dimensional matrix
+    
     .. math::
         A_{i,j} = \begin{cases}
             1, \text{ if } (i,j) \in E(G),\\
-            0, \text{ otherwise}
+            0, \text{ otherwise.}
         \end{cases}
+
+    The Hamiltonian, which depends on the adjacency matrix and the location of 
+    the marked vertices, is described in the set_hamiltonian method.
 
     The states of the computational basis are :math:`\ket{i}` for
     :math:`0 \leq i < |V|`, where
@@ -202,12 +205,11 @@ class ContinuousWalk(QuantumWalk):
         Parameters
         ----------
         time : float
-            Gerate the evolution operator of the given time.
+            Generate the evolution operator of the given time.
 
         hpc : bool, default = True
-            Whether or not to use neblina hpc functions to
-            generate the evolution operator.
-
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
         Returns
         -------
         :class:`numpy.ndarray`.
@@ -232,14 +234,14 @@ class ContinuousWalk(QuantumWalk):
         :math:`t` is the time.
 
         The evolution operator is constructed using
-        Taylor Series expansion.
+        a Taylor series expansion.
 
         .. warning::
-            For floating time (not integer),
-            the result is approximated. It is recommended to
-            choose a small time interval and performing
-            multiple matrix multiplications to
-            mitigate uounding errors.
+            For non-integer time (floating number),
+            the result is approximate. It is recommended 
+            to select a small time interval and perform 
+            multiple matrix multiplications to minimize 
+            rounding errors.
         """
         if time is None or time < 0:
             raise ValueError(
