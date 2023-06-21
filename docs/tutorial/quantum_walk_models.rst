@@ -48,7 +48,7 @@ To create a coined quantum walk, we execute
 <hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f655b0cd900>
 
 The Hilbert space of the coined quantum walk has dimension
-:math`2|E|`:, i.e. the number of arcs.
+:math:`2|E|`, i.e. the number of arcs.
 
 >>> coined.hilbert_space_dimension() == cycle.number_of_arcs()
 True
@@ -63,7 +63,7 @@ accepted default value for ``gamma`` in the literature.
 <hiperwalk.quantum_walk.continuous_walk.ContinuousWalk object at 0x7f655b0cd8d0>
 
 The Hilbert space of the continuous-time quantum walk has dimension
-:math`|V|`:, i.e. the number of verties.
+:math:`|V|`, i.e. the number of verties.
 
 >>> continuous.hilbert_space_dimension() == cycle.number_of_vertices()
 True
