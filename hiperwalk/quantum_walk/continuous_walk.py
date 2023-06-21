@@ -54,7 +54,7 @@ class ContinuousWalk(QuantumWalk):
         \end{cases}
 
     The Hamiltonian, which depends on the adjacency matrix and the location of 
-    the marked vertices, is described in the `set_hamiltonian` method.
+    the marked vertices, is described in the :meth:`set_hamiltonian` method.
 
     The states of the computational basis are :math:`\ket{i}` for
     :math:`0 \leq i < |V|`, where
