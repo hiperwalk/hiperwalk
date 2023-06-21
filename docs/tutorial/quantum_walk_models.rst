@@ -26,7 +26,7 @@ Creating a Quantum Walk
    import hiperwalk as hpw 
    cycle = hpw.Cycle(11)
 
-For creating a quantum qalk,
+For creating a quantum walk,
 we must first define the graph in which the quantum walk will 
 take place. This can be accomplished by passing a :class:`hiperwalk.Graph` 
 object to the Quantum Walk constructor.
@@ -63,7 +63,7 @@ accepted default value for ``gamma`` in the literature.
 <hiperwalk.quantum_walk.continuous_walk.ContinuousWalk object at 0x7f655b0cd8d0>
 
 The Hilbert space of the continuous-time quantum walk has dimension
-:math:`|V|`, i.e. the number of verties.
+:math:`|V|`, i.e. the number of vertices.
 
 >>> continuous.hilbert_space_dimension() == cycle.number_of_vertices()
 True
@@ -443,7 +443,7 @@ but ``step`` is used to rescale all values.
 For example, if ``time=(10, 0.51)`` --
 which is equivalent to ``time=(0, 10, 0.51)`` --
 it is converted to ``(19, 1)``.
-Hence the states coresponding to timestamps
+Hence the states corresponding to timestamps
 ``[0.   , 0.501, 1.002, 1.503, ..., 9.018, 9.519]`` wil be saved.
 On the other hand, if ``time=(10, 0.5000001)``,
 it is converted to ``(20, 1)``.
