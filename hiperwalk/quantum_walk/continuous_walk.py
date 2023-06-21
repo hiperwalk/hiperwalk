@@ -44,8 +44,8 @@ class ContinuousWalk(QuantumWalk):
 
     Notes
     -----
-    Let :math:`A` be the adjacency matrix of graph :math:`G(V, E)`.
-    :math:`A` is the :math:`|V| \times |V|`-dimensional matrix
+    The adjacency matrix of a graph :math:`G(V, E)` is
+    the :math:`|V| \times |V|`-dimensional matrix :math:`A` such that
     
     .. math::
         A_{i,j} = \begin{cases}
