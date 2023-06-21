@@ -293,9 +293,11 @@ def _default_graph_kwargs(kwargs, plot):
 
     # hiperwalk graph
     if isinstance(graph, Lattice):
-        if 'dimensions' not in kwargs:
+        if plot is None:
+            plot = 'plane'
+        if plot == 'plane' and 'dimensions' not in kwargs:
             kwargs['dimensions'] = graph.dimensions()
-        return 'plane' if plot is None else plot
+        return plot
 
     return 'graph' if plot is None else plot
 
@@ -739,7 +741,7 @@ def _configure_colorbar(ax, kwargs):
         the inferior and superior limit for colorbar values, respectively.
         'cmap' describes a valid matplotlib colormap
     """
-    from mpl_toolkits.axes_plane1 import make_axes_locatable
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     sm = plt.cm.ScalarMappable(
         cmap=kwargs['cmap'],
