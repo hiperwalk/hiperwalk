@@ -185,30 +185,28 @@ the amplitudes are renormalized when needed.
 ...                  [1, 3])
 array([0.5, 0.5, 0.5, 0.5, 0. , 0. , 0. , 0. , 0. , 0. , 0. ])
 
-Simulating
+
+Simulation of Propagation
 ----------
 
-Once a quantum walk is created,
-a valid evolution operator is associated with it.
-The user may change the evolution operator
-upon the quantum walk creation or afterwards.
-After defining the evolution operator,
-the user invokes the simulation process,
-determining which intermediate states are of interest.
+Once a quantum walk is defined, it is linked to an appropriate evolution operator. 
+The user has the flexibility to modify this operator either during 
+the quantum walk's creation or at any time afterward. Once the evolution 
+operator is set, the user triggers the simulation process, 
+deciding which intermediate states are of particular interest.
 
 Configuring the evolution operator
 ``````````````````````````````````
-To configure the evolution operator,
-check the :meth:`hiperwalk.QuantumWalk.set_evolution` method.
-This method parameters are model-dependent.
+To set up the evolution operator, users should refer to 
+the :meth:`hiperwalk.QuantumWalk.set_evolution` method. 
+Note that the parameters for this method depend on the model being used.
 
-Regardless of the method,
-:meth:`hiperwalk.QuantumWalk.set_evolution` is invoked upon the
-Quantum Walk instantiation.
-Hence, the constructors accept any parameter valid for ``set_evolution``.
-To illustrate this,
-let us analyze the explicit evolution operator of two Coined Walks
-(which can be obtained by :meth:`hiperwalk.QuantumWalk.get_evolution`).
+Regardless of the method employed, :meth:`hiperwalk.QuantumWalk.set_evolution` 
+is invoked when the quantum walk is instantiated. Consequently, the 
+constructors accept any parameter that is valid for the ``set_evolution`` method. 
+To illustrate this point, let us examine the explicit evolution operator 
+of two coined walks, which can be derived using 
+the :meth:`hiperwalk.QuantumWalk.get_evolution` method from the QuantumWalk class.
 
 >>> U = coined.get_evolution()
 >>> coined.set_evolution(shift='flipflop', coin='grover')
@@ -222,14 +220,14 @@ True
 
 Coined Model
 ''''''''''''
-The :meth:`hiperwalk.CoinedWalk.set_evolution`
+The :meth:`hiperwalk.CoinedWalk.set_evolution` method
 accepts three key arguments:
 ``shift``, ``coin``, and ``marked``.
-Respectively,
-they are the arguments of
+They are the arguments of
 :meth:`hiperwalk.CoinedWalk.set_shift`,
 :meth:`hiperwalk.CoinedWalk.set_coin`, and
-:meth:`hiperwalk.CoinedWalk.set_marked`.
+:meth:`hiperwalk.CoinedWalk.set_marked`,
+respectively.
 
 The ``shift`` key must have either a string value
 (``'persistent'`` or ``'flipflop'``) or
