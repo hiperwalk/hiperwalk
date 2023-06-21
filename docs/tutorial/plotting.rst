@@ -86,7 +86,8 @@ The respective valid matplotlib keywords can be used to customize the plot.
 
 >>> hpw.plot_probability_distribution(
 ...     prob, plot='bar', color='red', edgecolor='black', linewidth=3,
-...     tick_label=[str((x, y)) for x in range(dim) for y in range(dim)]
+...     tick_label=[str(lat.vertex_coordinates(i))
+                    for i in range(lat.number_of_vertices())]
 ... ) #doctest: +SKIP
 
 .. image:: custom_bar.png
@@ -154,6 +155,35 @@ be passed to the Hiperwalk function.
 
 Graph Plot
 ''''''''''
+
+Draws the graph where probabilities are depicted by
+different colors and vertex sizes.
+The graph structure is required.
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='graph', graph=lat) #doctest: +SKIP
+
+.. image:: graph.png
+
+The graph plot is built on top of :obj:`networkx.draw` function and
+accepts any valid keywords associated with it.
+
+>>> hpw.plot_probability_distribution(
+...     prob, plot='graph', graph=lat,
+...     labels={i: lat.vertex_coordinates(i)
+...             for i in range(lat.number_of_vertices())},
+...     cmap='copper', node_shape='s',
+...     font_color='white', font_weight='bold',
+...     edge_color='red', width=2, style=':',
+... )
+
+
+.. image:: custom_graph.png
+
+Default Plot Type
+-----------------
+
+Each graph has a default plot type...
 
 Hiperwalk Specific Arguments
 ----------------------------
