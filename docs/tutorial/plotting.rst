@@ -181,9 +181,16 @@ accepts any valid keywords associated with it.
 .. image:: custom_graph.png
 
 Default Plot Type
------------------
+'''''''''''''''''
 
-Each graph has a default plot type...
+Each Hiperwalk graph is associated with a default graph type.
+Hence, it is sufficient to specify the probabilities and the graph
+to obtain the default plot.
+For instance, the default lattice plot is the plane plot.
+
+>>> hpw.plot_probability_distribution(prob, graph=lat)
+
+.. image:: plane.png
 
 Hiperwalk Specific Arguments
 ----------------------------
