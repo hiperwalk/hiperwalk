@@ -54,7 +54,8 @@ class ContinuousWalk(QuantumWalk):
         \end{cases}
 
     The Hamiltonian, which depends on the adjacency matrix and the location of 
-    the marked vertices, is described in the :meth:`set_hamiltonian` method.
+    the marked vertices, is described in the
+    :meth:`hiperwalk.ContinuousWalk.set_hamiltonian` method.
 
     The states of the computational basis are :math:`\ket{i}` for
     :math:`0 \leq i < |V|`, where
@@ -126,7 +127,8 @@ class ContinuousWalk(QuantumWalk):
         **kwargs :
             Additional arguments.
             Used for determining the gamma value and marked vertices.
-            See :meth:`set_gamma` and :meth:`set_marked`.
+            See :meth:`hiperwalk.ContinuousWalk.set_gamma` and
+            :meth:`hiperwalk.ContinuousWalk.set_marked`.
 
         Notes
         -----
@@ -191,7 +193,7 @@ class ContinuousWalk(QuantumWalk):
 
     def set_evolution(self, **kwargs):
         r"""
-        Alias for :meth:`set_hamiltonian`.
+        Alias for :meth:`hiperwalk.ContinuousWalk.set_hamiltonian`.
         """
         self.set_hamiltonian(**kwargs)
 
@@ -291,13 +293,14 @@ class ContinuousWalk(QuantumWalk):
     def simulate(self, time=None, initial_state=None,
                  initial_condition=None, hpc=True):
         r"""
-        Analogous to :meth:`QuantumWalk.simulate`
+        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`
         accepting float entries for ``time``.
 
         Parameters
         ----------
         time : float or tuple of floats
-            Analogous to the parameters of :meth:`QuantumWalk.simulate`,
+            Analogous to the parameters of
+            :meth:`hiperwalk.QuantumWalk.simulate`,
             but accepts float inputs.
             ``step`` is used to construct the evolution operator.
             The states in the interval
@@ -308,7 +311,7 @@ class ContinuousWalk(QuantumWalk):
 
         Other Parameters
         ----------------
-        See :meth:`QuantumWalk.simulate`.
+        See :meth:`hiperwalk.QuantumWalk.simulate`.
 
         See Also
         --------
