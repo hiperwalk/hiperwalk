@@ -5,8 +5,7 @@ def _binary_search(v, elem, start=0, end=None):
     This function expects a sorted array and performs a binary search on the subarray 
     v[start:end], looking for the element 'elem'. 
     If the element is found, the function returns the index of the element. 
-    If the element is not found, the function returns -1.
-    
+    If the element is not found, the function returns -1.    
     This is an implementation of binary search following Cormen's algorithm. 
     It is used to improve the time complexity of the search process.
     """
@@ -43,16 +42,16 @@ class Graph():
 
     Notes
     -----
-    A plethora of methods are available.
-    These methods can be used by a quantum walk model to
-    generate a valid quantum walk.
-
-    This class can be passed as argument to plotting functions.
+    A wide range of methods are available. 
+    These methods can be utilized by a quantum walk model 
+    to generate a valid quantum walk.
+    
+    This class can be passed as an argument to plotting functions.
     In this case,
     the default representation for the graph will be displayed.
 
     The recommended parameter type is
-    :class:`scipy.sparse.csr_array` using ``dtype=np.int8``,
+    :class:`scipy.sparse.csr_array` with ``dtype=np.int8``,
     where 1 denotes adjacency and 0 denotes non-adjacency.
     If any entry differs from 0 or 1,
     some methods may not operate as expected.
@@ -66,13 +65,14 @@ class Graph():
             A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
         \end{align*}
 
-    Each arc is assigned a label (number).
-    These labels are ordered as follows:
+    An arc can be described in the arc notation as (tail,head) or
+    through a numeric label.
+    The order of the labels in the class :obj:`Graph` is as follows:
     consider two arcs, :math:`(v_1, u_1)` and :math:`(v_2, u_2')`,
-    with labels :math:`a_1` and :math:`a_2`, respectively.
+    with numerical labels :math:`a_1` and :math:`a_2`, respectively.
     Then, :math:`a_1 < a_2` if and only if
-    if either :math:`v_1 < v_2` or
-    :math:`v_1 = v_2` and :math:`u_1 < u_2`.
+    :math:`v_1 < v_2` or
+    (:math:`v_1 = v_2` and :math:`u_1 < u_2`).
 
     .. note::
         The arc ordering may change for specific graphs.
@@ -100,20 +100,21 @@ class Graph():
         :layout: neato
         :caption: Figure 1
 
-    The corresponding arcs are
+    The arcs of the associated digraph in the arc notation are
 
     >>> arcs = [(i, j) for i in range(4)
     ...                for j in range(4) if adj_matrix[i,j] == 1]
     >>> arcs
     [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
 
-    Note that ``arcs`` is already sorted, hence the labels are
+    Note that ``arcs`` is already sorted, hence the associated 
+    numeric labels are
 
     >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
     >>> arcs_labels
     {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
 
-    The labels of the arcs are depicted in Figure 2.
+    The numeric labels are depicted in Figure 2.
 
     .. graphviz:: ../../graphviz/graph-arcs.dot
         :align: center
