@@ -2,12 +2,15 @@ import numpy as np
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
-    expects sorted array and executes binary search in the subarray
-    v[start:end] searching for elem.
-    Return the index of the element if found, otherwise returns -1
-    Cormen's binary search implementation.
-    Used to improve time complexity
+    This function expects a sorted array and performs a binary search on the subarray 
+    v[start:end], looking for the element 'elem'. 
+    If the element is found, the function returns the index of the element. 
+    If the element is not found, the function returns -1.
+    
+    This is an implementation of binary search following Cormen's algorithm. 
+    It is used to improve the time complexity of the search process.
     """
+
     if end == None:
         end = len(v)
     
