@@ -137,7 +137,7 @@ array([0.30151134, 0.30151134, 0.30151134, 0.30151134, 0.30151134,
 
 
 Arbitrary state
-`````````````
+```````````````
 Creating a generic state with the :meth:`hiperwalk.QuantumWalk.state` 
 method can be a bit challenging. It expects a list consisting 
 of ``[amplitude, label]`` entries, where each entry represents an amplitude
@@ -187,7 +187,7 @@ array([0.5, 0.5, 0.5, 0.5, 0. , 0. , 0. , 0. , 0. , 0. , 0. ])
 
 
 Simulation of Propagation
-----------
+-------------------------
 
 Once a quantum walk is defined, it is linked to an appropriate evolution operator. 
 The user has the flexibility to modify this operator either during 
@@ -310,7 +310,7 @@ All these keys can be integrated into a single call to the
 an instance of the object.
 
 Continuous-time Model
-''''''''''''''''
+'''''''''''''''''''''
 The dynamics of the continuous-time quantum walk is
 fully defined by the Hamiltonian.
 As a result, calling :meth:`hiperwalk.ContinuousWalk.set_evolution`
@@ -415,7 +415,7 @@ There are three argument types for ``time``.
   True
 
 Continuous-time Model
-''''''''''''''''
+'''''''''''''''''''''
 In the continuous-time quantum walk model,
 the ``time`` parameter is continuous, which means it can accept 
 float values. The operation is similar to the coined model, but here, 
