@@ -327,7 +327,7 @@ class QuantumWalk(ABC):
 
     def ket(self, label):
         r"""
-        Create a computational basis state.
+        Creates a state of the computational basis.
 
         Parameters
         ----------
