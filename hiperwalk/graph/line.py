@@ -62,7 +62,7 @@ class Line(Graph):
         r"""
         Returns the default coin name.
 
-        The default coin for the coined quantum walk on the
+        The default coin for a coined quantum walk on a
         segment is ``'hadamard'``.
         """
         return 'hadamard'
