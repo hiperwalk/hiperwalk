@@ -43,7 +43,7 @@ class Graph():
     Notes
     -----
     A wide range of methods are available. 
-    These methods can be utilized by a quantum walk model 
+    These methods can be used by a quantum walk model 
     to generate a valid quantum walk.
     
     This class can be passed as an argument to plotting functions.
@@ -65,20 +65,19 @@ class Graph():
             A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
         \end{align*}
 
-    An arc can be described in the arc notation as (tail,head) or
-    through a numeric label.
-    The order of the labels in the class :obj:`Graph` is as follows:
-    consider two arcs, :math:`(v_1, u_1)` and :math:`(v_2, u_2')`,
-    with numerical labels :math:`a_1` and :math:`a_2`, respectively.
-    Then, :math:`a_1 < a_2` if and only if
-    :math:`v_1 < v_2` or
-    (:math:`v_1 = v_2` and :math:`u_1 < u_2`).
+    An arc can be described either in the arc notation as (tail,head) 
+    or through a numerical label. The ordering of the labels in 
+    the :obj:`Graph` class is as follows: 
+    Consider two arcs, :math:`(v_1, u_1)` and :math:`(v_2, u_2')`, 
+    with numerical labels :math:`a_1` and :math:`a_2` respectively. 
+    Then, :math:`a_1 < a_2` if and only if either :math:`v_1 < v_2` 
+    or :math:`v_1 = v_2` and :math:`u_1 < u_2`.
 
     .. note::
-        The arc ordering may change for specific graphs.
+        The arc ordering may change for graphs defined using specific classes.
 
     For example, the graph :math:`G(V, E)` shown in
-    Figure 1 has adjacency matrix ``adj_matrix``.
+    Figure 1 has an adjacency matrix ``adj_matrix``.
 
     .. testsetup::
 
@@ -150,8 +149,8 @@ class Graph():
         r"""
         Returns the default coin for the given graph.
 
-        The default coin for the coined quantum walk on arbitrary
-        graphs is ``grover``.
+        The default coin for a coined quantum walk on an arbitrary
+        graph is ``grover``.
         """
         return 'grover'
 
@@ -174,7 +173,7 @@ class Graph():
 
     def arc_label(self, tail, head):
         r"""
-        Returns arc label (number).
+        Returns the numerical label of the arc.
 
         Parameters
         ----------
@@ -195,7 +194,7 @@ class Graph():
 
     def arc(self, label):
         r"""
-        Arc in arc notation.
+        Converts the numerical label to arc notation.
 
         Given the arc label as a number,
         returns the arc in the ``(tail, head)`` notation.
