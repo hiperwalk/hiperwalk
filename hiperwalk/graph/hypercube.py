@@ -7,16 +7,29 @@ class Hypercube(Graph):
     r"""
     Hypercube graph.
 
-    The Hypercube has ``2**dimension`` vertices.
+    The hypercube has ``2**dimension`` vertices.
 
     Parameters
     ----------
     dimension : int
-        Dimension of Hypercube.
+        Dimension of hypercube.
 
     Notes
     -----
-    Order of the arcs....
+    The vertex :math:`v` is adjacent to all vertices that
+    have Hamming distance of 1.
+    That is, :math:`v` is adjacent to
+    :math:`v \oplus 2^0`, :math:`v \oplus 2^1`, :math:`\ldots`,
+    :math:`v \oplus 2^{n - 2}`, and :math:`v \oplus 2^{n - 1}`,
+    where :math:`\oplus` denotes bitwise XOR operation and
+    :math:`n` is the hypercube dimension.
+
+    The order of the arcs depends on on the XOR operation.
+    Consider two arc,
+    :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j`),
+    with numerical labels :math:`a_1` and :math:`a_2`, respectively.
+    Then, :math:`a_1 < a_2` if and only if either :math:`u < v` or
+    :math:`u = v` and :math:`i < j`.
     """
     def __init__(self, dimension):
         num_vert = 1 << dimension
@@ -42,6 +55,9 @@ class Hypercube(Graph):
         r"""
         Return arc direction.
 
+        The arc direction of ``(tail, head)`` is the number ``i``
+        such that ``tail == head ^ 2**i``.
+
         Parameters
         ----------
         arc
@@ -51,11 +67,6 @@ class Hypercube(Graph):
         Returns
         -------
         int
-            The bit of the n-tuple that is equal to 1.
-            From less significant to most significant counting from 0:
-            00001 ~ 0
-            00010 ~ 1
-            etc.
         """
         try:
             tail, head = arc
@@ -80,36 +91,10 @@ class Hypercube(Graph):
         return direction
 
     def arc_label(self, tail, head):
-        """
-        Return arc label (number).
-
-        Parameters
-        ----------
-        tail: int
-            Arc tail.
-        head: int
-            Arc head.
-        """
-
         direction = self.arc_direction((tail, head))
         return tail*self.dimension + direction
 
     def arc(self, label):
-        r"""
-        Return Arc in arc notation.
-
-        Given the arc label (a number),
-        return the arc in the ``(tail, head)`` notation.
-
-        Parameters
-        ----------
-        label : int
-            Arc label (number).
-
-        Returns
-        -------
-        (tail, head)
-        """
         tail = label // self.dimension
         direction = label - tail*self.dimension
         head = tail ^ (1 << direction)
