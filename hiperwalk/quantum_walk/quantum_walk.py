@@ -109,8 +109,8 @@ class QuantumWalk(ABC):
         Creates a uniform state.
 
         The state is constructed based on the ``hilb_dim`` attribute.
-        The uniform initial state is a unit vector with entries 
-        that have the same real amplitude.
+        The uniform state is a unit vector with entries 
+        that have the same real amplitudes.
 
         Returns
         -------
@@ -118,7 +118,7 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The uniform initial state is the state
+        An example of the uniform state is
 
         .. math::
 
