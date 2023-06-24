@@ -8,7 +8,7 @@ class Hypercube(Graph):
     Hypercube graph.
 
     The hypercube graph consists of ``2**n`` vertices,
-    where :math:`n` represents the :math:`dimension`. 
+    where :math:`n` represents the *dimension*. 
     The numerical labels of these vertices 
     are :math:`2^0`, :math:`2^1`, :math:`\ldots`,
     :math:`2^{n - 1}`. Two vertices :math:`v` and  :math:`w`
