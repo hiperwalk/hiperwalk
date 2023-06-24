@@ -7,29 +7,33 @@ class Hypercube(Graph):
     r"""
     Hypercube graph.
 
-    The hypercube has ``2**dimension`` vertices.
+    The hypercube graph consists of ``2**n`` vertices,
+    where :math:`n` represents the :math:`dimension`. 
+    The numerical labels of these vertices 
+    are :math:`2^0`, :math:`2^1`, :math:`\ldots`,
+    :math:`2^{n - 1}`. Two vertices :math:`v` and  :math:`w`
+    are adjacent if and only if the corresponding binary tuples
+    differ by only one bit, indicating a Hamming distance of 1.
 
     Parameters
     ----------
     dimension : int
-        Dimension of hypercube.
+        The dimension of the hypercube.
 
     Notes
     -----
-    The vertex :math:`v` is adjacent to all vertices that
-    have Hamming distance of 1.
-    That is, :math:`v` is adjacent to
-    :math:`v \oplus 2^0`, :math:`v \oplus 2^1`, :math:`\ldots`,
-    :math:`v \oplus 2^{n - 2}`, and :math:`v \oplus 2^{n - 1}`,
-    where :math:`\oplus` denotes bitwise XOR operation and
-    :math:`n` is the hypercube dimension.
-
-    The order of the arcs depends on on the XOR operation.
-    Consider two arc,
-    :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j`),
-    with numerical labels :math:`a_1` and :math:`a_2`, respectively.
-    Then, :math:`a_1 < a_2` if and only if either :math:`u < v` or
-    :math:`u = v` and :math:`i < j`.
+    The vertex :math:`v` in the hypercube is adjacent to all other vertices 
+    that have a Hamming distance of 1. To put it differently, :math:`v` 
+    is adjacent to :math:`v \oplus 2^0`, :math:`v \oplus 2^1`, 
+    :math:`\ldots`, :math:`v \oplus 2^{n - 2}`, and :math:`v \oplus 2^{n - 1}`. 
+    Here, :math:`\oplus` represents the bitwise XOR operation, 
+    and :math:`n` signifies the dimension of the hypercube.
+    
+    The order of the arcs is determined by the XOR operation. 
+    Consider two arcs, :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j)`, 
+    labeled numerically as :math:`a_1` and :math:`a_2`, respectively. 
+    The condition :math:`a_1 < a_2` holds true if and only 
+    if :math:`u < v` or, when :math:`u = v`, :math:`i < j`.
     """
     def __init__(self, dimension):
         num_vert = 1 << dimension
