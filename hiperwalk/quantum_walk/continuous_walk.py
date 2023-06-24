@@ -294,19 +294,19 @@ class ContinuousWalk(QuantumWalk):
                  initial_condition=None, hpc=True):
         r"""
         Analogous to :meth:`hiperwalk.QuantumWalk.simulate`
-        accepting float entries for ``time``.
+        which accepts float entries for the ``time`` parameter.
 
         Parameters
         ----------
         time : float or tuple of floats
-            Analogous to the parameters of
+            This parameter is analogous to those in
             :meth:`hiperwalk.QuantumWalk.simulate`,
-            but accepts float inputs.
-            ``step`` is used to construct the evolution operator.
-            The states in the interval
-            ***[* ``start/step``, ``end/step`` **]** are saved.
-            The values that describe this interval are
-            rounded up if the decimal part is greater than ``1 - 1e-5``,
+            with the distinction that it accepts float inputs.
+            The ``step`` parameter is used to construct the evolution operator.
+            The states within the interval
+            **[** ``start/step``, ``end/step`` **]** are stored.
+            The values describing this interval are
+            rounded up if the decimal part exceeds ``1 - 1e-5``,
             and rounded down otherwise.
 
         Other Parameters
