@@ -20,8 +20,9 @@ neblina-core, pyneblina, and all necessary Python libraries.
    diligently to extend support to other distributions as soon as 
    possible.
 
-   We are actively developing support for Ubuntu 22.04. Our main challenges 
-   lie in adapting the plotting features for this distribution. 
+   We are developing support for Ubuntu 22.04 with the main challenge 
+   being the adaptation of plotting features, which currently work well 
+   in Jupyter notebooks. 
 
 .. _docs_install_hiperwalk:
 
