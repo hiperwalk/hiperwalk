@@ -22,7 +22,7 @@ class Hypercube(Graph):
 
     Notes
     -----
-    The vertex :math:`v` in the hypercube is adjacent to all other vertices 
+    A vertex :math:`v` in the hypercube is adjacent to all other vertices 
     that have a Hamming distance of 1. To put it differently, :math:`v` 
     is adjacent to :math:`v \oplus 2^0`, :math:`v \oplus 2^1`, 
     :math:`\ldots`, :math:`v \oplus 2^{n - 2}`, and :math:`v \oplus 2^{n - 1}`. 
@@ -57,7 +57,7 @@ class Hypercube(Graph):
 
     def arc_direction(self, arc):
         r"""
-        Return arc direction.
+        Returns the arc direction.
 
         The arc direction of ``(tail, head)`` is the number ``i``
         such that ``tail == head ^ 2**i``.
@@ -65,8 +65,8 @@ class Hypercube(Graph):
         Parameters
         ----------
         arc
-            The arc in either arc notation (``(tail, head)``) or
-            the arc label (``int``).
+            The arc can be represented in either arc notation (``(tail, head)``) 
+            or by using the numerical label  (``int``).
 
         Returns
         -------
