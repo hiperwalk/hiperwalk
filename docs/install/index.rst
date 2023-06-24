@@ -16,10 +16,12 @@ neblina-core, pyneblina, and all necessary Python libraries.
 
 .. warning::
 
-   Other distributions than Ubuntu 20.04 are currently not supported.
+   While currently only Ubuntu 20.04 is supported, we are working 
+   diligently to extend support to other distributions as soon as 
+   possible.
 
-   Support for Ubuntu 22.04 is under development.
-   Contributions are welcomed.
+   We are actively developing support for Ubuntu 22.04. Our main challenges 
+   lie in adapting the plotting features for this distribution. 
 
 .. _docs_install_hiperwalk:
 
