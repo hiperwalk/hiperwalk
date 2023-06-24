@@ -11,8 +11,8 @@ class Hypercube(Graph):
     where :math:`n` represents the *dimension*. 
     The numerical labels of these vertices 
     are :math:`2^0`, :math:`2^1`, :math:`\ldots`,
-    :math:`2^{n - 1}`. Two vertices :math:`v` and  :math:`w`
-    are adjacent if and only if the corresponding binary tuples
+    :math:`2^{n - 1}`. Two vertices are adjacent 
+    if and only if the corresponding binary tuples
     differ by only one bit, indicating a Hamming distance of 1.
 
     Parameters
