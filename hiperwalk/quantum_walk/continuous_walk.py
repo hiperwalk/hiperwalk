@@ -88,7 +88,9 @@ class ContinuousWalk(QuantumWalk):
 
     def set_gamma(self, gamma=None):
         r"""
-        Set gamma used for the Hamiltonian.
+        Sets the gamma parameter.
+        
+        The gamma parameter is used in the definition of the Hamiltonian.
 
         Parameters
         ----------
@@ -207,7 +209,7 @@ class ContinuousWalk(QuantumWalk):
         Parameters
         ----------
         time : float
-            Generate the evolution operator of the given time.
+            Generates the evolution operator corresponding to the specified time.
 
         hpc : bool, default = True
             Determines whether or not to use neblina HPC 
@@ -293,7 +295,7 @@ class ContinuousWalk(QuantumWalk):
     def simulate(self, time=None, initial_state=None,
                  initial_condition=None, hpc=True):
         r"""
-        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`
+        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
         which accepts float entries for the ``time`` parameter.
 
         Parameters
