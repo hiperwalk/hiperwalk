@@ -313,7 +313,7 @@ class ContinuousWalk(QuantumWalk):
 
         Other Parameters
         ----------------
-        See :meth:`hiperwalk.QuantumWalk.simulate`.
+        See :obj:`hiperwalk.QuantumWalk.simulate`.
 
         See Also
         --------
