@@ -8,10 +8,10 @@ class Hypercube(Graph):
     Hypercube graph.
 
     The hypercube graph consists of ``2**n`` vertices,
-    where :math:`n` represents the *dimension*. 
-    The numerical labels of these vertices 
-    are :math:`2^0`, :math:`2^1`, :math:`\ldots`,
-    :math:`2^{n - 1}`. Two vertices are adjacent 
+    where ``n`` is the hypercube *dimension*.
+    The numerical labels of these vertices  are
+    ``0``, ``1``, ..., ``2**n - 1``.
+    Two vertices are adjacent
     if and only if the corresponding binary tuples
     differ by only one bit, indicating a Hamming distance of 1.
 
@@ -22,18 +22,20 @@ class Hypercube(Graph):
 
     Notes
     -----
-    A vertex :math:`v` in the hypercube is adjacent to all other vertices 
-    that have a Hamming distance of 1. To put it differently, :math:`v` 
-    is adjacent to :math:`v \oplus 2^0`, :math:`v \oplus 2^1`, 
-    :math:`\ldots`, :math:`v \oplus 2^{n - 2}`, and :math:`v \oplus 2^{n - 1}`. 
-    Here, :math:`\oplus` represents the bitwise XOR operation, 
+    A vertex :math:`v` in the hypercube is adjacent to all other vertices
+    that have a Hamming distance of 1. To put it differently, :math:`v`
+    is adjacent to :math:`v \oplus 2^0`, :math:`v \oplus 2^1`,
+    :math:`\ldots`, :math:`v \oplus 2^{n - 2}`, and
+    :math:`v \oplus 2^{n - 1}`.
+    Here, :math:`\oplus` represents the bitwise XOR operation,
     and :math:`n` signifies the dimension of the hypercube.
-    
-    The order of the arcs is determined by the XOR operation. 
-    Consider two arcs, :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j)`, 
-    labeled numerically as :math:`a_1` and :math:`a_2`, respectively. 
-    The condition :math:`a_1 < a_2` holds true if and only 
-    if :math:`u < v` or, when :math:`u = v`, :math:`i < j`.
+
+    The order of the arcs is determined by the XOR operation.
+    Consider two arcs, :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j)`,
+    labeled numerically as :math:`a_1` and :math:`a_2`, respectively.
+    The condition :math:`a_1 < a_2` is true if and only
+    if either :math:`u < v` is true, or
+    both :math:`u = v` and :math:`i < j` are true.
     """
     def __init__(self, dimension):
         num_vert = 1 << dimension
@@ -65,7 +67,7 @@ class Hypercube(Graph):
         Parameters
         ----------
         arc
-            The arc can be represented in either arc notation (``(tail, head)``) 
+            The arc can be represented in either arc notation (``(tail, head)``)
             or by using the numerical label  (``int``).
 
         Returns
