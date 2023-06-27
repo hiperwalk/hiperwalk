@@ -2,41 +2,41 @@
 Install
 =======
 
-Hiperwalk relies on a number of Python libraries. 
-However, installing these Python libraries alone does not enable 
-Hiperwalk to leverage High-Performance Computing (HPC). 
+Hiperwalk relies on a number of Python libraries.
+However, installing these Python libraries alone does not enable
+Hiperwalk to leverage High-Performance Computing (HPC).
 If you desire to install Hiperwalk with HPC support, please refer
-to :ref:`docs_install_hpc_prerequisites` before proceeding 
+to :ref:`docs_install_hpc_prerequisites` before proceeding
 with the Hiperwalk installation.
 
-On this page, we outline the process for installing Hiperwalk on 
-a newly installed Ubuntu 20.04 operating system. The steps will 
-cover identifying the GPU, installing the GPU drivers, 
+On this page, we outline the process for installing Hiperwalk on
+a newly installed Ubuntu 20.04 operating system. The steps will
+cover identifying the GPU, installing the GPU drivers,
 neblina-core, pyneblina, and all necessary Python libraries.
 
 .. warning::
 
-   While currently only Ubuntu 20.04 is supported, we are working 
-   diligently to extend support to other distributions as soon as 
+   While currently only Ubuntu 20.04 is supported, we are working
+   diligently to extend support to other distributions as soon as
    possible.
 
-   We are developing support for Ubuntu 22.04 with the main challenge 
-   being the adaptation of plotting features, which currently work well 
-   in Jupyter notebooks. 
+   We are developing support for Ubuntu 22.04 with the main challenge
+   being the adaptation of plotting features, which currently work well
+   in Jupyter notebooks.
 
 .. _docs_install_hiperwalk:
 
 Hiperwalk
 =========
 
-Hiperwalk can be conveniently installed using pip. 
+Hiperwalk can be conveniently installed using pip.
 To begin, ensure that pip is installed on your system.
 
 .. code-block:: shell
 
    sudo apt install python3-pip
 
-The following command will install Hiperwalk as well as all its 
+The following command will install Hiperwalk as well as all its
 Python dependencies, which include
 `numpy <https://numpy.org/>`_,
 `scipy <https://scipy.org/>`_,
@@ -45,16 +45,16 @@ Python dependencies, which include
 
 .. warning::
 
-    If you have older versions of these packages, they will likely be 
-    updated. If you prefer not to have them updated, we recommend 
-    `creating a virtual environment 
-    <https://docs.python.org/3/library/venv.html>`_.   
+    If you have older versions of these packages, they will likely be
+    updated. If you prefer not to have them updated, we recommend
+    `creating a virtual environment
+    <https://docs.python.org/3/library/venv.html>`_.
 
 .. code-block:: shell
 
    pip3 install hiperwalk
 
-To verify the success of the installation, 
+To verify the success of the installation,
 you can execute any code found in the
 `examples directory of the repository
 <https://`https://github.com/hiperwalk/hiperwalk/tree/2.0.x/examples>`_
@@ -65,7 +65,7 @@ or proceed to the :ref:`docs_tutorial`.
 HPC Prerequisites
 =================
 
-Before proceeding, it's advisable to update and upgrade your 
+Before proceeding, it's advisable to update and upgrade your
 Ubuntu packages. Execute the following commands:
 
 .. code-block:: shell
@@ -73,7 +73,7 @@ Ubuntu packages. Execute the following commands:
    sudo apt update
    sudo apt upgrade
 
-   
+
 Next, run the following commands to install the prerequisites:
 
 .. code-block:: shell
@@ -97,7 +97,7 @@ These newly installed programs serve the following purposes:
 * python3-pip: necessary for installing Python libraries;
 * pytest: helps test pyneblina.
 
-Although it's not essential, we **recommend** installing FFmpeg, 
+Although it's not essential, we **recommend** installing FFmpeg,
 which is used for generating animations.
 
 .. code-block:: shell
@@ -125,11 +125,11 @@ If it is, execute the following command:
 
    ubuntu-drivers devices
 
-This will list the available drivers for your GPU. We recommend 
+This will list the available drivers for your GPU. We recommend
 installing the driver tagged with ``recommended`` at the end.
 The driver's name typically follows the format ``nvidia-driver-XXX``
 where ``XXX`` is a specific number.
-For the subsequent steps in the installation process, substitute ``XXX`` 
+For the subsequent steps in the installation process, substitute ``XXX``
 as required. To install the GPU driver, execute the following command:
 
 .. code-block:: shell
@@ -137,32 +137,32 @@ as required. To install the GPU driver, execute the following command:
    sudo apt install nvidia-driver-XXX
 
 Finally, **reboot you computer**.
-After rebooting, if the installation was successful, 
+After rebooting, if the installation was successful,
 running the following command:
 
 .. code-block::
 
    nvidia-smi
 
-should display GPU information such as the name, driver version, 
-CUDA version, and so on. Alternatively, you can verify the 
+should display GPU information such as the name, driver version,
+CUDA version, and so on. Alternatively, you can verify the
 availability of the **NVIDIA Settings** application by
-pressing the ``Super`` key on your keyboard and 
+pressing the ``Super`` key on your keyboard and
 typing ``nvidia settings``.
 
 NVIDIA Toolkit
 --------------
 
-Once the GPU drivers have been successfully installed, it's 
-necessary to install the NVIDIA Toolkit, allowing neblina-core 
+Once the GPU drivers have been successfully installed, it's
+necessary to install the NVIDIA Toolkit, allowing neblina-core
 to use CUDA. To do this, execute the following command:
 
 .. code-block:: shell
 
    sudo apt install nvidia-cuda-toolkit
 
-To verify the correct installation of the NVIDIA Toolkit, 
-you can check if the ``nvcc`` compiler has been installed. 
+To verify the correct installation of the NVIDIA Toolkit,
+you can check if the ``nvcc`` compiler has been installed.
 This can be simply done by running the following command:
 
 .. code-block:: shell
@@ -174,7 +174,7 @@ Installing neblina-core and pyneblina
 =====================================
 
 For HPC support,
-Hiperwalk uses 
+Hiperwalk uses
 `neblina-core <https://github.com/paulomotta/neblina-core>`_,
 and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
 Note that a computer with a **GPU compatible with CUDA** is required
@@ -200,7 +200,7 @@ Firstly, clone the repository in the home directory.
    cd ~
    git clone https://github.com/paulomotta/neblina-core.git
 
-Next, navigate to the neblina-core directory to compile and 
+Next, navigate to the neblina-core directory to compile and
 install the code.
 
 .. code-block:: shell
