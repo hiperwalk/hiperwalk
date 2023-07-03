@@ -5,31 +5,35 @@ from .graph import Graph
 
 class Line(Graph):
     r"""
-    Finite Line Graph (Path Graph).
+    Finite line graph (path graph).
 
     Parameters
     ----------
     num_vert : int
-        Number of vertices on the line.
+        The number of vertices on the line.
 
     Notes
     -----
-    .. todo::
+    In the :obj:`Line` class, directions can be assigned to the arcs. 
+    An arc pointing to the right has direction 0 (e.g., (1, 2)), 
+    and an arc pointing to the left has direction 1 (e.g., (2, 1)).
 
-        update
+    The order of the arcs is determined by their direction. 
+    Thus, for a vertex :math:`v \in V`, 
+    the arcs :math:`(v, v + 1)` and :math:`(v, v - 1)` 
+    have labels :math:`a_0` and :math:`a_1` respectively, 
+    with :math:`a_0 < a_1`. 
+    The only exceptions to this rule are the extreme vertices 0 
+    and :math:`|V| - 1`, as they have outdegree 1. 
 
+    Apart from these exceptions, 
+    for any two vertices :math:`v_1 < v_2`, 
+    any arc with tail :math:`v_1` will have a label smaller than the 
+    label of any arc with tail :math:`v_2`.
 
-    Since :class:`Segment` is built on top of :class:`Graph`,
-    operators and states respect the edge order
-    (See :class:`Graph` notes for more details).
-    As a consequence, for any vertex :math:`v \in V`,
-    the state :math:`\ket{2v - d}` for :math:`d \in \{0, 1\}`
-    corresponds to the walker being on vertex :math:`v` and the
-    coin pointing rightwars (:math:`d = 0`) or leftwards (:math:`d = 1`).
-    For example, the edges labels of the 4-vertices :class:`Segment`
-    are represented in Figure 1.
+    For instance, Figure 1 illustrates the labels of the arcs of a path graph with 4 vertices.
     
-    .. graphviz:: ../../graphviz/coined-segment-edges-labels.dot
+    .. graphviz:: ../../graphviz/line-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 1.
@@ -52,16 +56,13 @@ class Line(Graph):
         super().__init__(adj_matrix)
 
     def embeddable(self):
-        r"""
-        See :meth:`Graph.has_persistent_shift_operator`.
-        """
         return True
 
-    def get_default_coin(self):
+    def default_coin(self):
         r"""
         Returns the default coin name.
 
-        The default coin for the coined quantum walk on the
+        The default coin for a coined quantum walk on a
         segment is ``'hadamard'``.
         """
         return 'hadamard'
@@ -71,11 +72,18 @@ class Line(Graph):
         if diff != 1 and diff != -1:
             raise ValueError('Invalid arc.')
 
-        return tail*2 if diff == 1 else tail*2 - 1 
+        num_vert = self.number_of_vertices()
+        return (2*tail - 1 if (diff == 1 and tail != 0
+                               or head == num_vert - 1)
+                else tail*2)
 
     def arc(self, label):
-        tail = (label + 1)//2
-        head = tail + (-1)**(label % 2)
+        label += 1
+        tail = label//2
+        num_vert = self.number_of_vertices()
+        head = (tail + (-1)**(label % 2)
+                if tail != 0 and tail != num_vert - 1
+                else tail - (-1)**(label % 2))
         return (tail, head)
 
     def next_arc(self, arc):
@@ -92,12 +100,12 @@ class Line(Graph):
             return ((tail + 1, head + 1) if diff == 1
                     else (tail - 1, head - 1))
         except TypeError:
-            if arc == 1:
-                return 0
-            num_arcs = self.number_of_arcs() 
-            if arc == num_arcs - 2:
-                return num_arcs - 1
-            return arc + 2 if arc % 2 == 0 else arc - 2
+            if arc == 0:
+                return 1
+            num_arcs = self.number_of_arcs()
+            if arc == num_arcs - 1:
+                return num_arcs - 2
+            return arc + 2 if arc % 2 == 1 else arc - 2
 
     def previous_arc(self, arc):
         # implemented only if is embeddable
@@ -113,9 +121,14 @@ class Line(Graph):
             return ((tail - 1, head - 1) if diff == 1
                     else (tail + 1, head + 1))
         except TypeError:
-            if arc == 0:
-                return 1
-            num_arcs = self.number_of_arcs() 
-            if arc == num_arcs - 1:
-                return num_arcs - 2
-            return arc - 2 if arc % 2 == 0 else arc + 2
+            num_arcs = self.number_of_arcs()
+            if arc < 0 or arc >= num_arcs:
+                raise ValueError('Invalid arc')
+
+            arc = arc + 2 if arc % 2 == 0 else arc - 2
+            if arc < 0:
+                arc += 1
+            elif arc >= num_arcs:
+                arc -= 1
+
+            return arc

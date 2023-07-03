@@ -14,7 +14,6 @@ plt.rcParams["figure.figsize"] = (12, 10)
 plt.rcParams["figure.dpi"] = 100
 
 
-# TODO: add documentation for 'fixed_probabilities' kwarg
 # TODO: add option for changing figsize and dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
@@ -37,13 +36,9 @@ def plot_probability_distribution(
     plot : str, default=None
         The plot type.
         The valid options are
-        ``{'bar', 'line', 'graph', 'histogram', 'grid'}``.
+        ``{'bar', 'line', 'graph', 'histogram', 'plane'}``.
         If ``None``, uses default plotting. Usually ``bar``,
         but default plotting changes according to ``graph``.
-    animate : bool, default=False
-        Whether or not to animate multiple plots.
-        If ``False``, each quantum walk step generates an image.
-        If ``True``, each quantum walk step is used as an animation frame.
     show : bool, default=True
         Whether or not to show plots or animation.
         With ``show=True`` we have:
@@ -66,8 +61,6 @@ def plot_probability_distribution(
         the j-step is saved in the ``filename-j.png`` file;
         if ``animate==True``,
         the entire walk is saved in the ``filename.fig`` file.
-    interval : int, default=250
-        Time in milliseconds that each frame is shown if ``animate==True``.
     graph : optional
         The structure of the graph on which the walk occurs.
         The graph labels are used as plotting labels.
@@ -83,6 +76,25 @@ def plot_probability_distribution(
             NetworkX Graph
         * :class:`scipy.sparse.csr_matrix`
             Adjacency matrix.
+    rescale : bool, optional
+        If ``False`` or omitted, the reference maximum probability
+        is the global one.
+        If ``True``, the reference maximum probability depends on
+        the current step, changing every image or frame.
+        For example, if the global maximum probability is 1,
+        ``min_node_size, max_node_size = (300, 3000)``,
+        and the maximum probability of a given step is 0.5;
+        then for ``rescale=False``,
+        the step maximum node size shown is 1650
+        (halfway betweeen 300 and 3000),
+        while for ``rescale=True``,
+        the step maximum node size shown is 3000.
+    animate : bool, default=False
+        Whether or not to animate multiple plots.
+        If ``False``, each quantum walk step generates an image.
+        If ``True``, each quantum walk step is used as an animation frame.
+    interval : int, default=250
+        Time in milliseconds that each frame is shown if ``animate==True``.
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
         Valid arguments depend on ``plot``.
@@ -90,19 +102,6 @@ def plot_probability_distribution(
 
     Other Parameters
     ----------------
-    fixed_probabilities : bool, optional
-        If ``True`` or omitted, the reference maximum probability
-        is the global one.
-        If ``False``, the reference maximum probability depends on
-        the current step, changing every image or frame.
-        For example, if the global maximum probability is 1,
-        ``min_node_size, max_node_size = (300, 3000)``,
-        and the maximum probability of a given step is 0.5;
-        then for ``fixed_probabilities=True``,
-        the step maximum node size shown is halfway betweeen 300 and 3000,
-        while for ``fixed_probabilities=False``,
-        the step maximum node size shown is 3000.
-
     Bar Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
 
@@ -128,7 +127,8 @@ def plot_probability_distribution(
             A colormap for representing vertices probabilities.
             if ``cmap='default'``, uses the ``'viridis'`` colormap.
             For more colormap options, check
-            `Matplolib's Colormap reference <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
+            `Matplolib's Colormap reference
+            <https://matplotlib.org/stable/gallery/color/colormap_reference.html>`_.
 
     Histogram Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
@@ -137,9 +137,9 @@ def plot_probability_distribution(
     Line Plots
         See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
-    Grid Plots
+    Plane Plots
         dimensions: 2-tuple of int
-            grid dimensions in ``(x_dim, y_dim)`` format.
+            plane dimensions in ``(x_dim, y_dim)`` format.
 
 
     Raises
@@ -198,15 +198,13 @@ def plot_probability_distribution(
     # passes kwargs by reference to be updated accordingly
 
     if 'graph' in kwargs:
-        if plot is None:
-            plot = _default_graph_kwargs(kwargs)
-        else:
-            _default_graph_kwargs(kwargs)
+        plot = _default_graph_kwargs(kwargs, plot)
+
     if plot is None:
         plot = 'bar'
 
     plot = plot.lower()
-    valid_plots = ['bar', 'line', 'graph', 'histogram', 'grid']
+    valid_plots = ['bar', 'line', 'graph', 'histogram', 'plane']
 
     if plot not in valid_plots:
         raise ValueError(
@@ -227,14 +225,14 @@ def plot_probability_distribution(
             valid_plots[1]: _configure_plot_figure,
             valid_plots[2]: _configure_graph_figure,
             valid_plots[3]: _configure_plot_figure,
-            valid_plots[4]: _configure_grid_figure}
+            valid_plots[4]: _configure_plane_figure}
     # plot functions: code for plotting the graph accordingly
     plot_funcs = {
         valid_plots[0]: _plot_probability_distribution_on_bars,
         valid_plots[1]: _plot_probability_distribution_on_line,
         valid_plots[2]: _plot_probability_distribution_on_graph,
         valid_plots[3]: _plot_probability_distribution_on_histogram,
-        valid_plots[4]: _plot_probability_distribution_on_grid
+        valid_plots[4]: _plot_probability_distribution_on_plane
     }
 
     # preparing probabilities to shape requested by called functions
@@ -281,8 +279,10 @@ def plot_probability_distribution(
         if show:
             anim.show_animation()
 
-def _default_graph_kwargs(kwargs):
-    if not 'cmap' in kwargs:
+def _default_graph_kwargs(kwargs, plot):
+    if ((plot is None or plot == 'graph' or plot == 'plane')
+        and not 'cmap' in kwargs
+    ):
         kwargs['cmap'] = 'default'
 
     if 'cmap' in kwargs:
@@ -290,16 +290,16 @@ def _default_graph_kwargs(kwargs):
             kwargs['cmap'] = 'viridis'
 
     graph = kwargs['graph']
-    if not isinstance(graph, Graph):
-        return None
 
     # hiperwalk graph
     if isinstance(graph, Lattice):
-        if 'dimensions' not in kwargs:
+        if plot is None:
+            plot = 'plane'
+        if plot == 'plane' and 'dimensions' not in kwargs:
             kwargs['dimensions'] = graph.dimensions()
-        return 'grid'
+        return plot
 
-    return 'bar'
+    return 'graph' if plot is None else plot
 
 
 def _preconfigure_plot(probabilities, kwargs):
@@ -318,8 +318,7 @@ def _preconfigure_plot(probabilities, kwargs):
         Reference of kwargs containing all extra keywords.
     """
 
-    if ('fixed_probabilities' not in kwargs
-            or kwargs.pop('fixed_probabilities')):
+    if ('rescale' not in kwargs or not kwargs.pop('rescale')):
         kwargs['min_prob'] = 0
         kwargs['max_prob'] = probabilities.max()
 
@@ -347,20 +346,19 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes
     """
 
-    # vmin and vmax are default keywords used by networkx_draw.
-    # if an invalid keyword is passed to nx.draw(), it does not execute
-    if ('fixed_probabilities' not in kwargs
-            or kwargs['fixed_probabilities']):
-        kwargs['vmin'] = 0 #min_prob
-        kwargs['vmax'] = probabilities.max() #max_prob
+    if ('rescale' not in kwargs or not kwargs['rescale']):
+        kwargs['min_prob'] = 0 #min_prob
+        kwargs['max_prob'] = probabilities.max() #max_prob
+        kwargs['rescale'] = False
 
     if 'graph' not in kwargs:
         raise KeyError("'graph' kwarg not provided.")
-        graph = kwargs['graph']
-        if isinstance(graph, scipy.sparse.csr_array):
-            kwargs['graph'] = nx.from_scipy_sparse_array(graph)
-        elif isinstance(graph, Graph):
-            kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
+
+    graph = kwargs['graph']
+    if isinstance(graph, scipy.sparse.csr_array):
+        kwargs['graph'] = nx.from_scipy_sparse_array(graph)
+    elif isinstance(graph, Graph):
+        kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
 
     if 'adj_matrix' in kwargs:
         # Pops adj_matrix if both graph and adj_matrix keywords are set;
@@ -431,7 +429,7 @@ def _configure_graph_figure(num_vert=None, fig_width=None,
                             fig_height=None):
     return _configure_figure(num_vert, fig_width, fig_height)
 
-def _configure_grid_figure(num_vert=None, fig_width=None,
+def _configure_plane_figure(num_vert=None, fig_width=None,
                            fig_height=None):
     if fig_width is None:
         fig_width = plt.rcParams["figure.figsize"][0]
@@ -444,8 +442,8 @@ def _configure_grid_figure(num_vert=None, fig_width=None,
                            subplot_kw={"projection": "3d"})
 
     ax.tick_params(length=10, width=1, labelsize=16, pad=10)
-    ax.set_xlabel('Vertex X ID', labelpad=15, fontsize=18)
-    ax.set_ylabel('Vertex Y ID', labelpad=15, fontsize=18)
+    ax.set_xlabel('Vertex X', labelpad=15, fontsize=18)
+    ax.set_ylabel('Vertex Y', labelpad=15, fontsize=18)
     ax.set_zlabel('Probability', labelpad=30, fontsize=18)
     return fig, ax
 
@@ -583,7 +581,7 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             ind = loc().astype('int')
             ind = [i for i in ind if i >=0 and i < num_vert]
 
-            nodes = list(graph.nodes())
+            nodes = list(range(0, graph.number_of_vertices()))
 
             ax.set_xticks(ind, [nodes[i] for i in ind])
         else:
@@ -616,11 +614,15 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     _update_nodes(probabilities, kwargs.pop('min_node_size'),
                   kwargs.pop('max_node_size'), kwargs)
 
+    vmin = kwargs.pop('min_prob')
+    vmax = kwargs.pop('max_prob')
     nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
-            **kwargs)
+            vmin=vmin, vmax=vmax, **kwargs)
     # Note: nx.draw_networkx_labels dramatically increases plotting time.
     # It is called by nx.draw
+    kwargs['min_prob'] = vmin
+    kwargs['max_prob'] = vmax
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
@@ -711,16 +713,15 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
             max_node_size = 3000
 
     if min_node_size is not None and max_node_size is not None:
-        if ('fixed_probabilities' in kwargs
-                and not kwargs.pop('fixed_probabilities')):
-            kwargs['vmin'] = 0
-            kwargs['vmax'] = probabilities.max()
+        if ('rescale' in kwargs and kwargs.pop('rescale')):
+            kwargs['min_prob'] = 0
+            kwargs['max_prob'] = probabilities.max()
 
         # calculating size of each node acording to probability 
         # as a function f(x) = ax + b where b = min_size and
         # max_size = a*(max_prob-min_prob) + min_size
         a = ((max_node_size - min_node_size)
-             / (kwargs['vmax'] - kwargs['vmin']))
+             / (kwargs['max_prob'] - kwargs['min_prob']))
         kwargs['node_size'] = list(map(
             lambda x: a*x + min_node_size, probabilities
         ))
@@ -735,36 +736,54 @@ def _configure_colorbar(ax, kwargs):
     ax : :class:`matplotlib.axes.Axes`
         Ax on which the plot was drawn.
     kwargs : dict
-        Dictionary containing the keys 'cmap', 'vmin' and 'vmax'.
-        'vmin' and 'vmax' describe the inferior and superior limit for
-        colorbar values, respectively.
+        Dictionary containing the keys 'cmap', 'min_prob' and 'max_prob'.
+        'min_prob' and 'max_prob' describe
+        the inferior and superior limit for colorbar values, respectively.
         'cmap' describes a valid matplotlib colormap
     """
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     sm = plt.cm.ScalarMappable(
         cmap=kwargs['cmap'],
-        norm=plt.Normalize(vmin=kwargs['vmin'],
-                           vmax=kwargs['vmax'])
+        norm=plt.Normalize(vmin=kwargs['min_prob'],
+                           vmax=kwargs['max_prob'])
     )
 
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='2.5%', pad=0.01)
     cbar = plt.colorbar(
         sm,
-        ticks=np.linspace(kwargs['vmin'], kwargs['vmax'], num=5),
+        ticks=np.linspace(kwargs['min_prob'], kwargs['max_prob'], num=5),
         cax=cax
     )
 
     cbar.ax.tick_params(labelsize=14, length=7)
 
+def _default_plane_kwargs(kwargs):
+    if not 'cmap' in kwargs:
+        kwargs['cmap'] = 'default'
 
-def _plot_probability_distribution_on_grid(
+    if 'cmap' in kwargs:
+        if kwargs['cmap'] == 'default':
+            kwargs['cmap'] = 'viridis'
+
+    if 'linewidth' not in kwargs:
+        kwargs['linewidth'] = 0
+    if 'antialiased' not in kwargs:
+        kwargs['antialiased'] = False
+    if 'cstride' not in kwargs:
+        kwargs['cstride'] = 1
+    if 'rstride' not in kwargs:
+        kwargs['rstride'] = 1
+    if 'alpha' not in kwargs:
+        kwargs['alpha'] = 0.5
+
+def _plot_probability_distribution_on_plane(
         probabilities, ax, labels=None, graph=None,
         min_prob=None, max_prob=None, dimensions=None, **kwargs
     ):
     """
-    Plots probability distribution on the grid.
+    Plots probability distribution on the plane.
     """
     x_dim, y_dim = dimensions
 
@@ -773,13 +792,25 @@ def _plot_probability_distribution_on_grid(
     X, Y = np.meshgrid(X, Y)
     Z = np.reshape(probabilities, (x_dim, y_dim))
 
-    #mappable = plt.cm.ScalarMappable(cmap=plt.cm.viridis)
-    mappable = plt.cm.ScalarMappable(cmap=kwargs['cmap'])
-    mappable.set_array(Z)
-    mappable.set_clim(0, Z.max()) # optional
+    _default_plane_kwargs(kwargs)
 
-    ax.plot_surface(X, Y, Z, cmap=mappable.cmap, linewidth=0, antialiased=False,
-                    cstride=1, rstride=1, alpha=0.5)
+    cmap = kwargs.pop('cmap')
+    mappable = plt.cm.ScalarMappable(cmap=cmap)
+    mappable.set_array(Z)
+    if min_prob is not None and max_prob is not None:
+        vmin = min_prob
+        vmax = max_prob
+    else: #rescale
+        vmin = 0
+        vmax = Z.max()
+    mappable.set_clim(vmin, vmax)
+
+    # division by 4 apparently normalize the colors
+    ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
+                    vmin=vmin/4, vmax=vmax/4,
+                    **kwargs)
+    ax.set_zlim(vmin, vmax)
+    kwargs['cmap'] = cmap # reinserts into kwargs
 
     cbar = plt.colorbar(mappable, shrink=0.4, aspect=20, pad=0.15)
     cbar.ax.tick_params(length=10, width=1, labelsize=16)

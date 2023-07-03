@@ -1,0 +1,36 @@
+digraph {
+	"(0, 0)" [pos="0.0,0.0!" width=0.75 height=0.75 fixedsize=True]
+	"(1, 0)" [pos="1.75,0.0!" width=0.75 height=0.75 fixedsize=True]
+	"(2, 0)" [pos="3.5,0.0!" width=0.75 height=0.75 fixedsize=True]
+	"(0, 1)" [pos="0.0,1.75!" width=0.75 height=0.75 fixedsize=True]
+	"(1, 1)" [pos="1.75,1.75!" width=0.75 height=0.75 fixedsize=True]
+	"(2, 1)" [pos="3.5,1.75!" width=0.75 height=0.75 fixedsize=True]
+	"(0, 2)" [pos="0.0,3.5!" width=0.75 height=0.75 fixedsize=True]
+	"(1, 2)" [pos="1.75,3.5!" width=0.75 height=0.75 fixedsize=True]
+	"(2, 2)" [pos="3.5,3.5!" width=0.75 height=0.75 fixedsize=True]
+
+	 "(0, 0)" -> "(1, 0)"[headlabel=0 labeldistance=4 labelangle=-20];
+	 "(0, 0)" -> "(0, 1)"[headlabel=1 labeldistance=4 labelangle=-20];
+	 "(1, 0)" -> "(2, 0)"[headlabel=2 labeldistance=4 labelangle=-20];
+	 "(1, 0)" -> "(0, 0)"[headlabel=3 labeldistance=4 labelangle=-20];
+	 "(1, 0)" -> "(1, 1)"[headlabel=4 labeldistance=4 labelangle=-20];
+	 "(2, 0)" -> "(1, 0)"[headlabel=5 labeldistance=4 labelangle=-20];
+	 "(2, 0)" -> "(2, 1)"[headlabel=6 labeldistance=4 labelangle=-20];
+	 "(0, 1)" -> "(1, 1)"[headlabel=7 labeldistance=4 labelangle=-20];
+	 "(0, 1)" -> "(0, 2)"[headlabel=8 labeldistance=4 labelangle=-20];
+	 "(0, 1)" -> "(0, 0)"[headlabel=9 labeldistance=4 labelangle=-20];
+	 "(1, 1)" -> "(2, 1)"[headlabel=10 labeldistance=4 labelangle=-20];
+	 "(1, 1)" -> "(0, 1)"[headlabel=11 labeldistance=4 labelangle=-20];
+	 "(1, 1)" -> "(1, 2)"[headlabel=12 labeldistance=4 labelangle=-20];
+	 "(1, 1)" -> "(1, 0)"[headlabel=13 labeldistance=4 labelangle=-20];
+	 "(2, 1)" -> "(1, 1)"[headlabel=14 labeldistance=4 labelangle=-20];
+	 "(2, 1)" -> "(2, 2)"[headlabel=15 labeldistance=4 labelangle=-20];
+	 "(2, 1)" -> "(2, 0)"[headlabel=16 labeldistance=4 labelangle=-20];
+	 "(0, 2)" -> "(1, 2)"[headlabel=17 labeldistance=4 labelangle=-20];
+	 "(0, 2)" -> "(0, 1)"[headlabel=18 labeldistance=4 labelangle=-20];
+	 "(1, 2)" -> "(2, 2)"[headlabel=19 labeldistance=4 labelangle=-20];
+	 "(1, 2)" -> "(0, 2)"[headlabel=20 labeldistance=4 labelangle=-20];
+	 "(1, 2)" -> "(1, 1)"[headlabel=21 labeldistance=4 labelangle=-20];
+	 "(2, 2)" -> "(1, 2)"[headlabel=22 labeldistance=4 labelangle=-20];
+	 "(2, 2)" -> "(2, 1)"[headlabel=23 labeldistance=4 labelangle=-20];
+}

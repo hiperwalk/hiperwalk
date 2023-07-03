@@ -3,7 +3,7 @@ from .graph import *
 
 class Cycle(Graph):
     r"""
-    Cycle Graph.
+    Cycle graph.
 
     Parameters
     ----------
@@ -12,30 +12,17 @@ class Cycle(Graph):
 
     Notes
     -----
-    The cycle may be interpreted as being embedded on the line
-    with cyclic boundary condition.
+    The cycle can be interpreted as being embedded on the line
+    with a cyclic boundary condition.
+    In this context,
+    we assign the direction ``0`` to the right and ``1`` to the left.
+    This assignment alters the order of the arcs.
+    Any arc with a tail denoted by :math:`v`
+    has the label :math:`2v` if it points to the right,
+    and the label :math:`2v + 1` if it points to the left.
+    Figure 1 illustrates the arc labels of a cycle with 3 vertices.
 
-
-    .. todo::
-        
-        update below
-
-    The edge order respects the default vertex-coin notation.
-    In other words, 0 corresponds to the coin pointing rightwards,
-    and 1 to the coin pointing leftwards.
-    Therefore, the arcs are sorted with respect to this order
-    (vertex has precedence over direction and
-    right has precedence over left):
-
-    .. math::
-        \begin{align*}
-            \ket{(v, c)} = \ket{2v + c}
-        \end{align*}
-
-    where :math:`v \in V` and :math:`c \in \{0, 1\}`.
-    Figure 1 illustrates the arcs of a 3 vertices cycle.
-
-    .. graphviz:: ../../graphviz/coined-cycle-edges-labels.dot
+    .. graphviz:: ../../graphviz/cycle-arcs.dot
         :align: center
         :layout: neato
         :caption: Figure 1.
@@ -60,54 +47,11 @@ class Cycle(Graph):
     def embeddable(self):
         return True
 
-    def get_default_coin(self):
+    def default_coin(self):
         r"""
         Returns the default coin name.
         """
         return 'hadamard'
-
-    # def _state_vertex_dir(self, state, entries):
-    #     r"""
-    #     Overrides Coined model method so the directions respect
-    #     the default coin directions.
-    #     In other words:
-    #     0 pointing rightwards and 1 pointing leftwards.
-    #     """
-    #     num_vert = self.adj_matrix.shape[0]
-
-    #     for amplitude, src, coin_dir in entries:
-    #         if coin_dir != 0 and coin_dir != 1:
-    #             raise ValueError(
-    #                 "Invalid entry coin direction for vertex " + str(src)
-    #                 + ". Expected either 0 (rightwards) or 1 (leftwards),"
-    #                 + " but received " + str(coin_dir) + " instead."
-    #             )
-
-    #         arc = 2*src + coin_dir
-    #         # if src == 0 or src == num_vert - 1:
-    #         #     arc = 2*src + coin_dir 
-
-    #         print(arc)
-    #         state[arc] = amplitude
-
-    #     return state
-
-    # def _state_arc_notation(self, state, entries):
-    #     num_vert = self.adj_matrix.shape[0]
-
-    #     for amplitude, src, dst in entries:
-    #         if (dst != (src - 1) % num_vert and
-    #             dst != (src + 1) % num_vert):
-    #             raise ValueError (
-    #                 "Vertices " + str(src) + " and " + str(dst)
-    #                 + " are not adjacent."
-    #             )
-    #         
-    #         arc = (2*src if dst - src == 1 or src - dst == num_vert - 1
-    #                else 2*src + 1)
-    #         state[arc] = amplitude
-
-    #     return state
 
     def arc_label(self, tail, head):
         num_vert = self.number_of_vertices()

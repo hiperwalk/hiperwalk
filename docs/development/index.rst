@@ -1,38 +1,68 @@
+.. _docs_development:
+
 ===========
 Development
 ===========
 
-The ``main`` branch is where the new features are developed.
-To contribute, clone the repository.
+HiperWalk is built upon several Python libraries. 
+Before developing for HiperWalk, these libraries need to be installed. 
+The required libraries include
+`numpy <https://numpy.org/>`_,
+`scipy <https://scipy.org/>`_,
+`networkx <https://networkx.org/>`_, and
+`matplotlib <https://matplotlib.org/>`_.
+To install these libraries, use the following commands:
+
+.. code-block:: shell
+
+   pip3 install numpy
+   pip3 install scipy
+   pip3 install networkx
+   pip3 install matplotlib
+
+The ``main`` branch is the main development area for new features. 
+To contribute, first clone the repository.
 
 .. code-block:: shell
 
     git clone https://github.com/hiperwalk/hiperwalk.git
 
-Then, make the desired alterations.
-And make a pull request.
+Next, make the desired modifications and submit a pull request.
 
-.. todo::
+Testing
+=======
 
-   Continuous model must be implemented.
+Tests are located in the ``hiperwalk/tests/`` directory.
+If a complete installation (including HPC support) was performed, 
+execute:
+
+.. code-block:: shell
+
+    ./run_all.sh
+
+If you installed the standalone version (without HPC support), 
+execute:
+
+.. code-block:: shell
+
+    ./run_nonhpc.sh
 
 Documentation
 =============
 
-It is very likely that there are new features in the ``main`` branch.
-These new features are documentated online in the **latest** version.
+There are likely to be new features in the ``main`` branch. 
+These features are documented online in the  **latest** version.
 
 Install Requirements
 --------------------
 
-To generate the current (under development) documentation locally,
-it is necessary to install all the HiperWalk requirements
+To generate the current, under-development documentation locally, 
+all HiperWalk requirements must be installed
 (see :ref:`HiperWalk section in the installation guide
 <docs_install_hiperwalk>`).
 
-Supposing that all HiperWalk requirements are installed
-(see *TODO*),
-the following commands install the remaining documentation only requirements.
+Assuming that all HiperWalk requirements are installed (see *TODO*), 
+the following commands install the remaining documentation-specific requirements.
 
 .. code-block:: shell
 
@@ -45,7 +75,7 @@ the following commands install the remaining documentation only requirements.
 Generate Documentation
 ----------------------
 
-Inside the ``hiperwalk/docs/`` directory, execute
+Within the ``hiperwalk/docs/`` directory, execute:
 
 
 .. code-block:: shell
@@ -55,12 +85,10 @@ Inside the ``hiperwalk/docs/`` directory, execute
 View Generated Documentation
 ----------------------------
 
-If everything went right,
-the recently compiled documentation is available locally.
-To view (and test) it,
-open the file ``hiperwalk/docs/build/html/index.html``
-in the browser of your reference --
-e.g. by double clicking it.
+If the process was successful, the newly compiled documentation 
+is now available for local access. To view (and test) it, open the 
+file  ``hiperwalk/docs/build/html/index.html``
+in your preferred browser -- for instance, by double-clicking on it.
 
 Todo
 ====
@@ -68,4 +96,4 @@ Todo
 * The current version was tested with Ubuntu 20.04.
   Hiperwalk failed to be configured in Ubuntu 22.04.
 * The current version only works with GTK 3.0.
-  Implementation using GTK 4.0 are postponed to the next release.
+  Implementation using GTK 4.0 is postponed to the next release.

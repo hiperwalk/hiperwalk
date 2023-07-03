@@ -1,0 +1,7 @@
+python3 periodic-natural.py > periodic-natural.dot
+python3 bounded-natural.py > bounded-natural.dot
+python3 periodic-diagonal.py > periodic-diagonal.dot
+python3 bounded-diagonal.py > bounded-diagonal.dot
+python3 even-dim-diagonal.py > even-dim-diagonal.dot
+
+# neato -Tpng bounded-natural.dot > output.png
