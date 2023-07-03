@@ -5,7 +5,6 @@ Encapsules Animation class, responsible for managing animations.
 import matplotlib.pyplot as plt
 from PIL import Image
 from .._constants import __DEBUG__
-from warnings import warn
 
 if __DEBUG__:
     from time import time
@@ -104,8 +103,6 @@ class Animation:
             if __DEBUG__:
                 global start
                 end = time()
-                print('update_figure: ' + str(end - start) + 's')
-                print('\t' + str(img))
                 start = end
 
         # TODO: repeat_delay not implemented in animation.save
@@ -125,7 +122,6 @@ class Animation:
         if __DEBUG__:
             # used to check if no extra padding is being added
             fig.patch.set_facecolor('red')
-            print("Fig dpi " + str(fig.dpi))
 
     # TODO: saving video is supported but not recommended because
     #   fps may not be respected.
@@ -172,14 +168,8 @@ class Animation:
             filename += '.gif'
         self.save_path = filename
 
-        print('--------------------------------')
-        print(self.save_path)
-        print('--------------------------------')
         self.plt_anim.save(self.save_path)
         plt.close()
-
-        if __DEBUG__:
-            print('finished saving')
 
         # by ignoring this condition while using the terminal,
         # a non-aborting exception is thrown:
@@ -201,9 +191,6 @@ class Animation:
         if not self._is_saved():
             import tempfile
             temp = tempfile.NamedTemporaryFile(suffix='.gif')
-            print('---------------------------------')
-            print(temp.name)
-            print('---------------------------------')
             self.save_animation(temp.name)
             return temp
 
@@ -291,7 +278,7 @@ class Animation:
                 window.add(img)
 
             def configure_video_window(self):
-                warn('Showing video not supported.')
+                raise NotImplementedError('Showing video not supported.')
 
             if self.save_path[-4:] == '.gif':
                 configure_gif_window(self)
@@ -325,9 +312,6 @@ class Animation:
                 configure_video_window(self)
 
             def on_activate(app, save_path):
-                print('------------------------------')
-                print(save_path)
-                print('------------------------------')
                 win = Gtk.ApplicationWindow(application=app)
                 ############################
                 from gi.repository import GdkPixbuf

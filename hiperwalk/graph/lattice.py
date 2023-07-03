@@ -4,28 +4,172 @@ from .graph import Graph
 from warnings import warn
 
 class Lattice(Graph):
+    r"""
+    Two-dimensionsal lattice.
+
+    The lattice can be designed with either
+    cyclic boundary conditions or borders.
+    Moreover, the lattice's representation can be either
+    *natural* or *diagonal*.
+    In the *natural* representation,
+    neighboring vertices lie along the X and Y axes,
+    while in the *diagonal* representation,
+    they lie along the diagonals.
+
+    Parameters
+    ----------
+    dimensions : int or tuple of int
+        Lattice dimensions in ``(x_dim, y_dim)`` format.
+        If ``dimensions`` is an integer, creates a square lattice.
+
+    periodic : bool, default=True
+        ``True`` if the lattice has cyclic boundary conditions,
+        ``False`` if it has borders.
+
+    diagonal : bool, default=False
+        ``True`` if the lattice has the diagonal representation,
+        ``False`` if it has the natural representation.
+
+    Notes
+    -----
+    The order of the arcs is determined according to
+    the order of the vertices.
+    The order of the vertices is defined as follows:
+    if :math:`(x_1, y_1)` and :math:`(x_2, y_2)` are two valid vertices,
+    we say that :math:`(x_1, y_1) < (x_2, y_2)` if :math:`y_1 < y_2` or
+    if :math:`y_1 = y_2` and :math:`x_1 < x_2`.
+    The order of the arcs also depends on the lattice representation
+    (natural or diagonal).
+
+    Natural Lattice:
+        In the natural lattice,
+        the directions are described as follows:
+
+        * 00 = 0: right;
+        * 01 = 1: left;
+        * 10 = 2: up;
+        * 11 = 3: down.
+        
+        The most significant bit corresponds to the axis:
+        0 represents the X-axis and 1 represents the Y-axis.
+        The least significant bit indicates the direction of
+        movement along the given axis, with 0 signifying
+        forward movement and 1 signifying backward movement.
+
+        The order of arcs corresponds with the order of vertices
+        and their respective directions. For example,
+        consider a vertex :math:`(x, y)`. Then,
+        :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
+        are adjacent vertices.
+        The order of these arcs is
+
+        .. math::
+            ((x, y), (x + 1, y)) &< ((x, y), (x - 1, y)) \\
+                                 &< ((x, y), (x, y + 1)) \\
+                                 &< ((x, y), (x, y - 1)).
+
+        The directions are depicted in :ref:`fig-natural-dir`.
+
+        .. graphviz:: ../../graphviz/lattice/natural-directions.dot
+            :align: center
+            :layout: neato
+            :name: fig-natural-dir
+            :caption: Figure: Directions in the natural representation.
+
+        For example, the labels of the arcs for
+        the :math:`3 \times 3`-lattice with periodic boundary
+        conditions are depicted in :ref:`fig-periodic-natural-lattice`.
+
+        .. graphviz:: ../../graphviz/lattice/periodic-natural.dot
+            :align: center
+            :layout: neato
+            :name: fig-periodic-natural-lattice
+            :caption: Figure: 3x3-lattice with cyclic boundary conditions.
+
+        In the case of a natural lattice with borders, the labels of the
+        arcs maintain the same sequence but with some modifications
+        due to the presence of vertices with degrees 2 and 3.
+        Figure :ref:fig-bounded-natural-Lattice provides an illustration
+        of a bounded natural lattice.
+
+        .. graphviz:: ../../graphviz/lattice/bounded-natural.dot
+            :align: center
+            :layout: neato
+            :name: fig-bounded-natural-lattice
+            :caption: Figure: Bounded natural 3x3-lattice.
+
+    Diagonal Lattice:
+        In the diagonal lattice,
+        the directions are described as follows:
+
+        * 00 = 0: right, up;
+        * 01 = 1: right, down;
+        * 10 = 2: left, up;
+        * 11 = 3: left, down.
+
+        Each binary value indicates the direction of movement,
+        with 0 representing forward motion and 1 representing
+        backward motion. The most significant bit corresponds to
+        movement along the X-axis, while the least significant bit
+        corresponds to movement along the Y-axis.
+
+        The order of arcs corresponds with the order of vertices
+        and their respective directions. For example,
+        consider a vertex :math:`(x, y)`. Then,
+        :math:`(x \pm 1, y)` and :math:`(x, y \pm 1)`
+        are adjacent vertices.
+        The order of these arcs is
+        
+        .. math::
+            ((x, y), (x + 1, y + 1)) &< ((x, y), (x + 1, y - 1)) \\
+                                     &< ((x, y), (x - 1, y + 1)) \\
+                                     &< ((x, y), (x - 1, y - 1)).
+
+        The directions are depicted in :ref:`fig-diagonal-dir`.
+
+        .. graphviz:: ../../graphviz/lattice/diagonal-directions.dot
+            :align: center
+            :layout: neato
+            :name: fig-diagonal-dir
+            :caption: Figure: Directions in the diagonal representation.
+
+        For example, the labels of the arcs for
+        the :math:`3 \times 3`-lattice with periodic boundary
+        conditions are depicted in :ref:`fig-periodic-diagonal-lattice`
+
+        .. graphviz:: ../../graphviz/lattice/periodic-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-periodic-diagonal-lattice
+            :caption: Figure: Periodic diagonal 3x3-lattice.
+
+        In the case of a diagonal lattice with borders, the labels of the
+        arcs maintain the same sequence but with some modifications.
+        Figure :ref:`fig-bounded-diagonal-Lattice` provides
+        an illustration of a bounded diagonal lattice.
+
+        .. graphviz:: ../../graphviz/lattice/bounded-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-bounded-diagonal-lattice
+            :caption: Figure: Bounded 3x3-lattice in the diagonal representation.
+
+        Note that in this context,
+        there exist two independent sublattices.
+        In other words, a vertex in one sublattice is not accessible from
+        a vertex in the other sublattice. This situation also arises
+        if the diagonal lattice has periodic boundary conditions and both
+        dimensions are even.
+        Figure :ref:`fig-even-dim-diagonal` illustrates
+        an example of this case.
+
+        .. graphviz:: ../../graphviz/lattice/even-dim-diagonal.dot
+            :align: center
+            :layout: neato
+            :name: fig-even-dim-diagonal
+            :caption: Figure: 4x4-lattice with cyclic boundary conditions.
+    """
     def __init__(self, dimensions, periodic=True, diagonal=False):
-        r"""
-        Two-dimensionsal lattice.
-
-        The lattice may have boundary conditions or not.
-        Its adjacency may be either natural or diagonal.
-
-        Parameters
-        ----------
-        dimensions : int or tuple of int
-            Lattice dimensions in ``(x_dim, y_dim)`` format.
-            If ``dimensions`` is an integer, creates a square lattice.
-
-
-        periodic : bool, default=True
-            Whether the lattice has boundary conditions or not.
-
-        diagonal : bool, default=False
-            If ``False`` the natural adjacency is used.
-            Otherwise, diagonal adjacency is used.
-        """
-
         try:
             x_dim, y_dim = dimensions
         except TypeError:
@@ -100,14 +244,81 @@ class Lattice(Graph):
         return True
 
     def vertex_coordinates(self, label):
+        r"""
+        Returns vertex (x, y)-coordinates given its label.
+
+        Parameters
+        ----------
+        label : int
+            Vertex label.
+
+        Returns
+        -------
+        x : int
+            Vertex X-coordinate.
+        y : int
+            Vertex Y-coordinate.
+
+        See Also
+        --------
+        vertex_label
+        """
         return (label % self.x_dim, label // self.x_dim)
 
 
     def vertex_label(self, x, y):
+        r"""
+        Returns vertex label (number) given its coordinates.
+
+        Parameters
+        ----------
+        x : int
+            Vertex X-coordinate.
+        y : int
+            Vertex Y-coordinate.
+
+        Returns
+        -------
+        int
+            Vertex label.
+
+        See Also
+        --------
+        vertex_coordinates
+        """
         return (x + self.x_dim*y) % self.number_of_vertices()
 
     def arc_direction(self, arc):
         r"""
+        Return arc direction.
+
+        Parameters
+        ----------
+        arc
+            Any of the following notations are acceptable.
+            
+            * ((int, int), (int, int))
+                Arc notation with vertices' coordinates.
+            * (int, int)
+                Arc notation with vertices' labels.
+            * int
+                Arc label.
+
+        Returns
+        -------
+        int
+            If natural (not diagonal) lattice:
+                * 0: right
+                * 1: left
+                * 2: up
+                * 3: down
+
+            If diagonal lattice:
+                * 0: right, up
+                * 1: right, down
+                * 2: left, up
+                * 3: left, down
+
         Notes
         -----
         Does not check if arc exists.
@@ -150,7 +361,7 @@ class Lattice(Graph):
             raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
 
         if self.periodic:
-            return 4*tail + self.arc_direction((tail, head))  
+            return 4*tail + self.arc_direction((tail, head))
 
         label = self.adj_matrix.indptr[tail]
         direction = self.arc_direction((tail, head))
@@ -169,6 +380,30 @@ class Lattice(Graph):
         return label + direction - sub_x - sub_y
 
     def arc(self, label, coordinates=True):
+        r"""
+        Arc in arc notation.
+
+        Given the arc label (a number),
+        returns the arc in the ``(tail, head)`` notation.
+
+        Parameters
+        ----------
+        label : int
+            Arc label (number)
+        coordinates : bool, default=True
+            Whether the vertices are returned as coordinates or as labels.
+
+        Returns
+        -------
+        (tail, head)
+            There are two possible formats for the vertices
+            ``tail`` and ``head``.
+
+            (vertex_x, vertex_y) : (int, int)
+                If ``coordinates=True``.
+            label : int
+                If ``coordinates=False``.
+        """
         if not self.periodic and self.diagonal:
             raise NotImplementedError
 
@@ -285,7 +520,7 @@ class Lattice(Graph):
 
         if not iterable:
             tail = self.vertex_label(tail[0], tail[1])
-            head = self.vertex_label(head[0], head[1]) 
+            head = self.vertex_label(head[0], head[1])
         return (tail, head)
 
     def previous_arc(self, arc):
@@ -340,19 +575,41 @@ class Lattice(Graph):
         return (tail, head)
 
     def dimensions(self):
+        r"""
+        Lattice dimensions.
+
+        Returns
+        -------
+        x_dim : int
+            Dimension alongside de X axis.
+        y_dim : int
+            Dimension alongside de Y axis.
+        """
         return (self.x_dim, self.y_dim)
 
     def get_central_vertex(self):
         r"""
-        Central vertex is different from center vertex.
-        In the sense that...
+        Vertex with label in the center of the graph as plane.
+
+        .. deprecated:: 2.0a1
+            ``get_central_vertex`` will be removed in Hiperwalk 2.0 because
+            the user can calculate the central vertex easily using
+            :meth:`dimensions`.
+
+        The central vertex is the vertex that would be located at the
+        plane center after mapping every vertex ``(x, y)`` to its
+        respetive plane point.
+        
+        This is not the center vertex.
+
+        Raises
+        ------
+        ValueError
+            If any lattice dimension is even.
         """
         warn('`get_central_vertex` is deprecated. '
-             + 'Use `central_vertex` instead.',
-             DeprecationWarning)
-        return self.central_vertex()
+             + 'It will be removed in version 2.0.')
 
-    def central_vertex(self):
         if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
             raise ValueError(
                 "One of lattice dimensions is even. "

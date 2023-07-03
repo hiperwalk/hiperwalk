@@ -1,0 +1,12 @@
+digraph {
+	4 [pos="0,0!" label="(x, y)" width=1.5 height=1.5 fixedsize=True]
+	0 [pos="2,2!" label="(x + 1, y + 1)" width=1.5 height=1.5 fixedsize=True]
+	1 [pos="2,-2!" label="(x + 1, y - 1)" width=1.5 height=1.5 fixedsize=True]
+	2 [pos="-2,2!" label="(x - 1, y + 1)" width=1.5 height=1.5 fixedsize=True]
+	3 [pos="-2,-2!" label="(x - 1, y - 1)" width=1.5 height=1.5 fixedsize=True]
+
+	4 -> 0 [headlabel=0 labeldistance=5 labelangle=-10];
+	4 -> 1 [headlabel=1 labeldistance=5 labelangle=-10];
+	4 -> 2 [headlabel=2 labeldistance=5 labelangle=10];
+	4 -> 3 [headlabel=3 labeldistance=5 labelangle=10];
+}

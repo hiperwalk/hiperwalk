@@ -3,7 +3,6 @@ import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
-from warnings import warn
 try:
     from . import _pyneblina_interface as nbl
 except:
@@ -11,39 +10,33 @@ except:
 
 class ContinuousWalk(QuantumWalk):
     r"""
-    Manage instance of the continuous time quantum walk model
-    on unweighted graphs.
+    Manage an instance of a continuous-time quantum walk
+    on any simple graph.
 
-    For implemantation details see Notes Section.
+    For further implementation details, refer to the Notes Section.
 
     Parameters
     ----------
     graph :
-        Graph on which the quantum walk occurs.
-        There are three two types acceptable.
+        Graph on which the quantum walk takes place.
+        There are two acceptable inputs:
 
         :class:`hiperwalk.graph.Graph` :
             The graph itself.
 
         :class:`class:scipy.sparse.csr_array`:
-            The graph adjacency matrix.
+            The adjacency matrix of the graph.
 
-        .. todo::
-            * Accept other types such as numpy array
-
-
-
-    adjacency : :class:`scipy.sparse.csr_array`
-        .. deprecated ::
-            This parameter is deprecated and will be removed in
-            future versions.
+    adjacency : :class:`scipy.sparse.csr_array`, optional
+        .. deprecated:: 2.0a1
+            It will be removed in version 2.0.
             Use ``graph`` instead.
 
-        Adjacency matrix of the graph on which the quantum occurs
-        is going to occur.
+        Adjacency matrix of the graph on which
+        the quantum walk takes place.
 
     **kwargs : optional
-        Arguments for setting Hamiltonian.
+        Arguments to set the Hamiltonian.
 
     See Also
     --------
@@ -51,22 +44,26 @@ class ContinuousWalk(QuantumWalk):
 
     Notes
     -----
-    Let :math:`A` be the adjacency matrix of the graph :math:`G(V, E)`.
-    :math:`A` is a :math:`|V| \times |V|`-dimensional matrix such that
-
+    The adjacency matrix of a graph :math:`G(V, E)` is
+    the :math:`|V| \times |V|`-dimensional matrix :math:`A` such that
+    
     .. math::
         A_{i,j} = \begin{cases}
             1, \text{ if } (i,j) \in E(G),\\
-            0, \text{ otherwise}
+            0, \text{ otherwise.}
         \end{cases}
 
+    The Hamiltonian, which depends on the adjacency matrix and the location of 
+    the marked vertices, is described in the
+    :meth:`hiperwalk.ContinuousWalk.set_hamiltonian` method.
+
     The states of the computational basis are :math:`\ket{i}` for
-    :math:`0 \leq i < |V|` where
+    :math:`0 \leq i < |V|`, where
     :math:`\ket i` is associated with the :math:`i`-th vertex.
 
-    This class can also be used to simulate the evolution of any
-    any Hamiltonian.
-    Simply pass the disered Hamiltonian instead of the adjacency matrix.
+    This class can also facilitate the simulation of any Hamiltonian
+    evolution. To do this, simply pass the desired Hamiltonian in place
+    of the adjacency matrix.
     """
 
     _hamiltonian_kwargs = dict()
@@ -91,7 +88,9 @@ class ContinuousWalk(QuantumWalk):
 
     def set_gamma(self, gamma=None):
         r"""
-        Set gamma used for the Hamiltonian.
+        Sets the gamma parameter.
+        
+        The gamma parameter is used in the definition of the Hamiltonian.
 
         Parameters
         ----------
@@ -102,11 +101,17 @@ class ContinuousWalk(QuantumWalk):
             raise TypeError("Value of 'gamma' is not float.")
 
         self._gamma = gamma
+        self._hamiltonian = None
         self._evolution = None
+
+    def set_marked(self, marked=[]):
+        super().set_marked(marked)
+        self._hamiltonian = None
 
     def get_gamma(self):
         r"""
-        Get the gamma used for the Hamiltonian.
+        Retrieves the gamma value used in
+        the definition of the Hamiltonian.
 
         Returns
         -------
@@ -121,21 +126,18 @@ class ContinuousWalk(QuantumWalk):
 
         Parameters
         ----------
-        **kwargs : 
+        **kwargs :
             Additional arguments.
             Used for determining the gamma value and marked vertices.
-            See :meth:`set_gamma` and :meth:`set_marked`.
+            See :meth:`hiperwalk.ContinuousWalk.set_gamma` and
+            :meth:`hiperwalk.ContinuousWalk.set_marked`.
 
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
-            
         Notes
         -----
         The Hamiltonian is given by
 
         .. math::
-            H = -\gamma A  - \sum_{m \in M} \ket m \bra m
+            H = -\gamma A  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`A` is the adjacency matrix, and
         :math:`M` is the set of marked vertices.
@@ -162,6 +164,18 @@ class ContinuousWalk(QuantumWalk):
 
         self.set_gamma(**gamma_kwargs)
         self.set_marked(**marked_kwargs)
+
+    def get_hamiltonian(self):
+        r"""
+        Returns the Hamiltonian.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`
+        """
+        if self._hamiltonian is not None:
+            return self._hamiltonian
+
         H = -self._gamma * self._graph.adj_matrix
 
         # creating oracle
@@ -171,7 +185,7 @@ class ContinuousWalk(QuantumWalk):
                     (data, (self._marked, self._marked)),
                     shape=(self.hilb_dim, self.hilb_dim))
 
-            H -= self._oracle
+            H -= oracle
 
         self._hamiltonian = H
         # since the hamiltonian was changed,
@@ -179,18 +193,15 @@ class ContinuousWalk(QuantumWalk):
         self._evolution_operator = None
         return H
 
-    def get_hamiltonian(self):
-        return self._hamiltonian
-
     def set_evolution(self, **kwargs):
         r"""
-        Alias for :meth:`set_hamiltonian`.
+        Alias for :meth:`hiperwalk.ContinuousWalk.set_hamiltonian`.
         """
         self.set_hamiltonian(**kwargs)
 
     def get_evolution(self, time=None, hpc=True):
         r"""
-        Return the evolution operator.
+        Returns the evolution operator.
 
         Constructs the evolution operator based on the previously
         set Hamiltonian.
@@ -198,12 +209,11 @@ class ContinuousWalk(QuantumWalk):
         Parameters
         ----------
         time : float
-            Gerate the evolution operator of the given time.
+            Generates the evolution operator corresponding to the specified time.
 
         hpc : bool, default = True
-            Whether or not to use neblina hpc functions to
-            generate the evolution operator.
-
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
         Returns
         -------
         :class:`numpy.ndarray`.
@@ -211,7 +221,7 @@ class ContinuousWalk(QuantumWalk):
         Raises
         ------
         ValueError
-            If `time < 0`.
+            If ``time < 0``.
 
         See Also
         --------
@@ -222,31 +232,37 @@ class ContinuousWalk(QuantumWalk):
         The evolution operator is given by
 
         .. math::
-            U = e^{-\text{i}tH}
+            U = e^{-\text{i}tH},
 
-        where :math:`H` is a Hamiltonian matrix, and
+        where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
 
-        The evolution operator is constructed by Taylor Series expansion.
+        The evolution operator is constructed using
+        a Taylor series expansion.
+
+        .. warning::
+            For non-integer time (floating number),
+            the result is approximate. It is recommended 
+            to select a small time interval and perform 
+            multiple matrix multiplications to minimize 
+            rounding errors.
         """
         if time is None or time < 0:
             raise ValueError(
                 "Expected non-negative `time` value."
             )
 
-        if self._hamiltonian is None:
-            raise AssertionError
+        H = self.get_hamiltonian()
 
         if hpc and not self._pyneblina_imported():
-            warn(PYNEBLINA_IMPORT_ERROR_MSG)
             hpc = False
 
         if hpc:
             # determining the number of terms in power series
-            max_val = np.max(np.abs(self._hamiltonian))
+            max_val = np.max(np.abs(H))
             if max_val*time <= 1:
                 nbl_U = nbl.matrix_power_series(
-                        -1j*time*self._hamiltonian, 30)
+                        -1j*time*H, 30)
 
             else:
                 # if the order of magnitude is very large,
@@ -261,13 +277,9 @@ class ContinuousWalk(QuantumWalk):
                     order = np.ceil(np.math.log(new_time, 20))
                     new_time /= 10**order
                     num_mult = int(np.round(time/new_time)) - 1
-                    warn("Result is approximated. It is recommended to "
-                         + "choose a small time interval and performing "
-                         + "multiple matrix multiplications to "
-                         + "mitigate uounding errors.")
 
                 new_nbl_U = nbl.matrix_power_series(
-                        -1j*new_time*self._hamiltonian, 20)
+                        -1j*new_time*H, 20)
                 nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
                 for i in range(num_mult - 1):
                     nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
@@ -275,73 +287,43 @@ class ContinuousWalk(QuantumWalk):
             U = nbl.retrieve_matrix(nbl_U)
 
         else:
-            U = scipy.linalg.expm(-1j*time*self._hamiltonian.todense())
+            U = scipy.linalg.expm(-1j*time*H.todense())
 
         self._evolution = U
         return U
 
-    def simulate(self, time=None, initial_condition=None, hpc=True):
+    def simulate(self, time=None, initial_state=None,
+                 initial_condition=None, hpc=True):
         r"""
-        Simulate the Continuous Time Quantum Walk Hamiltonian.
-
-        Analogous to the :meth:`QuantumWalk.simulate`
-        but uses the Hamiltonian to construct the evolution operator.
-        The Hamiltonian may be the previously set or
-        passed in the arguments.
+        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
+        which accepts float entries for the ``time`` parameter.
 
         Parameters
         ----------
         time : float or tuple of floats
-            Analogous to the parameters of :meth:`QuantumWalk.simulate`,
-            but accepts float inputs.
-            ``step`` is used to construct the evolution operator.
-            The states in the interval
-            ***[* ``start/step``, ``end/step`` **]** are saved.
-            The values that describe this interval are
-            rounded up if the decimal part is greater than ``1 - 1e-5``,
+            This parameter is analogous to those in
+            :meth:`hiperwalk.QuantumWalk.simulate`,
+            with the distinction that it accepts float inputs.
+            The ``step`` parameter is used to construct the evolution operator.
+            The states within the interval
+            **[** ``start/step``, ``end/step`` **]** are stored.
+            The values describing this interval are
+            rounded up if the decimal part exceeds ``1 - 1e-5``,
             and rounded down otherwise.
-
-        hamiltonian : :class:`numpy.ndarray` or None
-            Hamiltonian matrix to be used for constructing
-            the evolution operator.
-            If ``None``, uses the previously set Hamiltonian
 
         Other Parameters
         ----------------
-        initial_condition :
-            See :meth:`QuantumWalk.simulate`.
-        hpc :
-            See :meth:`QuantumWalk.simulate`.
-
-
-        Raises
-        ------
-        ValueError
-            If ``time_range=None`` or ``initial_condition=None``,
-            or ``hamiltonian`` has invalid Hilbert space dimension.
-
-
-        Notes
-        -----
-        It is recommended to call this method with ``hamiltonian=None``
-        to guarantee that a valid Hamiltonian was used.
-        If the Hamiltonian is passed by the user,
-        there is no guarantee that the Hamiltonian is local.
+        See `hiperwalk.QuantumWalk.simulate`.
 
         See Also
         --------
-        :meth:`QuantumWalk.simulate`
-        hamiltonian
+        set_evolution
+        get_evolution
         """
         if time is None:
             raise ValueError(
                 "Invalid `time_range`. Expected a float, 2-tuple, "
                 + "or 3-tuple of float."
-            )
-
-        if initial_condition is None:
-            raise ValueError(
-                "`initial_condition` not specified."
             )
 
         time = np.array(self._time_to_tuple(time))
@@ -356,5 +338,6 @@ class ContinuousWalk(QuantumWalk):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        states = super().simulate(time, initial_condition,  hpc)
+        states = super().simulate(time, initial_state,
+                                  initial_condition, hpc)
         return states

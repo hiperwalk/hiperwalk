@@ -13,27 +13,24 @@ except ModuleNotFoundError:
 
 class QuantumWalk(ABC):
     """
-    Basic (abstract) class for Quantum Walks.
+    Abstract class for Quantum Walks.
 
     Basic methods and attributes used for implementing
-    specific Quantum Walk models.
+    specific quantum walk models.
 
     Parameters
     ----------
     graph
-        Graph on which the quantum walk occurs.
+        Graph on which the quantum walk takes place.
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
-    adjacency : optional
-        The adjacency matrix.
-        It is deprecated. Use ``graph`` instead.
+    adjacency : :class:`scipy.sparse.csr_array`, optional
+        .. deprecated:: 2.0a1
+            It will be removed in version 2.0.
+            Use ``graph`` instead.
 
-    Attributes
-    ----------
-    hilb_dim : int, default=0
-        Hilbert Space dimension.
-        It must be updated by the subclass' ``__init__``.
+        The adjacency matrix.
 
     Warns
     -----
@@ -49,7 +46,8 @@ class QuantumWalk(ABC):
     -----
 
     .. todo::
-        The following methods must be overwritten.
+        * List the that methods must be overwritten.
+        * Accept other types as ``graph`` such as numpy array
 
     """
 
@@ -108,11 +106,11 @@ class QuantumWalk(ABC):
 
     def uniform_state(self):
         r"""
-        Generate the uniform state.
+        Creates a uniform state.
 
         The state is constructed based on the ``hilb_dim`` attribute.
-        The uniform initial condition is the state where
-        all entries have the same amplitude.
+        The uniform state is a unit vector with entries 
+        that have the same real amplitudes.
 
         Returns
         -------
@@ -120,7 +118,7 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The uniform initial condition is the state
+        An example of the uniform state is
 
         .. math::
 
@@ -143,7 +141,7 @@ class QuantumWalk(ABC):
         """
         if not hasattr(marked, '__iter__'):
             marked = [marked]
-        self._marked = set(marked)
+        self._marked = list(set(marked))
         self._evolution = None
 
     def get_marked(self):
@@ -179,7 +177,7 @@ class QuantumWalk(ABC):
     @abstractmethod
     def get_evolution():
         r"""
-        Returns the evolution operator in matricial form.
+        Returns the evolution operator in matrix form.
         """
         raise NotImplementedError()
 
@@ -192,7 +190,7 @@ class QuantumWalk(ABC):
 
     def probability(self, states):
         r"""
-        Compute the probability states.
+        Computes the probability distribution of each state.
 
         The probability of each entry of the state.
 
@@ -350,12 +348,13 @@ class QuantumWalk(ABC):
         return ('hiperwalk.quantum_walk._pyneblina_interface'
                 in sys_modules)
 
-    def simulate(self, time=None, initial_condition=None, hpc=True):
+    def simulate(self, time=None, initial_state=None,
+                 initial_condition=None, hpc=True):
         r"""
         Simulates the quantum walk.
 
         Simulates the quantum walk applying the evolution operator
-        multiple times to the initial condition.
+        multiple times to the initial state.
 
         Parameters
         ----------
@@ -376,9 +375,15 @@ class QuantumWalk(ABC):
                 to time ``end`` (inclusive)
                 that is multiple of ``step``.
 
-        initial_condition : :class:`numpy.array`, default=None
-            The initial condition which the evolution operator
+        initial_state : :class:`numpy.array`, default=None
+            The initial state which the evolution operator
             is going to be applied to.
+
+        initial_condition :
+            .. deprecated:: 2.0a4
+                It will be removed in Hiperwalk 2.0
+                due to nomenclature consistency.
+                Use ``initial_state`` instead.
 
         hpc : bool, default=True
             Whether or not to use neblina's high-performance computing
@@ -396,7 +401,7 @@ class QuantumWalk(ABC):
         ValueError
             If any of the following occurs
             * ``time=None``.
-            * ``initial_condition=None``.
+            * ``initial_state=None``.
             * ``evolution_operator=None`` and it was no set previously.
 
         See Also
@@ -407,7 +412,7 @@ class QuantumWalk(ABC):
         Notes
         -----
         The walk is simulated by applying the
-        evolution operator to the initial condition multiple times.
+        evolution operator to the initial state multiple times.
         The maximum and intermediate applications
         are describred by ``time``.
 
@@ -426,13 +431,19 @@ class QuantumWalk(ABC):
                 + "Must be an int or tuple of int."
             )
 
-        if initial_condition is None:
-            raise ValueError(
-                "``initial_condition`` not specified. "
-                + "Expected a np.array."
-            )
+        if initial_state is None:
+            if initial_condition is None:
+                raise ValueError(
+                    "``initial_state`` not specified. "
+                    + "Expected a np.array."
+                )
+            else:
+                initial_state = initial_condition
+                warn('\n`initial_condition` is deprecated. '
+                     + 'It will be removed in version 2.0. '
+                     + 'Use `initial_state` instead.')
 
-        if len(initial_condition) != self.hilb_dim:
+        if len(initial_state) != self.hilb_dim:
             raise ValueError(
                 "Initial condition has invalid dimension. "
                 + "Expected an np.array with length " + str(self.hilb_dim)
@@ -443,19 +454,13 @@ class QuantumWalk(ABC):
         ###########################
 
         def __prepare_engine(self):
-            if __DEBUG__:
-                print("Preparing engine")
-
             if hpc:
                 self._simul_mat = nbl.send_matrix(self._evolution)
-                self._simul_vec = nbl.send_vector(initial_condition)
+                self._simul_vec = nbl.send_vector(initial_state)
 
             else:
                 self._simul_mat = self._evolution
-                self._simul_vec = initial_condition
-
-            if __DEBUG__:
-                print("Done\n")
+                self._simul_vec = initial_state
 
         def __simulate_step(self, step):
             """
@@ -463,9 +468,6 @@ class QuantumWalk(ABC):
             to the simulation vector.
             Simulation vector is then updated.
             """
-            if __DEBUG__:
-                print("Simulating steps")
-
             if hpc:
                 # TODO: request multiple multiplications at once
                 #       to neblina-core
@@ -479,13 +481,7 @@ class QuantumWalk(ABC):
 
                 # TODO: compare with numpy.linalg.matrix_power
 
-            if __DEBUG__:
-                print("Done\n")
-
         def __save_simul_vec(self):
-            if __DEBUG__:
-                print("Saving simulated vec")
-
             ret = None
 
             if hpc:
@@ -494,9 +490,6 @@ class QuantumWalk(ABC):
                 ret = nbl.retrieve_vector(self._simul_vec)
             else:
                 ret = self._simul_vec
-
-            if __DEBUG__:
-                print("Done\n")
 
             return ret
 
@@ -516,9 +509,6 @@ class QuantumWalk(ABC):
 
         
         if hpc and not self._pyneblina_imported():
-            if __DEBUG__:
-                print("IMPORTING PYNEBLINA")
-            warn(PYNEBLINA_IMPORT_ERROR_MSG)
             hpc = False
 
         __prepare_engine(self)
@@ -528,20 +518,20 @@ class QuantumWalk(ABC):
         num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
 
         # create saved states matrix
-        # TODO: error: if initial condition is int and
+        # TODO: error: if initial state is int and
         # evolution operator is float, dtype is complex
-        dtype = (initial_condition.dtype if
-            initial_condition.dtype == self._evolution.dtype
+        dtype = (initial_state.dtype if
+            initial_state.dtype == self._evolution.dtype
             else complex
         )
         saved_states = np.zeros(
-            (num_states, initial_condition.shape[0]), dtype=dtype
+            (num_states, initial_state.shape[0]), dtype=dtype
         )
         state_index = 0 # index of the state to be saved
 
         # if save_initial_state:
         if start == 0:
-            saved_states[0] = initial_condition.copy()
+            saved_states[0] = initial_state.copy()
             state_index += 1
             num_states -= 1
 
@@ -568,3 +558,9 @@ class QuantumWalk(ABC):
     def _filter_valid_kwargs(kwargs, valid_kwargs):
         return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
                 #if kwargs.get(k) is not None}
+
+    def hilbert_space_dimension(self):
+        """
+        Returns dimension of the Hilbert space.
+        """
+        return self.hilb_dim
