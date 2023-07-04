@@ -44,7 +44,7 @@ def _init_engine():
     """
     global __engine_initiated
     if not __engine_initiated:
-        neblina.init_engine(0)
+        neblina.init_engine(neblina.GPU, 0)
         __engine_initiated = True
 
 def send_vector(v):
@@ -82,9 +82,9 @@ def send_vector(v):
     # there should be a way to return a vector and automatically
     # convert to an array of float or of complex numbers accordingly.
     # 
-    # vec = (neblina.vector_new(n, NEBLINA_COMPLEX)
-    #        if is_complex else neblina.vector_new(n, NEBLINA_FLOAT))
-    vec = neblina.vector_new(n, NEBLINA_COMPLEX)
+    # vec = (neblina.vector_new(n, neblina.COMPLEX)
+    #        if is_complex else neblina.vector_new(n, neblina.FLOAT))
+    vec = neblina.vector_new(n, neblina.COMPLEX)
 
     if is_complex:
         for i in range(n):
@@ -118,7 +118,8 @@ def retrieve_vector(pynbl_vec):
         global __engine_initiated
         if not __engine_initiated: raise AssertionError
 
-    nbl_vec = neblina.move_vector_host(pynbl_vec.nbl_obj)
+    nbl_vec = pynbl_vec.nbl_obj
+    neblina.move_vector_host(nbl_vec)
 
     if not pynbl_vec.is_complex:
         raise NotImplementedError("Cannot retrieve real-only vectors.")
@@ -160,9 +161,9 @@ def _send_sparse_matrix(M, is_complex):
     #   In addition, there should be a way to
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
-    # smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
-    #     if is_complex else neblina.sparse_matrix_new(n, n, NEBLINA_FLOAT)
-    smat = neblina.sparse_matrix_new(n, n, NEBLINA_COMPLEX)
+    # smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
+    #     if is_complex else neblina.sparse_matrix_new(n, n, neblina.FLOAT)
+    smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
     
     # inserts elements into neblina sparse matrix
     row = 0
@@ -193,9 +194,9 @@ def _send_dense_matrix(M, is_complex):
     _init_engine()
 
     num_rows, num_cols = M.shape
-    mat = (neblina.matrix_new(num_rows, num_cols, NEBLINA_COMPLEX)
+    mat = (neblina.matrix_new(num_rows, num_cols, neblina.COMPLEX)
            if is_complex
-           else neblina.matrix_new(num_rows, num_cols, NEBLINA_FLOAT))
+           else neblina.matrix_new(num_rows, num_cols, neblina.FLOAT))
     
     # inserts elements into neblina matrix
     # TODO: Check if there really is a difference between real and complex
@@ -231,7 +232,8 @@ def retrieve_matrix(pynbl_mat):
             "Cannot retrieve sparse matrix."
         )
 
-    nbl_mat = neblina.move_matrix_host(pynbl_mat.nbl_obj)
+    nbl_mat = pynbl_mat.nbl_obj
+    neblina.move_matrix_host(nbl_mat)
 
     # TODO: Check if using default numpy datatype.
     py_mat = np.zeros(pynbl_mat.shape, dtype=(
