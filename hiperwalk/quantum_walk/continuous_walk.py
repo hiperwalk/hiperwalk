@@ -190,7 +190,7 @@ class ContinuousWalk(QuantumWalk):
         self._hamiltonian = H
         # since the hamiltonian was changed,
         # the previous evolution operator may not be coherent.
-        self._evolution_operator = None
+        self._evolution = None
         return H
 
     def set_evolution(self, **kwargs):
