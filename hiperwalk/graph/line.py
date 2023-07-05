@@ -74,7 +74,7 @@ class Line(Graph):
 
         num_vert = self.number_of_vertices()
         return (2*tail - 1 if (diff == 1 and tail != 0
-                               or head == num_vert - 1)
+                               or tail == num_vert - 1)
                 else tail*2)
 
     def arc(self, label):
