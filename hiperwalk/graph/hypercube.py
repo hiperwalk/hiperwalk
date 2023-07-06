@@ -52,7 +52,7 @@ class Hypercube(Graph):
                                             shape=(num_vert, num_vert))
 
         super().__init__(adj_matrix)
-        self.dimension = int(dimension)
+        self._dimension = int(dimension)
 
     def embeddable(self):
         return False
@@ -91,23 +91,23 @@ class Hypercube(Graph):
         except:
             direction = np.log2(direction)
 
-        if count != 1 or direction < 0 or direction >= self.dimension:
+        if count != 1 or direction < 0 or direction >= self._dimension:
             raise ValueError("Arc " + str(arc) + " does not exist.")
 
         return direction
 
     def arc_label(self, tail, head):
         direction = self.arc_direction((tail, head))
-        return tail*self.dimension + direction
+        return tail*self._dimension + direction
 
     def arc(self, label):
-        tail = label // self.dimension
-        direction = label - tail*self.dimension
+        tail = label // self._dimension
+        direction = label - tail*self._dimension
         head = tail ^ (1 << direction)
         return (tail, head)
 
     def degree(self, vertex):
-        return self.dimension
+        return self._dimension
 
     def dimension(self):
         r"""
@@ -117,4 +117,4 @@ class Hypercube(Graph):
         -------
         int
         """
-        return self.dimension
+        return self._dimension
