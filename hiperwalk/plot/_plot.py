@@ -299,6 +299,23 @@ def _default_graph_kwargs(kwargs, plot):
             kwargs['dimensions'] = graph.dimensions()
         return plot
 
+    if isinstance(graph, Hypercube):
+        if plot is None:
+            plot = 'graph'
+
+            nx_graph = nx.from_scipy_sparse_array(graph.adj_matrix)
+            for v in nx_graph:
+                nx_graph.nodes[v]["subset"] = v.bit_count()
+
+            kwargs['pos'] = nx.multipartite_layout(nx_graph)
+            dim = graph.dimension()
+            kwargs['graph'] = nx_graph
+            kwargs['edge_color'] = (0, 0, 0, max(0.002, 2**(-dim/2)))
+            kwargs['labels'] = {0: 0, 2**dim - 1 : 2**dim - 1}
+            kwargs['min_node_size'] = 1
+            kwargs['max_node_size'] = 1000
+            kwargs['edgecolors'] = None
+
     return 'graph' if plot is None else plot
 
 
