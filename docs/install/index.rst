@@ -12,7 +12,8 @@ with the Hiperwalk installation.
 On this page, we outline the process for installing Hiperwalk on
 a newly installed Ubuntu 20.04 operating system. The steps will
 cover identifying the GPU, installing the GPU drivers,
-neblina-core, pyneblina, and all necessary Python libraries.
+neblina-core, neblina-opencl-bridge, pyneblina, and
+all necessary Python libraries.
 
 .. warning::
 
@@ -89,10 +90,12 @@ Next, run the following commands to install the prerequisites:
 
 These newly installed programs serve the following purposes:
 
-* git: used to download neblina-core, pyneblina, and hiperwalk;
-* g++: used for compiling neblina-core;
-* cmake: essential for compiling neblina-core;
-* libgtest-dev: verifies the successful installation of neblina-core;
+* git: used to download neblina-core, neblina-opencl-bridge,
+  pyneblina, and hiperwalk;
+* g++: used for compiling neblina-core, and neblina-opencl-bridge;
+* cmake: essential for compiling neblina-core, neblina-opencl-bridge;
+* libgtest-dev: verifies the successful installation of
+  neblina-core, and neblina-opencl-bridge;
 * python3-distutils: aids in the installation of pyneblina;
 * python3-pip: necessary for installing Python libraries;
 * pytest: helps test pyneblina.
@@ -170,22 +173,26 @@ This can be simply done by running the following command:
    nvcc --version
 
 
-Installing neblina-core and pyneblina
-=====================================
+Installing neblina-core neblina-opencl-bridge and pyneblina
+===========================================================
 
 For HPC support,
 Hiperwalk uses
 `neblina-core <https://github.com/paulomotta/neblina-core>`_,
+`neblina-opencl-bridge
+<https://github.com/paulomotta/neblina-opencl-bridge>`_,
 and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
 Note that a computer with a **GPU compatible with CUDA** is required
 for this.
 
 The information in this guide is compiled from
-`Paulo Motta's blog <https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/>`_,
+`Paulo Motta's blog
+<https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/>`_,
 `neblina-core github <https://github.com/paulomotta/neblina-core>`_,
 and `pyneblina github <https://github.com/paulomotta/pyneblina>`_.
 
-It is **strongly recommended** that neblina-core and pyneblina
+It is **strongly recommended** that neblina-core,
+neblina-opencl-bridge, and pyneblina
 are installed (i.e. cloned) in the same directory.
 In this guide, we will install both projects into the home directory.
 In Linux, the tilde (``~``) serves as an alias for the home directory.
@@ -213,6 +220,16 @@ install the code.
 
 The ``ldconfig`` command creates a link for the newly installed neblina-core,
 making it accessible for use by pyneblina.
+Before moving forward, **reboot** your computer to
+ensure that the ``ldconfig`` command takes effect.
+
+After rebboting,
+run the following ``ln`` command to create
+a symbolic link to another directory.
+
+.. code-block:: shell
+
+   sudo ln -s /usr/local/lib /usr/local/lib64
 
 To verify the successful installation of neblina-core,
 execute the ``vector_test`` and ``matrix_test`` tests.
@@ -222,13 +239,41 @@ execute the ``vector_test`` and ``matrix_test`` tests.
    ./vector_test
    ./matrix_test
 
+neblina-opencl-bridge
+---------------------
+
+The installation of the neblina-opencl-bridge is very similar to
+the installation of neblina-core.
+To install neblina-opencl-bridge,
+first clone the repository into
+**the same directory neblina-core was cloned**.
+In this guide, we cloned neblina-core into the home directory.
+
+.. code-block:: shell
+
+   cd ~
+   git clone https://github.com/paulomotta/neblina-opencl-bridge.git
+
+Now, enter the new ``neblina-opencl-bridge`` directory to compile and
+install the code.
+
+.. code-block:: shell
+
+   cd neblina-opencl-bridge
+   cmake .
+   make
+   sudo make install
+
+To verify the succesful installation of neblina-opencl-bridge,
+execute the tests
+
+.. code-block:: shell
+
+   ./vector_test
+   ./matrix_test
+
 pyneblina
 ---------
-
-Before installing pyneblina,
-ensure that neblina-core has been successfully installed.
-Then, **reboot** your computer
-to ensure that the ``ldconfig`` command takes effect.
 
 To install pyneblina, first clone the repository into
 **the same directory neblina-core was cloned**.
