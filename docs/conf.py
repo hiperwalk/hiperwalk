@@ -82,7 +82,7 @@ html_theme_options = {
         "alt_text": "Hiperwalk",
     },
     "switcher": {
-        "json_url": "https://hiperwalk.readthedocs.io/en/latest/_static/switcher.json",
+        "json_url": "https://hiperwalk.org/switcher.json",
         "version_match": version,
     },
    "navbar_start": ["navbar-logo", "version-switcher"]
