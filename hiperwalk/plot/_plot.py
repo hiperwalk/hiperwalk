@@ -305,7 +305,10 @@ def _default_graph_kwargs(kwargs, plot):
 
             nx_graph = nx.from_scipy_sparse_array(graph.adj_matrix)
             for v in nx_graph:
-                nx_graph.nodes[v]["subset"] = v.bit_count()
+                try:
+                    nx_graph.nodes[v]["subset"] = v.bit_count()
+                except AttributeError:
+                    nx_graph.nodes[v]["subset"] = bin(v).count('1')
 
             kwargs['pos'] = nx.multipartite_layout(nx_graph)
             dim = graph.dimension()
