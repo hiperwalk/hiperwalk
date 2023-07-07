@@ -44,7 +44,7 @@ def _init_engine():
     """
     global __engine_initiated
     if not __engine_initiated:
-        neblina.init_engine(neblina.GPU, 0)
+        neblina.init_engine(neblina.CPU, 0)
         __engine_initiated = True
 
 def send_vector(v):
