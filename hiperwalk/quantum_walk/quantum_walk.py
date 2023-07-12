@@ -25,17 +25,6 @@ class QuantumWalk(ABC):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
-    adjacency : :class:`scipy.sparse.csr_array`, optional
-        .. deprecated:: 2.0a1
-            It will be removed in version 2.0.
-            Use ``graph`` instead.
-
-        The adjacency matrix.
-
-    Warns
-    -----
-    If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
-
     Raises
     ------
     TypeError
@@ -52,13 +41,7 @@ class QuantumWalk(ABC):
     """
 
     @abstractmethod
-    def __init__(self, graph=None, adjacency=None, **kwargs):
-        if adjacency is not None:
-            if graph is None:
-                graph = adjacency
-            warn("'adjacency' parameter is deprecated. "
-                 + "It will be removed in future versions.")
-
+    def __init__(self, graph=None, **kwargs):
         if graph is None:
             raise TypeError('graph is None')
 
