@@ -284,8 +284,7 @@ class ContinuousTime(QuantumWalk):
         self._evolution = U
         return U
 
-    def simulate(self, time=None, initial_state=None,
-                 initial_condition=None, hpc=True):
+    def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
         which accepts float entries for the ``time`` parameter.
@@ -330,6 +329,5 @@ class ContinuousTime(QuantumWalk):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        states = super().simulate(time, initial_state,
-                                  initial_condition, hpc)
+        states = super().simulate(time, initial_state, hpc)
         return states
