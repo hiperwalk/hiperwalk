@@ -331,8 +331,7 @@ class QuantumWalk(ABC):
         return ('hiperwalk.quantum_walk._pyneblina_interface'
                 in sys_modules)
 
-    def simulate(self, time=None, initial_state=None,
-                 initial_condition=None, hpc=True):
+    def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Simulates the quantum walk.
 
@@ -361,12 +360,6 @@ class QuantumWalk(ABC):
         initial_state : :class:`numpy.array`, default=None
             The initial state which the evolution operator
             is going to be applied to.
-
-        initial_condition :
-            .. deprecated:: 2.0a4
-                It will be removed in Hiperwalk 2.0
-                due to nomenclature consistency.
-                Use ``initial_state`` instead.
 
         hpc : bool, default=True
             Whether or not to use neblina's high-performance computing
@@ -415,16 +408,10 @@ class QuantumWalk(ABC):
             )
 
         if initial_state is None:
-            if initial_condition is None:
-                raise ValueError(
-                    "``initial_state`` not specified. "
-                    + "Expected a np.array."
-                )
-            else:
-                initial_state = initial_condition
-                warn('\n`initial_condition` is deprecated. '
-                     + 'It will be removed in version 2.0. '
-                     + 'Use `initial_state` instead.')
+            raise ValueError(
+                "``initial_state`` not specified. "
+                + "Expected a np.array."
+            )
 
         if len(initial_state) != self.hilb_dim:
             raise ValueError(
