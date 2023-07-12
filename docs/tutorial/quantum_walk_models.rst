@@ -9,7 +9,7 @@ will be available to the child class. However, the abstract methods must
 be overridden by the child class as they are model-dependent.
 
 Currently, two models are available: the Coined model 
-(:class:`hiperwalk.CoinedWalk`) and the Continuous model 
+(:class:`hiperwalk.Coined`) and the Continuous model 
 (:class:`hiperwalk.ContinuousWalk`). Users are encouraged 
 to implement new models and add them to the Hiperwalk 
 package (see the :ref:`docs_development` section 
@@ -43,9 +43,9 @@ we can pass ``cycle`` to the quantum walk constructor.
 
 To create a coined quantum walk, we execute
 
->>> coined = hpw.CoinedWalk(graph=cycle)
+>>> coined = hpw.Coined(graph=cycle)
 >>> coined #doctest: +SKIP
-<hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f655b0cd900>
+<hiperwalk.quantum_walk.coined_walk.Coined object at 0x7f655b0cd900>
 
 The Hilbert space of the coined quantum walk has dimension
 :math:`2|E|`, i.e. the number of arcs.
@@ -213,20 +213,20 @@ the :meth:`hiperwalk.QuantumWalk.get_evolution` method from the QuantumWalk clas
 >>> U2 = coined.get_evolution()
 >>> (U != U2).nnz == 0 # efficient way of comparing sparse arrays
 False
->>> coined2 = hpw.CoinedWalk(graph=cycle, shift='flipflop', coin='grover')
+>>> coined2 = hpw.Coined(graph=cycle, shift='flipflop', coin='grover')
 >>> U3 = coined.get_evolution()
 >>> (U2 != U3).nnz == 0
 True
 
 Coined Model
 ''''''''''''
-The :meth:`hiperwalk.CoinedWalk.set_evolution` method
+The :meth:`hiperwalk.Coined.set_evolution` method
 accepts three key arguments:
 ``shift``, ``coin``, and ``marked``,
 which are the arguments of
-:meth:`hiperwalk.CoinedWalk.set_shift`,
-:meth:`hiperwalk.CoinedWalk.set_coin`, and
-:meth:`hiperwalk.CoinedWalk.set_marked`,
+:meth:`hiperwalk.Coined.set_shift`,
+:meth:`hiperwalk.Coined.set_coin`, and
+:meth:`hiperwalk.Coined.set_marked`,
 respectively.
 
 The ``shift`` key can either take a string value 
@@ -284,7 +284,7 @@ The ``marked`` key can accept two types of inputs:
 * A dictionary with the coin name as key and
   the list of vertices as values:
   This operates similarly to the dictionary accepted by the
-  :meth:`hiperwalk.CoinedWalk.set_coin` method.
+  :meth:`hiperwalk.Coined.set_coin` method.
   The vertices are set as marked and
   *the coin operator is modified* accordingly.
 
@@ -306,7 +306,7 @@ True
 True
 
 All these keys can be integrated into a single call to the
-:meth:`hiperwalk.CoinedWalk.set_evolution` method when creating 
+:meth:`hiperwalk.Coined.set_evolution` method when creating 
 an instance of the object.
 
 Continuous-time Model

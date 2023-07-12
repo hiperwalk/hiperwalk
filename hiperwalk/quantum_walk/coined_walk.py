@@ -13,7 +13,7 @@ except:
 if __DEBUG__:
     from time import time as now
 
-class CoinedWalk(QuantumWalk):
+class Coined(QuantumWalk):
     r"""
     Manage an instance of a coined quantum walk on
     any simple graph.
@@ -96,27 +96,27 @@ class CoinedWalk(QuantumWalk):
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.number_of_arcs()
 
-        if not bool(CoinedWalk._valid_kwargs):
+        if not bool(Coined._valid_kwargs):
             # assign static attribute
-            CoinedWalk._valid_kwargs = {
-                'shift': CoinedWalk._get_valid_kwargs(self.set_shift),
-                'coin': CoinedWalk._get_valid_kwargs(self.set_coin),
-                'marked': CoinedWalk._get_valid_kwargs(self.set_marked)
+            Coined._valid_kwargs = {
+                'shift': Coined._get_valid_kwargs(self.set_shift),
+                'coin': Coined._get_valid_kwargs(self.set_coin),
+                'marked': Coined._get_valid_kwargs(self.set_marked)
             }
 
         # dict with valid coins as keys and the respective
         # function pointers.
-        if not bool(CoinedWalk._coin_funcs):
+        if not bool(Coined._coin_funcs):
             # assign static attribute
-            CoinedWalk._coin_funcs = {
-                'fourier': CoinedWalk._fourier_coin,
-                'grover': CoinedWalk._grover_coin,
-                'hadamard': CoinedWalk._hadamard_coin,
-                'identity': CoinedWalk._identity_coin,
-                'minus_fourier': CoinedWalk._minus_fourier_coin,
-                'minus_grover': CoinedWalk._minus_grover_coin,
-                'minus_hadamard': CoinedWalk._minus_hadamard_coin,
-                'minus_identity': CoinedWalk._minus_identity_coin
+            Coined._coin_funcs = {
+                'fourier': Coined._fourier_coin,
+                'grover': Coined._grover_coin,
+                'hadamard': Coined._hadamard_coin,
+                'identity': Coined._identity_coin,
+                'minus_fourier': Coined._minus_fourier_coin,
+                'minus_grover': Coined._minus_grover_coin,
+                'minus_hadamard': Coined._minus_hadamard_coin,
+                'minus_identity': Coined._minus_identity_coin
             }
 
         self.set_evolution(**kwargs)
@@ -225,7 +225,7 @@ class CoinedWalk(QuantumWalk):
         Notes
         -----
         .. note::
-            Check :class:`CoinedWalk` Notes for details
+            Check :class:`Coined` Notes for details
             about the computational basis.
 
 
@@ -269,7 +269,7 @@ class CoinedWalk(QuantumWalk):
             ...                             [1, 0, 1, 1],
             ...                             [0, 1, 0, 1],
             ...                             [0, 1, 1, 0]])
-            >>> qw = hpw.CoinedWalk(A)
+            >>> qw = hpw.Coined(A)
             >>> qw.set_shift(shift='flipflop')
             >>> S = qw.get_shift().todense()
             >>> S
@@ -380,7 +380,7 @@ class CoinedWalk(QuantumWalk):
         Notes
         -----
         Owing to the selected computational basis (refer to the
-        Notes in the :class:`CoinedWalk`),
+        Notes in the :class:`Coined`),
         the outcome is a block diagonal operator.
         Each block is a :math:`\deg(v)`-dimensional ``coin``.
         As a result, there are :math:`|V|` blocks in total.
@@ -430,10 +430,10 @@ class CoinedWalk(QuantumWalk):
                      'H': 'hadamard', 'I': 'identity'}
             s = prefix + abbrv[s[-1]]
 
-        if s not in CoinedWalk._coin_funcs.keys():
+        if s not in Coined._coin_funcs.keys():
             raise ValueError(
                 'Invalid coin. Expected any of '
-                + str(list(CoinedWalk._coin_funcs.keys())) + ', '
+                + str(list(Coined._coin_funcs.keys())) + ', '
                 + "but received '" + str(coin) + "'."
             )
 
@@ -499,15 +499,15 @@ class CoinedWalk(QuantumWalk):
 
     @staticmethod
     def _minus_fourier_coin(dim):
-        return -CoinedWalk._fourier_coin(dim)
+        return -Coined._fourier_coin(dim)
 
     @staticmethod
     def _minus_grover_coin(dim):
-        return -CoinedWalk._grover_coin(dim)
+        return -Coined._grover_coin(dim)
 
     @staticmethod
     def _minus_hadamard_coin(dim):
-        return -CoinedWalk._hadamard_coin(dim)
+        return -Coined._hadamard_coin(dim)
 
     @staticmethod
     def _minus_identity_coin(dim):
@@ -657,7 +657,7 @@ class CoinedWalk(QuantumWalk):
             num_vert = self.number_of_vertices()
             degree = self.degree
             oracle_coin = self._oracle_coin
-            coin_funcs = CoinedWalk._coin_funcs
+            coin_funcs = Coined._coin_funcs
             blocks = [coin_funcs[oracle_coin[v]](degree(v))
                       if oracle_coin[v] != ''
                       else get_block(v)
@@ -699,15 +699,15 @@ class CoinedWalk(QuantumWalk):
         set_marked
         """
 
-        S_kwargs = CoinedWalk._filter_valid_kwargs(
+        S_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
-                              CoinedWalk._valid_kwargs['shift'])
-        C_kwargs = CoinedWalk._filter_valid_kwargs(
+                              Coined._valid_kwargs['shift'])
+        C_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
-                              CoinedWalk._valid_kwargs['coin'])
-        R_kwargs = CoinedWalk._filter_valid_kwargs(
+                              Coined._valid_kwargs['coin'])
+        R_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
-                              CoinedWalk._valid_kwargs['marked'])
+                              Coined._valid_kwargs['marked'])
 
         self.set_shift(**S_kwargs)
         self.set_coin(**C_kwargs)
@@ -857,7 +857,7 @@ class CoinedWalk(QuantumWalk):
 
         num_vert = self._graph.number_of_vertices()
         graph = self._graph
-        prob = np.array([[CoinedWalk._elementwise_probability(
+        prob = np.array([[Coined._elementwise_probability(
                               get_entries(
                                   states[i],
                                   graph.arcs_with_tail(v)

@@ -54,7 +54,7 @@ the :math:`7 \times 7`-dimensional natural lattice.
 >>> lat = hpw.Lattice(dim)
 >>> center = (dim//2, dim//2)
 >>> right = (center[0] + 1, center[1])
->>> qw = hpw.CoinedWalk(lat, shift='persistent', coin='grover')
+>>> qw = hpw.Coined(lat, shift='persistent', coin='grover')
 >>> psi0 = qw.state([0.5, (center, right)],
 ...                 [0.5, (right, center)])
 >>> psi = qw.simulate(time=dim//2, initial_state=psi0)

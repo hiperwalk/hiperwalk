@@ -42,18 +42,18 @@ Construct the quantum walk using the previously defined graph
 We now create a coined quantum walk on the line with 11 vertices. 
 We achieve this by passing the previously created graph as an 
 argument to the quantum walk constructor. 
-The outcome is an object from the :class:`hiperwalk.CoinedWalk` class.
+The outcome is an object from the :class:`hiperwalk.Coined` class.
 
->>> qw = hpw.CoinedWalk(line)
+>>> qw = hpw.Coined(line)
 >>> qw #doctest: +SKIP
-<hiperwalk.quantum_walk.coined_walk.CoinedWalk object at 0x7f2691de9840>
+<hiperwalk.quantum_walk.coined_walk.Coined object at 0x7f2691de9840>
 
 Simulate the quantum walk
 -------------------------
 
 Before running the simulation, we need to specify the initial state. 
 One way to accomplish this is by using the
-:meth:`hiperwalk.CoinedWalk.ket` method,
+:meth:`hiperwalk.Coined.ket` method,
 which generates a state of the computational basis.
 
 >>> vertex = N // 2
@@ -72,7 +72,7 @@ the number of steps
 When specifying only the final time,
 the output will be the final state.
 If everything was installed correctly,
-the :meth:`hiperwalk.CoinedWalk.simulate` method will automatically use
+the :meth:`hiperwalk.Coined.simulate` method will automatically use
 high-performance computing to perform the matrix-vector multiplications.
 
 >>> final_state = qw.simulate(time=N//2,
@@ -95,7 +95,7 @@ array([[ 0.1767767 ,  0.        ,  0.        , -0.1767767 ,  0.35355339,
 Or, the output could be more sophisticated. Often, we are interested 
 in the probability of the walker being found at each vertex. 
 This can be accomplished via the 
-:meth:`hiperwalk.CoinedWalk.probability_distribution` method
+:meth:`hiperwalk.Coined.probability_distribution` method
 by passing the final state as an argument.
 
 >>> probability = qw.probability_distribution(final_state)
