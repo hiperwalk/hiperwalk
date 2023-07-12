@@ -586,33 +586,3 @@ class Lattice(Graph):
             Dimension alongside de Y axis.
         """
         return (self.x_dim, self.y_dim)
-
-    def get_central_vertex(self):
-        r"""
-        Vertex with label in the center of the graph as plane.
-
-        .. deprecated:: 2.0a1
-            ``get_central_vertex`` will be removed in Hiperwalk 2.0 because
-            the user can calculate the central vertex easily using
-            :meth:`dimensions`.
-
-        The central vertex is the vertex that would be located at the
-        plane center after mapping every vertex ``(x, y)`` to its
-        respetive plane point.
-        
-        This is not the center vertex.
-
-        Raises
-        ------
-        ValueError
-            If any lattice dimension is even.
-        """
-        warn('`get_central_vertex` is deprecated. '
-             + 'It will be removed in version 2.0.')
-
-        if self.x_dim % 2 != 1 or self.y_dim % 2 != 1:
-            raise ValueError(
-                "One of lattice dimensions is even. "
-                + "Hence it does not have a single central vertex."
-            )
-        return np.array([self.x_dim // 2, self.y_dim // 2])
