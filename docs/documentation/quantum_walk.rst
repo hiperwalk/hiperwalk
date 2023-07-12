@@ -12,7 +12,7 @@ Classes
 
     QuantumWalk
     Coined
-    ContinuousWalk
+    ContinuousTime
 
 Pyneblina Interface
 -------------------

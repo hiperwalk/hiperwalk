@@ -10,7 +10,7 @@ be overridden by the child class as they are model-dependent.
 
 Currently, two models are available: the Coined model 
 (:class:`hiperwalk.Coined`) and the Continuous model 
-(:class:`hiperwalk.ContinuousWalk`). Users are encouraged 
+(:class:`hiperwalk.ContinuousTime`). Users are encouraged 
 to implement new models and add them to the Hiperwalk 
 package (see the :ref:`docs_development` section 
 for more information)."
@@ -58,9 +58,9 @@ we need to pass both the graph and the ``gamma`` parameter.
 The ``gamma`` parameter is required because there is no universally
 accepted default value for ``gamma`` in the literature.
 
->>> continuous = hpw.ContinuousWalk(graph=cycle, gamma=0.35)
+>>> continuous = hpw.ContinuousTime(graph=cycle, gamma=0.35)
 >>> continuous #doctest: +SKIP
-<hiperwalk.quantum_walk.continuous_walk.ContinuousWalk object at 0x7f655b0cd8d0>
+<hiperwalk.quantum_walk.continuous_walk.ContinuousTime object at 0x7f655b0cd8d0>
 
 The Hilbert space of the continuous-time quantum walk has dimension
 :math:`|V|`, i.e. the number of vertices.
@@ -313,8 +313,8 @@ Continuous-time Model
 '''''''''''''''''''''
 The dynamics of the continuous-time quantum walk is
 fully defined by the Hamiltonian.
-As a result, calling :meth:`hiperwalk.ContinuousWalk.set_evolution`
-is the same as calling :meth:`hiperwalk.ContinuousWalk.set_hamiltonian`
+As a result, calling :meth:`hiperwalk.ContinuousTime.set_evolution`
+is the same as calling :meth:`hiperwalk.ContinuousTime.set_hamiltonian`
 in the same class.
 The Hamiltonian is given by
 
@@ -329,9 +329,9 @@ Therefore, the ``set_hamiltonian`` method accepts two arguments:
 * ``marked``: the list of marked vertices.
 For example,
 
->>> continuous2 = hpw.ContinuousWalk(graph=cycle, gamma=0.35, marked=0)
+>>> continuous2 = hpw.ContinuousTime(graph=cycle, gamma=0.35, marked=0)
 >>> continuous2 #doctest: +SKIP
-<hiperwalk.quantum_walk.continuous_walk.ContinuousWalk object at 0x7ffad2de9510>
+<hiperwalk.quantum_walk.continuous_walk.ContinuousTime object at 0x7ffad2de9510>
 
 The evolution operator is defined as
 
@@ -483,8 +483,8 @@ True
 
 .. note::
    For the Continuous model,
-   :meth:`hiperwalk.ContinuousWalk.probability` and
-   :meth:`hiperwalk.ContinuousWalk.probability_distribution` yield
+   :meth:`hiperwalk.ContinuousTime.probability` and
+   :meth:`hiperwalk.ContinuousTime.probability_distribution` yield
    the same result.
 
 Having obtained a probability distribution, the user may find it helpful to 

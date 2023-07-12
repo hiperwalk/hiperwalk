@@ -8,7 +8,7 @@ try:
 except:
     pass
 
-class ContinuousWalk(QuantumWalk):
+class ContinuousTime(QuantumWalk):
     r"""
     Manage an instance of a continuous-time quantum walk
     on any simple graph.
@@ -55,7 +55,7 @@ class ContinuousWalk(QuantumWalk):
 
     The Hamiltonian, which depends on the adjacency matrix and the location of 
     the marked vertices, is described in the
-    :meth:`hiperwalk.ContinuousWalk.set_hamiltonian` method.
+    :meth:`hiperwalk.ContinuousTime.set_hamiltonian` method.
 
     The states of the computational basis are :math:`\ket{i}` for
     :math:`0 \leq i < |V|`, where
@@ -77,11 +77,11 @@ class ContinuousWalk(QuantumWalk):
 
         import inspect
 
-        if not bool(ContinuousWalk._hamiltonian_kwargs):
+        if not bool(ContinuousTime._hamiltonian_kwargs):
             # assign static attribute
-            ContinuousWalk._hamiltonian_kwargs = {
-                'gamma': ContinuousWalk._get_valid_kwargs(self.set_gamma),
-                'marked': ContinuousWalk._get_valid_kwargs(self.set_marked)
+            ContinuousTime._hamiltonian_kwargs = {
+                'gamma': ContinuousTime._get_valid_kwargs(self.set_gamma),
+                'marked': ContinuousTime._get_valid_kwargs(self.set_marked)
             }
 
         self.set_hamiltonian(**kwargs)
@@ -129,8 +129,8 @@ class ContinuousWalk(QuantumWalk):
         **kwargs :
             Additional arguments.
             Used for determining the gamma value and marked vertices.
-            See :meth:`hiperwalk.ContinuousWalk.set_gamma` and
-            :meth:`hiperwalk.ContinuousWalk.set_marked`.
+            See :meth:`hiperwalk.ContinuousTime.set_gamma` and
+            :meth:`hiperwalk.ContinuousTime.set_marked`.
 
         Notes
         -----
@@ -155,12 +155,12 @@ class ContinuousWalk(QuantumWalk):
         #     H -= self.adj_matrix
         #     H *= -gamma
 
-        gamma_kwargs = ContinuousWalk._filter_valid_kwargs(
+        gamma_kwargs = ContinuousTime._filter_valid_kwargs(
                               kwargs,
-                              ContinuousWalk._hamiltonian_kwargs['gamma'])
-        marked_kwargs = ContinuousWalk._filter_valid_kwargs(
+                              ContinuousTime._hamiltonian_kwargs['gamma'])
+        marked_kwargs = ContinuousTime._filter_valid_kwargs(
                               kwargs,
-                              ContinuousWalk._hamiltonian_kwargs['marked'])
+                              ContinuousTime._hamiltonian_kwargs['marked'])
 
         self.set_gamma(**gamma_kwargs)
         self.set_marked(**marked_kwargs)
@@ -195,7 +195,7 @@ class ContinuousWalk(QuantumWalk):
 
     def set_evolution(self, **kwargs):
         r"""
-        Alias for :meth:`hiperwalk.ContinuousWalk.set_hamiltonian`.
+        Alias for :meth:`hiperwalk.ContinuousTime.set_hamiltonian`.
         """
         self.set_hamiltonian(**kwargs)
 
