@@ -27,14 +27,6 @@ class ContinuousTime(QuantumWalk):
         :class:`class:scipy.sparse.csr_array`:
             The adjacency matrix of the graph.
 
-    adjacency : :class:`scipy.sparse.csr_array`, optional
-        .. deprecated:: 2.0a1
-            It will be removed in version 2.0.
-            Use ``graph`` instead.
-
-        Adjacency matrix of the graph on which
-        the quantum walk takes place.
-
     **kwargs : optional
         Arguments to set the Hamiltonian.
 
@@ -68,9 +60,9 @@ class ContinuousTime(QuantumWalk):
 
     _hamiltonian_kwargs = dict()
 
-    def __init__(self, graph=None, adjacency=None, **kwargs):
+    def __init__(self, graph=None, **kwargs):
 
-        super().__init__(graph=graph, adjacency=adjacency)
+        super().__init__(graph=graph)
 
         self.hilb_dim = self._graph.number_of_vertices()
         self._hamiltonian = None

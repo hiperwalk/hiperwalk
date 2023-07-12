@@ -32,21 +32,9 @@ class Coined(QuantumWalk):
         It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
         its adjacency matrix (:class:`scipy.sparse.csr_array`).
 
-    adjacency : :class:`scipy.sparse.csr_array`, optional
-        .. deprecated:: 2.0a1
-            It will be removed in version 2.0.
-            Use ``graph`` instead.
-
-        Use ``graph`` instead.
-        Adjacency matrix of the graph.
-
     **kwargs : optional
         Optional arguments for setting the non-default evolution operator.
         See :meth:`set_evolution`.
-
-    Warns
-    -----
-    If ``adjacency`` is set. It is deprecated. Use ``graph`` instead.
 
     Raises
     ------
@@ -86,12 +74,12 @@ class Coined(QuantumWalk):
     _coin_funcs = dict()
     _valid_kwargs = dict()
 
-    def __init__(self, graph=None, adjacency=None, **kwargs):
+    def __init__(self, graph=None, **kwargs):
 
         self._shift = None
         self._coin = None
         self._oracle_coin = []
-        super().__init__(graph=graph, adjacency=adjacency)
+        super().__init__(graph=graph)
 
         # Expects adjacency matrix with only 0 and 1 as entries
         self.hilb_dim = self._graph.number_of_arcs()
