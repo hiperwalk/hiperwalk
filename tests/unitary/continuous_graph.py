@@ -16,7 +16,7 @@ class TestContinuousGraph(unittest.TestCase):
         self.adj = nx.adjacency_matrix(nx_graph)
         self.g = hpw.Graph(self.adj)
         self.gamma = 1/2
-        self.qw = hpw.ContinuousWalk(self.g, gamma=self.gamma)
+        self.qw = hpw.ContinuousTime(self.g, gamma=self.gamma)
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hamiltonian_default(self):
