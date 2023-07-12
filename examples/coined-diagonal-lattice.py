@@ -1,8 +1,9 @@
 import hiperwalk as hpw
+import numpy as np
 
 dim = 121
 lat = hpw.Lattice(dim, diagonal=True)
-center = lat.get_central_vertex()
+center = np.array([dim // 2, dim // 2])
 dtqw = hpw.Coined(lat, shift='persistent', coin='grover')
 psi0 = dtqw.state([0.5, (center, center + (1, 1))],
                   [-0.5, (center, center + (1, -1))],
