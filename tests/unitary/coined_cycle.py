@@ -11,7 +11,7 @@ class TestCoinedCycle(unittest.TestCase):
     def setUp(self):
         self.num_vert = 10
         self.cycle = hpw.Cycle(self.num_vert)
-        self.qw = hpw.CoinedWalk(self.cycle)
+        self.qw = hpw.Coined(self.cycle)
 
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')

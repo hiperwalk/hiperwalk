@@ -1,8 +1,8 @@
 import hiperwalk as hpw
 
-dim = 11
+dim = 6
 g = hpw.Hypercube(dim)
-qw = hpw.CoinedWalk(g)
+qw = hpw.Coined(g)
 state = qw.state(*[[1, i] for i in range(dim)])
 states = qw.simulate(time=(dim), initial_state=state)
 probs = qw.probability_distribution(states)

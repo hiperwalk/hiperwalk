@@ -11,7 +11,7 @@ class TestCoinedLine(unittest.TestCase):
     def setUp(self):
         self.num_vert = 41
         self.line = hpw.Line(self.num_vert)
-        self.qw = hpw.CoinedWalk(self.line)
+        self.qw = hpw.Coined(self.line)
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_right_state_transfer(self):

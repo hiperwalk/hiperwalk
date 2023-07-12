@@ -11,7 +11,7 @@ Classes
     :nosignatures:
 
     QuantumWalk
-    CoinedWalk
+    Coined
     ContinuousWalk
 
 Pyneblina Interface
