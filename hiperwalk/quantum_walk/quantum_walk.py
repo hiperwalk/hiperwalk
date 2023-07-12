@@ -331,6 +331,52 @@ class QuantumWalk(ABC):
         return ('hiperwalk.quantum_walk._pyneblina_interface'
                 in sys_modules)
 
+
+    ######################################
+    ### Auxiliary Simulation functions ###
+    ######################################
+
+    def __prepare_engine(self, initial_state, hpc):
+        if hpc:
+            self._simul_mat = nbl.send_matrix(self._evolution)
+            self._simul_vec = nbl.send_vector(initial_state)
+
+        else:
+            self._simul_mat = self._evolution
+            self._simul_vec = initial_state
+
+    def __simulate_step(self, step, hpc):
+        """
+        Apply the simulation evolution operator ``step`` times
+        to the simulation vector.
+        Simulation vector is then updated.
+        """
+        if hpc:
+            # TODO: request multiple multiplications at once
+            #       to neblina-core
+            # TODO: check if intermediate states are being freed
+            for i in range(step):
+                self._simul_vec = nbl.multiply_matrix_vector(
+                    self._simul_mat, self._simul_vec)
+        else:
+            for i in range(step):
+                self._simul_vec = self._simul_mat @ self._simul_vec
+
+            # TODO: compare with numpy.linalg.matrix_power
+
+    def __save_simul_vec(self, hpc):
+        ret = None
+
+        if hpc:
+            # TODO: check if vector must be deleted or
+            #       if it can be reused via neblina-core commands.
+            ret = nbl.retrieve_vector(self._simul_vec)
+        else:
+            ret = self._simul_vec
+
+        return ret
+
+
     def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Simulates the quantum walk.
@@ -419,51 +465,6 @@ class QuantumWalk(ABC):
                 + "Expected an np.array with length " + str(self.hilb_dim)
             )
 
-        ###########################
-        ### Auxiliary functions ###
-        ###########################
-
-        def __prepare_engine(self):
-            if hpc:
-                self._simul_mat = nbl.send_matrix(self._evolution)
-                self._simul_vec = nbl.send_vector(initial_state)
-
-            else:
-                self._simul_mat = self._evolution
-                self._simul_vec = initial_state
-
-        def __simulate_step(self, step):
-            """
-            Apply the simulation evolution operator ``step`` times
-            to the simulation vector.
-            Simulation vector is then updated.
-            """
-            if hpc:
-                # TODO: request multiple multiplications at once
-                #       to neblina-core
-                # TODO: check if intermediate states are being freed
-                for i in range(step):
-                    self._simul_vec = nbl.multiply_matrix_vector(
-                        self._simul_mat, self._simul_vec)
-            else:
-                for i in range(step):
-                    self._simul_vec = self._simul_mat @ self._simul_vec
-
-                # TODO: compare with numpy.linalg.matrix_power
-
-        def __save_simul_vec(self):
-            ret = None
-
-            if hpc:
-                # TODO: check if vector must be deleted or
-                #       if it can be reused via neblina-core commands.
-                ret = nbl.retrieve_vector(self._simul_vec)
-            else:
-                ret = self._simul_vec
-
-            return ret
-
-
         ###############################
         ### simulate implemantation ###
         ###############################
@@ -481,7 +482,7 @@ class QuantumWalk(ABC):
         if hpc and not self._pyneblina_imported():
             hpc = False
 
-        __prepare_engine(self)
+        self.__prepare_engine(initial_state, hpc)
 
         # number of states to save
         num_states = int(end/step) + 1
@@ -507,11 +508,11 @@ class QuantumWalk(ABC):
 
         # simulate walk / apply evolution operator
         if start > 0:
-            __simulate_step(self, start - step)
+            self.__simulate_step(start - step, hpc)
 
         for i in range(num_states):
-            __simulate_step(self, step)
-            saved_states[state_index] = __save_simul_vec(self)
+            self.__simulate_step(step, hpc)
+            saved_states[state_index] = self.__save_simul_vec(hpc)
             state_index += 1
 
         # TODO: free vector from neblina core
