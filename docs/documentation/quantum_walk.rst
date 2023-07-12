@@ -1,6 +1,6 @@
-=============
-Quantum Walks
-=============
+===================
+Quantum Walk Models
+===================
 
 .. currentmodule:: hiperwalk
 
