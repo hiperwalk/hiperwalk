@@ -584,19 +584,6 @@ class Coined(QuantumWalk):
             self._evolution = None
         self._oracle_coin = coin_list
 
-    #def get_oracle_coin(self):
-    #    r"""
-    #    The coins to be applied in the marked vertices.
-    #
-    #    Returns
-    #    -------
-    #    list of str
-    #        If empty, no coin is changed (coin operator not altered).
-    #        If an entry is the empty string,
-    #        the coin for that vertex is not substituted.
-    #    """
-    #    return self._oracle_coin
-
     def get_coin(self):
         r"""
         Return coin to be used for creating the evolution operator.
@@ -950,3 +937,31 @@ class Coined(QuantumWalk):
             ket[args] = 1
 
         return ket
+
+    def _prepare_engine(self, initial_state, hpc):
+        if hpc:
+            S = nbl.send_matrix(self.get_shift())
+            C = nbl.send_matrix(self.get_coin())
+            self._simul_mat = (C, S)
+            self._simul_vec = nbl.send_vector(initial_state)
+
+            dtype = (complex if (S.is_complex or C.is_complex
+                                 or np.iscomplex(initial_state.dtype))
+                     else np.double)
+
+            return dtype
+
+        else:
+            return super()._prepare_engine(initial_state, hpc)
+
+
+    def _simulate_step(self, step, hpc):
+        if hpc:
+            for i in range(step):
+                self._simul_vec = nbl.multiply_matrix_vector(
+                    self._simul_mat[0], self._simul_vec)
+
+                self._simul_vec = nbl.multiply_matrix_vector(
+                    self._simul_mat[1], self._simul_vec)
+        else:
+            super()._simulate_step(step, hpc)
