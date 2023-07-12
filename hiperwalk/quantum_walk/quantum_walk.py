@@ -336,7 +336,10 @@ class QuantumWalk(ABC):
     ### Auxiliary Simulation functions ###
     ######################################
 
-    def __prepare_engine(self, initial_state, hpc):
+    def _prepare_engine(self, initial_state, hpc):
+        if self._evolution is None:
+            self._evolution = self.get_evolution(hpc=hpc)
+
         if hpc:
             self._simul_mat = nbl.send_matrix(self._evolution)
             self._simul_vec = nbl.send_vector(initial_state)
@@ -345,7 +348,13 @@ class QuantumWalk(ABC):
             self._simul_mat = self._evolution
             self._simul_vec = initial_state
 
-    def __simulate_step(self, step, hpc):
+        dtype = (complex if (np.iscomplex(self._evolution.dtype)
+                             or np.iscomplex(initial_state.dtype))
+                 else np.double)
+
+        return dtype
+
+    def _simulate_step(self, step, hpc):
         """
         Apply the simulation evolution operator ``step`` times
         to the simulation vector.
@@ -364,7 +373,7 @@ class QuantumWalk(ABC):
 
             # TODO: compare with numpy.linalg.matrix_power
 
-    def __save_simul_vec(self, hpc):
+    def _save_simul_vec(self, hpc):
         ret = None
 
         if hpc:
@@ -470,8 +479,6 @@ class QuantumWalk(ABC):
         ###############################
 
         time = np.array(self._time_to_tuple(time))
-        if self._evolution is None:
-            self._evolution = self.get_evolution(hpc=hpc)
 
         if not np.all([e.is_integer() for e in time]):
             raise ValueError("`time` has non-int entry.")
@@ -482,19 +489,12 @@ class QuantumWalk(ABC):
         if hpc and not self._pyneblina_imported():
             hpc = False
 
-        self.__prepare_engine(initial_state, hpc)
+        dtype = self._prepare_engine(initial_state, hpc)
 
         # number of states to save
         num_states = int(end/step) + 1
         num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
 
-        # create saved states matrix
-        # TODO: error: if initial state is int and
-        # evolution operator is float, dtype is complex
-        dtype = (initial_state.dtype if
-            initial_state.dtype == self._evolution.dtype
-            else complex
-        )
         saved_states = np.zeros(
             (num_states, initial_state.shape[0]), dtype=dtype
         )
@@ -508,11 +508,11 @@ class QuantumWalk(ABC):
 
         # simulate walk / apply evolution operator
         if start > 0:
-            self.__simulate_step(start - step, hpc)
+            self._simulate_step(start - step, hpc)
 
         for i in range(num_states):
-            self.__simulate_step(step, hpc)
-            saved_states[state_index] = self.__save_simul_vec(hpc)
+            self._simulate_step(step, hpc)
+            saved_states[state_index] = self._save_simul_vec(hpc)
             state_index += 1
 
         # TODO: free vector from neblina core
