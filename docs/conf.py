@@ -80,6 +80,8 @@ html_theme_options = {
     "logo" : {
         "text": "Hiperwalk",
         "alt_text": "Hiperwalk",
+        "image_dark": "https://hiperwalk.org/images/logo_small_dark.png",
+        "image_light": "https://hiperwalk.org/images/logo_small_light.png",
     },
     "switcher": {
         "json_url": "https://hiperwalk.org/switcher.json",
