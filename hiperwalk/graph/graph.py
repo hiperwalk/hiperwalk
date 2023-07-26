@@ -154,23 +154,6 @@ class Graph():
         """
         return 'grover'
 
-    def embeddable(self):
-        r"""
-        Returns ``True`` if the graph can be embedded on the plane,
-        and ``False`` otherwise.
-
-        If a graph can be embedded on the plane,
-        we can assign meaningful right or left directions,
-        and clockwise or counter-clockwise rotations to edges and arcs
-
-        Notes
-        -----
-        The implementation is class-dependent.
-        We do not inspect the structure of the graph to determine whether
-        it is embeddable or not.
-        """
-        return False
-
     def arc_label(self, tail, head):
         r"""
         Returns the numerical label of the arc.
@@ -216,60 +199,6 @@ class Graph():
             if adj_matrix.indptr[tail + 1] > label:
                 break
         return (tail, head)
-
-    def next_arc(self, arc):
-        r"""
-        Next arc in an embeddable graph.
-
-        Parameters
-        ----------
-        arc
-            The arc in any of the following notations.
-
-            * arc notation: tuple of vertices
-                In ``(tail, head)`` format where
-                ``tail`` and ``head`` must be valid vertices.
-            * arc label: int.
-                The arc label (number).
-
-        Returns
-        -------
-        Next arc in the same notation as the ``arc`` argument.
-
-        See Also
-        --------
-        arc
-        arc_label
-        """
-        # implemented only if is embeddable
-        raise AttributeError
-
-    def previous_arc(self, arc):
-        r"""
-        Previous arc in an embeddable graph.
-
-        Parameters
-        ----------
-        arc
-            The arc in any of the following notations.
-
-            * arc notation: tuple of vertices
-                In ``(tail, head)`` format where
-                ``tail`` and ``head`` must be valid vertices.
-            * arc label: int.
-                The arc label (number).
-
-        Returns
-        -------
-        Previous arc in the same notation as the ``arc`` argument.
-
-        See Also
-        --------
-        arc
-        arc_label
-        """
-        # implemented only if is embeddable
-        raise AttributeError
 
     def neighbors(self, vertex):
         r"""

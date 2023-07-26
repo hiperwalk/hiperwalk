@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.sparse import csr_array
 from sys import path as sys_path
-from .graph import Graph
+from .lattice import Lattice
 
-class Line(Graph):
+class Line(Lattice):
     r"""
     Finite line graph (path graph).
 
@@ -55,9 +55,6 @@ class Line(Graph):
         # initializing
         super().__init__(adj_matrix)
 
-    def embeddable(self):
-        return True
-
     def default_coin(self):
         r"""
         Returns the default coin name.
@@ -87,7 +84,6 @@ class Line(Graph):
         return (tail, head)
 
     def next_arc(self, arc):
-        # implemented only if is embeddable
         try:
             tail, head = arc
             diff = head - tail
@@ -108,7 +104,6 @@ class Line(Graph):
             return arc + 2 if arc % 2 == 1 else arc - 2
 
     def previous_arc(self, arc):
-        # implemented only if is embeddable
         try:
             tail, head = arc
             diff = head - tail

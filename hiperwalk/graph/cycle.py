@@ -1,7 +1,7 @@
 from scipy.sparse import csr_array
-from .graph import *
+from .lattice import *
 
-class Cycle(Graph):
+class Cycle(Lattice):
     r"""
     Cycle graph.
 
@@ -44,9 +44,6 @@ class Cycle(Graph):
         # initializing
         super().__init__(adj_matrix)
 
-    def embeddable(self):
-        return True
-
     def default_coin(self):
         r"""
         Returns the default coin name.
@@ -67,7 +64,6 @@ class Cycle(Graph):
         return (tail, head)
 
     def next_arc(self, arc):
-        # implemented only if is embeddable
         try:
             tail, head = arc
             num_vert = self.number_of_vertices()
@@ -86,7 +82,6 @@ class Cycle(Graph):
                     else (arc - 2) % num_arcs)
 
     def previous_arc(self, arc):
-        # implemented only if is embeddable
         try:
             tail, head = arc
             num_vert = self.number_of_vertices()
