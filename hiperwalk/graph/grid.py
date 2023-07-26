@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.sparse
-from .graph import Graph
+from .lattice import Lattice
 from warnings import warn
 
-class Grid(Graph):
+class Grid(Lattice):
     r"""
     Two-dimensionsal grid.
 
@@ -239,9 +239,6 @@ class Grid(Graph):
         self.y_dim = y_dim
         self.periodic = periodic
         self.diagonal = diagonal
-
-    def embeddable(self):
-        return True
 
     def vertex_coordinates(self, label):
         r"""

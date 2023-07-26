@@ -54,9 +54,6 @@ class Hypercube(Graph):
         super().__init__(adj_matrix)
         self._dimension = int(dimension)
 
-    def embeddable(self):
-        return False
-
     def arc_direction(self, arc):
         r"""
         Returns the arc direction.

@@ -155,7 +155,7 @@ class Coined(QuantumWalk):
         directions such as left, right, up, and down
         can be referred to naturally.
         """
-        return self._graph.embeddable()
+        return 'previous_arc' in dir(self._graph)
 
     def _set_persistent_shift(self):
         r"""
