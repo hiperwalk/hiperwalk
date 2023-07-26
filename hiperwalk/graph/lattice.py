@@ -5,11 +5,22 @@ from .graph import Graph
 from warnings import warn
 
 class Lattice(ABC, Graph):
+    r"""
+    Abstract class for Lattice graphs.
+
+    Lattice graphs are embedabble in a Euclidian Space,
+    forming a regular tiling.
+
+    Notes
+    -----
+    Given an embedding,
+    directions can be assigned to the arcs.
+    """
 
     @abstractmethod
     def next_arc(self, arc):
         r"""
-        Next arc in an embeddable graph.
+        Next arc with respect to the default embedding.
 
         Parameters
         ----------
@@ -36,7 +47,7 @@ class Lattice(ABC, Graph):
     @abstractmethod
     def previous_arc(self, arc):
         r"""
-        Previous arc in an embeddable graph.
+        Previous arc with respect to the default embedding.
 
         Parameters
         ----------
