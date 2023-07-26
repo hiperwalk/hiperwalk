@@ -348,8 +348,8 @@ class QuantumWalk(ABC):
             self._simul_mat = self._evolution
             self._simul_vec = initial_state
 
-        dtype = (complex if (np.iscomplex(self._evolution.dtype)
-                             or np.iscomplex(initial_state.dtype))
+        dtype = (np.complex128 if (np.iscomplexobj(self._evolution)
+                             or np.iscomplexobj(initial_state))
                  else np.double)
 
         return dtype
