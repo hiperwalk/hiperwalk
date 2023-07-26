@@ -47,11 +47,11 @@ bar, histogram, line, plane and graph.
 The difference between the plots are explained and illustrated in
 the following subsections.
 All plots correspond to the following quantum walk simulation on
-the :math:`7 \times 7`-dimensional natural lattice.
+the :math:`7 \times 7`-dimensional natural grid.
 
 >>> import hiperwalk as hpw
 >>> dim = 7
->>> lat = hpw.Lattice(dim)
+>>> lat = hpw.Grid(dim)
 >>> center = (dim//2, dim//2)
 >>> right = (center[0] + 1, center[1])
 >>> qw = hpw.Coined(lat, shift='persistent', coin='grover')
@@ -186,7 +186,7 @@ Default Plot Type
 Each Hiperwalk graph is associated with a default graph type.
 Hence, it is sufficient to specify the probabilities and the graph
 to obtain the default plot.
-For instance, the default lattice plot is the plane plot.
+For instance, the default grid plot is the plane plot.
 
 >>> hpw.plot_probability_distribution(prob, graph=lat) #doctest: +SKIP
 

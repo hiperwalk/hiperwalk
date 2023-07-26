@@ -292,7 +292,7 @@ def _default_graph_kwargs(kwargs, plot):
     graph = kwargs['graph']
 
     # hiperwalk graph
-    if isinstance(graph, Lattice):
+    if isinstance(graph, Grid):
         if plot is None:
             plot = 'plane'
         if plot == 'plane' and 'dimensions' not in kwargs:
