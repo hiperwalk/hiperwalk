@@ -147,7 +147,15 @@ class Coined(QuantumWalk):
     def has_persistent_shift(self):
         r"""
         Checks whether the persistent shift operator is defined
-        for the current graph and returns the result.
+        for the current graph.
+
+        Returns
+        -------
+        bool
+
+        Notes
+        -----
+        The persistent shift is sometimes called *moving shift*.
 
         The persistent shift operator can only be defined in a
         meaningful way for certain specific graphs. For instance,
@@ -204,7 +212,7 @@ class Coined(QuantumWalk):
         ------
         AttributeError
             If ``shift='persistent'`` and
-            the persistent shift operator is not implemented.
+            the persistent shift operator cannot be defined.
 
         See Also
         --------
@@ -216,6 +224,7 @@ class Coined(QuantumWalk):
             Check :class:`Coined` Notes for details
             about the computational basis.
 
+        The persistent shift is sometimes called *moving shift*.
 
         The flip-flop shift operator :math:`S` is defined such that
 
