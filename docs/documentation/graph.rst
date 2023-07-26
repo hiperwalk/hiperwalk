@@ -14,6 +14,6 @@ Classes
 
     Graph
     Cycle
+    Grid
     Hypercube
-    Lattice
     Line

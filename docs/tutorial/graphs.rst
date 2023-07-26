@@ -59,7 +59,7 @@ Specific Graphs
 ---------------
 
 Hiperwalk includes classes for well-known specific graphs,
-such as Line, Cycle, and Lattice.
+such as Line, Cycle, and Grid.
 For a complete list of specific graphs,
 refer to :ref:`docs_documentation_graph`.
 
@@ -70,15 +70,15 @@ However, for the latter, the adjacency matrix is automatically generated
 based on the number of vertices.
 Consequently, you can create a line with 10 vertices,
 a cycle with 10 vertices,
-and a lattice of dimensions :math:`10 \times 10` using
+and a grid of dimensions :math:`10 \times 10` using
 valid commands, respectively.
 
 >>> hpw.Line(10) #doctest: +SKIP
 <hiperwalk.graph.line.Line object at 0x7f0a6bb700d0>
 >>> hpw.Cycle(10) #doctest: +SKIP
 <hiperwalk.graph.cycle.Cycle object at 0x7f0a6bbb32e0>
->>> hpw.Lattice(10) #doctest: +SKIP
-<hiperwalk.graph.lattice.Lattice object at 0x7f0a6bbb2da0>
+>>> hpw.Grid(10) #doctest: +SKIP
+<hiperwalk.graph.grid.Grid object at 0x7f0a6bbb2da0>
 
 Naturally, you can create specific graphs using NetworkX and
 the :class:`hiperwalk.Graph` class.
