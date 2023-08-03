@@ -559,7 +559,7 @@ class Coined(QuantumWalk):
 
         Parameters
         ----------
-        marked : list of int of dict
+        marked : list of int or dict
             list of vertices to be marked and
             how they are going to be marked.
             
