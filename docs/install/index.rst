@@ -58,7 +58,7 @@ Python dependencies, which include
 To verify the success of the installation,
 you can execute any code found in the
 `examples directory of the repository
-<https://`https://github.com/hiperwalk/hiperwalk/tree/2.0.x/examples>`_
+<https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
 or proceed to the :ref:`docs_tutorial`.
 
 .. _docs_install_hpc_prerequisites:

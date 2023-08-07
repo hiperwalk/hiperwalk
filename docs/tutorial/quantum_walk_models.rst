@@ -13,7 +13,7 @@ Currently, two models are available: the Coined model
 (:class:`hiperwalk.ContinuousTime`). Users are encouraged 
 to implement new models and add them to the Hiperwalk 
 package (see the :ref:`docs_development` section 
-for more information)."
+for more information).
 
 Creating a Quantum Walk
 -----------------------
