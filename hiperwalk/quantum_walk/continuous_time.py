@@ -62,6 +62,7 @@ class ContinuousTime(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
+        self.__update_hamiltonian = False
         super().__init__(graph=graph)
 
         self.hilb_dim = self._graph.number_of_vertices()
@@ -93,12 +94,12 @@ class ContinuousTime(QuantumWalk):
             raise TypeError("Value of 'gamma' is not float.")
 
         self._gamma = gamma
-        self._hamiltonian = None
+        self._update_hamiltonian()
         self._evolution = None
 
     def set_marked(self, marked=[]):
         super().set_marked(marked)
-        self._hamiltonian = None
+        self._update_hamiltonian()
 
     def get_gamma(self):
         r"""
@@ -110,6 +111,19 @@ class ContinuousTime(QuantumWalk):
         float
         """
         return self._gamma
+
+    def _update_hamiltonian(self):
+        if self.__update_hamiltonian:
+            self._hamiltonian = -self._gamma * self._graph.adj_matrix
+
+            # creating oracle
+            if len(self._marked) > 0:
+                data = np.ones(len(self._marked), dtype=np.int8)
+                oracle = scipy.sparse.csr_array(
+                        (data, (self._marked, self._marked)),
+                        shape=(self.hilb_dim, self.hilb_dim))
+
+                self._hamiltonian -= oracle
 
     def set_hamiltonian(self, **kwargs):
         r"""
@@ -140,13 +154,7 @@ class ContinuousTime(QuantumWalk):
         set_marked
         """
 
-        # if laplacian:
-        #     degrees = self.adj_matrix.sum(axis=1)
-        #     H = scipy.sparse.diags(degrees, format="csr")
-        #     del degrees
-        #     H -= self.adj_matrix
-        #     H *= -gamma
-
+        self.__update_hamiltonian = False
         gamma_kwargs = ContinuousTime._filter_valid_kwargs(
                               kwargs,
                               ContinuousTime._hamiltonian_kwargs['gamma'])
@@ -157,6 +165,9 @@ class ContinuousTime(QuantumWalk):
         self.set_gamma(**gamma_kwargs)
         self.set_marked(**marked_kwargs)
 
+        self.__update_hamiltonian = True
+        self._update_hamiltonian()
+
     def get_hamiltonian(self):
         r"""
         Returns the Hamiltonian.
@@ -165,25 +176,8 @@ class ContinuousTime(QuantumWalk):
         -------
         :class:`scipy.sparse.csr_array`
         """
-        if self._hamiltonian is not None:
-            return self._hamiltonian
 
-        H = -self._gamma * self._graph.adj_matrix
-
-        # creating oracle
-        if len(self._marked) > 0:
-            data = np.ones(len(self._marked), dtype=np.int8)
-            oracle = scipy.sparse.csr_array(
-                    (data, (self._marked, self._marked)),
-                    shape=(self.hilb_dim, self.hilb_dim))
-
-            H -= oracle
-
-        self._hamiltonian = H
-        # since the hamiltonian was changed,
-        # the previous evolution operator may not be coherent.
-        self._evolution = None
-        return H
+        return self._hamiltonian
 
     def set_evolution(self, **kwargs):
         r"""
