@@ -250,37 +250,56 @@ class ContinuousTime(QuantumWalk):
         if hpc and not self._pyneblina_imported():
             hpc = False
 
-        if hpc:
-            # determining the number of terms in power series
-            max_val = np.max(np.abs(H))
-            if max_val*time <= 1:
+        #TODO: when scipy issue 18086 is solved,
+        # invoke scipy.linalg.expm to calculate power series
+        def numpy_matrix_power_series(A, n):
+            """
+            I + A + A^2/2 + A^3/3! + ... + A^n/n!
+            """
+            U = np.eye(A.shape[0], dtype=A.dtype)
+            curr_term = U.copy()
+            for i in range(1, n + 1):
+                curr_term = curr_term @ A / i
+                U += curr_term
+
+            return U
+
+        # determining the number of terms in power series
+        max_val = np.max(np.abs(H))
+        if max_val*time <= 1:
+            if hpc:
                 nbl_U = nbl.matrix_power_series(
                         -1j*time*H, 30)
-
             else:
-                # if the order of magnitude is very large,
-                # float point errors may occur
-                if ((isinstance(time, int) or time.is_integer())
-                    and max_val <= 1
-                ):
-                    new_time = 1
-                    num_mult = time - 1
-                else:
-                    new_time = max_val*time
-                    order = np.ceil(np.math.log(new_time, 20))
-                    new_time /= 10**order
-                    num_mult = int(np.round(time/new_time)) - 1
+                U = numpy_matrix_power_series(-1j*time*H.todense(), 30)
 
+        else:
+            # if the order of magnitude is very large,
+            # float point errors may occur
+            if ((isinstance(time, int) or time.is_integer())
+                and max_val <= 1
+            ):
+                new_time = 1
+                num_mult = time - 1
+            else:
+                new_time = max_val*time
+                order = np.ceil(np.math.log(new_time, 20))
+                new_time /= 10**order
+                num_mult = int(np.round(time/new_time)) - 1
+
+            if hpc:
                 new_nbl_U = nbl.matrix_power_series(
                         -1j*new_time*H, 20)
                 nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
                 for i in range(num_mult - 1):
                     nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
+            else:
+                U = numpy_matrix_power_series(
+                        -1j*new_time*H.todense(), 20)
+                U = np.linalg.matrix_power(U, num_mult + 1)
 
+        if hpc:
             U = nbl.retrieve_matrix(nbl_U)
-
-        else:
-            U = scipy.linalg.expm(-1j*time*H.todense())
 
         self._evolution = U
         return U
