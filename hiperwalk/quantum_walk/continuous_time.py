@@ -62,7 +62,7 @@ class ContinuousTime(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
-        self.__update_hamiltonian = False
+        self._hamiltonian = False # set to not None
         super().__init__(graph=graph)
 
         self.hilb_dim = self._graph.number_of_vertices()
@@ -113,7 +113,7 @@ class ContinuousTime(QuantumWalk):
         return self._gamma
 
     def _update_hamiltonian(self):
-        if self.__update_hamiltonian:
+        if self._hamiltonian is None:
             self._hamiltonian = -self._gamma * self._graph.adj_matrix
 
             # creating oracle
@@ -154,7 +154,7 @@ class ContinuousTime(QuantumWalk):
         set_marked
         """
 
-        self.__update_hamiltonian = False
+        self._hamiltonian = False #not None
         gamma_kwargs = ContinuousTime._filter_valid_kwargs(
                               kwargs,
                               ContinuousTime._hamiltonian_kwargs['gamma'])
@@ -165,7 +165,7 @@ class ContinuousTime(QuantumWalk):
         self.set_gamma(**gamma_kwargs)
         self.set_marked(**marked_kwargs)
 
-        self.__update_hamiltonian = True
+        self._hamiltonian = None
         self._update_hamiltonian()
 
     def get_hamiltonian(self):
