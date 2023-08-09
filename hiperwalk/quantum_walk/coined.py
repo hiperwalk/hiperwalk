@@ -87,9 +87,11 @@ class Coined(QuantumWalk):
         if not bool(Coined._valid_kwargs):
             # assign static attribute
             Coined._valid_kwargs = {
-                'shift': Coined._get_valid_kwargs(self.set_shift),
-                'coin': Coined._get_valid_kwargs(self.set_coin),
-                'marked': Coined._get_valid_kwargs(self.set_marked)
+                'shift': Coined._get_valid_kwargs(self._update_shift),
+                'coin': Coined._get_valid_kwargs(self._update_coin),
+                'marked': Coined._get_valid_kwargs(self._update_marked),
+                'evolution': Coined._get_valid_kwargs(
+                    self._update_evolution)
             }
 
         # dict with valid coins as keys and the respective
@@ -142,7 +144,6 @@ class Coined(QuantumWalk):
         )
 
         self._shift = S
-        self._evolution = None
 
     def has_persistent_shift(self):
         r"""
@@ -187,17 +188,39 @@ class Coined(QuantumWalk):
         )
 
         self._shift = S
-        self._evolution = None
 
-    def set_shift(self, shift='default'):
+    def _update_shift(self, shift='default'):
+        valid_vals = ['default', 'flipflop', 'persistent', 'ff', 'p']
+        if shift not in valid_vals:
+            raise ValueError(
+                "Invalid `shift` value. Expected one of "
+                + str(valid_vals) + ". But received '"
+                + str(shift) + "' instead."
+            )
+
+        if shift == 'default':
+            shift = 'p' if self.has_persistent_shift() else 'ff'
+
+        if shift == 'ff':
+            shift = 'flipflop'
+        elif shift == 'p':
+            shift = 'persistent'
+
+        
+        if shift == 'flipflop':
+            self._set_flipflop_shift()
+        else:
+            self._set_persistent_shift()
+
+        if __DEBUG__:
+            if self._shift is None: raise AssertionError
+
+    def set_shift(self, shift='default', **kwargs):
         r"""
         Set the shift operator.
 
         Sets either the flipflop or the persistent shift operator.
-
-        The generated shift operator is stored for future use in
-        creating the evolution operator. If an evolution operator
-        had been previously set, it is unset to maintain coherence.
+        Afterwards, the evolution operator is updated accordingly.
 
         Parameters
         ----------
@@ -208,6 +231,12 @@ class Coined(QuantumWalk):
             Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
+        **kwargs:
+            Additional arguments.
+            Used for determining the procedure for
+            updating the evolution operator.
+            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+
         Raises
         ------
         AttributeError
@@ -217,6 +246,7 @@ class Coined(QuantumWalk):
         See Also
         --------
         has_persistent_shift
+        set_evolution
 
         Notes
         -----
@@ -300,43 +330,55 @@ class Coined(QuantumWalk):
             
             Add persistent example.
         """
-        valid_keys = ['default', 'flipflop', 'persistent', 'ff', 'p']
-        if shift not in valid_keys:
-            raise ValueError(
-                "Invalid `shift` value. Expected one of "
-                + str(valid_keys) + ". But received '"
-                + str(shift) + "' instead."
-            )
-
-        if shift == 'default':
-            shift = 'p' if self.has_persistent_shift() else 'ff'
-
-        if shift == 'ff':
-            shift = 'flipflop'
-        elif shift == 'p':
-            shift = 'persistent'
-
-        
-        S = (self._set_flipflop_shift() if shift == 'flipflop'
-             else self._set_persistent_shift())
-
-        self._evolution = None
-
-        if __DEBUG__:
-            if self._shift is None: raise AssertionError
+        self._update_shift(shift=shift)
+        self._update_evolution(**kwargs)
 
     def get_shift(self):
+        r"""
+        Return the shift operator.
+
+        Shift operator used for constructing the evolution operator.
+
+        Returns
+        -------
+        scipy.sparse.csr_array
+        """
         return self._shift
 
-    def set_coin(self, coin='default'):
+    def _update_coin(self, coin='default'):
+        try:
+            if len(coin.shape) != 2:
+                raise TypeError('Explicit coin is not a matrix.')
+
+            # explicit coin
+            if not scipy.sparse.issparse(coin):
+                coin = scipy.sparse.csr_array(coin)
+
+            self._coin = coin
+            return
+
+        except AttributeError:
+            pass
+
+        coin_list, undefined_coin = self._coin_to_list(coin)
+        if undefined_coin:
+            raise ValueError('Coin was not specified for all vertices.')
+
+        self._coin = coin_list
+
+        if __DEBUG__:
+            if self._coin is None: raise AssertionError
+            if self._evolution is not None: raise AssertionError
+
+    def set_coin(self, coin='default', **kwargs):
         """
         Generate a coin operator based on the graph structure.
 
         Constructs a coin operator based on the degree of each vertex.
         A single type of coin may be applied to
         all vertices or a subset thereof.
-        The coin operator is then established to be used in the generation
-        of the evolution operator.
+        Once the coin operator is set,
+        the evolution operator is updated accordingly.
 
         Parameters
         ----------
@@ -374,6 +416,16 @@ class Coined(QuantumWalk):
             * :class:`scipy.sparse.csr_array`
                 The explicit coin operator.
 
+        **kwargs:
+            Additional arguments.
+            Used for determining the procedure for
+            updating the evolution operator.
+            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+
+        See Also
+        --------
+        set_evolution
+
         Notes
         -----
         Owing to the selected computational basis (refer to the
@@ -387,31 +439,12 @@ class Coined(QuantumWalk):
             Check if explicit coin is valid.
 
         """
-        try:
-            if len(coin.shape) != 2:
-                raise TypeError('Explicit coin is not a matrix.')
+        for key in kwargs:
+            if key not in Coined._valid_kwargs['evolution']:
+                kwargs.pop(key)
 
-            # explicit coin
-            if not scipy.sparse.issparse(coin):
-                coin = scipy.sparse.csr_array(coin)
-
-            self._coin = coin
-            self._evolution = None
-            return
-
-        except AttributeError:
-            pass
-
-        coin_list, undefined_coin = self._coin_to_list(coin)
-        if undefined_coin:
-            raise ValueError('Coin was not specified for all vertices.')
-
-        self._coin = coin_list
-        self._evolution = None
-
-        if __DEBUG__:
-            if self._coin is None: raise AssertionError
-            if self._evolution is not None: raise AssertionError
+        self._update_coin(coin=coin)
+        self._update_evolution(**kwargs)
 
     def _coin_to_valid_name(self, coin):
         r"""
@@ -510,40 +543,28 @@ class Coined(QuantumWalk):
     def _minus_identity_coin(dim):
         return -np.identity(dim)
 
-    def _coin_list_to_explicit_coin(self, coin_list):
-        num_vert = self._graph.number_of_vertices()
-        degree = self._graph.degree
-        blocks = [self._coin_funcs[coin_list[v]](degree(v))
-                  for v in range(num_vert)]
-        C = scipy.sparse.block_diag(blocks, format='csr')
-        return scipy.sparse.csr_array(C)
+    def _update_marked(self, marked=[]):
+        coin_list = []
 
-    #def get_coin(self):
-    #    r"""
-    #    Returns the coin operator in matricial form.
-    #
-    #    Returns
-    #    -------
-    #    :class:`scipy.sparse.csr_array`
-    #    """
-    #    if not scipy.sparse.issparse(self._coin):
-    #        coin_list = self._coin
-    #        C = self._coin_list_to_explicit_coin(coin_list)
-    #
-    #        if __DEBUG__:
-    #            if not isinstance(C, scipy.sparse.csr_array):
-    #                raise AssertionError
-    #
-    #        return C
-    #    return self._coin
+        if isinstance(marked, dict):
+            coin_list, _ = self._coin_to_list(marked)
 
-    def set_marked(self, marked=[]):
+            dict_values = marked.values()
+            vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
+                        for vlist in dict_values]
+            vertices = [v for vlist in vertices for v in vlist ]
+            marked = vertices
+
+        super()._update_marked(marked=marked)
+        self._oracle_coin = coin_list
+
+    def set_marked(self, marked=[], **kwargs):
         r"""
         Set marked vertices.
 
         If a list of vertices is provided, those vertices are
-        deemed as marked. However, the associated evolution operator
-        remains unaffected.
+        deemed as marked.
+        The evolution operator is updated accordingly.
 
         If a dictionary is passed,
         the coin of those vertices are substituted
@@ -572,35 +593,39 @@ class Coined(QuantumWalk):
                 ``{coin_type : list_of_vertices}``.
                 Analogous to the one accepted by :meth:`set_coin`.
 
+        **kwargs:
+            Additional arguments.
+            Used for determining the procedure for
+            updating the evolution operator.
+            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+
         See Also
         --------
         set_coin
+        set_evolution
         """
-        coin_list = []
+        super().set_marked(marked=marked, **kwargs)
 
-        if isinstance(marked, dict):
-            coin_list, _ = self._coin_to_list(marked)
-
-            dict_values = marked.values()
-            vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
-                        for vlist in dict_values]
-            vertices = [v for vlist in vertices for v in vlist ]
-            marked = vertices
-
-        super().set_marked(marked)
-        if bool(coin_list) or bool(self._oracle_coin):
-            # evolution operator was changed
-            self._evolution = None
-        self._oracle_coin = coin_list
+    def _coin_list_to_explicit_coin(self, coin_list):
+        num_vert = self._graph.number_of_vertices()
+        degree = self._graph.degree
+        blocks = [self._coin_funcs[coin_list[v]](degree(v))
+                  for v in range(num_vert)]
+        C = scipy.sparse.block_diag(blocks, format='csr')
+        return scipy.sparse.csr_array(C)
 
     def get_coin(self):
         r"""
-        Return coin to be used for creating the evolution operator.
+        Return coin used for creating the evolution operator.
 
         Returns
         -------
         :class:`scipy.sparse.csr_array`
 
+        See Also
+        --------
+        set_coin
+        
         Notes
         -----
         The final coin :math:`C'` is obtained by multiplying the
@@ -661,13 +686,50 @@ class Coined(QuantumWalk):
 
         return self._coin_list_to_explicit_coin(coin_list)
 
-    def set_evolution(self, **kwargs):
-        """
-        Set the evolution operator.
+    def _update_evolution(self, hpc=True):
+        U = None
+        if hpc and not self._pyneblina_imported():
+            hpc = False
 
-        Shorthand for setting shift, coin and marked vertices.
+        S = self.get_shift()
+        C = self.get_coin()
+
+        if hpc:
+
+            S = S.todense()
+            C = C.todense()
+
+            nbl_S = nbl.send_matrix(S)
+            del S
+            nbl_C = nbl.send_matrix(C)
+            del C
+            nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
+
+            del nbl_S
+
+            U = nbl.retrieve_matrix(nbl_C)
+            del nbl_C
+            U = scipy.sparse.csr_array(U)
+
+        else:
+            U = S @ C
+
+        self._evolution = U
+        return U
+
+    def set_evolution(self, hpc=True, **kwargs):
+        """
+        Create evolution operator.
+
+        Sets shift, coin and marked vertices.
         They are set using the appropriate ``**kwargs``.
         If ``**kwargs`` is empty, the default arguments are used.
+
+        Then, creates evolution operator by multiplying the
+        shift operator and coin operator.
+        If the coin operator is not an explicit matrix,
+        and the coin for marked vertices was specified,
+        the coin of each marked vertex is substituted.
 
         Parameters
         ----------
@@ -676,47 +738,16 @@ class Coined(QuantumWalk):
             Accepts any valid keywords from
             :meth:`set_shift` :meth:`set_coin`, and :meth:`set_marked`.
 
+        hpc : bool, default=True
+            Whether or not the evolution operator should be
+            constructed using nelina's high-performance computing.
+
         See Also
         --------
         set_shift
         set_coin
         set_marked
-        """
-
-        S_kwargs = Coined._filter_valid_kwargs(
-                              kwargs,
-                              Coined._valid_kwargs['shift'])
-        C_kwargs = Coined._filter_valid_kwargs(
-                              kwargs,
-                              Coined._valid_kwargs['coin'])
-        R_kwargs = Coined._filter_valid_kwargs(
-                              kwargs,
-                              Coined._valid_kwargs['marked'])
-
-        self.set_shift(**S_kwargs)
-        self.set_coin(**C_kwargs)
-        self.set_marked(**R_kwargs)
-        self._evolution = None
-
-    def get_evolution(self, hpc=True):
-        r"""
-        Create evolution operator from previously set attributes.
-
-        Creates evolution operator by multiplying the
-        shift operator and coin operator.
-        If the coin operator is not an explicit matrix,
-        and the coin for marked vertices was specified,
-        the coin of each marked vertex is substituted.
-
-        Parameters
-        ----------
-        hpc : bool, default=True
-            Whether or not the evolution operator should be
-            constructed using nelina's high-performance computing.
-
-        Returns
-        -------
-        :class:`scipy.sparse.csr_array`
+        get_evolution
 
         Notes
         -----
@@ -756,42 +787,21 @@ class Coined(QuantumWalk):
         .. todo::
             Valid examples to clear behavior.
         """
-        if self._evolution is not None:
-            # evolution operator was not changed.
-            # No need to create it again
-            return self._evolution
 
-        U = None
-        if hpc and not self._pyneblina_imported():
-            hpc = False
+        S_kwargs = Coined._filter_valid_kwargs(
+                              kwargs,
+                              Coined._valid_kwargs['shift'])
+        C_kwargs = Coined._filter_valid_kwargs(
+                              kwargs,
+                              Coined._valid_kwargs['coin'])
+        R_kwargs = Coined._filter_valid_kwargs(
+                              kwargs,
+                              Coined._valid_kwargs['marked'])
 
-
-        S = self.get_shift()
-        C = self.get_coin()
-
-        if hpc:
-
-            S = S.todense()
-            C = C.todense()
-
-            nbl_S = nbl.send_matrix(S)
-            del S
-            nbl_C = nbl.send_matrix(C)
-            del C
-            nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
-
-            del nbl_S
-
-            U = nbl.retrieve_matrix(nbl_C)
-            del nbl_C
-            U = scipy.sparse.csr_array(U)
-
-        else:
-            U = S @ C
-
-        self._evolution = U
-        return U
-
+        self._update_shift(**S_kwargs)
+        self._update_coin(**C_kwargs)
+        self._update_marked(**R_kwargs)
+        self._update_evolution(hpc=hpc)
 
     def probability_distribution(self, states):
         """
