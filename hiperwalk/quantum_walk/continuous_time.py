@@ -385,20 +385,6 @@ class ContinuousTime(QuantumWalk):
             self._evolution_time = time
             self._update_evolution(hpc=hpc, terms=terms)
 
-    def get_evolution(self):
-        r"""
-        Returns the evolution operator.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`.
-
-        See Also
-        --------
-        set_evolution
-        """
-        return self._evolution
-
     def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
