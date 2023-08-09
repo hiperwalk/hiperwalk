@@ -123,7 +123,7 @@ class QuantumWalk(ABC):
             return True
         return False
 
-    def set_marked(self, marked=[], hpc=True):
+    def set_marked(self, marked=[], **kwargs):
         r"""
         Sets marked vertices.
 
@@ -136,9 +136,14 @@ class QuantumWalk(ABC):
             List of vertices to be marked.
             If empty list, no vertex is marked.
 
-        hpc : bool, default = True
-            Determines whether or not to use neblina HPC 
-            functions to update the evolution operator.
+        ** kwargs :
+            Additional arguments for updating the evolution operator.
+            For example, whether to use neblina HPC or not.
+            See :meth:`set_evolution` for more options.
+
+        See Also
+        --------
+        set_evolution
         """
         self.set_evolution(marked=marked, hpc=hpc)
 
