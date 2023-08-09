@@ -45,9 +45,10 @@ class QuantumWalk(ABC):
         if graph is None:
             raise TypeError('graph is None')
 
-        self._marked = (self.set_marked(kwargs['marked'])
-                        if 'marked' in kwargs
-                        else self.set_marked([]))
+        self._marked = []
+        if 'marked' in kwargs:
+            self._update_marked(kwargs['marked'])
+
         self._evolution = None
 
         ##############################
@@ -112,20 +113,34 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def set_marked(self, marked=[]):
+    def _update_marked(self, marked=[]):
+        if not hasattr(marked, '__iter__'):
+            marked = [marked]
+        marked = np.sort(list(set(marked)))
+
+        if not np.array_equal(marked, self._marked):
+            self._marked = marked
+            return True
+        return False
+
+    def set_marked(self, marked=[], hpc=True):
         r"""
         Sets marked vertices.
+
+        After the marked elements are changed,
+        the evolution operator is updated accordingly.
 
         Parameters
         ----------
         marked : list of int or int
             List of vertices to be marked.
             If empty list, no vertex is marked.
+
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to update the evolution operator.
         """
-        if not hasattr(marked, '__iter__'):
-            marked = [marked]
-        self._marked = list(set(marked))
-        self._evolution = None
+        self.set_evolution(marked=marked, hpc=hpc)
 
     def get_marked(self):
         r"""
@@ -137,7 +152,7 @@ class QuantumWalk(ABC):
             List of marked vertices.
             If no vertex is marked, returns the empty list.
         """
-        return list(self._marked)
+        return self._marked
 
     @abstractmethod
     def set_evolution(self, **kwargs):

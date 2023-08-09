@@ -27,6 +27,9 @@ class ContinuousTime(QuantumWalk):
         :class:`class:scipy.sparse.csr_array`:
             The adjacency matrix of the graph.
 
+    gamma : float
+        Gamma value for setting Hamiltonian.
+
     **kwargs : optional
         Arguments to set the Hamiltonian.
 
@@ -58,48 +61,60 @@ class ContinuousTime(QuantumWalk):
     of the adjacency matrix.
     """
 
-    _hamiltonian_kwargs = dict()
+    _gamma_kwargs = dict()
+    _marked_kwargs = dict()
 
-    def __init__(self, graph=None, **kwargs):
+    def __init__(self, graph=None, gamma=None, **kwargs):
 
-        self._hamiltonian = False # set to not None
         super().__init__(graph=graph)
 
+        # create attributes
         self.hilb_dim = self._graph.number_of_vertices()
+        self._gamma = None
         self._hamiltonian = None
+        self._evolution = None
+        self._evolution_time = None
 
-        import inspect
+        # import inspect
 
-        if not bool(ContinuousTime._hamiltonian_kwargs):
+        if not bool(ContinuousTime._gamma_kwargs):
             # assign static attribute
-            ContinuousTime._hamiltonian_kwargs = {
-                'gamma': ContinuousTime._get_valid_kwargs(self.set_gamma),
-                'marked': ContinuousTime._get_valid_kwargs(self.set_marked)
-            }
+            ContinuousTime._gamma_kwargs = (
+                ContinuousTime._get_valid_kwargs(self._update_gamma))
+            ContinuousTime._marked_kwargs = (
+                ContinuousTime._get_valid_kwargs(self._update_marked))
 
-        self.set_hamiltonian(**kwargs)
+        if not 'time' in kwargs:
+            kwargs['time'] = 0
 
-    def set_gamma(self, gamma=None):
+        self.set_evolution(gamma=gamma, **kwargs)
+
+    def set_gamma(self, gamma=None, hpc=True):
         r"""
         Sets the gamma parameter.
         
         The gamma parameter is used in the definition of the Hamiltonian.
+        By setting gamma,
+        both the Hamiltonian and evolution operator are updated.
 
         Parameters
         ----------
-        gamma : float, default = 1
+        gamma : float
             Gamma value.
+
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to update the evolution operator.
+
+        Raises
+        ------
+        TypeError
+            If ``gamma`` is ``None`` or complex.
+        ValueError
+            If ``gamma < 0``.
         """
-        if gamma is None or gamma.imag != 0:
-            raise TypeError("Value of 'gamma' is not float.")
-
-        self._gamma = gamma
-        self._update_hamiltonian()
-        self._evolution = None
-
-    def set_marked(self, marked=[]):
-        super().set_marked(marked)
-        self._update_hamiltonian()
+        self.set_evolution(time=self._evolution_time,
+                           gamma=gamma, hpc=hpc)
 
     def get_gamma(self):
         r"""
@@ -112,26 +127,23 @@ class ContinuousTime(QuantumWalk):
         """
         return self._gamma
 
-    def _update_hamiltonian(self):
-        if self._hamiltonian is None:
-            self._hamiltonian = -self._gamma * self._graph.adj_matrix
+    def set_marked(self, marked=[], hpc=True):
+        self.set_evolution(time=self._evolution_time,
+                           marked=marked, hpc=hpc)
 
-            # creating oracle
-            if len(self._marked) > 0:
-                data = np.ones(len(self._marked), dtype=np.int8)
-                oracle = scipy.sparse.csr_array(
-                        (data, (self._marked, self._marked)),
-                        shape=(self.hilb_dim, self.hilb_dim))
-
-                self._hamiltonian -= oracle
-
-    def set_hamiltonian(self, **kwargs):
+    def set_hamiltonian(self, hpc=True, **kwargs):
         r"""
         Creates the Hamiltonian.
 
+        After the Hamiltonian is created,
+        the evolution operator is updated accordingly.
 
         Parameters
         ----------
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to update the evolution operator.
+
         **kwargs :
             Additional arguments.
             Used for determining the gamma value and marked vertices.
@@ -153,20 +165,8 @@ class ContinuousTime(QuantumWalk):
         set_gamma
         set_marked
         """
-
-        self._hamiltonian = False #not None
-        gamma_kwargs = ContinuousTime._filter_valid_kwargs(
-                              kwargs,
-                              ContinuousTime._hamiltonian_kwargs['gamma'])
-        marked_kwargs = ContinuousTime._filter_valid_kwargs(
-                              kwargs,
-                              ContinuousTime._hamiltonian_kwargs['marked'])
-
-        self.set_gamma(**gamma_kwargs)
-        self.set_marked(**marked_kwargs)
-
-        self._hamiltonian = None
-        self._update_hamiltonian()
+        self.set_evolution(time=self._evolution_time,
+                           hpc=hpc, **kwargs)
 
     def get_hamiltonian(self):
         r"""
@@ -179,71 +179,41 @@ class ContinuousTime(QuantumWalk):
 
         return self._hamiltonian
 
-    def set_evolution(self, **kwargs):
+    def _update_gamma(self, gamma=None):
+        if gamma is None or gamma.imag != 0:
+            raise TypeError("Value of 'gamma' is not float.")
+
+        if self._gamma != gamma:
+            self._gamma = gamma
+            return True
+        return False
+
+    def _update_hamiltonian(self):
         r"""
-        Alias for :meth:`hiperwalk.ContinuousTime.set_hamiltonian`.
+        If this method is invoked,
+        the hamiltonian is recalculated
         """
-        self.set_hamiltonian(**kwargs)
+        self._hamiltonian = -self._gamma * self._graph.adj_matrix
 
-    def get_evolution(self, time=None, hpc=True):
+        # creating oracle
+        if len(self._marked) > 0:
+            data = np.ones(len(self._marked), dtype=np.int8)
+            oracle = scipy.sparse.csr_array(
+                    (data, (self._marked, self._marked)),
+                    shape=(self.hilb_dim, self.hilb_dim))
+
+            self._hamiltonian -= oracle
+
+    def _update_evolution(self, hpc):
         r"""
-        Returns the evolution operator.
-
-        Constructs the evolution operator based on the previously
-        set Hamiltonian.
-
-        Parameters
-        ----------
-        time : float
-            Generates the evolution operator corresponding to the specified time.
-
-        hpc : bool, default = True
-            Determines whether or not to use neblina HPC 
-            functions to generate the evolution operator.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`.
-
-        Raises
-        ------
-        ValueError
-            If ``time < 0``.
-
-        See Also
-        --------
-        set_hamiltonian
-
-        Notes
-        -----
-        The evolution operator is given by
-
-        .. math::
-            U = e^{-\text{i}tH},
-
-        where :math:`H` is the Hamiltonian, and
-        :math:`t` is the time.
-
-        The evolution operator is constructed using
-        a Taylor series expansion.
-
-        .. warning::
-            For non-integer time (floating number),
-            the result is approximate. It is recommended 
-            to select a small time interval and perform 
-            multiple matrix multiplications to minimize 
-            rounding errors.
-
-        .. todo::
-            Use ``scipy.linalg.expm`` when ``hpc=False`` once the
-            `scipy issue 18086
-            <https://github.com/scipy/scipy/issues/18086>`_
-            is solved.
+        If this method is invoked,
+        the evolution is recalculated
         """
-        if time is None or time < 0:
-            raise ValueError(
-                "Expected non-negative `time` value."
-            )
+        time = self._evolution_time
+
+        if time == 0:
+            self._evolution = np.eye(self.hilb_dim)
+            return
 
         H = self.get_hamiltonian()
 
@@ -302,7 +272,103 @@ class ContinuousTime(QuantumWalk):
             U = nbl.retrieve_matrix(nbl_U)
 
         self._evolution = U
-        return U
+
+    def set_evolution(self, time=None, hpc=True, **kwargs):
+        r"""
+        Sets the evolution operator.
+
+        Either constructs the evolution operator based on the previously
+        set Hamiltonian;
+        or sets a new Hamiltonian and constructs the evolution operator
+        based on the new Hamiltonian.
+
+        Parameters
+        ----------
+        time : float
+            Generates the evolution operator corresponding to the specified time.
+
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
+
+        **kwargs :
+            Additional arguments for setting Hamiltonian
+            (see :meth:`hiperwalk.ContinuousTime.set_hamiltonian`).
+            If omitted, the previously set Hamiltonian is used for
+            constructing the eovlution operator.
+
+        Raises
+        ------
+        ValueError
+            If ``time < 0``.
+
+        See Also
+        --------
+        set_hamiltonian
+
+        Notes
+        -----
+        The evolution operator is given by
+
+        .. math::
+            U(t) = e^{-\text{i}tH},
+
+        where :math:`H` is the Hamiltonian, and
+        :math:`t` is the time.
+
+        The evolution operator is constructed using
+        a Taylor series expansion.
+
+        .. warning::
+            For non-integer time (floating number),
+            the result is approximate. It is recommended 
+            to select a small time interval and perform 
+            multiple matrix multiplications to minimize 
+            rounding errors.
+
+        .. todo::
+            Use ``scipy.linalg.expm`` when ``hpc=False`` once the
+            `scipy issue 18086
+            <https://github.com/scipy/scipy/issues/18086>`_
+            is solved.
+        """
+        if time is None or time < 0:
+            raise ValueError(
+                "Expected non-negative `time` value."
+            )
+
+        gamma_kwargs = ContinuousTime._filter_valid_kwargs(
+                              kwargs,
+                              ContinuousTime._gamma_kwargs)
+        marked_kwargs = ContinuousTime._filter_valid_kwargs(
+                              kwargs,
+                              ContinuousTime._marked_kwargs)
+
+        update = bool(gamma_kwargs) and self._update_gamma(**gamma_kwargs)
+        update = ((bool(marked_kwargs)
+                   and self._update_marked(**marked_kwargs))
+                  or update)
+
+        if update:
+            self._update_hamiltonian()
+
+        if update or time != self._evolution_time:
+            self._evolution_time = time
+            self._update_evolution(hpc=hpc)
+
+    def get_evolution(self):
+        r"""
+        Returns the evolution operator.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`.
+
+        See Also
+        --------
+        set_evolution
+        """
+        return self._evolution
 
     def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
@@ -339,7 +405,7 @@ class ContinuousTime(QuantumWalk):
 
         time = np.array(self._time_to_tuple(time))
 
-        self.get_evolution(time=time[2], hpc=hpc)
+        self.set_evolution(time=time[2], hpc=hpc)
 
         # cleaning time_range to int
         tol = 1e-5
