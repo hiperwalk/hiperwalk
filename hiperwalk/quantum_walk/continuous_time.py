@@ -31,11 +31,12 @@ class ContinuousTime(QuantumWalk):
         Gamma value for setting Hamiltonian.
 
     **kwargs : optional
-        Arguments to set the Hamiltonian.
+        Arguments to set the Hamiltonian and evolution operator.
 
     See Also
     --------
     set_hamiltonian
+    set_evolution
 
     Notes
     -----
@@ -63,6 +64,7 @@ class ContinuousTime(QuantumWalk):
 
     _gamma_kwargs = dict()
     _marked_kwargs = dict()
+    _evolution_kwargs = dict()
 
     def __init__(self, graph=None, gamma=None, **kwargs):
 
@@ -83,13 +85,15 @@ class ContinuousTime(QuantumWalk):
                 ContinuousTime._get_valid_kwargs(self._update_gamma))
             ContinuousTime._marked_kwargs = (
                 ContinuousTime._get_valid_kwargs(self._update_marked))
+            ContinuousTime._evolution_kwargs = (
+                ContinuousTime._get_valid_kwargs(self._update_evolution))
 
         if not 'time' in kwargs:
             kwargs['time'] = 0
 
         self.set_evolution(gamma=gamma, **kwargs)
 
-    def set_gamma(self, gamma=None, hpc=True):
+    def set_gamma(self, gamma=None, **kwargs):
         r"""
         Sets the gamma parameter.
         
@@ -102,9 +106,10 @@ class ContinuousTime(QuantumWalk):
         gamma : float
             Gamma value.
 
-        hpc : bool, default = True
-            Determines whether or not to use neblina HPC 
-            functions to update the evolution operator.
+        ** kwargs :
+            Additional arguments for updating the evolution operator.
+            For example, whether to use neblina HPC or not.
+            See :meth:`set_evolution` for more options.
 
         Raises
         ------
@@ -113,8 +118,12 @@ class ContinuousTime(QuantumWalk):
         ValueError
             If ``gamma < 0``.
         """
-        self.set_evolution(time=self._evolution_time,
-                           gamma=gamma, hpc=hpc)
+        for key in kwargs:
+            if not key in ContinuousTime._evolution_kwargs:
+                kwargs.pop[key]
+
+        self.set_evolution(time=self._evolution_time, gamma=gamma,
+                           **kwargs)
 
     def get_gamma(self):
         r"""
@@ -127,11 +136,15 @@ class ContinuousTime(QuantumWalk):
         """
         return self._gamma
 
-    def set_marked(self, marked=[], hpc=True):
-        self.set_evolution(time=self._evolution_time,
-                           marked=marked, hpc=hpc)
+    def set_marked(self, marked=[], **kwargs):
+        for key in kwargs:
+            if key not in ContinuousTime._evolution_kwargs:
+                kwargs.pop[key]
 
-    def set_hamiltonian(self, hpc=True, **kwargs):
+        self.set_evolution(time=self._evolution_time,
+                           marked=marked, **kwargs)
+
+    def set_hamiltonian(self, **kwargs):
         r"""
         Creates the Hamiltonian.
 
@@ -146,9 +159,11 @@ class ContinuousTime(QuantumWalk):
 
         **kwargs :
             Additional arguments.
-            Used for determining the gamma value and marked vertices.
-            See :meth:`hiperwalk.ContinuousTime.set_gamma` and
-            :meth:`hiperwalk.ContinuousTime.set_marked`.
+            Used for determining the gamma value,  marked vertices, and
+            the procedure for updating the evolution operator.
+            See :meth:`hiperwalk.ContinuousTime.set_gamma`,
+            :meth:`hiperwalk.ContinuousTime.set_marked`, and
+            See :meth:`hiperwalk.ContinuousTime.set_evolution`.
 
         Notes
         -----
@@ -164,9 +179,11 @@ class ContinuousTime(QuantumWalk):
         --------
         set_gamma
         set_marked
+        set_evolution
         """
-        self.set_evolution(time=self._evolution_time,
-                           hpc=hpc, **kwargs)
+        if 'time' in kwargs:
+            kwargs.pop('time')
+        self.set_evolution(time=self._evolution_time, **kwargs)
 
     def get_hamiltonian(self):
         r"""
@@ -204,7 +221,7 @@ class ContinuousTime(QuantumWalk):
 
             self._hamiltonian -= oracle
 
-    def _update_evolution(self, hpc):
+    def _update_evolution(self, hpc=True, terms=21):
         r"""
         If this method is invoked,
         the evolution is recalculated
@@ -215,6 +232,7 @@ class ContinuousTime(QuantumWalk):
             self._evolution = np.eye(self.hilb_dim)
             return
 
+        n = terms - 1
         H = self.get_hamiltonian()
 
         if hpc and not self._pyneblina_imported():
@@ -238,10 +256,9 @@ class ContinuousTime(QuantumWalk):
         max_val = np.max(np.abs(H))
         if max_val*time <= 1:
             if hpc:
-                nbl_U = nbl.matrix_power_series(
-                        -1j*time*H, 30)
+                nbl_U = nbl.matrix_power_series(-1j*time*H, n)
             else:
-                U = numpy_matrix_power_series(-1j*time*H.todense(), 30)
+                U = numpy_matrix_power_series(-1j*time*H.todense(), n)
 
         else:
             # if the order of magnitude is very large,
@@ -252,20 +269,21 @@ class ContinuousTime(QuantumWalk):
                 new_time = 1
                 num_mult = time - 1
             else:
+                # TODO: assert precision
                 new_time = max_val*time
-                order = np.ceil(np.math.log(new_time, 20))
+                order = np.ceil(np.math.log(new_time, n))
                 new_time /= 10**order
                 num_mult = int(np.round(time/new_time)) - 1
 
             if hpc:
                 new_nbl_U = nbl.matrix_power_series(
-                        -1j*new_time*H, 20)
+                        -1j*new_time*H, n)
                 nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
                 for i in range(num_mult - 1):
                     nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
             else:
                 U = numpy_matrix_power_series(
-                        -1j*new_time*H.todense(), 20)
+                        -1j*new_time*H.todense(), n)
                 U = np.linalg.matrix_power(U, num_mult + 1)
 
         if hpc:
@@ -273,7 +291,7 @@ class ContinuousTime(QuantumWalk):
 
         self._evolution = U
 
-    def set_evolution(self, time=None, hpc=True, **kwargs):
+    def set_evolution(self, time=None, hpc=True, terms=21, **kwargs):
         r"""
         Sets the evolution operator.
 
@@ -281,6 +299,9 @@ class ContinuousTime(QuantumWalk):
         set Hamiltonian;
         or sets a new Hamiltonian and constructs the evolution operator
         based on the new Hamiltonian.
+
+        The evolution operator is constructed using
+        a Taylor series expansion.
 
         Parameters
         ----------
@@ -290,6 +311,9 @@ class ContinuousTime(QuantumWalk):
         hpc : bool, default = True
             Determines whether or not to use neblina HPC 
             functions to generate the evolution operator.
+
+        terms : int
+            Number of terms in Taylor series expansion.
 
         **kwargs :
             Additional arguments for setting Hamiltonian
@@ -316,8 +340,13 @@ class ContinuousTime(QuantumWalk):
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
 
-        The evolution operator is constructed using
-        a Taylor series expansion.
+        The Taylor series expansion is given by
+
+        .. math::
+            e^{-\text{i}tH} &= \sum_{j = 0}^{n} (\text{i}tH)^j / j!
+
+        where :math:`n` is the number of terms minus 1
+        (i.e. ``terms - 1``).
 
         .. warning::
             For non-integer time (floating number),
@@ -354,7 +383,7 @@ class ContinuousTime(QuantumWalk):
 
         if update or time != self._evolution_time:
             self._evolution_time = time
-            self._update_evolution(hpc=hpc)
+            self._update_evolution(hpc=hpc, terms=terms)
 
     def get_evolution(self):
         r"""
