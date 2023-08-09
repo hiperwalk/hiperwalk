@@ -116,12 +116,7 @@ class QuantumWalk(ABC):
     def _update_marked(self, marked=[]):
         if not hasattr(marked, '__iter__'):
             marked = [marked]
-        marked = np.sort(list(set(marked)))
-
-        if not np.array_equal(marked, self._marked):
-            self._marked = marked
-            return True
-        return False
+        self._marked = np.sort(list(set(marked)))
 
     def set_marked(self, marked=[], **kwargs):
         r"""
@@ -145,7 +140,8 @@ class QuantumWalk(ABC):
         --------
         set_evolution
         """
-        self.set_evolution(marked=marked, hpc=hpc)
+        self._update_marked(marked=marked)
+        self._update_evolution(**kwargs)
 
     def get_marked(self):
         r"""
@@ -177,12 +173,19 @@ class QuantumWalk(ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
-    def get_evolution():
+    def get_evolution(self):
         r"""
-        Returns the evolution operator in matrix form.
+        Returns the evolution operator.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`.
+
+        See Also
+        --------
+        set_evolution
         """
-        raise NotImplementedError()
+        return self._evolution
 
     @staticmethod
     def _elementwise_probability(elem):
