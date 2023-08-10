@@ -572,12 +572,6 @@ class Coined(QuantumWalk):
         This can only be done if the set coin operator is
         not a explicit matrix.
 
-        If a dictionary is provided,
-        the coins associated with those vertices  are replaced,
-        but only for generating the evolution operator.
-        Note that this can only be done if the coin operator
-        is not set as an explicit matrix.
-
         Parameters
         ----------
         marked : list of int or dict
