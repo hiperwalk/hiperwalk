@@ -23,7 +23,7 @@ class TestContinuousGraph(unittest.TestCase):
         H = self.qw.get_hamiltonian()
         self.assertTrue((H - (-self.gamma*self.adj) != 0).nnz == 0)
         self.assertTrue(self.qw._hamiltonian is not None)
-        self.assertTrue(self.qw._marked == [])
+        self.assertTrue(self.qw._marked.size == 0)
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hamiltonian_multiple_marked(self):
@@ -51,8 +51,9 @@ class TestContinuousGraph(unittest.TestCase):
         H = self.qw._hamiltonian
         U = self.qw._evolution
 
-        self.assertRaises(ValueError, self.qw.get_evolution,
-                          time=-1, hpc=False)
+        self.assertRaises(ValueError, self.qw.set_evolution,
+                          time=-1, gamma=self.qw.get_gamma(),
+                          hpc=False)
 
         self.assertTrue(id(marked) == id(self.qw._marked))
         self.assertTrue(id(H) == id(self.qw._hamiltonian))
@@ -64,8 +65,8 @@ class TestContinuousGraph(unittest.TestCase):
         prev_H = self.qw._hamiltonian
         prev_U = self.qw._evolution
 
-        self.qw.set_evolution(gamma=1, marked=[])
-        U = self.qw.get_evolution(time=1, hpc=False)
+        self.qw.set_evolution(time=1, hpc=False, gamma=1, marked=[])
+        U = self.qw.get_evolution()
 
         self.assertTrue(U is not None)
         self.assertTrue(self.qw._evolution is not None)
@@ -79,8 +80,8 @@ class TestContinuousGraph(unittest.TestCase):
         prev_H = self.qw._hamiltonian
         prev_U = self.qw._evolution
 
-        self.qw.set_evolution(gamma=1, marked=0)
-        U = self.qw.get_evolution(time=1, hpc=False)
+        self.qw.set_evolution(time=1, gamma=1, marked=0, hpc=False)
+        U = self.qw.get_evolution()
 
         self.assertTrue(U is not None)
         self.assertTrue(self.qw._evolution is not None)
@@ -90,7 +91,9 @@ class TestContinuousGraph(unittest.TestCase):
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_unitary(self):
-        U = self.qw.get_evolution(time=1, hpc=False)
+        U = self.qw.set_evolution(gamma=self.qw.get_gamma(),
+                time=1, hpc=False)
+        U = self.qw.get_evolution()
 
         self.assertTrue(np.allclose(
             U@U.T.conjugate(), np.eye(U.shape[0])
