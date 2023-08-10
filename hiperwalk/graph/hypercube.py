@@ -45,8 +45,6 @@ class Hypercube(Graph):
         indptr = np.arange(0, num_arcs + 1, dimension)
         indices = np.array([v ^ 1 << shift for v in range(num_vert)
                                            for shift in range(dimension)])
-        # for v in range(num_vert):
-        #     indices[v*dimension:(v + 1)*dimension].sort()
 
         adj_matrix = scipy.sparse.csr_array((data, indices, indptr),
                                             shape=(num_vert, num_vert))
