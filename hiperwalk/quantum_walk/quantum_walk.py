@@ -551,7 +551,10 @@ class QuantumWalk(ABC):
     @staticmethod
     def _filter_valid_kwargs(kwargs, valid_kwargs):
         return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
-                #if kwargs.get(k) is not None}
+
+    @staticmethod
+    def _pop_valid_kwargs(kwargs, valid_kwargs):
+        return {k : kwargs.pop(k) for k in valid_kwargs if k in kwargs}
 
     def hilbert_space_dimension(self):
         """
