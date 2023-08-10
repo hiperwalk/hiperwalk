@@ -226,7 +226,6 @@ class Grid(Lattice):
                               + x_dim*(v // x_dim + (-1)**(coin % 2)))
                              % num_vert
                              for coin in range(4)]))
-                cols.sort()
                 indices[arc_count:arc_count + 4] = cols
                 arc_count += 4
 
