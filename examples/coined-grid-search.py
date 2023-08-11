@@ -12,7 +12,7 @@ num_steps = int(1.5*np.sqrt(N*np.log(N)))
 states = qw.simulate(time=(num_steps, 1),
                      initial_state=psi0,
                      hpc=False)
-mark_prob = qw.marked_probability(states)
-plt.plot(list(range(num_steps + 1)), mark_prob,
+succ_prob = qw.success_probability(states)
+plt.plot(list(range(num_steps + 1)), succ_prob,
          marker='o')
 plt.show()
