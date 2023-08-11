@@ -224,27 +224,52 @@ class QuantumWalk(ABC):
 
     def probability_distribution(self, states):
         r"""
-        Compute the probability distribution of given states.
+        Compute the probability distribution of given state(s).
 
         The probability of the walker being found on each vertex
-        for the given states.
+        for the given state(s).
 
         Parameters
         ----------
         states : :class:`numpy.ndarray`
-            The states used to compute the probabilities.
+            The state(s) used to compute the probabilities.
+            It may be a single state or a list of states.
 
         Returns
         -------
         probabilities : :class:`numpy.ndarray`
-            ``probabilities[i]`` is the probability of the
-            walker beign found at vertex ``i``.
+            If ``states`` is a single state,
+            ``probabilities[v]`` is the probability of the
+            walker being found on vertex ``v``.
+
+            If ``states`` is a list of states,
+            ``probabilities[i][v]`` is the probability of the
+            walker beign found at vertex ``v`` in ``states[i]``.
 
         See Also
         --------
         simulate
+
+        Notes
+        -----
+        The probability for a given vertex is the absolute square of
+        its amplitude.
+        That is, for an arbitrary superposition
+
+        .. math::
+            \sum_{v \in V} \alpha_v \ket{v},
+
+        the probability associated with vertex :math:`v` is
+        :math:`|\alpha_v|^2`.
         """
-        return self.probability(states)
+        single_state = len(states.shape) == 1
+        if single_state:
+            states = [states]
+
+        prob = list(map(QuantumWalk._elementwise_probability, states))
+        prob = np.array(prob)
+
+        return prob[0] if single_state else prob
 
     def _time_to_tuple(self, time):
         r"""

@@ -798,20 +798,28 @@ class Coined(QuantumWalk):
         self._update_evolution(hpc=hpc)
 
     def probability_distribution(self, states):
-        """
-        Compute the probability distribution of the given states.
+        r"""
+        Compute the probability distribution of given state(s).
 
-        The probability of finding the walker at each vertex
-        for the given states.
+        The probability of the walker being found on each vertex
+        for the given state(s).
 
         Parameters
         ----------
         states : :class:`numpy.ndarray`
-            The states used to compute the probabilities.
+            The state(s) used to compute the probabilities.
+            It may be a single state or a list of states.
 
         Returns
         -------
         probabilities : :class:`numpy.ndarray`
+            If ``states`` is a single state,
+            ``probabilities[v]`` is the probability of the
+            walker being found on vertex ``v``.
+
+            If ``states`` is a list of states,
+            ``probabilities[i][v]`` is the probability of the
+            walker beign found at vertex ``v`` in ``states[i]``.
 
         See Also
         --------
@@ -819,26 +827,27 @@ class Coined(QuantumWalk):
 
         Notes
         -----
-        .. note::
-            
-            benchmark performance
+        The probability for a given vertex :math:`u` is the sum of the
+        absolute square of the amplitudes of the arcs with tail :math:`u`.
+        That is, for an arbitrary superposition
+
+        .. math::
+            \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
+
+        -- where :math:`\vec G` is the graph :math:`G` with each
+        edge substituted by two arcs (one for each direction) --
+        the probability associated with vertex :math:`u` is
+
+        .. math::
+            \sum_{v \in N(u)}|\alpha_{u, v}|^2,
+
+        where :math:`N(u)` is the set of neighbors of :math:`u`.
         """
-        # TODO: test with nonregular graph
-        # TODO: test with nonuniform condition
         if __DEBUG__:
             start = now()
 
         if len(states.shape) == 1:
             states = [states]
-
-        #edges_indices = self.adj_matrix.indptr
-        #
-        #prob = np.array([[
-        #        Graph._elementwise_probability(
-        #            states[i][edges_indices[j]:edges_indices[j + 1]]
-        #        ).sum()
-        #        for j in range(len(edges_indices) - 1)
-        #    ] for i in range(len(states)) ])
 
         def get_entries(state, indexes):
             return np.array([state[i] for i in indexes])
@@ -854,7 +863,6 @@ class Coined(QuantumWalk):
                           for v in range(num_vert)]
                         for i in range(len(states))])
 
-        # TODO: benchmark (time and memory usage)
         return prob
 
     def state(self, *args):
