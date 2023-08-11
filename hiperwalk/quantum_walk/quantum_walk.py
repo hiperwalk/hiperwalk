@@ -194,33 +194,47 @@ class QuantumWalk(ABC):
         # elem.real**2 + elem.imag**2
         return elem.real*elem.real + elem.imag*elem.imag
 
-    def probability(self, states):
+    def probability(self, states, vertices):
         r"""
-        Computes the probability distribution of each state.
+        Computes the vertices probability.
 
-        The probability of each entry of the state.
+        Computes the probability of the walker being found on a
+        subset of the vertices in the given state(s).
 
         Parameters
         ----------
         states : :class:`numpy.ndarray`
-            The states used to compute the probabilities.
+            The state(s) used to compute the probability.
+            ``states`` can be a single state or a list of states.
+
+        vertices: list of int
+           The subset of vertices. 
 
         Returns
         -------
-        probabilities : :class:`numpy.ndarray`
-            ``probabilities[i]`` is the probability of the ``i``-entry.
+        probabilities : float or :class:`numpy.ndarray`
+            float:
+                If ``states`` is a single state.
+            :class:`numpy.ndarray`:
+                If ``states`` is a list of states,
+                ``probabilities[i]`` is the probability
+                corresponding to the ``i``-th state.
 
         See Also
         --------
         simulate
         """
-        if len(states.shape) == 1:
-            states = [states]
+        single_state = len(states.shape) == 1
+        if single_state:
+            states = np.array([states])
 
-        prob = list(map(QuantumWalk._elementwise_probability, states))
-        prob = np.array(prob)
+        probs = self.probability_distribution(states)
+        probs = np.array([
+                    np.sum(probs[i, vertices])
+                    for i in range(len(states))
+                    ])
 
-        return prob
+        return probs[0] if single_state else probs
 
     def probability_distribution(self, states):
         r"""
