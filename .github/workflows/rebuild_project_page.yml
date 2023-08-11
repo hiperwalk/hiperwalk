@@ -1,0 +1,94 @@
+name: Rebuild project page
+
+on:
+  push:
+    branches:
+    - master
+    - 2.0a
+    paths:
+    - 'docs/**'
+    - 'hiperwalk/**'
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        repository: hiperwalk/hiperwalk.github.io
+        submodules: true
+
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v2
+      with:
+        hugo-version: '0.109.0'
+        extended: true
+
+    - name: Build site
+      run: hugo
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install graphviz
+      run: |
+          sudo apt update
+          sudo apt install graphviz
+
+    - name: Checkout hiperwalk source code (stable)
+      uses: actions/checkout@v3
+      with:
+        repository: hiperwalk/hiperwalk
+        path: hiperwalk
+        ref: 2.0a
+
+    - name: Build docs (stable)
+      run: |
+          pushd hiperwalk/docs/
+          pip3 install -r requirements.txt
+          ./go
+          popd
+
+    - name: Copy Sphinx generated HTML files (stable)
+      run: |
+          mkdir -p ./public/docs/stable
+          cp -r hiperwalk/docs/build/html/* ./public/docs/stable
+          rm -rf hiperwalk
+
+    - name: Checkout hiperwalk source code (latest)
+      uses: actions/checkout@v3
+      with:
+        repository: hiperwalk/hiperwalk
+        path: hiperwalk
+        ref: master
+
+    - name: Build docs (latest)
+      run: |
+          pushd hiperwalk/docs/
+          pip3 install -r requirements.txt
+          ./go
+          popd
+
+    - name: Copy Sphinx generated HTML files (latest)
+      run: |
+          mkdir -p ./public/docs/latest
+          cp -r hiperwalk/docs/build/html/* ./public/docs/latest
+          rm -rf hiperwalk
+
+    - name: Prevent Jekyll processing
+      run: touch ./public/.nojekyll
+
+    - name: Create CNAME
+      run: echo 'hiperwalk.org' >  ./public/CNAME
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        external_repository: hiperwalk/hiperwalk.github.io
+        publish_branch: gh-pages
+        publish_dir: ./public
+
