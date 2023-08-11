@@ -194,9 +194,46 @@ class QuantumWalk(ABC):
         # elem.real**2 + elem.imag**2
         return elem.real*elem.real + elem.imag*elem.imag
 
+    def marked_probability(self, states):
+        r"""
+        Computes the the marked vertices probability
+        for the given state(s).
+
+        The marked vertices probability is the probability of the
+        walker being found in any of the marked vertices.
+        If no vertex is marked,
+        the marked vertices probability is 0.
+
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray`
+            The state(s) used to compute the probability.
+            ``states`` can be a single state or a list of states.
+
+        Returns
+        -------
+        probabilities : float or :class:`numpy.ndarray`
+            float:
+                If ``states`` is a single state.
+            :class:`numpy.ndarray`:
+                If ``states`` is a list of states,
+                ``probabilities[i]`` is the probability
+                corresponding to the ``i``-th state.
+
+        See Also
+        --------
+        probability
+        """
+        if len(self._marked) > 0:
+            return self.probability(states, self._marked)
+
+        if len(states.shape) > 1:
+            return np.zeros(states.shape[0])
+        return 0
+
     def probability(self, states, vertices):
         r"""
-        Computes the vertices probability.
+        Computes the sum of probabilities of the given vertices.
 
         Computes the probability of the walker being found on a
         subset of the vertices in the given state(s).
