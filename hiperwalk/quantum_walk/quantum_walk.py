@@ -382,26 +382,51 @@ class QuantumWalk(ABC):
         *args
             Each entry is a 2-tuple or array with format
             ``(amplitude, vertex)``.
+            An entry may be an array of such tuples.
 
         Returns
         -------
         :class:`numpy.array`
 
+        Notes
+        -----
+        If there are repeated vertices,
+        the amplitude of the last entry is used.
+
         Examples
         --------
-        .. todo::
+        The following commands generate the same state.
 
-            valid example
+        >>> psi = qw.state([1, 0], (1, 1), (1, 2)) #doctest: +SKIP
+        >>> psi1 = qw.state([1, 0], [(1, 1), (1, 2)]) #doctest: +SKIP
+        >>> psi2 = qw.state(([1, 0], (1, 1)), (1, 2)) #doctest: +SKIP
+        >>> psi3 = qw.state([[1, 0], (1, 1), (1, 2)]) #doctest: +SKIP
+        >>> np.all(psi == ps1) #doctest: +SKIP
+        True
+        >>> np.all(psi1 == ps2) #doctest: +SKIP
+        True
+        >>> np.all(psi2 == ps3) #doctest: +SKIP
+        True
         """
-        # TODO benchmark with list comprehension
+        if len(args) == 0:
+            raise TypeError("Entries were not specified.")
 
-        # checking if there is a complex entry
-        has_complex = np.any([ampl.imag != 0 for ampl, _ in args])
-        state = np.zeros(self.hilb_dim,
-                         dtype=complex if has_complex else float)
-        for ampl, v in args:
-            state[v] = ampl
+        state = [0] * self.hilb_dim
+        def add_amplitude(ampl, v):
+            try:
+                state[v] = ampl
+            except:
+                state[self._graph.vertex_label(*v)] = ampl
 
+        for arg in args:
+            if hasattr(arg[0],'__iter__'):
+                for ampl, v in arg:
+                    add_amplitude(ampl, v)
+            else:
+                ampl, v = arg
+                add_amplitude(ampl, v)
+
+        state = np.array(state)
         return self._normalize(state)
 
     def ket(self, label):
