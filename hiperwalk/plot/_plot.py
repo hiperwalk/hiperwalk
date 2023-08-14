@@ -837,5 +837,60 @@ def _plot_probability_distribution_on_plane(
 
 #########################################################################################
 
+def plot_success_probability(time, probabilities, **kwargs):
+    r"""
+    Plots the success probability with respect to time.
+
+    The probabilities must have been calculated previously.
+
+    Parameters
+    ----------
+    time:
+        Time used for the quantum walk simulation.
+        See :meth:`QuantumWalk.simulate` for details.
+
+    probabilities:
+        Success probabilities with respect to ``time``,
+        such that ``probabilities[i]`` corresponds to ``i``-th
+        timestamp described by ``time``.
+
+    **kwargs:
+        Additional arguments to customize plot.
+        See :obj:`matplotlib.pyplot.plot` for the optional keywords.
+
+    See Also
+    --------
+    QuantumWalk.simulate
+    QuantumWalk.success_probability
+    matplotlib.pyplot.plot
+    """
+
+    if hasattr(time, '__iter__'):
+        time = (time)
+    if len(time) == 1:
+        time = (time[0], time[0], 1)
+    elif len(time) == 2:
+        time = (0, time[0], time[1])
+    # else len(time) == 3
+
+    time = list(time)
+    time[1] += time[2]
+    time = np.arange(*time)
+
+
+    if 'marker' not in kwargs:
+        kwargs['marker'] = 'o'
+
+    plt.xlabel('Time', fontsize=18)
+    plt.ylabel('Success probability', fontsize=18)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+
+    ax = plt.gca()
+    ax.set_ylim(0, 1.05*max(probabilities))
+
+    plt.plot(time, probabilities, **kwargs)
+    plt.show()
+
 if __DEBUG__:
     start = time()
