@@ -5,6 +5,7 @@ from PIL import Image
 from ._animation import *
 from .._constants import __DEBUG__
 from ..graph import *
+from ..quantum_walk import QuantumWalk
 
 if __DEBUG__:
     from time import time
@@ -865,15 +866,7 @@ def plot_success_probability(time, probabilities, **kwargs):
     matplotlib.pyplot.plot
     """
 
-    if hasattr(time, '__iter__'):
-        time = (time)
-    if len(time) == 1:
-        time = (time[0], time[0], 1)
-    elif len(time) == 2:
-        time = (0, time[0], time[1])
-    # else len(time) == 3
-
-    time = list(time)
+    time = QuantumWalk._time_to_tuple(time)
     time[1] += time[2]
     time = np.arange(*time)
 

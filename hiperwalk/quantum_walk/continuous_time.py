@@ -447,7 +447,7 @@ class ContinuousTime(QuantumWalk):
                 + "or 3-tuple of float."
             )
 
-        time = np.array(self._time_to_tuple(time))
+        time = np.array(QuantumWalk._time_to_tuple(time))
 
         self.set_time(time=time[2])
 
