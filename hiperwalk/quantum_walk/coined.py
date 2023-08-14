@@ -131,7 +131,7 @@ class Coined(QuantumWalk):
         num_vert = self._graph.number_of_vertices()
         num_arcs = self._graph.number_of_arcs()
 
-        S_cols = [self._graph.arc_label(j, i)
+        S_cols = [self._graph.arc_label((j, i))
                   for i in range(num_vert)
                   for j in self._graph.neighbors(i)]
 
@@ -651,8 +651,8 @@ class Coined(QuantumWalk):
             def get_block(vertex):
                 g = self._graph
                 neighbors = g.neighbors(vertex)
-                start = g.arc_label(vertex, neighbors[0])
-                end = g.arc_label(vertex, neighbors[-1]) + 1
+                start = g.arc_label((vertex, neighbors[0]))
+                end = g.arc_label((vertex, neighbors[-1])) + 1
 
                 return scipy.sparse.csr_array(self._coin[start:end,
                                                          start:end])
@@ -923,23 +923,14 @@ class Coined(QuantumWalk):
             raise TypeError("Entries were not specified.")
 
         state = [0] * self.hilb_dim
-        def add_amplitude(ampl, arc):
-            if len(arc) == 1:
-                arc = arc[0]
-                try:
-                    state[arc] = ampl
-                except:
-                    state[self._graph.arc_label(*arc)] = ampl
-            else:
-                state[self._graph.arc_label(*arc)] = ampl
-
 
         for arg in args:
             if hasattr(arg[0],'__iter__'):
-                for entry in arg:
-                    add_amplitude(entry[0], entry[1:])
+                for ampl, arc in arg:
+                    state[self._graph.arc_label(arc)] = ampl
             else:
-                add_amplitude(arg[0], arg[1:])
+                ampl, arc = arg
+                state[self._graph.arc_label(arc)] = ampl
 
         state = np.array(state)
         return self._normalize(state)
@@ -966,10 +957,11 @@ class Coined(QuantumWalk):
             valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
-        if len(args) == 2:
-            ket[self._graph.arc_label(args[0], args[1])] = 1
-        else:
-            ket[args] = 1
+        # if len(args) == 2:
+        #     ket[self._graph.arc_label(args[0], args[1])] = 1
+        # else:
+        #     ket[args] = 1
+        ket[self._graph.arc_label(args)] = 1
 
         return ket
 

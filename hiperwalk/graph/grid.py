@@ -353,14 +353,13 @@ class Grid(Lattice):
         return (y << 1) + x
 
 
-    def arc_label(self, tail, head):
-        try:
-            tail = self.vertex_label(tail)
-            head = self.vertex_label(head)
-        except TypeError:
-            pass
-        except IndexError:
-            pass
+    def arc_label(self, arc):
+        if not hasattr(arc, '__iter__'):
+            return super().arc_label(arc)
+
+        tail, head = arc
+        tail = self.vertex_label(tail)
+        head = self.vertex_label(head)
 
         if self.adj_matrix[tail, head] == 0:
             raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
@@ -576,7 +575,7 @@ class Grid(Lattice):
             head = self.vertex_label(head)
 
         if not arc_iterable:
-            return self.arc_label(tail, head)
+            return self.arc_label((tail, head))
         return (tail, head)
 
     def dimensions(self):

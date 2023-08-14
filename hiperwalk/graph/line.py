@@ -64,7 +64,11 @@ class Line(Lattice):
         """
         return 'hadamard'
 
-    def arc_label(self, tail, head):
+    def arc_label(self, arc):
+        if not hasattr(arc, '__iter__'):
+            return super().arc_label(arc)
+
+        tail, head = arc
         diff = head - tail
         if diff != 1 and diff != -1:
             raise ValueError('Invalid arc.')
