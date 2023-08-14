@@ -154,26 +154,40 @@ class Graph():
         """
         return 'grover'
 
-    def arc_label(self, tail, head):
+    def arc_label(self, arc):
         r"""
         Returns the numerical label of the arc.
 
         Parameters
         ----------
-        tail: int
-            Tail of the arc.
-
-        head: int
-            Head of the arc.
+        arc: int or tuple of int
+            int:
+                If the numerical arc label itself is passed
+                as argument.
+            (int, int):
+                Arc in arc notation.
+                That is, in ``(tail, head)`` notation.
 
         Returns
         -------
         label: int
             Arc label.
         """
-        return _binary_search(self.adj_matrix.indices, head,
-                              start = self.adj_matrix.indptr[tail],
-                              end = self.adj_matrix.indptr[tail + 1])
+        if not hasattr(arc, '__iter__'):
+            num_arcs = self.number_of_arcs()
+            if arc < 0 and arc >= num_arcs:
+                raise ValueError("Arc value out of range. "
+                                 + "Expected arc value from 0 to "
+                                 + str(num_arcs - 1))
+            return int(arc)
+
+        tail, head = arc
+        arc_label = _binary_search(self.adj_matrix.indices, head,
+                                   start = self.adj_matrix.indptr[tail],
+                                   end = self.adj_matrix.indptr[tail + 1])
+        if arc_label == -1:
+            raise ValueError("Inexistent arc " + str(arc) + ".")
+        return arc_label
 
     def arc(self, label):
         r"""

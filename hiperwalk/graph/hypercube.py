@@ -91,7 +91,11 @@ class Hypercube(Graph):
 
         return direction
 
-    def arc_label(self, tail, head):
+    def arc_label(self, arc):
+        if not hasattr(arc, '__iter__'):
+            return super().arc_label(arc)
+
+        tail, head = arc
         direction = self.arc_direction((tail, head))
         return tail*self._dimension + direction
 

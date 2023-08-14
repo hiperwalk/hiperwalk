@@ -50,7 +50,11 @@ class Cycle(Lattice):
         """
         return 'hadamard'
 
-    def arc_label(self, tail, head):
+    def arc_label(self, arc):
+        if not hasattr(arc, '__iter__'):
+            return super().arc_label(arc)
+
+        tail, head = arc
         num_vert = self.number_of_vertices()
         arc = (2*tail if (head - tail == 1
                           or tail - head == num_vert - 1)
