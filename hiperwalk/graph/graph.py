@@ -154,7 +154,7 @@ class Graph():
         """
         return 'grover'
 
-    def arc_label(self, arc):
+    def arc_number(self, arc):
         r"""
         Returns the numerical label of the arc.
 
@@ -182,18 +182,18 @@ class Graph():
             return int(arc)
 
         tail, head = arc
-        arc_label = _binary_search(self.adj_matrix.indices, head,
+        arc_number = _binary_search(self.adj_matrix.indices, head,
                                    start = self.adj_matrix.indptr[tail],
                                    end = self.adj_matrix.indptr[tail + 1])
-        if arc_label == -1:
+        if arc_number == -1:
             raise ValueError("Inexistent arc " + str(arc) + ".")
-        return arc_label
+        return arc_number
 
     def arc(self, label):
         r"""
         Converts the numerical label to arc notation.
 
-        Given the arc label as a number,
+        Given the arc number,
         returns the arc in the ``(tail, head)`` notation.
 
         Parameters

@@ -30,8 +30,8 @@ class Lattice(ABC, Graph):
             * arc notation: tuple of vertices
                 In ``(tail, head)`` format where
                 ``tail`` and ``head`` must be valid vertices.
-            * arc label: int.
-                The arc label (number).
+            * arc number: int.
+                The numerical arc label.
 
         Returns
         -------
@@ -40,7 +40,7 @@ class Lattice(ABC, Graph):
         See Also
         --------
         arc
-        arc_label
+        arc_number
         """
         raise NotImplementedError
 
@@ -57,8 +57,8 @@ class Lattice(ABC, Graph):
             * arc notation: tuple of vertices
                 In ``(tail, head)`` format where
                 ``tail`` and ``head`` must be valid vertices.
-            * arc label: int.
-                The arc label (number).
+            * arc number: int.
+                The numerical arc label.
 
         Returns
         -------
@@ -67,6 +67,6 @@ class Lattice(ABC, Graph):
         See Also
         --------
         arc
-        arc_label
+        arc_number
         """
         raise NotImplementedError

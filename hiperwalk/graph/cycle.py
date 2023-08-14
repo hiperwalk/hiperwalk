@@ -18,9 +18,9 @@ class Cycle(Lattice):
     we assign the direction ``0`` to the right and ``1`` to the left.
     This assignment alters the order of the arcs.
     Any arc with a tail denoted by :math:`v`
-    has the label :math:`2v` if it points to the right,
-    and the label :math:`2v + 1` if it points to the left.
-    Figure 1 illustrates the arc labels of a cycle with 3 vertices.
+    has the numerical label :math:`2v` if it points to the right,
+    and the numerical label :math:`2v + 1` if it points to the left.
+    Figure 1 illustrates the arc numbers of a cycle with 3 vertices.
 
     .. graphviz:: ../../graphviz/cycle-arcs.dot
         :align: center
@@ -50,9 +50,9 @@ class Cycle(Lattice):
         """
         return 'hadamard'
 
-    def arc_label(self, arc):
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
-            return super().arc_label(arc)
+            return super().arc_number(arc)
 
         tail, head = arc
         num_vert = self.number_of_vertices()

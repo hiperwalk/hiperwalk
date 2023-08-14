@@ -21,13 +21,13 @@ class TestHypercube(unittest.TestCase):
         num_vert = self.g.number_of_vertices()
         self.assertTrue(array == list(range(self.dim))*num_vert)
 
-    def test_arc_label(self):
-        array = [self.g.arc_label((v, v ^ 1 << direction))
+    def test_arc_number(self):
+        array = [self.g.arc_number((v, v ^ 1 << direction))
                  for v in range(self.g.number_of_vertices())
                  for direction in range(self.dim)]
         self.assertTrue(array == list(range(self.g.number_of_arcs())))
 
     def test_arc(self):
-        array = [self.g.arc_label((self.g.arc(a)[0], self.g.arc(a)[1]))
+        array = [self.g.arc_number((self.g.arc(a)[0], self.g.arc(a)[1]))
                  for a in range(self.g.number_of_arcs())]
         self.assertTrue(array == list(range(self.g.number_of_arcs())))
