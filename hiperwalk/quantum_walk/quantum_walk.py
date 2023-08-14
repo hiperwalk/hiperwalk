@@ -116,7 +116,9 @@ class QuantumWalk(ABC):
     def _update_marked(self, marked=[]):
         if not hasattr(marked, '__iter__'):
             marked = [marked]
-        self._marked = np.sort(list(set(marked)))
+
+        self._marked = set(map(self._graph.vertex_label, marked))
+        self._marked = np.sort(list(self._marked))
 
     def set_marked(self, marked=[], **kwargs):
         r"""
@@ -413,19 +415,14 @@ class QuantumWalk(ABC):
             raise TypeError("Entries were not specified.")
 
         state = [0] * self.hilb_dim
-        def add_amplitude(ampl, v):
-            try:
-                state[v] = ampl
-            except:
-                state[self._graph.vertex_label(*v)] = ampl
 
         for arg in args:
             if hasattr(arg[0],'__iter__'):
                 for ampl, v in arg:
-                    add_amplitude(ampl, v)
+                    state[self._graph.vertex_label(v)] = ampl
             else:
                 ampl, v = arg
-                add_amplitude(ampl, v)
+                state[self._graph.vertex_label(v)] = ampl
 
         state = np.array(state)
         return self._normalize(state)
