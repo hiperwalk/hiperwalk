@@ -98,12 +98,12 @@ Next, we create the line using the :class:`hiperwalk.Line` class.
 
 In a simple graph, we associate each edge with two arcs. Suppose we wish
 to know the label of the arc that links vertex 1 to 2. This information
-can be obtained using the :meth:`hiperwalk.Graph.arc_label` method.
+can be obtained using the :meth:`hiperwalk.Graph.arc_number` method.
 Observe the following results:
 
->>> arbitrary_line.arc_label(1, 2)
+>>> arbitrary_line.arc_number(1, 2)
 2
->>> specific_line.arc_label(1, 2)
+>>> specific_line.arc_number(1, 2)
 1
 
 For further details on arc labels for each graph, refer to the Notes

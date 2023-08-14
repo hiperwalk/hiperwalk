@@ -353,9 +353,9 @@ class Grid(Lattice):
         return (y << 1) + x
 
 
-    def arc_label(self, arc):
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
-            return super().arc_label(arc)
+            return super().arc_number(arc)
 
         tail, head = arc
         tail = self.vertex_label(tail)
@@ -387,13 +387,14 @@ class Grid(Lattice):
         r"""
         Arc in arc notation.
 
-        Given the arc label (a number),
+        Given the numerical arc label,
         returns the arc in the ``(tail, head)`` notation.
 
         Parameters
         ----------
-        label : int
-            Arc label (number)
+        arc number : int
+            Numerical arc label.
+
         coordinates : bool, default=True
             Whether the vertices are returned as coordinates or as labels.
 
@@ -575,7 +576,7 @@ class Grid(Lattice):
             head = self.vertex_label(head)
 
         if not arc_iterable:
-            return self.arc_label((tail, head))
+            return self.arc_number((tail, head))
         return (tail, head)
 
     def dimensions(self):

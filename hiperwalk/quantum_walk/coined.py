@@ -131,7 +131,7 @@ class Coined(QuantumWalk):
         num_vert = self._graph.number_of_vertices()
         num_arcs = self._graph.number_of_arcs()
 
-        S_cols = [self._graph.arc_label((j, i))
+        S_cols = [self._graph.arc_number((j, i))
                   for i in range(num_vert)
                   for j in self._graph.neighbors(i)]
 
@@ -651,8 +651,8 @@ class Coined(QuantumWalk):
             def get_block(vertex):
                 g = self._graph
                 neighbors = g.neighbors(vertex)
-                start = g.arc_label((vertex, neighbors[0]))
-                end = g.arc_label((vertex, neighbors[-1])) + 1
+                start = g.arc_number((vertex, neighbors[0]))
+                end = g.arc_number((vertex, neighbors[-1])) + 1
 
                 return scipy.sparse.csr_array(self._coin[start:end,
                                                          start:end])
@@ -881,7 +881,7 @@ class Coined(QuantumWalk):
             An entry can be specified in three different ways:
             ``(amplitude, (tail, head))``,
             ``(amplitude, tail, head)``, and
-            ``(amplitude, arc_label)``.
+            ``(amplitude, arc_number)``.
 
             amplitude
                 The amplitude of the given entry.
@@ -893,8 +893,8 @@ class Coined(QuantumWalk):
                 The vertex to which the coin is pointing.
                 That is, the tuple
                 ``(tail, head)`` must be a valid arc.
-            arc_label
-                The arc label with respect to the arc ordering
+            arc_number
+                The numerical arc label with respect to the arc ordering
                 given by the computational basis.
 
         Notes
@@ -927,10 +927,10 @@ class Coined(QuantumWalk):
         for arg in args:
             if hasattr(arg[0],'__iter__'):
                 for ampl, arc in arg:
-                    state[self._graph.arc_label(arc)] = ampl
+                    state[self._graph.arc_number(arc)] = ampl
             else:
                 ampl, arc = arg
-                state[self._graph.arc_label(arc)] = ampl
+                state[self._graph.arc_number(arc)] = ampl
 
         state = np.array(state)
         return self._normalize(state)
@@ -947,7 +947,7 @@ class Coined(QuantumWalk):
 
             tail, head
                 The arc notation.
-            arc_label
+            arc_number
                 The label of the arc.
                 Its number according to the computational basis order.
 
@@ -958,10 +958,10 @@ class Coined(QuantumWalk):
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
         # if len(args) == 2:
-        #     ket[self._graph.arc_label(args[0], args[1])] = 1
+        #     ket[self._graph.arc_number(args[0], args[1])] = 1
         # else:
         #     ket[args] = 1
-        ket[self._graph.arc_label(args)] = 1
+        ket[self._graph.arc_number(args)] = 1
 
         return ket
 

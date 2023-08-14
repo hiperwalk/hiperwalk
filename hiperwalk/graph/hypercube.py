@@ -91,9 +91,9 @@ class Hypercube(Graph):
 
         return direction
 
-    def arc_label(self, arc):
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
-            return super().arc_label(arc)
+            return super().arc_number(arc)
 
         tail, head = arc
         direction = self.arc_direction((tail, head))

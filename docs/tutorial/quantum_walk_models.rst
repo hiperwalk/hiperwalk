@@ -87,7 +87,7 @@ In the coined quantum walk model,
 the label of a state within the computational basis corresponds 
 to an arc. You can use either the arc notation, which involves 
 specifying the arc's tail and head,
-or the arc label (an integer). Please refer to the Graph class 
+or the arc number (an integer). Please refer to the Graph class 
 for correct arc labeling guidelines.
 
 >>> state = coined.ket(5, 6)
@@ -100,15 +100,15 @@ True
 
 An easy way to convert between arc notation and the numerical label is by using
 the :meth:`hiperwalk.Graph.arc` and
-:meth:`hiperwalk.Graph.arc_label` methods.
+:meth:`hiperwalk.Graph.arc_number` methods.
 
 >>> arc = cycle.arc(10)
 >>> arc
 (5, 6)
->>> cycle.arc_label(arc[0], arc[1])
+>>> cycle.arc_number(arc[0], arc[1])
 10
 >>>
->>> cycle.arc(cycle.arc_label(5, 6))
+>>> cycle.arc(cycle.arc_number(5, 6))
 (5, 6)
 
 In the continuous-time model,
