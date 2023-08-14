@@ -879,55 +879,69 @@ class Coined(QuantumWalk):
         *args
             Each entry is a tuple (or array).
             An entry can be specified in three different ways:
-            ``(amplitude, (vertex, dst_vertex))``,
-            ``(amplitude, arc_label)``,
-            ``(amplitude, vertex, coin)``.
+            ``(amplitude, (tail, head))``,
+            ``(amplitude, tail, head)``, and
+            ``(amplitude, arc_label)``.
 
             amplitude
                 The amplitude of the given entry.
-            vertex
+            tail
                 The vertex corresponding to the position of the walker
                 in the superposition.
-            dst_vertex
+                In other words, the tail of the arc.
+            head
                 The vertex to which the coin is pointing.
-                In other words, the tuple
-                ``(vertex, dst_vertex)`` must be a valid arc.
+                That is, the tuple
+                ``(tail, head)`` must be a valid arc.
             arc_label
                 The arc label with respect to the arc ordering
                 given by the computational basis.
-            coin
-                The direction towards which the coin is pointing.
-                It is dependable on the Graph coloring.
 
         Notes
         -----
-        If entries are repeated (except by the amplitude),
-        they are overwritten by the last one.
+        If there are repeated arcs,
+        the amplitude of the last entry is used.
 
         Examples
         --------
-        .. todo::
-            
-            qw.state([1/np.sqrt(2), 0], [1/np.sqrt(2), (1, 0)])
+        The following commands generate the same state on a
+        ``(dim, dim)``-dimensional grid.
+
+        >>> psi = qw.state((1, (0, 1)), [1, 1], (1, 2))
+        >>> psi1 = qw.state((1, ([0, 0], [1, 0])),
+        ...                 [[1, (0, dim - 1)],
+        ...                  (1, [(0, 0), [0, 1]])])
+        >>> psi2 = qw.state([(1, [0, 0], [1, 0]),
+        ...                  [1, 0, dim - 1]],
+        ...                 (1, (0, 0), [0, 1]))
+        >>> np.all(psi == ps1) #doctest: +SKIP
+        True
+        >>> np.all(psi1 == ps2) #doctest: +SKIP
+        True
         """
+        if len(args) == 0:
+            raise TypeError("Entries were not specified.")
 
-        has_complex = np.any([arg[0].imag != 0 for arg in args])
-        state = np.zeros(self.hilb_dim, dtype=complex if has_complex
-                                                      else float)
-
-        for entry in args:
-            if len(entry) == 3:
-                raise NotImplementedError(
-                    'position-coin notation not implemented')
-
-            if hasattr(entry[1], '__iter__'):
-                # arc notation
-                head, tail = entry[1]
-                state[self._graph.arc_label(head, tail)] = entry[0]
+        state = [0] * self.hilb_dim
+        def add_amplitude(ampl, arc):
+            if len(arc) == 1:
+                arc = arc[0]
+                try:
+                    state[arc] = ampl
+                except:
+                    state[self._graph.arc_label(*arc)] = ampl
             else:
-                # arc label
-                state[entry[1]] = entry[0]
+                state[self._graph.arc_label(*arc)] = ampl
 
+
+        for arg in args:
+            if hasattr(arg[0],'__iter__'):
+                for entry in arg:
+                    add_amplitude(entry[0], entry[1:])
+            else:
+                add_amplitude(arg[0], arg[1:])
+
+        state = np.array(state)
         return self._normalize(state)
 
     def ket(self, *args):
