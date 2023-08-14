@@ -924,13 +924,19 @@ class Coined(QuantumWalk):
 
         state = [0] * self.hilb_dim
 
+        def add_entry(entry):
+            ampl = entry[0]
+            arc = entry[1:]
+            if len(arc) == 1:
+                arc = arc[0]
+            state[self._graph.arc_number(arc)] = ampl
+
         for arg in args:
             if hasattr(arg[0],'__iter__'):
-                for ampl, arc in arg:
-                    state[self._graph.arc_number(arc)] = ampl
+                for entry in arg:
+                    add_entry(entry)
             else:
-                ampl, arc = arg
-                state[self._graph.arc_number(arc)] = ampl
+                add_entry(arg)
 
         state = np.array(state)
         return self._normalize(state)
