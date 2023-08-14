@@ -154,25 +154,42 @@ class Graph():
         """
         return 'grover'
 
-    def arc_number(self, arc):
+    def arc_number(self, *args):
         r"""
         Returns the numerical label of the arc.
 
         Parameters
         ----------
-        arc: int or tuple of int
+        *args:
             int:
-                If the numerical arc label itself is passed
+                The numerical arc label itself is passed
                 as argument.
-            (int, int):
+            (tail, head):
                 Arc in arc notation.
-                That is, in ``(tail, head)`` notation.
+            tail, head:
+                Arc in arc notation,
+                but ``tail`` and ``head`` are passed as
+                different arguments, not as a tuple.
 
         Returns
         -------
         label: int
             Arc label.
+
+        Examples
+        --------
+        If arc ``(0, 1)`` exists, the following commands should return
+        the same result.
+
+        >>> qw.arc_number(0)
+        0
+        >>> qw.arc_number((0, 1))
+        0
+        >>> qw.arc_number(0, 1)
+        0
         """
+        arc = (args[0], args[1]) if len(args) == 2 else args[0]
+
         if not hasattr(arc, '__iter__'):
             num_arcs = self.number_of_arcs()
             if arc < 0 and arc >= num_arcs:

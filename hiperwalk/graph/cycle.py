@@ -50,7 +50,9 @@ class Cycle(Lattice):
         """
         return 'hadamard'
 
-    def arc_number(self, arc):
+    def arc_number(self, *args):
+        arc = (args[0], args[1]) if len(args) == 2 else args[0]
+
         if not hasattr(arc, '__iter__'):
             return super().arc_number(arc)
 
