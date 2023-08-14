@@ -321,7 +321,8 @@ class QuantumWalk(ABC):
 
         return prob[0] if single_state else prob
 
-    def _time_to_tuple(self, time):
+    @staticmethod
+    def _time_to_tuple(time):
         r"""
         Clean and format ``time`` to ``(start, end, step)`` format.
 
@@ -601,7 +602,7 @@ class QuantumWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        time = np.array(self._time_to_tuple(time))
+        time = np.array(QuantumWalk._time_to_tuple(time))
 
         if not np.all([e.is_integer() for e in time]):
             raise ValueError("`time` has non-int entry.")
