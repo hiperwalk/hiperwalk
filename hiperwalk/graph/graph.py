@@ -241,3 +241,40 @@ class Graph():
         """
         indptr = self.adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
+
+    def vertex_label(self, vertex):
+        r"""
+        Returns vertex label (number) given any vertex representation.
+
+        By invoking this method,
+        the vertex label is returned regardless of its representation.
+        There are some graphs in which a vertex may have multiple
+        representations.
+        For example, coordinates in a grid.
+        For general graphs,
+        this function returns the argument itself.
+
+        Parameters
+        ----------
+        vertex: int
+            The vertex in any of its representation.
+            For general graphs,
+            only its label is accepted.
+
+        Returns
+        -------
+        int
+            Vertex label.
+
+        Notes
+        -----
+        It is useful to have this function implemented for general graphs
+        to simplify the implementation of some quantum walk methods.
+        """
+        vertex = int(vertex)
+        num_vert = self.number_of_vertices()
+        if vertex < 0 or vertex >= num_vert:
+            raise ValueError("Vertex label out of range. " +
+                             "Expected integer value from 0 to" +
+                             str(num_vert - 1))
+        return vertex

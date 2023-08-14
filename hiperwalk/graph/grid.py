@@ -262,16 +262,21 @@ class Grid(Lattice):
         return (label % self.x_dim, label // self.x_dim)
 
 
-    def vertex_label(self, x, y):
+    def vertex_label(self, vertex):
         r"""
-        Returns vertex label (number) given its coordinates.
+        Returns vertex label (number) given any vertex representation.
+
+        By invoking this method,
+        the vertex label is returned regardless of its representation.
+        The representation may be the vertex itself or its coordinates.
 
         Parameters
         ----------
-        x : int
-            Vertex X-coordinate.
-        y : int
-            Vertex Y-coordinate.
+        vertex: int or tuple of int
+            * int :
+                The vertex label.
+            * (int, int):
+                The vertex coordinates in ``(x, y)`` format.
 
         Returns
         -------
@@ -282,6 +287,10 @@ class Grid(Lattice):
         --------
         vertex_coordinates
         """
+        if not hasattr(vertex, '__iter__'):
+            return super().vertex_label(vertex)
+
+        x, y = vertex
         return (x + self.x_dim*y) % self.number_of_vertices()
 
     def arc_direction(self, arc):
@@ -346,8 +355,8 @@ class Grid(Lattice):
 
     def arc_label(self, tail, head):
         try:
-            tail = self.vertex_label(tail[0], tail[1])
-            head = self.vertex_label(head[0], head[1])
+            tail = self.vertex_label(tail)
+            head = self.vertex_label(head)
         except TypeError:
             pass
         except IndexError:
@@ -445,7 +454,7 @@ class Grid(Lattice):
     def neighbors(self, vertex):
         iterable = hasattr(vertex, '__iter__')
         if iterable:
-            vertex = self.vertex_label(vertex[0], vertex[1])
+            vertex = self.vertex_label(vertex)
 
         neigh = super().neighbors(vertex)
 
@@ -455,7 +464,7 @@ class Grid(Lattice):
 
     def arcs_with_tail(self, tail):
         try:
-            tail = self.vertex_label(tail[0], tail[1])
+            tail = self.vertex_label(tail)
         except TypeError:
             pass
 
@@ -463,7 +472,7 @@ class Grid(Lattice):
 
     def degree(self, vertex):
         try:
-            vertex = self.vertex_label(vertex[0], vertex[1])
+            vertex = self.vertex_label(vertex)
         except TypeError:
             pass
 
@@ -515,8 +524,8 @@ class Grid(Lattice):
                 head = new_head
 
         if not iterable:
-            tail = self.vertex_label(tail[0], tail[1])
-            head = self.vertex_label(head[0], head[1])
+            tail = self.vertex_label(tail)
+            head = self.vertex_label(head)
         return (tail, head)
 
     def previous_arc(self, arc):
@@ -563,8 +572,8 @@ class Grid(Lattice):
                 tail = new_tail
 
         if not vertex_iterable:
-            tail = self.vertex_label(tail[0], tail[1]),
-            head = self.vertex_label(head[0], head[1])
+            tail = self.vertex_label(tail),
+            head = self.vertex_label(head)
 
         if not arc_iterable:
             return self.arc_label(tail, head)
