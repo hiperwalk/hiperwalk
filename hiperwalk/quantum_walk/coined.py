@@ -445,13 +445,47 @@ class Coined(QuantumWalk):
         self._update_coin(coin=coin)
         self._update_evolution(**kwargs)
 
+    def default_coin(self):
+        r"""
+        Returns the default coin name.
+
+        The default coin name depends on the graph on
+        which the quantum walk occurs.
+        In general, the default coin is ``'grover'``.
+        For the :class:`hiperwalk.Line` and :class:`hiperwalk.Cycle`,
+        the default coin is ``'hadamard'``.
+
+        Returns
+        -------
+        str
+
+        Notes
+        -----
+        Although the default coin depends on the graph,
+        the coin is not an attribute of the graph.
+        That is, it is part of graph theory.
+        In addition, it does not make sense to have a
+        default coin in continuous-time quantum walks.
+        Hence, the method is implemented in the Coined class
+        instead of each graph class.
+
+        Following duck typing,
+        we do not verify if the graph is an instance of the line or cycle.
+        Instead, we verify if the maximum degree on the graph is at most 2.
+        """
+        degs = list(map(self._graph.degree,
+                        np.arange(self._graph.number_of_vertices())))
+        if max(degs) <= 2:
+            return 'hadamard'
+        return 'grover'
+
     def _coin_to_valid_name(self, coin):
         r"""
         Convert a string to its respective valid coin name.
         """
         s = coin
         if s == 'default' or s == 'd':
-            s = self._graph.default_coin()
+            s = self.default_coin()
         
         if len(s) <= 2:
             prefix = 'minus_' if len(coin) == 2 else ''
