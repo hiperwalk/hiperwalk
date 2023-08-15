@@ -64,7 +64,7 @@ array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
 
 This state corresponds to the walker on
 vertex 5 with the coin pointing to vertex 6
-(keep in mind that the vertex labels range from 0 to 10).
+(keep in mind that the vertex numbers range from 0 to 10).
 
 To run the simulation, we must specify the initial state and
 the number of steps
