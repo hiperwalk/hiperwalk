@@ -86,13 +86,13 @@ Display the results
 Presenting the results can be as straightforward as printing them.
 
 >>> final_state
-array([[ 0.1767767 +0.j,  0.        +0.j,  0.        +0.j,
-        -0.1767767 +0.j,  0.35355339+0.j,  0.        +0.j,
-         0.        +0.j,  0.        +0.j, -0.35355339+0.j,
-         0.        +0.j,  0.        +0.j,  0.        +0.j,
-         0.35355339+0.j,  0.        +0.j,  0.        +0.j,
-         0.70710678+0.j,  0.1767767 +0.j,  0.        +0.j,
-         0.        +0.j,  0.1767767 +0.j]])
+array([[ 0.1767767 ,  0.        ,  0.        , -0.1767767 ,  0.35355339,
+         0.        ,  0.        ,  0.        , -0.35355339,  0.        ,
+         0.        ,  0.        ,  0.35355339,  0.        ,  0.        ,
+         0.70710678,  0.1767767 ,  0.        ,  0.        ,  0.1767767 ]])
+
+
+
          
 
 Or, the output could be more sophisticated. Often, we are interested 

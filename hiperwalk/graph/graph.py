@@ -178,14 +178,24 @@ class Graph():
 
         Examples
         --------
-        If arc ``(0, 1)`` exists, the following commands should return
+        If arc ``(0, 1)`` exists, the following commands return
         the same result.
 
-        >>> qw.arc_number(0)
+        .. testsetup::
+
+            import networkx as nx
+            from sys import path
+            path.append('../..')
+            import hiperwalk as hpw
+            nxg = nx.cycle_graph(10)
+            adj_matrix = nx.adjacency_matrix(nxg)
+            graph = hpw.Graph(adj_matrix)
+
+        >>> graph.arc_number(0) #arc number 0
         0
-        >>> qw.arc_number((0, 1))
+        >>> graph.arc_number((0, 1)) #arc as tuple
         0
-        >>> qw.arc_number(0, 1)
+        >>> graph.arc_number(0, 1) #tail and head in separate arguments
         0
         """
         arc = (args[0], args[1]) if len(args) == 2 else args[0]

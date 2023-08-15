@@ -313,9 +313,6 @@ Continuous-time Model
 '''''''''''''''''''''
 The dynamics of the continuous-time quantum walk is
 fully defined by the Hamiltonian.
-As a result, calling :meth:`hiperwalk.ContinuousTime.set_evolution`
-is the same as calling :meth:`hiperwalk.ContinuousTime.set_hamiltonian`
-in the same class.
 The Hamiltonian is given by
 
 .. math::
@@ -327,25 +324,27 @@ where :math:`A` is the graph adjacency matrix and
 Therefore, the ``set_hamiltonian`` method accepts two arguments:
 * ``gamma``: the value of gamma.
 * ``marked``: the list of marked vertices.
-For example,
 
->>> continuous2 = hpw.ContinuousTime(graph=cycle, gamma=0.35, marked=0)
->>> continuous2 #doctest: +SKIP
-<hiperwalk.quantum_walk.continuous_walk.ContinuousTime object at 0x7ffad2de9510>
-
-The evolution operator is defined as
+On the other hand,
+the evolution operator is defined as
 
 .. math::
 
    U = e^{-\text{i} t H}.
 
-Since the continuous-time evolution operator is time-dependent,
-it should be generated as needed, based on the most recent timestamp. 
+Note that the continuous-time evolution operator is time-dependent.
+The ``time`` may be specified using the constructor, by the
+:meth:`hiperwalk.ContinuousTime.set_time` method or by the
+:meth:`hiperwalk.ContinuousTime.set_evolution`.
+If ``time`` is omitted, it is set to 0 and
+the evolution operator equals the identity.
 
->>> U = continuous.get_evolution(time=1)
->>> continuous.set_marked(marked=0)
->>> U2 = continuous.get_evolution(time=1)
->>> np.any(U != U2)
+>>> I = continuous.get_evolution() # time was omitted on the constructor
+>>> np.all(I == np.eye(I.shape[0]))
+True
+>>> continuous.set_time(1)
+>>> U = continuous.get_evolution()
+>>> np.any(U != I)
 True
 
 Simulation Invocation
@@ -451,6 +450,11 @@ it is converted to ``(20, 1)``, which
 results in the states corresponding to the timestamps
 ``[ 0.       ,  0.5000001,  1.0000002,  ...,  9.5000019, 10.000002 ])``.
 
+In the continuous-time quantum walk model,
+it is recommended that ``step`` has the same value as
+the ``time`` used in the constructor or in the ``set_evolution``.
+Otherwise, the evolution operator is computated twice.
+
 Calculating Probability
 -----------------------
 
@@ -458,12 +462,13 @@ There are two ways of calculating probabilities:
 :meth:`hiperwalk.QuantumWalk.probability` and
 :meth:`hiperwalk.QuantumWalk.probability_distribution`.
 :meth:`hiperwalk.QuantumWalk.probability` computes
-the probability of each state entry.
+the probability of the walker being found on a
+subset of the vertices for each state.
 
->>> probs = coined.probability(states)
+>>> probs = coined.probability(states, [0, 1, 2])
 >>> len(probs) == len(states)
 True
->>> len(probs[0]) == len(states[0])
+>>> np.all([0 <= p and p <= 1  for p in probs])
 True
 
 :meth:`hiperwalk.QuantumWalk.probability_distribution`

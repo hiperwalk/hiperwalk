@@ -1,6 +1,6 @@
 import numpy as np
 import scipy.sparse
-from .graph import Graph
+from .graph import *
 from warnings import warn
 
 class Hypercube(Graph):
