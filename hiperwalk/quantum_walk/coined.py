@@ -368,7 +368,6 @@ class Coined(QuantumWalk):
 
         if __DEBUG__:
             if self._coin is None: raise AssertionError
-            if self._evolution is not None: raise AssertionError
 
     def set_coin(self, coin='default', **kwargs):
         """
@@ -491,9 +490,11 @@ class Coined(QuantumWalk):
                 value = coin[key]
                 if value != []:
                     if not hasattr(value, '__iter__'):
-                        value = [value]
-                    for vertex in value:
-                        coin_list[vertex] = coin_name
+                        raise TypeError("Expected a list of vertices. "
+                                + "Received " + str(type(value)) + " "
+                                + "with value " + str(value) + " instead.")
+                    for v in value:
+                        coin_list[self._graph.vertex_number(v)] = coin_name
                 else:
                     coin_list = [coin_name if coin_list[i] == ''
                                  else coin_list[i]
