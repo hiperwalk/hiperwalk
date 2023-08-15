@@ -117,7 +117,7 @@ class QuantumWalk(ABC):
         if not hasattr(marked, '__iter__'):
             marked = [marked]
 
-        self._marked = set(map(self._graph.vertex_label, marked))
+        self._marked = set(map(self._graph.vertex_number, marked))
         self._marked = np.sort(list(self._marked))
 
     def set_marked(self, marked=[], **kwargs):
@@ -419,10 +419,10 @@ class QuantumWalk(ABC):
         for arg in args:
             if hasattr(arg[0],'__iter__'):
                 for ampl, v in arg:
-                    state[self._graph.vertex_label(v)] = ampl
+                    state[self._graph.vertex_number(v)] = ampl
             else:
                 ampl, v = arg
-                state[self._graph.vertex_label(v)] = ampl
+                state[self._graph.vertex_number(v)] = ampl
 
         state = np.array(state)
         return self._normalize(state)

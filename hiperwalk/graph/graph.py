@@ -273,17 +273,17 @@ class Graph():
         indptr = self.adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
 
-    def vertex_label(self, vertex):
+    def vertex_number(self, vertex):
         r"""
-        Returns vertex label (number) given any vertex representation.
+        Returns vertex number given any vertex representation.
 
         By invoking this method,
-        the vertex label is returned regardless of its representation.
+        the vertex number is returned regardless of its representation.
         There are some graphs in which a vertex may have multiple
         representations.
         For example, coordinates in a grid.
         For general graphs,
-        this function returns the argument itself.
+        this function returns the argument itself if valid.
 
         Parameters
         ----------
@@ -295,7 +295,7 @@ class Graph():
         Returns
         -------
         int
-            Vertex label.
+            Vertex number.
 
         Notes
         -----
