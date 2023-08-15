@@ -55,15 +55,6 @@ class Line(Lattice):
         # initializing
         super().__init__(adj_matrix)
 
-    def default_coin(self):
-        r"""
-        Returns the default coin name.
-
-        The default coin for a coined quantum walk on a
-        segment is ``'hadamard'``.
-        """
-        return 'hadamard'
-
     def arc_number(self, *args):
         arc = (args[0], args[1]) if len(args) == 2 else args[0]
 

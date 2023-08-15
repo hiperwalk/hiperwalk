@@ -145,15 +145,6 @@ class Graph():
         self.adj_matrix = adj_matrix
         self.coloring = None
 
-    def default_coin(self):
-        r"""
-        Returns the default coin for the given graph.
-
-        The default coin for a coined quantum walk on an arbitrary
-        graph is ``grover``.
-        """
-        return 'grover'
-
     def arc_number(self, *args):
         r"""
         Returns the numerical label of the arc.
