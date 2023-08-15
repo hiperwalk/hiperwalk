@@ -907,6 +907,16 @@ class Coined(QuantumWalk):
         The following commands generate the same state on a
         ``(dim, dim)``-dimensional grid.
 
+        .. testsetup::
+
+            from sys import path
+            path.append('../..')
+            import hiperwalk as hpw
+            import numpy as np
+            dim = 10
+            g = hpw.Grid((dim, dim))
+            qw = hpw.Coined(graph=g)
+
         >>> psi = qw.state((1, (0, 1)), [1, 1], (1, 2))
         >>> psi1 = qw.state((1, ([0, 0], [1, 0])),
         ...                 [[1, (0, dim - 1)],
@@ -914,9 +924,9 @@ class Coined(QuantumWalk):
         >>> psi2 = qw.state([(1, [0, 0], [1, 0]),
         ...                  [1, 0, dim - 1]],
         ...                 (1, (0, 0), [0, 1]))
-        >>> np.all(psi == ps1) #doctest: +SKIP
+        >>> np.all(psi == psi1)
         True
-        >>> np.all(psi1 == ps2) #doctest: +SKIP
+        >>> np.all(psi1 == psi2)
         True
         """
         if len(args) == 0:
@@ -949,10 +959,13 @@ class Coined(QuantumWalk):
         ----------
         *args
             The ket label.
-            There are two different labels acceptable.
+            There are three different labels acceptable.
 
-            tail, head
+            (tail, head)
                 The arc notation.
+            tail, head
+                The arc notation with ``tail`` and ``head`` as
+                separate arguments.
             arc_number
                 The label of the arc.
                 Its number according to the computational basis order.
@@ -963,11 +976,7 @@ class Coined(QuantumWalk):
             valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
-        # if len(args) == 2:
-        #     ket[self._graph.arc_number(args[0], args[1])] = 1
-        # else:
-        #     ket[args] = 1
-        ket[self._graph.arc_number(args)] = 1
+        ket[self._graph.arc_number(*args)] = 1
 
         return ket
 
