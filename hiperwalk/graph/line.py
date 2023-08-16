@@ -71,13 +71,13 @@ class Line(Lattice):
                                or tail == num_vert - 1)
                 else tail*2)
 
-    def arc(self, label):
-        label += 1
-        tail = label//2
+    def arc(self, number):
+        number += 1
+        tail = number//2
         num_vert = self.number_of_vertices()
-        head = (tail + (-1)**(label % 2)
+        head = (tail + (-1)**(number % 2)
                 if tail != 0 and tail != num_vert - 1
-                else tail - (-1)**(label % 2))
+                else tail - (-1)**(number % 2))
         return (tail, head)
 
     def next_arc(self, arc):
