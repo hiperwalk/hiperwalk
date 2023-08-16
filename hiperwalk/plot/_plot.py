@@ -304,7 +304,7 @@ def _default_graph_kwargs(kwargs, plot):
         if plot is None:
             plot = 'graph'
 
-            nx_graph = nx.from_scipy_sparse_array(graph.adj_matrix)
+            nx_graph = nx.from_scipy_sparse_array(graph.adjacency_matrix())
             for v in nx_graph:
                 try:
                     nx_graph.nodes[v]["subset"] = v.bit_count()
@@ -379,7 +379,8 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     if isinstance(graph, scipy.sparse.csr_array):
         kwargs['graph'] = nx.from_scipy_sparse_array(graph)
     elif isinstance(graph, Graph):
-        kwargs['graph'] = nx.from_scipy_sparse_array(graph.adj_matrix)
+        adj_matrix = graph.adjacency_matrix()
+        kwargs['graph'] = nx.from_scipy_sparse_array(adj_matrix)
 
     if 'adj_matrix' in kwargs:
         # Pops adj_matrix if both graph and adj_matrix keywords are set;
