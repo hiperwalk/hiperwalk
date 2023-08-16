@@ -143,7 +143,7 @@ class Graph():
         # * Add option: numpy dense matrix as parameters.
         # * Add option: networkx graph as parameter.
         self._adj_matrix = adj_matrix
-        self.coloring = None
+        self._coloring = None
 
     def arc_number(self, *args):
         r"""
