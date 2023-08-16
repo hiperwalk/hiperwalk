@@ -49,7 +49,7 @@ class CompleteBipartite(Graph):
                              + ". But values " + str(tail) + " and " +
                              str(head) + " were received.")
 
-        arc_number = 0
+        arc_number = None
         if tail < self._num_vert1 and head >= self._num_vert1:
             head -= self._num_vert1
             arc_number = tail*self._num_vert2 + head
@@ -73,15 +73,15 @@ class CompleteBipartite(Graph):
         num_edges = self.number_of_edges()
         if number < num_edges:
             # tail in V_1 and head in V_2
-            tail = number // self._num_vert1
-            head = number % self._num_vert1
+            tail = number // self._num_vert2
+            head = number % self._num_vert2
             head += self._num_vert1
         else:
             # tail in V_2 and head in V_1
             number -= num_edges
-            tail = number // self._num_vert2
+            tail = number // self._num_vert1
             tail += self._num_vert1
-            head = number % self._num_vert2
+            head = number % self._num_vert1
 
         return (tail, head)
 
