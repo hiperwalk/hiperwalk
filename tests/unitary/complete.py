@@ -6,7 +6,7 @@ from test_constants import *
 import hiperwalk as hpw
 import unittest
 
-class TestHypercube(unittest.TestCase):
+class TestComplete(unittest.TestCase):
     
     def setUp(self):
         self.num_vert = 49
