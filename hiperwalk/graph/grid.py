@@ -364,13 +364,13 @@ class Grid(Lattice):
         tail = self.vertex_number(tail)
         head = self.vertex_number(head)
 
-        if self.adj_matrix[tail, head] == 0:
+        if self._adj_matrix[tail, head] == 0:
             raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
 
         if self.periodic:
             return 4*tail + self.arc_direction((tail, head))
 
-        label = self.adj_matrix.indptr[tail]
+        label = self._adj_matrix.indptr[tail]
         direction = self.arc_direction((tail, head))
         if self.diagonal:
             raise NotImplementedError
@@ -433,7 +433,7 @@ class Grid(Lattice):
         else:
             # not diagonal
             tail, _ = super().arc(label)
-            diff = label - self.adj_matrix.indptr[tail]
+            diff = label - self._adj_matrix.indptr[tail]
             num_vert = self.number_of_vertices()
 
             for coin in range(4):

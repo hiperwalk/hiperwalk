@@ -154,7 +154,7 @@ class ContinuousTime(QuantumWalk):
         If this method is invoked,
         the hamiltonian is recalculated
         """
-        self._hamiltonian = -self._gamma * self._graph.adj_matrix
+        self._hamiltonian = -self._gamma * self._graph.adjacency_matrix()
 
         # creating oracle
         if len(self._marked) > 0:

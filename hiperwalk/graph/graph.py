@@ -142,7 +142,7 @@ class Graph():
         # * Check if valid adjacency matrix
         # * Add option: numpy dense matrix as parameters.
         # * Add option: networkx graph as parameter.
-        self.adj_matrix = adj_matrix
+        self._adj_matrix = adj_matrix
         self.coloring = None
 
     def arc_number(self, *args):
@@ -200,9 +200,9 @@ class Graph():
             return int(arc)
 
         tail, head = arc
-        arc_number = _binary_search(self.adj_matrix.indices, head,
-                                   start = self.adj_matrix.indptr[tail],
-                                   end = self.adj_matrix.indptr[tail + 1])
+        arc_number = _binary_search(self._adj_matrix.indices, head,
+                                   start = self._adj_matrix.indptr[tail],
+                                   end = self._adj_matrix.indptr[tail + 1])
         if arc_number == -1:
             raise ValueError("Inexistent arc " + str(arc) + ".")
         return arc_number
@@ -224,7 +224,7 @@ class Graph():
         (int, int)
             Arc in the arc notation ``(tail, head)``.
         """
-        adj_matrix = self.adj_matrix
+        adj_matrix = self._adj_matrix
         head = adj_matrix.indices[label]
         # TODO: binary search
         for tail in range(len(adj_matrix.indptr)):
@@ -236,22 +236,22 @@ class Graph():
         r"""
         Returns all neighbors of the given vertex.
         """
-        start = self.adj_matrix.indptr[vertex]
-        end = self.adj_matrix.indptr[vertex + 1]
-        return self.adj_matrix.indices[start:end]
+        start = self._adj_matrix.indptr[vertex]
+        end = self._adj_matrix.indptr[vertex + 1]
+        return self._adj_matrix.indices[start:end]
 
     def arcs_with_tail(self, tail):
         r"""
         Returns all arcs that have the given tail.
         """
-        arcs_lim = self.adj_matrix.indptr
+        arcs_lim = self._adj_matrix.indptr
         return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
 
     def number_of_vertices(self):
         r"""
         Cardinality of vertex set.
         """
-        return self.adj_matrix.shape[0]
+        return self._adj_matrix.shape[0]
 
     def number_of_arcs(self):
         r"""
@@ -259,19 +259,19 @@ class Graph():
 
         For simple graphs, the cardinality is twice the number of edges.
         """
-        return self.adj_matrix.sum()
+        return self._adj_matrix.sum()
 
     def number_of_edges(self):
         r"""
         Cardinality of edge set.
         """
-        return self.adj_matrix.sum() >> 1
+        return self._adj_matrix.sum() >> 1
 
     def degree(self, vertex):
         r"""
         Degree of given vertex.
         """
-        indptr = self.adj_matrix.indptr
+        indptr = self._adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
 
     def vertex_number(self, vertex):
@@ -310,3 +310,18 @@ class Graph():
                              "Expected integer value from 0 to" +
                              str(num_vert - 1))
         return vertex
+
+    def adjacency_matrix(self):
+        r"""
+        Returns the graph adjacency matrix.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`.
+
+        Notes
+        -----
+        .. todo::
+            Add other return types depending on the stored matrix type.
+        """
+        return self._adj_matrix

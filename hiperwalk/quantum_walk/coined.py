@@ -887,8 +887,8 @@ class Coined(QuantumWalk):
         def get_entries(state, indexes):
             return np.array([state[i] for i in indexes])
 
-        num_vert = self._graph.number_of_vertices()
         graph = self._graph
+        num_vert = graph.number_of_vertices()
         prob = np.array([[Coined._elementwise_probability(
                               get_entries(
                                   states[i],
