@@ -37,11 +37,11 @@ class Complete(Graph):
 
         tail, head = arc
         arc_number = (self._num_vert - 1) * tail + head
-        return arc_number if tail <= head else arc_number - 1
+        return arc_number if tail > head else arc_number - 1
 
     def arc(self, number):
-        tail = number // self._num_vert
-        head = number % self._num_vert
+        tail = number // (self._num_vert - 1)
+        head = number % (self._num_vert - 1)
         if head >= tail:
             head += 1
         return (tail, head)
@@ -51,7 +51,8 @@ class Complete(Graph):
         return np.delete(neigh, vertex)
 
     def arcs_with_tail(self, tail):
-        return np.arange(self._num_vert*tail, self._num_vert*(tail + 1))
+        return np.arange((self._num_vert - 1)*tail,
+                         (self._num_vert - 1)*(tail + 1))
 
     def number_of_vertices(self):
         return self._num_vert
