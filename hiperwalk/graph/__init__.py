@@ -5,3 +5,4 @@ from .line import *
 from .grid import *
 from .hypercube import *
 from .complete import *
+from .complete_bipartite import *
