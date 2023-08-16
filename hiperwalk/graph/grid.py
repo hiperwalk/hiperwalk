@@ -386,7 +386,7 @@ class Grid(Lattice):
                  else 0)
         return label + direction - sub_x - sub_y
 
-    def arc(self, label, coordinates=True):
+    def arc(self, number, coordinates=True):
         r"""
         Arc in arc notation.
 
@@ -395,11 +395,12 @@ class Grid(Lattice):
 
         Parameters
         ----------
-        arc number : int
+        number : int
             Numerical arc label.
 
         coordinates : bool, default=True
-            Whether the vertices are returned as coordinates or as labels.
+            Whether the vertices are returned as coordinates or as
+            a single number.
 
         Returns
         -------
@@ -409,15 +410,15 @@ class Grid(Lattice):
 
             (vertex_x, vertex_y) : (int, int)
                 If ``coordinates=True``.
-            label : int
+            number : int
                 If ``coordinates=False``.
         """
         if not self.periodic and self.diagonal:
             raise NotImplementedError
 
         if self.periodic:
-            tail = label // 4
-            coin = label % 4
+            tail = number // 4
+            coin = number % 4
             num_vert = self.number_of_vertices()
             x_dim = self.x_dim
             if self.diagonal:
@@ -432,8 +433,8 @@ class Grid(Lattice):
 
         else:
             # not diagonal
-            tail, _ = super().arc(label)
-            diff = label - self._adj_matrix.indptr[tail]
+            tail, _ = super().arc(number)
+            diff = number - self._adj_matrix.indptr[tail]
             num_vert = self.number_of_vertices()
 
             for coin in range(4):

@@ -207,17 +207,17 @@ class Graph():
             raise ValueError("Inexistent arc " + str(arc) + ".")
         return arc_number
 
-    def arc(self, label):
+    def arc(self, number):
         r"""
-        Converts the numerical label to arc notation.
+        Converts the arc number to arc notation.
 
         Given the arc number,
         returns the arc in the ``(tail, head)`` notation.
 
         Parameters
         ----------
-        label: int
-            Arc label (number)
+        number: int
+            The arc number
 
         Returns
         -------
@@ -225,10 +225,10 @@ class Graph():
             Arc in the arc notation ``(tail, head)``.
         """
         adj_matrix = self._adj_matrix
-        head = adj_matrix.indices[label]
-        # TODO: binary search
+        head = adj_matrix.indices[number]
+        #TODO: binary search
         for tail in range(len(adj_matrix.indptr)):
-            if adj_matrix.indptr[tail + 1] > label:
+            if adj_matrix.indptr[tail + 1] > number:
                 break
         return (tail, head)
 

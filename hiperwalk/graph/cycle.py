@@ -57,9 +57,9 @@ class Cycle(Lattice):
                else 2*tail + 1)
         return arc
 
-    def arc(self, label):
-        tail = label//2
-        remainder = label % 2
+    def arc(self, number):
+        tail = number//2
+        remainder = number % 2
         head = (tail + (-1)**remainder) % self.number_of_vertices()
         return (tail, head)
 

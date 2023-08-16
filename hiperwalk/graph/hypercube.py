@@ -101,9 +101,9 @@ class Hypercube(Graph):
         direction = self.arc_direction((tail, head))
         return tail*self._dimension + direction
 
-    def arc(self, label):
-        tail = label // self._dimension
-        direction = label - tail*self._dimension
+    def arc(self, number):
+        tail = number // self._dimension
+        direction = number - tail*self._dimension
         head = tail ^ (1 << direction)
         return (tail, head)
 
