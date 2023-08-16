@@ -121,9 +121,9 @@ class CompleteBipartite(Graph):
                          + str(vertex) + " instead.")
 
     def adjacency_matrix(self):
-        A = np.zeros((self._num_vert1, self._num_vert1))
-        B = np.ones((self._num_vert1, self._num_vert2))
-        C = np.ones((self._num_vert2, self._num_vert1))
-        D = np.zeros((self._num_vert2, self._num_vert2))
+        A = np.zeros((self._num_vert1, self._num_vert1), dtype=np.int8)
+        B = np.ones((self._num_vert1, self._num_vert2), dtype=np.int8)
+        C = np.ones((self._num_vert2, self._num_vert1), dtype=np.int8)
+        D = np.zeros((self._num_vert2, self._num_vert2), dtype=np.int8)
         return np.block([[A, B],
-                         [C, D]])
+                         [C, D]], dtype=np.int8)
