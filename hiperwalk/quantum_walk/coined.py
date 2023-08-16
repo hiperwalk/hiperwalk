@@ -884,19 +884,12 @@ class Coined(QuantumWalk):
         if len(states.shape) == 1:
             states = [states]
 
-        def get_entries(state, indexes):
-            return np.array([state[i] for i in indexes])
-
         graph = self._graph
         num_vert = graph.number_of_vertices()
         prob = np.array([[Coined._elementwise_probability(
-                              get_entries(
-                                  states[i],
-                                  graph.arcs_with_tail(v)
-                              )
-                          ).sum()
+                              states[i, graph.arcs_with_tail(v)]).sum()
                           for v in range(num_vert)]
-                        for i in range(len(states))])
+                         for i in range(len(states))])
 
         return prob
 
