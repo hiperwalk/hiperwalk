@@ -258,9 +258,6 @@ class Animation:
             # creating window
             window = Gtk.ApplicationWindow(title="Animation")
             state = window.get_state()
-            raise NotImplementedError(
-                "window.get_state() is deprecated. Change."
-            )
             window.override_background_color(state, RGBA(1, 1, 1, 1))
 
             def configure_gif_window(self):
