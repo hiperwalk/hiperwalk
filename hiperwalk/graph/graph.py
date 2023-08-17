@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.sparse import issparse, csr_array
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -30,18 +31,21 @@ class Graph():
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`
+    adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
         Adjacency matrix of the graph on
         which the quantum walk takes place.
 
     Raises
     ------
     TypeError
-        if ``adj_matrix`` is not an instance of
-        :class:`scipy.sparse.csr_array`.
+        if ``adj_matrix`` is not an square matrix.
 
     Notes
     -----
+    .. todo::
+        Check if it is more efficient to store the adjacency matrix as
+        sparse or dense.
+
     A wide range of methods are available. 
     These methods can be used by a quantum walk model 
     to generate a valid quantum walk.
@@ -142,6 +146,19 @@ class Graph():
         # * Check if valid adjacency matrix
         # * Add option: numpy dense matrix as parameters.
         # * Add option: networkx graph as parameter.
+        if not issparse(adj_matrix):
+            adj_matrix = csr_array(adj_matrix, dtype=np.int8)
+
+        if adj_matrix.shape[0] != adj_matrix.shape[1]:
+            raise TypeError("Adjacency matrix is not square.")
+
+        # the following is commented because the current way to
+        # implement Laplacian in ContinuousTime quantum walks is by
+        # passing the Laplacian as adjacency matrix
+        # if adj_matrix.data.min() != 1 or adj_matrix.data.max() != 1:
+        #     raise ValueError("Adjacency matrix must only have 0's "
+        #                      + "and 1's as entries.")
+
         self._adj_matrix = adj_matrix
         self._coloring = None
 
