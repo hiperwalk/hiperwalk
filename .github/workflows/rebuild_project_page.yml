@@ -38,6 +38,12 @@ jobs:
           sudo apt update
           sudo apt install graphviz
 
+    - name: Install Gtk related packages
+      run: |
+          sudo apt install libgirepository1.0-dev gcc libcairo2-dev pkg-config python3-dev gir1.2-gtk-4.0
+          pip3 install pycairo
+          pip3 install PyGObject
+
     - name: Checkout hiperwalk source code (stable)
       uses: actions/checkout@v3
       with:
