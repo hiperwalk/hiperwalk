@@ -258,12 +258,9 @@ def plot_probability_distribution(
         # saves or shows image (or both)
         if not animate:
             if filename is not None:
-                # enumarating the plot
-                filename_suffix = (
-                    '-' + (len(probabilities)-1)//10 * '0' + str(i)
-                    if len(probabilities) > 1 else ''
-                )
-                plt.savefig(filename + filename_suffix)
+                # TODO: consider using Python's string formatting operations
+                filename_suffix = str(i).zfill(len(str(len(probabilities))))
+                plt.savefig(filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
             if show:
