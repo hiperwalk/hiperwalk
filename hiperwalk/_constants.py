@@ -1,4 +1,4 @@
-__version__ = '2.0a6'
+__version__ = '2.0b0'
 
 from sys import modules as sys_modules
 
