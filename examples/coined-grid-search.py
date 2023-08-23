@@ -6,7 +6,7 @@ import scipy
 dim = 25
 g = hpw.Grid((dim, dim))
 N = g.number_of_vertices()
-qw = hpw.Coined(graph=g, coin='G', shift='ff', marked={'-I': 0})
+qw = hpw.Coined(graph=g, coin='G', shift='ff', marked={'-I': [0]})
 psi0 = qw.uniform_state()
 num_steps = int(1.5*np.sqrt(N*np.log(N)))
 states = qw.simulate(time=(num_steps, 1),
