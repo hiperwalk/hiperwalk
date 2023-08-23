@@ -259,7 +259,7 @@ def plot_probability_distribution(
         if not animate:
             if filename is not None:
                 # TODO: consider using Python's string formatting operations
-                filename_suffix = str(i).zfill(len(str(len(probabilities))))
+                filename_suffix = str(i).zfill(len(str(len(probabilities) - 1)))
                 plt.savefig(filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
