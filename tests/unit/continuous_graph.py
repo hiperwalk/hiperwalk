@@ -101,7 +101,8 @@ class TestContinuousGraph(unittest.TestCase):
 
     @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
     def test_hpc_evolution_unitary(self):
-        U = self.qw.get_evolution(time=1, hpc=True)
+        self.qw.set_time(time=1, hpc=True)
+        U = self.qw.get_evolution()
 
         self.assertTrue(np.allclose(
             U@U.T.conjugate(), np.eye(U.shape[0])
