@@ -18,7 +18,7 @@ class Animation:
     ----------
     frames : list
         List of frames.
-    plt_anim : :class:`matplotlib.animation.FuncAnimation`
+    plt_anim : :class:`matplotlib.animation.ArtistAnimation`
         Animation object of matplotlib.
     save_path : str
         Filepath for saving the animation.
@@ -86,7 +86,7 @@ class Animation:
                 ignores the `repeat_delay` parameter.
         """
         from ._plot import _configure_figure
-        from matplotlib.animation import FuncAnimation
+        from matplotlib.animation import ArtistAnimation
 
         fig, ax = _configure_figure(None)
 
@@ -97,17 +97,11 @@ class Animation:
         # and y-axes were not found.
         # TODO: documentation: recommend saving gif
         # and not showing for any animations
-        def update_figure(img):
-            ax.imshow(img)
-
-            if __DEBUG__:
-                global start
-                end = time()
-                start = end
 
         # TODO: repeat_delay not implemented in animation.save
-        self.plt_anim = FuncAnimation(
-            fig, update_figure, frames=self.frames,
+        artists = [[ax.imshow(x)] for x in self.frames]
+        self.plt_anim = ArtistAnimation(
+            fig, artists,
             interval=interval, repeat=self._is_in_notebook()
         )
         # repeat=True causes updateFigure to be called
