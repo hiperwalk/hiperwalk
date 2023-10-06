@@ -664,6 +664,68 @@ class QuantumWalk(ABC):
 
     @staticmethod
     def fit_sin_square(x, y):
+        r"""
+        Fit data to the squared sine function.
+
+        Parameters
+        ----------
+        x : :class:`numpy.ndarray`
+            The domain values.
+            It is assumed that the entries are evenly spaced.
+            That is, ``x[i + 1] - x[i] == x[j + 1] - x[j]`` for
+            any valid ``i`` and ``j``.
+
+        y : :class:`numpy.ndarray`
+            The image values evaluated at each ``x[i]``.
+            It is required that ``y[i]`` corresponds to
+            the evaluation at ``x[i]``.
+
+        Returns
+        -------
+        d : dict
+            It contains information about the best fit found.
+            The dictionary keys are
+
+            ``"fit function"`` :
+                a pointer to the obtained sine squared
+                function. Issuing ``d["fit function"](theta)`` evaluates
+                the function at point ``theta``.
+
+            ``"amplitude"``:
+                amplitude of the obtained fit function.
+
+            ``"angular frequency"`` :
+                angular frequency of the obtained fit function.
+
+            ``"phase shift"`` :
+                phase shift of the obtained fit function.
+
+            ``"vertical offset"`` :
+                vertical offset of the obtained fit function.
+
+            ``"frequency"`` :
+                frequency of the obtained fit function.
+
+            ``"period"`` :
+                period of the obtained fit function.
+
+        Notes
+        -----
+        The returned ``d["fit function"]`` is a pointer to
+
+        .. code-block:: python
+
+            def fit_func(theta):
+                return d["amplitude"]*np.sin(
+                           d["angular frequency"]*theta +
+                           d["phase shift"]
+                       )**2 + d["vertical offset"]
+
+
+        The code was adapted from
+        `https://stackoverflow.com/questions/16716302/how-do-i-fit-a-sine-curve-to-my-data-with-pylab-and-numpy
+        <https://stackoverflow.com/questions/16716302/how-do-i-fit-a-sine-curve-to-my-data-with-pylab-and-numpy>`_
+        """
         # uniform spacing is assumed
         fft_freq = np.fft.fftfreq(len(x), (x[1] - x[0]))
         abs_fft = abs(np.fft.fft(y))
