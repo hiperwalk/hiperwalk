@@ -6,6 +6,7 @@ from sys import modules as sys_modules
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from warnings import warn
 from ..graph import Graph
+import scipy.optimize
 try:
     from . import _pyneblina_interface as nbl
 except ModuleNotFoundError:
@@ -659,3 +660,32 @@ class QuantumWalk(ABC):
         Returns dimension of the Hilbert space.
         """
         return self.hilb_dim
+
+
+    @staticmethod
+    def fit_sin_square(x, y):
+        # uniform spacing is assumed
+        fft_freq = np.fft.fftfreq(len(x), (x[1] - x[0]))
+        abs_fft = abs(np.fft.fft(y))
+
+        # excluding the zero frequency "peak", which is related to offset
+        guess_freq = abs(fft_freq[np.argmax(abs_fft[1:]) + 1])
+        guess_amp = 2*np.std(y) * np.sqrt(2)
+        guess_offset = np.mean(y)
+        guess = np.array([guess_amp, np.pi*guess_freq, 0, guess_offset])
+
+        def sin_square(t, ampl, ang_freq, shift, vert_offset):
+            return ampl*np.sin(ang_freq*t + shift)**2 + vert_offset
+                
+        opt_res, _ = scipy.optimize.curve_fit(sin_square, x, y, p0=guess)
+
+        ampl, ang_freq, shift, vert_offset = opt_res
+        freq = ang_freq/np.pi
+        fitfunc = lambda x: ampl*np.sin(ang_freq*x + shift)**2 + vert_offset
+        return {"amplitude": ampl,
+                "angular frequency": ang_freq,
+                "phase shift": shift,
+                "vertical offset": vert_offset,
+                "frequency": freq,
+                "period": 1/freq,
+                "fit function": fitfunc}
