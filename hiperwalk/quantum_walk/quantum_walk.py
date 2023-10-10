@@ -825,3 +825,21 @@ class QuantumWalk(ABC):
         """
         t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
         return t_opt
+
+    def max_success_probability(self,
+        initial_state=None, delta_time=1, hpc=True):
+        r"""
+        TODO
+        """
+        t_opt, p_succ = self._optimal_runtime(initial_state,
+                                              delta_time, hpc)
+        opt_index = int(t_opt / delta_time)
+        print(t_opt)
+        print(t_opt / delta_time)
+        print(opt_index)
+        #print(p_succ)
+        print(p_succ[opt_index - 2: opt_index + 3])
+        # TODO: if t_opt / delta_time is not close to an integer,
+        # max_sucess_probability is not in p_succ.
+        # simulation must be rerun
+        return p_succ[opt_index]
