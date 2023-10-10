@@ -1035,3 +1035,6 @@ class Coined(QuantumWalk):
                     self._simul_mat[1], self._simul_vec)
         else:
             super()._simulate_step(step, hpc)
+
+    def _number_to_valid_time(self, number):
+        return int(number)

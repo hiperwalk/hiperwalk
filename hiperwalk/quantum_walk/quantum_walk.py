@@ -751,3 +751,41 @@ class QuantumWalk(ABC):
                 "frequency": freq,
                 "period": 1/freq,
                 "fit function": fitfunc}
+
+    def _number_to_valid_time(self, number):
+        raise NotImplementedError()
+
+    def _optimal_runtime(self, initial_state, delta_time, hpc):
+        r"""
+        .. todo::
+            Returns all arguments.
+            It is used by optinal_runtime and max_p_succ to avoid
+            redundant computation.
+        """
+        if initial_state is None:
+            initial_state = self.uniform_state()
+
+        N = self._graph.number_of_vertices()
+        # if search algorithm takes O(N),
+        # it is better to use classical computing.
+        final_time = self._number_to_valid_time(N/2)
+        states = self.simulate(time=(final_time, delta_time),
+                               initial_state=initial_state,
+                               hpc=hpc)
+        p_succ = self.success_probability(states)
+        del states
+
+        d = QuantumWalk.fit_sin_square(
+                np.arange(0, final_time + delta_time, delta_time),
+                p_succ
+            )
+        t_opt = (np.pi/2 - d['phase shift']) / d['angular frequency']
+        return self._number_to_valid_time(t_opt), p_succ
+
+
+    def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
+        r"""
+        TODO
+        """
+        t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
+        return t_opt

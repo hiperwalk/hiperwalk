@@ -461,3 +461,6 @@ class ContinuousTime(QuantumWalk):
 
         states = super().simulate(time, initial_state, hpc)
         return states
+
+    def _number_to_valid_time(self, number):
+        return number
