@@ -663,7 +663,7 @@ class QuantumWalk(ABC):
 
 
     @staticmethod
-    def fit_sin_square(x, y):
+    def fit_sin_squared(x, y):
         r"""
         Fit data to the squared sine function.
 
@@ -775,7 +775,7 @@ class QuantumWalk(ABC):
         p_succ = self.success_probability(states)
         del states
 
-        d = QuantumWalk.fit_sin_square(
+        d = QuantumWalk.fit_sin_squared(
                 np.arange(0, final_time + delta_time, delta_time),
                 p_succ
             )
