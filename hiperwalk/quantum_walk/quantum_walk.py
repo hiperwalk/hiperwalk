@@ -821,7 +821,57 @@ class QuantumWalk(ABC):
         --------
         simulate
         uniform_state
+        success_probability
         fit_sin_squared
         """
         t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
         return t_opt
+
+    def max_success_probability(self,
+        initial_state=None, delta_time=1, hpc=True):
+        r"""
+        Find the max success probability.
+        The success probability corresponding to the optimal runtime.
+
+        Parameters
+        ----------
+        initial_state : :class:`numpy.ndarray`, default=None
+            The state initial state for the simulation.
+            If ``None``, uses the uniform state.
+
+        delta_time :
+            Time difference between two consecutive states
+            to be saved by the simulation.
+            See ``time`` argument in :meth:`simulate` for details.
+
+        hpc : boolean
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses standalone python.
+
+        Returns
+        -------
+        float
+            The maximum success probability.
+
+        See Also
+        --------
+        optimal_runtime
+        simulate
+        uniform_state
+
+        Notes
+        -----
+
+        .. todo::
+            If ``t_opt / delta_time`` is not close to an integer,
+            the max success probability was not obtained in the simulation.
+            The simulation must be rerun or interpolated.
+        """
+        t_opt, p_succ = self._optimal_runtime(initial_state,
+                                              delta_time, hpc)
+        opt_index = int(t_opt / delta_time)
+        # TODO: if t_opt / delta_time is not close to an integer,
+        # max_sucess_probability is not in p_succ.
+        # simulation must be rerun
+        return p_succ[opt_index]
