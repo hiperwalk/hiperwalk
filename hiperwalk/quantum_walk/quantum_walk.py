@@ -663,7 +663,7 @@ class QuantumWalk(ABC):
 
 
     @staticmethod
-    def fit_sin_square(x, y):
+    def fit_sin_squared(x, y):
         r"""
         Fit data to the squared sine function.
 
@@ -751,3 +751,77 @@ class QuantumWalk(ABC):
                 "frequency": freq,
                 "period": 1/freq,
                 "fit function": fitfunc}
+
+    def _number_to_valid_time(self, number):
+        raise NotImplementedError()
+
+    def _optimal_runtime(self, initial_state, delta_time, hpc):
+        r"""
+        .. todo::
+            Returns all arguments.
+            It is used by optinal_runtime and max_p_succ to avoid
+            redundant computation.
+        """
+        if initial_state is None:
+            initial_state = self.uniform_state()
+
+        N = self._graph.number_of_vertices()
+        # if search algorithm takes O(N),
+        # it is better to use classical computing.
+        final_time = self._number_to_valid_time(N/2)
+        states = self.simulate(time=(final_time, delta_time),
+                               initial_state=initial_state,
+                               hpc=hpc)
+        p_succ = self.success_probability(states)
+        del states
+
+        d = QuantumWalk.fit_sin_squared(
+                np.arange(0, final_time + delta_time, delta_time),
+                p_succ
+            )
+        t_opt = (np.pi/2 - d['phase shift']) / d['angular frequency']
+        return self._number_to_valid_time(t_opt), p_succ
+
+
+    def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
+        r"""
+        Find the optimal runtime of a quantum walk search.
+
+        Simulate the aplication of the previously set evolution operator
+        passing the ``initial_state`` to the simulation.
+        Calculate the success probability of each intermediate state.
+        Fit the probabilities to a sine squared function.
+        The optimal runtime is the point in the domain where the
+        sine squared function attains its first maximum.
+
+        Parameters
+        ----------
+        initial_state : :class:`numpy.ndarray`, default=None
+            The state initial state for the simulation.
+            If ``None``, uses the uniform state.
+
+        delta_time :
+            Time difference between two consecutive states
+            to be saved by the simulation.
+            See ``time`` argument in :meth:`simulate` for details.
+
+        hpc : boolean
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses standalone python.
+
+        Returns
+        -------
+        int or float
+            The optimal runtime found.
+            The returned type depends of the quantum walk model.
+
+
+        See Also
+        --------
+        simulate
+        uniform_state
+        fit_sin_squared
+        """
+        t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
+        return t_opt
