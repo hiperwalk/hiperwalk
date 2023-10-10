@@ -785,7 +785,43 @@ class QuantumWalk(ABC):
 
     def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
         r"""
-        TODO
+        Find the optimal runtime of a quantum walk search.
+
+        Simulate the aplication of the previously set evolution operator
+        passing the ``initial_state`` to the simulation.
+        Calculate the success probability of each intermediate state.
+        Fit the probabilities to a sine squared function.
+        The optimal runtime is the point in the domain where the
+        sine squared function attains its first maximum.
+
+        Parameters
+        ----------
+        initial_state : :class:`numpy.ndarray`, default=None
+            The state initial state for the simulation.
+            If ``None``, uses the uniform state.
+
+        delta_time :
+            Time difference between two consecutive states
+            to be saved by the simulation.
+            See ``time`` argument in :meth:`simulate` for details.
+
+        hpc : boolean
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses standalone python.
+
+        Returns
+        -------
+        int or float
+            The optimal runtime found.
+            The returned type depends of the quantum walk model.
+
+
+        See Also
+        --------
+        simulate
+        uniform_state
+        fit_sin_squared
         """
         t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
         return t_opt
