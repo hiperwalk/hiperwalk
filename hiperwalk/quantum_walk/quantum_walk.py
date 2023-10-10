@@ -821,6 +821,7 @@ class QuantumWalk(ABC):
         --------
         simulate
         uniform_state
+        success_probability
         fit_sin_squared
         """
         t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
