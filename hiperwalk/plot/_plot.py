@@ -877,5 +877,10 @@ def plot_success_probability(time, probabilities, **kwargs):
     plt.plot(time, probabilities, **kwargs)
     plt.show()
 
+def plot_x_by_y(qw_gen, x_arg, y_func, *y_args, **y_kwargs):
+    y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
+    plt.plot(x_arg, y_vals)
+    plt.show()
+
 if __DEBUG__:
     start = time()
