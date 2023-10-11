@@ -238,7 +238,7 @@ def plot_probability_distribution(
 
     # preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
-        probabilities = [probabilities]
+        probabilities = np.array([probabilities])
 
     # passes kwargs by reference to be updated accordingly
     preconfigs[plot](probabilities, kwargs)
