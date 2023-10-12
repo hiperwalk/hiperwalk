@@ -975,19 +975,16 @@ def plot_optimal_runtime(qw_iter, x_label, x_vals, initial_state=None,
     if hasattr(initial_state, '__iter__'):
         initial_state = iter(initial_state)
 
-    valid_opt_run_kwargs = QuantumWalk._get_valid_kwargs(
-                                    QuantumWalk.optimal_runtime)
-    def function(qw, initial_state=None, **kwargs):
-        opt_run_kwargs = QuantumWalk._filter_valid_kwargs(kwargs,
-                                valid_opt_run_kwargs)
-
+    def function(qw, initial_state=None, delta_time=1, hpc=True):
         psi0 = None
         if initial_state is not None:
             psi0 = (initial_state(qw)
                     if callable(initial_state)
                     else next(initial_state))
 
-        return qw.optimal_runtime(initial_state=psi0, **opt_run_kwargs)
+        return qw.optimal_runtime(initial_state=psi0,
+                                  delta_time=delta_time,
+                                  hpc=hpc)
 
     plot_function(qw_iter, x_label, 'Optimal runtime', x_vals, function,
                   initial_state=initial_state, **kwargs)
