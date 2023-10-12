@@ -989,5 +989,28 @@ def plot_optimal_runtime(qw_iter, x_label, x_vals, initial_state=None,
     plot_function(qw_iter, x_label, 'Optimal runtime', x_vals, function,
                   initial_state=initial_state, **kwargs)
 
+def plot_max_success_probability(qw_iter, x_label, x_vals,
+        initial_state=None, **kwargs):
+    r"""
+    TODO
+    """
+    if hasattr(initial_state, '__iter__'):
+        initial_state = iter(initial_state)
+
+    def function(qw, initial_state=None, delta_time=1, hpc=True):
+        psi0 = None
+        if initial_state is not None:
+            psi0 = (initial_state(qw)
+                    if callable(initial_state)
+                    else next(initial_state))
+
+        return qw.max_success_probability(initial_state=psi0,
+                                          delta_time=delta_time,
+                                          hpc=hpc)
+
+    plot_function(qw_iter, x_label, 'Max success probability',
+                  x_vals, function, initial_state=initial_state, **kwargs)
+
+
 if __DEBUG__:
     start = time()
