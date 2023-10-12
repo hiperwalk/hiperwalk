@@ -828,7 +828,7 @@ def _plot_probability_distribution_on_plane(
     cbar = plt.colorbar(mappable, shrink=0.4, aspect=20, pad=0.15)
     cbar.ax.tick_params(length=10, width=1, labelsize=16)
 
-#########################################################################################
+###########################################################################
 
 def plot_success_probability(time, probabilities, **kwargs):
     r"""
@@ -877,9 +877,35 @@ def plot_success_probability(time, probabilities, **kwargs):
     plt.plot(time, probabilities, **kwargs)
     plt.show()
 
-def plot_x_by_y(qw_gen, x_arg, y_func, *y_args, **y_kwargs):
-    y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
-    plt.plot(x_arg, y_vals)
+def plot_function(qw_iter, x_label, y_label, x_vals, function,
+                  *args, **kwargs):
+    # TODO: any situation where *y_args and **y_kwargs are iterable?
+
+    # y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
+    # plt.plot(x_arg, y_vals)
+    # plt.show()
+    #######################################
+    if hasattr(x_vals, '__iter__'):
+        x_vals = iter(x_vals)
+
+    valid_function_kwargs = QuantumWalk._get_valid_kwargs(function)
+    function_kwargs = QuantumWalk._pop_valid_kwargs(kwargs,
+            valid_function_kwargs)
+    del valid_function_kwargs
+
+    x = []
+    y = []
+
+    for qw in qw_iter:
+        x.append(x_vals(qw)
+                 if callable(x_vals)
+                 else next(x_vals))
+
+        y.append(function(qw, *args, **function_kwargs))
+
+    plt.plot(x, y, marker='o')
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
     plt.show()
 
 if __DEBUG__:
