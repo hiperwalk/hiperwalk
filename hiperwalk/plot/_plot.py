@@ -908,5 +908,89 @@ def plot_function(qw_iter, x_label, y_label, x_vals, function,
     plt.ylabel(y_label)
     plt.show()
 
+def plot_optimal_runtime(qw_iter, x_label, x_vals, initial_state=None,
+                         **kwargs):
+    r"""
+    Parameters
+    ----------
+    qw_iter : iterable of :class:`QuantumWalk`
+        The code will be execute for each quantum walk in
+        the iterable.
+
+    x_vals :
+        The values to be plotted in the x-axis.
+        Iterable or callable.
+
+    initial_state:
+        The initial state of the simulation.
+        If ``None`` uses default argument.
+        There are two types allowed.
+
+        iterable :
+            An array of states or an iterable.
+            The ``i``-th entry will be used as the inital state
+            of the ``i``-th quantum walk.
+
+        callable :
+            A function that receives a :class:`QuantumWalk` as argument
+            and returns a state.
+
+            .. todo::
+                Should the function accept ``*args`` and ``**kwargs``?
+    """
+    # if hasattr(x_vals, '__iter__'):
+    #     x_vals = iter(x_vals)
+
+    # if hasattr(initial_state, '__iter__'):
+    #     initial_state = iter(initial_state)
+
+    # valid_opt_run_kwargs = QuantumWalk._get_valid_kwargs(
+    #                                 QuantumWalk.optimal_runtime)
+    # opt_run_kwargs = QuantumWalk._pop_valid_kwargs(kwargs,
+    #                         valid_opt_run_kwargs)
+    # del valid_opt_run_kwargs
+
+    # x = []
+    # t_opt = []
+    # psi0 = None
+
+    # for qw in qw_iter:
+    #     x.append(x_vals(qw)
+    #              if callable(x_vals)
+    #              else next(x_vals))
+
+    #     if initial_state is not None:
+    #         psi0 = (initial_state(qw)
+    #                 if callable(initial_state)
+    #                 else next(initial_state))
+
+    #     t_opt.append(
+    #         qw.optimal_runtime(initial_state=psi0, **opt_run_kwargs))
+
+    # plt.plot(x, t_opt, marker='o')
+    # plt.xlabel(x_label)
+    # plt.ylabel('Optimal runtime')
+    # plt.show()
+
+    if hasattr(initial_state, '__iter__'):
+        initial_state = iter(initial_state)
+
+    valid_opt_run_kwargs = QuantumWalk._get_valid_kwargs(
+                                    QuantumWalk.optimal_runtime)
+    def function(qw, initial_state=None, **kwargs):
+        opt_run_kwargs = QuantumWalk._filter_valid_kwargs(kwargs,
+                                valid_opt_run_kwargs)
+
+        psi0 = None
+        if initial_state is not None:
+            psi0 = (initial_state(qw)
+                    if callable(initial_state)
+                    else next(initial_state))
+
+        return qw.optimal_runtime(initial_state=psi0, **opt_run_kwargs)
+
+    plot_function(qw_iter, x_label, 'Optimal runtime', x_vals, function,
+                  initial_state=initial_state, **kwargs)
+
 if __DEBUG__:
     start = time()
