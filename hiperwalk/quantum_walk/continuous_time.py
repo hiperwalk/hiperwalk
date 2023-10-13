@@ -4,7 +4,9 @@ import scipy.linalg
 from .quantum_walk import QuantumWalk
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
 try:
-    from . import _pyneblina_interface as nbl
+    from sys import path
+    path.append('..')
+    import _pyneblina_interface as nbl
 except:
     pass
 

@@ -8,7 +8,9 @@ from warnings import warn
 from ..graph import Graph
 import scipy.optimize
 try:
-    from . import _pyneblina_interface as nbl
+    from sys import path
+    path.append('..')
+    import _pyneblina_interface as nbl
 except ModuleNotFoundError:
     warn(PYNEBLINA_IMPORT_ERROR_MSG)
 
