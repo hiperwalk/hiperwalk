@@ -6,7 +6,9 @@ from .quantum_walk import QuantumWalk
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
 try:
-    from . import _pyneblina_interface as nbl
+    from sys import path
+    path.append('..')
+    import _pyneblina_interface as nbl
 except:
     pass
 
