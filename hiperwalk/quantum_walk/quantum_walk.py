@@ -2,17 +2,10 @@ from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
 import inspect
-from sys import modules as sys_modules
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
-from warnings import warn
+from .._constants import __DEBUG__
 from ..graph import Graph
 import scipy.optimize
-try:
-    from sys import path
-    path.append('..')
-    import _pyneblina_interface as nbl
-except ModuleNotFoundError:
-    warn(PYNEBLINA_IMPORT_ERROR_MSG)
+from ..simulator import Simulator
 
 class QuantumWalk(ABC):
     """
@@ -52,20 +45,6 @@ class QuantumWalk(ABC):
         if 'marked' in kwargs:
             self._update_marked(kwargs['marked'])
 
-        self._evolution = None
-
-        ##############################
-        ### Simulation attributes. ###
-        ##############################
-        # Matrix object used during simulation.
-        # It may by a scipy matrix or a neblina matrix.
-        # Should be different from None during simulation only.
-        self._simul_mat = None
-        # Vector object used during simulation.
-        # Should be different from None during simulation only.
-        self._simul_vec = None
-
-
         # TODO: create sparse matrix from graph or dense adjacency matrix
         if isinstance(graph, Graph):
             # DO STUFF
@@ -89,6 +68,7 @@ class QuantumWalk(ABC):
             )
 
         self.hilb_dim = 0
+        self._simulator = None
 
 
     def uniform_state(self):
@@ -160,6 +140,9 @@ class QuantumWalk(ABC):
         """
         return self._marked
 
+    def _update_evolution(self, U):
+        self._simulator.set_matrix(U)
+
     @abstractmethod
     def set_evolution(self, **kwargs):
         """
@@ -178,9 +161,15 @@ class QuantumWalk(ABC):
         """
         raise NotImplementedError()
 
-    def get_evolution(self):
+    def get_evolution(self, copy=True):
         r"""
         Returns the evolution operator.
+
+        Parameters
+        ----------
+        copy: bool, default=True
+            If ``True`` returns a hard copy.
+            If ``False`` returns matrix pointer.
 
         Returns
         -------
@@ -190,7 +179,7 @@ class QuantumWalk(ABC):
         --------
         set_evolution
         """
-        return self._evolution
+        return self._simulator.get_matrix(copy)
 
     @staticmethod
     def _elementwise_probability(elem):
@@ -338,36 +327,7 @@ class QuantumWalk(ABC):
         ValueError
             If ``time`` is in an invalid input format.
         """
-
-        if not hasattr(time, '__iter__'):
-            time = [time]
-
-        if len(time) == 1:
-            start = end = step = time[0]
-        elif len(time) == 2:
-            start = 0
-            end = time[0]
-            step = time[1]
-        else:
-            start = time[0]
-            end = time[1]
-            step = time[2]
-        
-        time = [start, end, step]
-
-        if start < 0 or end < 0 or step <= 0:
-            raise ValueError(
-                "Invalid 'time' value."
-                + "'start' and 'end' must be non-negative"
-                + " and 'step' must be positive."
-            )
-        if start > end:
-            raise ValueError(
-                "Invalid `time` value."
-                + "`start` cannot be larger than `end`."
-            )
-
-        return time
+        return Simulator.exponent_to_tuple(time)
 
     def _normalize(self, state, error=1e-16):
         norm = np.linalg.norm(state)
@@ -448,68 +408,6 @@ class QuantumWalk(ABC):
         ket[label] = 1
         return ket
 
-    def _pyneblina_imported(self):
-        """
-        Expects pyneblina interface to be imported as nbl
-        """
-        return ('hiperwalk.quantum_walk._pyneblina_interface'
-                in sys_modules)
-
-
-    ######################################
-    ### Auxiliary Simulation functions ###
-    ######################################
-
-    def _prepare_engine(self, initial_state, hpc):
-        if self._evolution is None:
-            self._evolution = self.get_evolution(hpc=hpc)
-
-        if hpc:
-            self._simul_mat = nbl.send_matrix(self._evolution)
-            self._simul_vec = nbl.send_vector(initial_state)
-
-        else:
-            self._simul_mat = self._evolution
-            self._simul_vec = initial_state
-
-        dtype = (np.complex128 if (np.iscomplexobj(self._evolution)
-                             or np.iscomplexobj(initial_state))
-                 else np.double)
-
-        return dtype
-
-    def _simulate_step(self, step, hpc):
-        """
-        Apply the simulation evolution operator ``step`` times
-        to the simulation vector.
-        Simulation vector is then updated.
-        """
-        if hpc:
-            # TODO: request multiple multiplications at once
-            #       to neblina-core
-            # TODO: check if intermediate states are being freed
-            for i in range(step):
-                self._simul_vec = nbl.multiply_matrix_vector(
-                    self._simul_mat, self._simul_vec)
-        else:
-            for i in range(step):
-                self._simul_vec = self._simul_mat @ self._simul_vec
-
-            # TODO: compare with numpy.linalg.matrix_power
-
-    def _save_simul_vec(self, hpc):
-        ret = None
-
-        if hpc:
-            # TODO: check if vector must be deleted or
-            #       if it can be reused via neblina-core commands.
-            ret = nbl.retrieve_vector(self._simul_vec)
-        else:
-            ret = self._simul_vec
-
-        return ret
-
-
     def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Simulates the quantum walk.
@@ -577,73 +475,9 @@ class QuantumWalk(ABC):
         the initial state (0), the intermediate states (3, 6, and 9),
         and the final state (12).
         """
-        ############################################
-        ### Check if simulation was set properly ###
-        ############################################
-        if time is None:
-            raise ValueError(
-                "``time` not specified`. "
-                + "Must be an int or tuple of int."
-            )
-
-        if initial_state is None:
-            raise ValueError(
-                "``initial_state`` not specified. "
-                + "Expected a np.array."
-            )
-
-        if len(initial_state) != self.hilb_dim:
-            raise ValueError(
-                "Initial condition has invalid dimension. "
-                + "Expected an np.array with length " + str(self.hilb_dim)
-            )
-
-        ###############################
-        ### simulate implemantation ###
-        ###############################
-
-        time = np.array(QuantumWalk._time_to_tuple(time))
-
-        if not np.all([e.is_integer() for e in time]):
-            raise ValueError("`time` has non-int entry.")
-
-        start, end, step = time
-
-        
-        if hpc and not self._pyneblina_imported():
-            hpc = False
-
-        dtype = self._prepare_engine(initial_state, hpc)
-
-        # number of states to save
-        num_states = int(end/step) + 1
-        num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
-
-        saved_states = np.zeros(
-            (num_states, initial_state.shape[0]), dtype=dtype
-        )
-        state_index = 0 # index of the state to be saved
-
-        # if save_initial_state:
-        if start == 0:
-            saved_states[0] = initial_state.copy()
-            state_index += 1
-            num_states -= 1
-
-        # simulate walk / apply evolution operator
-        if start > 0:
-            self._simulate_step(start - step, hpc)
-
-        for i in range(num_states):
-            self._simulate_step(step, hpc)
-            saved_states[state_index] = self._save_simul_vec(hpc)
-            state_index += 1
-
-        # TODO: free vector from neblina core
-        self._simul_mat = None
-        self._simul_vec = None
-
-        return saved_states
+        return self._simulator.simulate(exponent=time,
+                                        vector=initial_state,
+                                        hpc=hpc)
 
     @staticmethod
     def _get_valid_kwargs(method):
