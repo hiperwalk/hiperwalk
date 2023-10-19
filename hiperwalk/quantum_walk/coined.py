@@ -3,14 +3,9 @@ import scipy
 import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
-try:
-    from sys import path
-    path.append('..')
-    import _pyneblina_interface as nbl
-except:
-    pass
+from ..simulator import Simulator, pyneblina_imported
+from .._constants import __DEBUG__
 
 if __DEBUG__:
     from time import time as now
@@ -111,6 +106,8 @@ class Coined(QuantumWalk):
                 'minus_identity': Coined._minus_identity_coin
             }
 
+        # simulator matrix will be updated
+        self._simulator = Simulator([[1]])
         self.set_evolution(**kwargs)
 
         if __DEBUG__:
@@ -725,7 +722,7 @@ class Coined(QuantumWalk):
 
     def _update_evolution(self, hpc=True):
         U = None
-        if hpc and not self._pyneblina_imported():
+        if hpc and not pyneblina_imported():
             hpc = False
 
         S = self.get_shift()
@@ -751,8 +748,7 @@ class Coined(QuantumWalk):
         else:
             U = S @ C
 
-        self._evolution = U
-        return U
+        super()._update_evolution(U)
 
     def set_evolution(self, hpc=True, **kwargs):
         """
