@@ -167,7 +167,7 @@ class Simulator():
         if len(vector) != self._matrix.shape[1]:
             raise ValueError(
                 "Vector has invalid dimension. "
-                + "Expected an np.array with length " + str(self.hilb_dim)
+                + "Expected an np.array with length " + str(self._matrix.shape[1])
             )
 
         ###############################
