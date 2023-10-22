@@ -21,8 +21,8 @@ class Simulator():
     TODO: docs
     """
 
-    def __init__(self, matrix):
-        self.set_matrix(matrix)
+    def __init__(self, evolution):
+        self.set_evolution(evolution)
 
         ##############################
         ### Simulation attributes. ###
@@ -35,79 +35,121 @@ class Simulator():
         # Should be different from None during simulation only.
         self._simul_vec = None
 
-    def set_matrix(self, matrix):
-        r"""
+    def set_evolution(self, evolution=None, copy=True):
         """
-        # TODO: check dimensions
-        self._matrix = matrix
+        Create the standard evolution operator.
 
-    def get_matrix(self, copy=True):
-        r"""
-        TODO
+        The evolution operator is saved to be used during the simulation.
+
+        Parameters
+        ----------
+        evolution: :class:`numpy.ndarray`
+            The evolution operator.
+
+        copy: bool, default=True
+            If ``True``, a hard copy of the matrix is made.
+            Otherwise, a pointer to the matrix is saved.
+
+        Raises
+        ------
+        ValueError
+            If ``evolution`` is not a matrix.
+
+        See Also
+        --------
+        simulate
         """
-        return np.copy(self._matrix) if copy else self._matrix
+        try:
+            evolution.shape
+        except AttributeError:
+            evolution = np.array(evolution)
+
+        if len(evolution.shape) != 2:
+            raise ValueError("Expected a matrix.")
+
+        self._evolution = np.copy(evolution) if copy else evolution
+
+    def get_evolution(self, copy=True):
+        r"""
+        Returns the evolution operator.
+
+        Parameters
+        ----------
+        copy: bool, default=True
+            If ``True`` returns a hard copy.
+            If ``False`` returns matrix pointer.
+
+        Returns
+        -------
+        :class:`numpy.ndarray`.
+
+        See Also
+        --------
+        set_evolution
+        """
+        return np.copy(self._evolution) if copy else self._evolution
 
     @staticmethod
-    def exponent_to_tuple(exponent):
+    def time_to_tuple(time):
         r"""
-        Clean and format ``exponent`` to ``(start, end, step)`` format.
+        Clean and format ``time`` to ``(start, end, step)`` format.
 
         See :meth:`simulate` for valid input format options.
 
         Raises
         ------
         ValueError
-            If ``exponent`` is in an invalid input format.
+            If ``time`` is in an invalid input format.
         """
-        if not hasattr(exponent, '__iter__'):
-            exponent = [exponent]
+        if not hasattr(time, '__iter__'):
+            time = [time]
 
-        if len(exponent) == 1:
-            start = end = step = exponent[0]
-        elif len(exponent) == 2:
+        if len(time) == 1:
+            start = end = step = time[0]
+        elif len(time) == 2:
             start = 0
-            end = exponent[0]
-            step = exponent[1]
+            end = time[0]
+            step = time[1]
         else:
-            start = exponent[0]
-            end = exponent[1]
-            step = exponent[2]
+            start = time[0]
+            end = time[1]
+            step = time[2]
 
-        exponent = [start, end, step]
+        time = [start, end, step]
 
         if start < 0 or end < 0 or step <= 0:
             raise ValueError(
-                "Invalid 'exponent' value."
+                "Invalid 'time' value."
                 + "'start' and 'end' must be non-negative"
                 + " and 'step' must be positive."
             )
         if start > end:
             raise ValueError(
-                "Invalid `exponent` value."
+                "Invalid `time` value."
                 + "`start` cannot be larger than `end`."
             )
 
-        return exponent
+        return time
 
     ######################################
     ### Auxiliary Simulation functions ###
     ######################################
 
-    def _prepare_engine(self, initial_vector, hpc):
-        if self._matrix is None:
+    def _prepare_engine(self, vector, hpc):
+        if self._evolution is None:
             #self._evolution = self.get_evolution(hpc=hpc)
             raise ValueError("Matrix not set.")
 
         if hpc:
-            self._simul_mat = nbl.send_matrix(self._matrix)
-            self._simul_vec = nbl.send_vector(initial_vector)
+            self._simul_mat = nbl.send_matrix(self._evolution)
+            self._simul_vec = nbl.send_vector(vector)
 
         else:
-            self._simul_mat = self._matrix
-            self._simul_vec = initial_vector
+            self._simul_mat = self._evolution
+            self._simul_vec = vector
 
-        dtype = (np.complex128 if (np.iscomplexobj(self._matrix)
-                             or np.iscomplexobj(initial_vector))
+        dtype = (np.complex128 if (np.iscomplexobj(self._evolution)
+                             or np.iscomplexobj(vector))
                  else np.double)
 
         return dtype
@@ -143,78 +185,146 @@ class Simulator():
 
         return ret
 
-
-
-    def simulate(self, exponent=None, vector=None, hpc=True):
+    def simulate(self, time=None, state=None, hpc=True,
+                 initial_state=None):
         r"""
-        TODO DOCS
+        Simulates the dynamics described by the evolution operator.
+
+        The dynamics is simulated by applying the
+        evolution operator to the initial ``state`` multiple times.
+        The first, intermediate and last applications
+        are describred by ``time``.
+
+        .. deprecated: 2.0
+            ``initial_state`` will be removed in version 2.1,
+            it is replaced by ``state`` because the latter is more concise.
+
+        Parameters
+        ----------
+        time : int, tuple of int, default=None
+            Describes at which time instants the state must be saved.
+            It can be specified in three different ways.
+            
+            * end
+                Save the state at time ``end``.
+                Only the final state is saved.
+
+            * (end, step)
+                Saves each state from time 0 to time ``end`` (inclusive)
+                that is multiple of ``step``.
+
+            * (start, end, step)
+                Saves every state from time ``start`` (inclusive)
+                to time ``end`` (inclusive)
+                that is multiple of ``step``.
+
+        state : :class:`numpy.array`, default=None
+            The initial state which the evolution operator
+            is going to be applied to.
+
+        hpc : bool, default=True
+            Whether or not to use neblina's high-performance computing
+            to perform matrix multiplications.
+            If ``hpc=False`` uses standalone python.
+
+        Returns
+        -------
+        states : :class:`numpy.ndarray`.
+            States saved during simulation where
+            ``states[i]`` corresponds to the ``i``-th saved state.
+
+        Raises
+        ------
+        ValueError
+            If any of the following occurs
+            * ``time=None``.
+            * ``initial_state=None``.
+            * ``evolution_operator=None`` and it was no set previously.
+
+        See Also
+        --------
+        evolution_operator
+        state
+
+        Examples
+        --------
+        If ``time=(0, 13, 3)``, the saved states will be:
+        the initial state (0), the intermediate states (3, 6, and 9),
+        and the final state (12).
         """
+        if initial_state is not None:
+            from warnings import warn
+            warn("Deprecation warning. `initial_state` is deprecated. "
+                 + "Use `state` instead.")
+            if state is None:
+                state = initial_state
         ############################################
         ### Check if simulation was set properly ###
         ############################################
-        if exponent is None:
+        if time is None:
             raise ValueError(
-                "``exponent` not specified`. "
+                "``time` not specified`. "
                 + "Must be an int or tuple of int."
             )
 
-        if vector is None:
+        if state is None:
             raise ValueError(
-                "``vector`` not specified. "
+                "``state`` not specified. "
                 + "Expected a np.array."
             )
 
-        if len(vector) != self._matrix.shape[1]:
+        if len(state) != self._evolution.shape[1]:
             raise ValueError(
                 "Vector has invalid dimension. "
-                + "Expected an np.array with length " + str(self._matrix.shape[1])
+                + "Expected an np.array with length "
+                + str(self._evolution.shape[1])
             )
 
         ###############################
         ### simulate implemantation ###
         ###############################
 
-        exponent = np.array(Simulator.exponent_to_tuple(exponent))
+        time = np.array(Simulator.time_to_tuple(time))
 
-        if not np.all([e.is_integer() for e in exponent]):
-            raise ValueError("`exponent` has non-int entry.")
+        if not np.all([e.is_integer() for e in time]):
+            raise ValueError("`time` has non-int entry.")
 
-        start, end, step = exponent
+        start, end, step = time
 
         if hpc and not pyneblina_imported():
             hpc = False
 
-        dtype = self._prepare_engine(vector, hpc)
+        dtype = self._prepare_engine(state, hpc)
 
-        # number of vectors to save
-        num_vectors = int(end/step) + 1
-        num_vectors -= (int((start - 1)/step) + 1) if start > 0 else 0
+        # number of states to save
+        num_states = int(end/step) + 1
+        num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
 
-        saved_vectors = np.zeros(
-            (num_vectors, vector.shape[0]), dtype=dtype
+        saved_states = np.zeros(
+            (num_states, state.shape[0]), dtype=dtype
         )
         state_index = 0 # index of the state to be saved
 
-        # if save_vector:
+        # if save_state:
         if start == 0:
-            saved_vectors[0] = vector.copy()
+            saved_states[0] = state.copy()
             state_index += 1
-            num_vectors -= 1
+            num_states -= 1
 
         # simulate walk / apply evolution operator
         if start > 0:
             self._simulate_step(start - step, hpc)
 
-        for i in range(num_vectors):
+        for i in range(num_states):
             self._simulate_step(step, hpc)
-            saved_vectors[state_index] = self._save_simul_vec(hpc)
+            saved_states[state_index] = self._save_simul_vec(hpc)
             state_index += 1
 
-        # TODO: check if vector is freed from neblina core
+        # TODO: check if state is freed from neblina core
         if hpc:
             del self._simul_mat
             del self._simul_vec
         self._simul_mat = None
         self._simul_vec = None
 
-        return saved_vectors
+        return saved_states

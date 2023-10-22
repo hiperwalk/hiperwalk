@@ -7,7 +7,7 @@ from ..graph import Graph
 import scipy.optimize
 from ..simulator import Simulator
 
-class QuantumWalk(ABC):
+class QuantumWalk(ABC, Simulator):
     """
     Abstract class for Quantum Walks.
 
@@ -43,7 +43,7 @@ class QuantumWalk(ABC):
 
         self._marked = []
         if 'marked' in kwargs:
-            self._update_marked(kwargs['marked'])
+            self._set_marked(kwargs['marked'])
 
         # TODO: create sparse matrix from graph or dense adjacency matrix
         if isinstance(graph, Graph):
@@ -68,7 +68,6 @@ class QuantumWalk(ABC):
             )
 
         self.hilb_dim = 0
-        self._simulator = None
 
 
     def uniform_state(self):
@@ -96,7 +95,7 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def _update_marked(self, marked=[]):
+    def _set_marked(self, marked=[]):
         if not hasattr(marked, '__iter__'):
             marked = [marked]
 
@@ -125,8 +124,8 @@ class QuantumWalk(ABC):
         --------
         set_evolution
         """
-        self._update_marked(marked=marked)
-        self._update_evolution(**kwargs)
+        self._set_marked(marked=marked)
+        self._set_evolution(**kwargs)
 
     def get_marked(self):
         r"""
@@ -139,47 +138,6 @@ class QuantumWalk(ABC):
             If no vertex is marked, returns the empty list.
         """
         return self._marked
-
-    def _update_evolution(self, U):
-        self._simulator.set_matrix(U)
-
-    @abstractmethod
-    def set_evolution(self, **kwargs):
-        """
-        Create the standard evolution operator.
-
-        The evolution operator is saved to be used during the simulation.
-
-        Parameters
-        ----------
-        **kwargs : dict, optional
-            Additional arguments for constructing the evolution operator
-
-        See Also
-        --------
-        simulate
-        """
-        raise NotImplementedError()
-
-    def get_evolution(self, copy=True):
-        r"""
-        Returns the evolution operator.
-
-        Parameters
-        ----------
-        copy: bool, default=True
-            If ``True`` returns a hard copy.
-            If ``False`` returns matrix pointer.
-
-        Returns
-        -------
-        :class:`numpy.ndarray`.
-
-        See Also
-        --------
-        set_evolution
-        """
-        return self._simulator.get_matrix(copy)
 
     @staticmethod
     def _elementwise_probability(elem):
@@ -332,20 +290,6 @@ class QuantumWalk(ABC):
 
         return prob[0] if single_state else prob
 
-    @staticmethod
-    def _time_to_tuple(time):
-        r"""
-        Clean and format ``time`` to ``(start, end, step)`` format.
-
-        See :meth:`simulate` for valid input format options.
-
-        Raises
-        ------
-        ValueError
-            If ``time`` is in an invalid input format.
-        """
-        return Simulator.exponent_to_tuple(time)
-
     def _normalize(self, state, error=1e-16):
         norm = np.linalg.norm(state)
         if 1 - error <= norm and norm <= 1 + error:
@@ -424,77 +368,6 @@ class QuantumWalk(ABC):
         ket = np.zeros(self.hilb_dim, dtype=float)
         ket[label] = 1
         return ket
-
-    def simulate(self, time=None, initial_state=None, hpc=True):
-        r"""
-        Simulates the quantum walk.
-
-        Simulates the quantum walk applying the evolution operator
-        multiple times to the initial state.
-
-        Parameters
-        ----------
-        time : int, tuple of int, default=None
-            Describes at which time instants the state must be saved.
-            It can be specified in three different ways.
-            
-            * end
-                Save the state at time ``end``.
-                Only the final state is saved.
-
-            * (end, step)
-                Saves each state from time 0 to time ``end`` (inclusive)
-                that is multiple of ``step``.
-
-            * (start, end, step)
-                Saves every state from time ``start`` (inclusive)
-                to time ``end`` (inclusive)
-                that is multiple of ``step``.
-
-        initial_state : :class:`numpy.array`, default=None
-            The initial state which the evolution operator
-            is going to be applied to.
-
-        hpc : bool, default=True
-            Whether or not to use neblina's high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses standalone python.
-
-        Returns
-        -------
-        states : :class:`numpy.ndarray`.
-            States saved during simulation where
-            ``states[i]`` corresponds to the ``i``-th saved state.
-
-        Raises
-        ------
-        ValueError
-            If any of the following occurs
-            * ``time=None``.
-            * ``initial_state=None``.
-            * ``evolution_operator=None`` and it was no set previously.
-
-        See Also
-        --------
-        evolution_operator
-        state
-
-        Notes
-        -----
-        The walk is simulated by applying the
-        evolution operator to the initial state multiple times.
-        The maximum and intermediate applications
-        are describred by ``time``.
-
-        Examples
-        --------
-        If ``time=(0, 13, 3)``, the saved states will be:
-        the initial state (0), the intermediate states (3, 6, and 9),
-        and the final state (12).
-        """
-        return self._simulator.simulate(exponent=time,
-                                        vector=initial_state,
-                                        hpc=hpc)
 
     @staticmethod
     def _get_valid_kwargs(method):
@@ -728,3 +601,7 @@ class QuantumWalk(ABC):
         # max_sucess_probability is not in p_succ.
         # simulation must be rerun
         return p_succ[opt_index]
+
+    @abstractmethod
+    def _set_evolution(self, **kwargs):
+        super().set_evolution(**kwargs)
