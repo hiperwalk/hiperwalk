@@ -481,22 +481,22 @@ class QuantumWalk(ABC, Simulator):
     def _number_to_valid_time(self, number):
         raise NotImplementedError()
 
-    def _optimal_runtime(self, initial_state, delta_time, hpc):
+    def _optimal_runtime(self, state, delta_time, hpc):
         r"""
         .. todo::
             Returns all arguments.
             It is used by optinal_runtime and max_p_succ to avoid
             redundant computation.
         """
-        if initial_state is None:
-            initial_state = self.uniform_state()
+        if state is None:
+            state = self.uniform_state()
 
         N = self._graph.number_of_vertices()
         # if search algorithm takes O(N),
         # it is better to use classical computing.
         final_time = self._number_to_valid_time(N/2)
         states = self.simulate(time=(final_time, delta_time),
-                               initial_state=initial_state,
+                               state=state,
                                hpc=hpc)
         p_succ = self.success_probability(states)
         del states
@@ -509,12 +509,12 @@ class QuantumWalk(ABC, Simulator):
         return self._number_to_valid_time(t_opt), p_succ
 
 
-    def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
+    def optimal_runtime(self, state=None, delta_time=1, hpc=True):
         r"""
         Find the optimal runtime of a quantum walk search.
 
         Simulate the aplication of the previously set evolution operator
-        passing the ``initial_state`` to the simulation.
+        passing the ``state`` to the simulation.
         Calculate the success probability of each intermediate state.
         Fit the probabilities to a sine squared function.
         The optimal runtime is the point in the domain where the
@@ -522,7 +522,7 @@ class QuantumWalk(ABC, Simulator):
 
         Parameters
         ----------
-        initial_state : :class:`numpy.ndarray`, default=None
+        state : :class:`numpy.ndarray`, default=None
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
@@ -550,18 +550,18 @@ class QuantumWalk(ABC, Simulator):
         success_probability
         fit_sin_squared
         """
-        t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
+        t_opt, _ = self._optimal_runtime(state, delta_time, hpc)
         return t_opt
 
     def max_success_probability(self,
-        initial_state=None, delta_time=1, hpc=True):
+        state=None, delta_time=1, hpc=True):
         r"""
         Find the max success probability.
         The success probability corresponding to the optimal runtime.
 
         Parameters
         ----------
-        initial_state : :class:`numpy.ndarray`, default=None
+        state : :class:`numpy.ndarray`, default=None
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
@@ -594,7 +594,7 @@ class QuantumWalk(ABC, Simulator):
             the max success probability was not obtained in the simulation.
             The simulation must be rerun or interpolated.
         """
-        t_opt, p_succ = self._optimal_runtime(initial_state,
+        t_opt, p_succ = self._optimal_runtime(state,
                                               delta_time, hpc)
         opt_index = int(t_opt / delta_time)
         # TODO: if t_opt / delta_time is not close to an integer,
