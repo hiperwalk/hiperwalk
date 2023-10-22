@@ -881,8 +881,14 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             start = now()
 
+        try:
+            states.shape == 1
+        except:
+            states = np.array(states, copy=False)
+
         if len(states.shape) == 1:
-            states = [states]
+            states = np.array([states], copy=False)
+
 
         graph = self._graph
         num_vert = graph.number_of_vertices()
