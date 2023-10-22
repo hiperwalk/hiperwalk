@@ -858,7 +858,7 @@ def plot_success_probability(time, probabilities, **kwargs):
     matplotlib.pyplot.plot
     """
 
-    time = QuantumWalk._time_to_tuple(time)
+    time = QuantumWalk.time_to_tuple(time)
     time[1] += time[2]
     time = np.arange(*time)
 
