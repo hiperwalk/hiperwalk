@@ -579,16 +579,22 @@ class Coined(QuantumWalk):
         return -np.identity(dim)
 
     def _update_marked(self, marked=[]):
-        coin_list = []
+        try:
+            marked.get(0) #throws exception if list
+        except AttributeError:
+            # list
+            if len(marked) > 0:
+                marked = {'-I': marked}
+            else:
+                marked = {}
 
-        if isinstance(marked, dict):
-            coin_list, _ = self._coin_to_list(marked)
+        coin_list, _ = self._coin_to_list(marked)
 
-            dict_values = marked.values()
-            vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
-                        for vlist in dict_values]
-            vertices = [v for vlist in vertices for v in vlist ]
-            marked = vertices
+        dict_values = marked.values()
+        vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
+                    for vlist in dict_values]
+        vertices = [v for vlist in vertices for v in vlist ]
+        marked = vertices
 
         super()._update_marked(marked=marked)
         self._oracle_coin = coin_list
@@ -614,8 +620,8 @@ class Coined(QuantumWalk):
             how they are going to be marked.
             
             * list of int
-                Given vertices are set as marked but
-                the evolution operator remains unchanged.
+                Given vertices are set as marked.
+                The coin for those vertices is '-I'.
 
             * dict
                 A dictionary with structure
