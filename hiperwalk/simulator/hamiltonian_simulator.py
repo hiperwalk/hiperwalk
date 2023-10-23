@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.sparse import issparse
+from scipy import sparse
 from .simulator import *
 
 class HamiltonianSimulator(Simulator):
@@ -69,7 +69,11 @@ class HamiltonianSimulator(Simulator):
         r"""
         TODO
         """
-        return np.copy(self._hamiltonian) if copy else self._hamiltonian
+        if not copy:
+            return self._hamiltonian
+        if sparse.issparse(self._hamiltonian):
+            return sparse.csr_matrix.copy(self._hamiltonian)
+        return np.copy(self._hamiltonian)
 
     def set_terms(self, terms=21, hpc=True):
         r"""
@@ -252,7 +256,7 @@ class HamiltonianSimulator(Simulator):
                 for i in range(num_mult - 1):
                     nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
             else:
-                if issparse(H):
+                if sparse.issparse(H):
                     H = H.todense()
                 U = numpy_matrix_power_series(-1j*new_time*H, n)
                 U = np.linalg.matrix_power(U, num_mult + 1)
