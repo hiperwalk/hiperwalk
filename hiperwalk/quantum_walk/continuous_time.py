@@ -4,7 +4,7 @@ import scipy.linalg
 from .quantum_walk import QuantumWalk
 from ..simulator import HamiltonianSimulator
 
-class ContinuousTime(QuantumWalk):
+class ContinuousTime(QuantumWalk, HamiltonianSimulator):
     r"""
     Manage an instance of a continuous-time quantum walk
     on any simple graph.
@@ -23,15 +23,11 @@ class ContinuousTime(QuantumWalk):
         :class:`class:scipy.sparse.csr_array`:
             The adjacency matrix of the graph.
 
-    gamma : float
-        Gamma value for setting Hamiltonian.
-
-    **kwargs : optional
-        Arguments to set the Hamiltonian and evolution operator.
+    **kwargs :
+        Arguments to set the evolution operator.
 
     See Also
     --------
-    set_hamiltonian
     set_evolution
 
     Notes
@@ -61,24 +57,16 @@ class ContinuousTime(QuantumWalk):
 
     _valid_kwargs = dict()
 
-    def __init__(self, graph=None, gamma=None, **kwargs):
+    def __init__(self, graph=None, **kwargs):
 
-        super().__init__(graph=graph)
+        QuantumWalk.__init__(self, graph=graph)
 
         # create attributes
         self.hilb_dim = self._graph.number_of_vertices()
         self._gamma = None
         self._hamil_type = None
 
-        time = kwargs['time'] if 'time' in kwargs else 0
-
-        # simulator matrix will be updated
-        self._simulator = HamiltonianSimulator(time=time,
-                                               hamiltonian=[[1]],
-                                               hpc=False)
-        if 'terms' in kwargs:
-            self.set_terms(terms=kwargs.pop['terms'], hpc=False)
-        self.set_hamiltonian(gamma=gamma, **kwargs)
+        HamiltonianSimulator.__init__(self, **kwargs)
 
     def _set_gamma(self, gamma=None):
         if gamma is None or gamma.imag != 0:
@@ -89,7 +77,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def set_gamma(self, gamma=None, **kwargs):
+    def set_gamma(self, gamma=None, hpc=True):
         r"""
         Sets the gamma parameter.
         
@@ -114,11 +102,10 @@ class ContinuousTime(QuantumWalk):
         ValueError
             If ``gamma < 0``.
         """
-        self.set_hamiltonian(gamma=gamma, type=self._hamil_type,
-                marked=self._marked)
-        if self._set_gamma(gamma=gamma):
-            self._set_hamiltonian()
-            self._set_evolution(**kwargs)
+        self.set_hamiltonian(gamma=gamma,
+                             type=self._hamil_type,
+                             marked=self._marked,
+                             hpc=hpc)
 
     def get_gamma(self):
         r"""
@@ -131,10 +118,45 @@ class ContinuousTime(QuantumWalk):
         """
         return self._gamma
 
-    def set_marked(self, marked=[], **kwargs):
+    def _set_marked(self, marked=[]):
+        raise NotImplementedError()
+
+    def set_marked(self, marked=[], hpc=True):
         self.set_hamiltonian(gamma=self._gamma,
                              type=self._hamil_type,
-                             marked=marked)
+                             marked=marked,
+                             hpc=hpc)
+
+    def _set_hamiltonian(self, gamma=None, type="adjacency", marked=[]):
+        update = False
+        if self._gamma != gamma:
+            self._gamma = gamma
+            update = True
+        if self._hamil_type != type:
+            self._hamil_type = type
+            update = True
+        if id(self._marked) != id(marked):
+            self._marked = marked
+            update = True
+
+        if update:
+            if type == 'adjacency':
+                H = -self._gamma * self._graph.adjacency_matrix()
+            else:
+                raise NotImplementedError()
+
+            # creating oracle
+            if len(self._marked) > 0:
+                data = np.ones(len(self._marked), dtype=np.int8)
+                oracle = scipy.sparse.csr_array(
+                        (data, (self._marked, self._marked)),
+                        shape=(self.hilb_dim, self.hilb_dim))
+
+                H -= oracle
+
+            self._hamiltonian = H
+
+        return update
 
     def set_hamiltonian(self, gamma=None, type="adjacency", marked=[],
                         hpc=True):
@@ -180,61 +202,28 @@ class ContinuousTime(QuantumWalk):
         where :math:`A` is the adjacency matrix, and
         :math:`M` is the set of marked vertices.
         """
-        update = False
-        if self._gamma != gamma:
-            self._gamma = gamma
-            update = True
-        if self._hamil_type != type:
-            self._hamil_type = type
-            update = True
-        if id(self._marked) != id(marked):
-            self._marked = marked
-            update = True
+        self.set_evolution(time=self._time,
+                           terms=self._terms,
+                           gamma=gamma,
+                           type=type,
+                           marked=marked,
+                           hpc=hpc)
 
-        if type == 'adjacency':
-            H = -self._gamma * self._graph.adjacency_matrix()
-        else:
-            raise NotImplementedError()
+    def _set_evolution(self, **kwargs):
+        HamiltonianSimulator._set_evolution(self, **kwargs)
 
-        # creating oracle
-        if len(self._marked) > 0:
-            data = np.ones(len(self._marked), dtype=np.int8)
-            oracle = scipy.sparse.csr_array(
-                    (data, (self._marked, self._marked)),
-                    shape=(self.hilb_dim, self.hilb_dim))
+    def set_time(self, time=None, hpc=True):
+        self.set_evolution(time=time,
+                           terms=self._terms,
+                           gamma=self._gamma,
+                           type=self._hamil_type,
+                           marked=self._marked,
+                           hpc=hpc)
 
-            H -= oracle
-
-        self._simulator.set_hamiltonian(H, hpc=hpc)
-
-    def get_hamiltonian(self, **kwargs):
-        r"""
-        See :meth:`HamiltonianSimulator.get_hamiltonian`.
-        """
-        return self._simulator.get_hamiltonian(**kwargs)
-
-    def set_time(self, **kwargs):
-        r"""
-        See :meth:`HamiltonianSimulator.set_time`.
-        """
-        self._simulator.set_time(**kwargs)
-
-    def get_time(self):
-        return self._simulator.get_time()
-
-    def set_terms(self, **kwargs):
-        self._simulator.set_terms(**kwargs)
-
-    def get_terms(self):
-        return self._simulator
-
-    def simulate(self, time=None, initial_state=None, hpc=True):
-        return self._simulator.simulate(time=time,
-                                        vector=initial_state,
-                                        hpc=hpc)
-
-    def set_evolution(self, **kwargs):
-        self._simulator.set_evolution(**kwargs)
-
-    def get_evolution(self, **kwargs):
-        return self._simulator.get_evolution(**kwargs)
+    def set_terms(self, terms=21, hpc=True):
+        self.set_evolution(time=self._time,
+                           terms=terms,
+                           gamma=self._gamma,
+                           type=self._hamil_type,
+                           marked=self._marked,
+                           hpc=hpc)

@@ -13,12 +13,6 @@ class HamiltonianSimulator(Simulator):
         self._terms = None
         self.set_evolution(**kwargs)
 
-    def set_matrix(self, **kwargs):
-        r"""
-        Alias for :meth:`set_evolution`.
-        """
-        self.set_evolution(**kwargs)
-
     def set_time(self, time=None, hpc=True):
         r"""
         Alias for :meth:`set_evolution`,
@@ -64,7 +58,7 @@ class HamiltonianSimulator(Simulator):
         r"""
         Generates the evolution operator with the same
         previous parameters but changes the Hamiltonian.
-        Hamiltonian is expected to be is kew-Hermitian.
+        Hamiltonian is expected to be is skew-Hermitian.
         """
         self.set_evolution(time=self._time,
                            hamiltonian=hamiltonian,
@@ -78,6 +72,16 @@ class HamiltonianSimulator(Simulator):
         return np.copy(self._hamiltonian) if copy else self._hamiltonian
 
     def set_terms(self, terms=21, hpc=True):
+        r"""
+        Parameters
+        ----------
+        terms : int
+            Number of terms in Taylor series expansion.
+
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
+        """
         self.set_evolution(time=self._time,
                            hamiltonian=self._hamiltonian,
                            terms=terms,
@@ -86,8 +90,7 @@ class HamiltonianSimulator(Simulator):
     def get_terms(self):
         return self._terms
 
-    def set_evolution(self, time=None, hamiltonian=None, terms=21,
-                      hpc=True):
+    def set_evolution(self, **kwargs):
         r"""
         Sets the evolution operator.
 
@@ -99,23 +102,19 @@ class HamiltonianSimulator(Simulator):
 
         Parameters
         ----------
-        hpc : bool, default = True
-            Determines whether or not to use neblina HPC 
-            functions to generate the evolution operator.
-
-        terms : int
-            Number of terms in Taylor series expansion.
-
         **kwargs :
-            Additional arguments for setting Hamiltonian and time.
-            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`, and
-            :meth:`hiperwalk.ContinuousTime.set_time`.
+            Key arguments for setting Hamiltonian, time, and
+            number of terms.
+            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`,
+            :meth:`hiperwalk.ContinuousTime.set_time`, and
+            :meth:`hiperwalk.ContinuousTime.set_terms`.
             If omitted, the default arguments are used.
 
         See Also
         --------
         set_hamiltonian
         set_time
+        set_terms
 
         Notes
         -----
@@ -149,18 +148,23 @@ class HamiltonianSimulator(Simulator):
             is solved.
         """
 
-        update = self._set_time(time)
-        update = self._set_hamiltonian(hamiltonian) or update
-        update = self._set_terms(terms) or update
+        def filter_and_call(method, update):
+            valid = self._get_valid_kwargs(method)
+            filtered = self._filter_valid_kwargs(kwargs, valid)
+            return method(**filtered) or update
+
+        update = filter_and_call(self._set_time, False)
+        update = filter_and_call(self._set_hamiltonian, update)
+        update = filter_and_call(self._set_terms, update)
         if (update):
-            self._set_evolution(hpc=hpc)
+            filter_and_call(self._set_evolution, update)
 
 
     ############################################
     ### Auxiliary methods for _set_evolution ###
     ############################################
 
-    def _set_time(self, time):
+    def _set_time(self, time=None):
         if time is None or time < 0:
             raise ValueError(
                 "Expected non-negative `time` value."
@@ -171,13 +175,13 @@ class HamiltonianSimulator(Simulator):
             return True
         return False
 
-    def _set_hamiltonian(self, hamiltonian):
+    def _set_hamiltonian(self, hamiltonian=None):
         if id(self._hamiltonian) != id(hamiltonian):
             self._hamiltonian = hamiltonian
             return True
         return False
 
-    def _set_terms(self, terms):
+    def _set_terms(self, terms=21):
         if self._terms != terms:
             self._terms = terms
             return True
@@ -263,36 +267,37 @@ class HamiltonianSimulator(Simulator):
     ############################################
     ############################################
 
-    def get_evolution(self, copy=True):
-        return np.copy(self._evolution) if copy else self._evolution
-
-    def simulate(self, time=None, vector=None, hpc=True):
+    def simulate(self, time=None, state=None, hpc=True,
+                 initial_state=None):
         r"""
-        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
-        which accepts float entries for the ``time`` parameter.
+        Analogous to :meth:`hiperwalk.Simulator.simulate`,
+        but accepts float entries for the ``time`` parameter.
 
         Parameters
         ----------
         time : float or tuple of floats
             This parameter is analogous to those in
-            :meth:`hiperwalk.QuantumWalk.simulate`,
+            :meth:`hiperwalk.Simulator.simulate`,
             with the distinction that it accepts float inputs.
-            The ``step`` parameter is used to
-            construct the evolution operator.
-            The states within the interval
-            **[** ``start/step``, ``end/step`` **]** are stored.
-            The values describing this interval are
-            rounded up if the decimal part exceeds ``1 - 1e-5``,
-            and rounded down otherwise.
+
+            If the ``step`` parameter specified, it is used to
+            recalculate the evolution operator if needed.
+            Otherwise, ``step`` is set to the value of
+            :meth:`hiperwalk.HamiltonianSimulator.get_time`.
+
+            The saved states are within the interval
+            **[** ``start``, ``end`` **]**
+            such that the timestamps are multiples of ``step``.
 
         Other Parameters
         ----------------
-        See `hiperwalk.QuantumWalk.simulate`.
+        See `hiperwalk.Simulator.simulate`.
 
         See Also
         --------
-        set_evolution
-        get_evolution
+        set_time
+        get_time
+        hiperwalk.Simulator.siulate
         """
         if time is None:
             raise ValueError(
@@ -300,7 +305,7 @@ class HamiltonianSimulator(Simulator):
                 + "or 3-tuple of float."
             )
 
-        time = np.array(Simulator.exponent_to_tuple(time))
+        time = np.array(Simulator.time_to_tuple(time))
 
         self.set_time(time=time[2], hpc=hpc)
 
@@ -312,8 +317,9 @@ class HamiltonianSimulator(Simulator):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        saved_vectors = super().simulate(time, vector, hpc)
-        return saved_vectors
+        saved_states = super().simulate(time=time, state=state, hpc=hpc,
+                                        initial_state=initial_state)
+        return saved_states
 
     def _number_to_valid_time(self, number):
         return number

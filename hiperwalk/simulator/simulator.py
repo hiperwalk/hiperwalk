@@ -1,4 +1,5 @@
 import numpy as np
+import inspect
 from sys import modules as sys_modules
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
 try:
@@ -137,7 +138,6 @@ class Simulator():
 
     def _prepare_engine(self, vector, hpc):
         if self._evolution is None:
-            #self._evolution = self.get_evolution(hpc=hpc)
             raise ValueError("Matrix not set.")
 
         if hpc:
@@ -328,3 +328,15 @@ class Simulator():
         self._simul_vec = None
 
         return saved_states
+
+    @staticmethod
+    def _get_valid_kwargs(method):
+        return inspect.getfullargspec(method)[0][1:]
+
+    @staticmethod
+    def _filter_valid_kwargs(kwargs, valid_kwargs):
+        return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
+
+    @staticmethod
+    def _pop_valid_kwargs(kwargs, valid_kwargs):
+        return {k : kwargs.pop(k) for k in valid_kwargs if k in kwargs}

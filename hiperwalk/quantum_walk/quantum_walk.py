@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
 import scipy.sparse
-import inspect
 from .._constants import __DEBUG__
 from ..graph import Graph
 import scipy.optimize
@@ -368,18 +367,6 @@ class QuantumWalk(ABC, Simulator):
         ket = np.zeros(self.hilb_dim, dtype=float)
         ket[label] = 1
         return ket
-
-    @staticmethod
-    def _get_valid_kwargs(method):
-        return inspect.getfullargspec(method)[0][1:]
-
-    @staticmethod
-    def _filter_valid_kwargs(kwargs, valid_kwargs):
-        return {k : kwargs.get(k) for k in valid_kwargs if k in kwargs}
-
-    @staticmethod
-    def _pop_valid_kwargs(kwargs, valid_kwargs):
-        return {k : kwargs.pop(k) for k in valid_kwargs if k in kwargs}
 
     def hilbert_space_dimension(self):
         """
