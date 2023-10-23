@@ -67,6 +67,7 @@ class QuantumWalk(ABC, Simulator):
             )
 
         self.hilb_dim = 0
+        self._simulator = None
 
 
     def uniform_state(self):
