@@ -879,12 +879,11 @@ def plot_success_probability(time, probabilities, **kwargs):
 
 def plot_function(qw_iter, x_label, y_label, x_vals, function,
                   *args, **kwargs):
-    # TODO: any situation where *y_args and **y_kwargs are iterable?
-
-    # y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
-    # plt.plot(x_arg, y_vals)
-    # plt.show()
-    #######################################
+    """
+    ..todo ::
+        Add documentation explaining that it is recommended that
+        ``qw_ter`` is an generator.
+    """
     if hasattr(x_vals, '__iter__'):
         x_vals = iter(x_vals)
 
