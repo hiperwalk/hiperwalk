@@ -269,7 +269,7 @@ class ContinuousTime(QuantumWalk):
         The evolution operator is given by
 
         .. math::
-            U(t) = e^{-\text{i}tH},
+            U(t) = 	\text{e}^{-\text{i}tH},
 
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
@@ -383,7 +383,7 @@ class ContinuousTime(QuantumWalk):
         The evolution operator is given by
 
         .. math::
-            U(t) = e^{-\text{i}tH},
+            U(t) = 	\text{e}^{-\text{i}tH},
 
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
