@@ -15,12 +15,11 @@ if __DEBUG__:
 
 class Coined(QuantumWalk):
     r"""
-    Manage an instance of a coined quantum walk on
-    any simple graph.
+    Manage instances of coined quantum walks on any simple graph.
 
-    This class provides methods for handling, simulating, and generating
-    operators within the coined quantum walk model for
-    various types of graphs.
+    The class provides methods to handle and generate operators in the 
+    coined quantum walk model. It also facilitates the simulation of 
+    coined quantum walks with coins on simple graphs.
     
     For additional details about coined quantum walks,
     refer to the Notes Section.
@@ -121,7 +120,7 @@ class Coined(QuantumWalk):
 
     def _set_flipflop_shift(self):
         r"""
-        Create the flipflop shift operator (:math:`S`) based on
+        Creates the flipflop shift operator (:math:`S`) based on
         the ``_graph`` attribute.
 
         The operator is configured for future use. If an evolution
@@ -168,7 +167,7 @@ class Coined(QuantumWalk):
 
     def _set_persistent_shift(self):
         r"""
-        Create the persistent shift operator (:math:`S`) based on
+        Creates the persistent shift operator (:math:`S`) based on
         the ``_graph`` attribute.
 
         The operator is set for future usage.
@@ -219,8 +218,8 @@ class Coined(QuantumWalk):
         r"""
         Set the shift operator.
 
-        Sets either the flipflop or the persistent shift operator.
-        Afterwards, the evolution operator is updated accordingly.
+        Chooses either the flipflop or the persistent shift operator.
+        Following this, the evolution operator updates accordingly.
 
         Parameters
         ----------
@@ -335,7 +334,7 @@ class Coined(QuantumWalk):
 
     def get_shift(self):
         r"""
-        Return the shift operator.
+        Retrieve the shift operator.
 
         Shift operator used for constructing the evolution operator.
 
@@ -371,12 +370,12 @@ class Coined(QuantumWalk):
 
     def set_coin(self, coin='default', **kwargs):
         """
-        Generate a coin operator based on the graph structure.
+        Set the coin operator based on the graph's structure.
 
-        Constructs a coin operator based on the degree of each vertex.
-        A single type of coin may be applied to
-        all vertices or a subset thereof.
-        Once the coin operator is set,
+        Builds a coin operator considering the degree of each vertex.
+        The same coin can be applied to all vertices, or multiple 
+        coins can be assigned, each to a specific subset of vertices. 
+        After setting the coin operator,
         the evolution operator is updated accordingly.
 
         Parameters
@@ -579,33 +578,38 @@ class Coined(QuantumWalk):
         return -np.identity(dim)
 
     def _update_marked(self, marked=[]):
-        coin_list = []
+        try:
+            marked.get(0) #throws exception if list
+        except AttributeError:
+            # list
+            if len(marked) > 0:
+                marked = {'-I': marked}
+            else:
+                marked = {}
 
-        if isinstance(marked, dict):
-            coin_list, _ = self._coin_to_list(marked)
+        coin_list, _ = self._coin_to_list(marked)
 
-            dict_values = marked.values()
-            vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
-                        for vlist in dict_values]
-            vertices = [v for vlist in vertices for v in vlist ]
-            marked = vertices
+        dict_values = marked.values()
+        vertices = [vlist if hasattr(vlist, '__iter__') else [vlist]
+                    for vlist in dict_values]
+        vertices = [v for vlist in vertices for v in vlist ]
+        marked = vertices
 
         super()._update_marked(marked=marked)
         self._oracle_coin = coin_list
 
     def set_marked(self, marked=[], **kwargs):
         r"""
-        Set marked vertices.
+        Set the marked vertices.
 
-        If a list of vertices is provided, those vertices are
-        deemed as marked.
+        When a set or list of vertices is provided, they 
+        are set as marked.
         The evolution operator is updated accordingly.
 
-        If a dictionary is passed,
-        the coin of those vertices are substituted
-        only for generating the evolution operator.
-        This can only be done if the set coin operator is
-        not a explicit matrix.
+        If a dictionary is passed, the coin of those vertices is
+        replaced solely for the purpose of generating the evolution 
+        operator. This can only be done if the set coin operator is
+        not an explicit matrix.
 
         Parameters
         ----------
@@ -614,8 +618,8 @@ class Coined(QuantumWalk):
             how they are going to be marked.
             
             * list of int
-                Given vertices are set as marked but
-                the evolution operator remains unchanged.
+                Given vertices are set as marked.
+                The coin for those vertices is '-I'.
 
             * dict
                 A dictionary with structure
@@ -645,7 +649,7 @@ class Coined(QuantumWalk):
 
     def get_coin(self):
         r"""
-        Return coin used for creating the evolution operator.
+        Retrieve the coin used in the creation of the evolution operator.
 
         Returns
         -------
@@ -748,17 +752,18 @@ class Coined(QuantumWalk):
 
     def set_evolution(self, hpc=True, **kwargs):
         """
-        Create evolution operator.
+        Set the evolution operator.
 
-        Sets shift, coin and marked vertices.
+        Establishes the shift operator, coin operator,
+        and the marked vertices.
         They are set using the appropriate ``**kwargs``.
         If ``**kwargs`` is empty, the default arguments are used.
 
-        Then, creates evolution operator by multiplying the
-        shift operator and coin operator.
-        If the coin operator is not an explicit matrix,
-        and the coin for marked vertices was specified,
-        the coin of each marked vertex is substituted.
+        Subsequently, the evolution operator is constructed by 
+        multiplying the shift and coin operators. 
+        If the coin operator isn't an explicit matrix 
+        and a coin for the marked vertices has been specified, 
+        the coin for each marked vertex is replaced.
 
         Parameters
         ----------
@@ -881,8 +886,14 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             start = now()
 
+        try:
+            states.shape == 1
+        except:
+            states = np.array(states, copy=False)
+
         if len(states.shape) == 1:
-            states = [states]
+            states = np.array([states], copy=False)
+
 
         graph = self._graph
         num_vert = graph.number_of_vertices()

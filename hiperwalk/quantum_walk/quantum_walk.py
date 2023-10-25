@@ -123,10 +123,10 @@ class QuantumWalk(ABC):
 
     def set_marked(self, marked=[], **kwargs):
         r"""
-        Sets marked vertices.
+        Set the marked vertices.
 
-        After the marked elements are changed,
-        the evolution operator is updated accordingly.
+        When the marked vertices are updated using this method,
+        the evolution operator adjusts accordingly.
 
         Parameters
         ----------
@@ -148,7 +148,7 @@ class QuantumWalk(ABC):
 
     def get_marked(self):
         r"""
-        Gets marked vertices.
+        Retrieve the marked vertices.
 
         Returns
         -------
@@ -161,9 +161,9 @@ class QuantumWalk(ABC):
     @abstractmethod
     def set_evolution(self, **kwargs):
         """
-        Create the standard evolution operator.
+        Set the standard evolution operator.
 
-        The evolution operator is saved to be used during the simulation.
+        This evolution operator is stored for use in subsequent simulations.
 
         Parameters
         ----------
@@ -178,7 +178,7 @@ class QuantumWalk(ABC):
 
     def get_evolution(self):
         r"""
-        Returns the evolution operator.
+        Retrieve the evolution operator.
 
         Returns
         -------
@@ -208,7 +208,7 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        states : :class:`numpy.ndarray`
+        states : :class:`numpy.ndarray` or list of :class:`numpy.ndarray`
             The state(s) used to compute the probability.
             ``states`` can be a single state or a list of states.
 
@@ -226,11 +226,19 @@ class QuantumWalk(ABC):
         --------
         probability
         """
+        if isinstance(states, set):
+            raise TypeError("Type 'set' is not supported.")
+
         if len(self._marked) > 0:
             return self.probability(states, self._marked)
 
-        if len(states.shape) > 1:
-            return np.zeros(states.shape[0])
+        try:
+            states.shape == 1
+        except TypeError:
+            states = np.array(states, copy=False)
+
+        if states.shape == 1:
+            return np.zeros(size)
         return 0
 
     def probability(self, states, vertices):
@@ -263,9 +271,15 @@ class QuantumWalk(ABC):
         --------
         simulate
         """
-        single_state = len(states.shape) == 1
-        if single_state:
-            states = np.array([states])
+        if isinstance(states, set):
+            raise TypeError("Type 'set' is not supported.")
+
+        single_state = False
+        try:
+            len(states[0])
+        except TypeError:
+            single_state = True
+            states = np.array([states], copy=False)
 
         probs = self.probability_distribution(states)
         probs = np.array([
@@ -315,9 +329,12 @@ class QuantumWalk(ABC):
         the probability associated with vertex :math:`v` is
         :math:`|\alpha_v|^2`.
         """
-        single_state = len(states.shape) == 1
-        if single_state:
-            states = [states]
+        single_state = False
+        try:
+            len(states[0])
+        except TypeError:
+            single_state = True
+            states = np.array([states])
 
         prob = list(map(QuantumWalk._elementwise_probability, states))
         prob = np.array(prob)
