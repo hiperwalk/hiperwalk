@@ -61,7 +61,7 @@ class ContinuousTime(QuantumWalk):
     of the adjacency matrix.
 
     For a more detailed understanding of continuous-time quantum 
-    walks, see [1].
+    walks, see [1]_.
     
     References
     ----------
@@ -214,7 +214,7 @@ class ContinuousTime(QuantumWalk):
             H = -\gamma A  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`A` is the adjacency matrix, and
-        :math:`M` is the set of marked vertices [1,2].
+        :math:`M` is the set of marked vertices [1,2]_.
         
         References
         ----------
