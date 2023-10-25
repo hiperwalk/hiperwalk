@@ -529,8 +529,8 @@ class QuantumWalk(ABC):
         r"""
         Simulates the quantum walk.
 
-        Simulates the quantum walk applying the evolution operator
-        multiple times to the initial state.
+        The walk is simulated by repeatedly applying the evolution operator 
+        to the result of the previous application, starting from the initial state.
 
         Parameters
         ----------
@@ -581,16 +581,16 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The walk is simulated by applying the
-        evolution operator to the initial state multiple times.
+        The walk is simulated by repeatedly applying the evolution operator 
+        to the result of the previous application, starting from the initial state.
         The maximum and intermediate applications
-        are describred by ``time``.
+        are described by ``time``.
 
         Examples
         --------
         If ``time=(0, 13, 3)``, the saved states will be:
-        the initial state (0), the intermediate states (3, 6, and 9),
-        and the final state (12).
+        the initial state (t=0), the intermediate states (t=3, 6, and 9),
+        and the final state (t=12).
         """
         ############################################
         ### Check if simulation was set properly ###
