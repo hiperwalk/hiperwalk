@@ -1,6 +1,11 @@
 .. _docs_development:
 
-===========
+=========================
+Contributing to Hiperwalk
+=========================
+
+To send a bug report or to contact the developers for other issues, write an email to hiperwalk@gmail.com.
+
 Development
 ===========
 
