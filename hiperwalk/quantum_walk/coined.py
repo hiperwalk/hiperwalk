@@ -120,7 +120,7 @@ class Coined(QuantumWalk):
 
     def _set_flipflop_shift(self):
         r"""
-        Create the flipflop shift operator (:math:`S`) based on
+        Creates the flipflop shift operator (:math:`S`) based on
         the ``_graph`` attribute.
 
         The operator is configured for future use. If an evolution
@@ -167,7 +167,7 @@ class Coined(QuantumWalk):
 
     def _set_persistent_shift(self):
         r"""
-        Create the persistent shift operator (:math:`S`) based on
+        Creates the persistent shift operator (:math:`S`) based on
         the ``_graph`` attribute.
 
         The operator is set for future usage.
@@ -216,7 +216,7 @@ class Coined(QuantumWalk):
 
     def set_shift(self, shift='default', **kwargs):
         r"""
-        Set the shift operator.
+        Sets the shift operator.
 
         Sets either the flipflop or the persistent shift operator.
         Afterwards, the evolution operator is updated accordingly.
@@ -370,7 +370,7 @@ class Coined(QuantumWalk):
 
     def set_coin(self, coin='default', **kwargs):
         """
-        Generate a coin operator based on the graph structure.
+        Sets the coin operator based on the graph structure.
 
         Constructs a coin operator based on the degree of each vertex.
         A single type of coin may be applied to
@@ -600,7 +600,7 @@ class Coined(QuantumWalk):
 
     def set_marked(self, marked=[], **kwargs):
         r"""
-        Set marked vertices.
+        Sets the set of marked vertices.
 
         If a list of vertices is provided, those vertices are
         deemed as marked.
@@ -753,7 +753,7 @@ class Coined(QuantumWalk):
 
     def set_evolution(self, hpc=True, **kwargs):
         """
-        Create evolution operator.
+        Sets the evolution operator.
 
         Sets shift, coin and marked vertices.
         They are set using the appropriate ``**kwargs``.
