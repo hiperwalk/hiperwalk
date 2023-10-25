@@ -3,8 +3,6 @@ import inspect
 from sys import modules as sys_modules
 from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
 try:
-    from sys import path
-    path.append('..')
     import _pyneblina_interface as nbl
 except ModuleNotFoundError:
     from warnings import warn
@@ -12,7 +10,7 @@ except ModuleNotFoundError:
 
 def pyneblina_imported():
     """
-    Expects pyneblina interface to be imported as nbl
+    Expects pyneblina interface to be imported as nbl.
     """
     return ('hiperwalk.quantum_walk._pyneblina_interface'
             in sys_modules)
