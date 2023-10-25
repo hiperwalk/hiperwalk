@@ -1,14 +1,11 @@
 .. _docs_development:
 
-=========================
-Contributing to Hiperwalk
-=========================
-
-To send a bug report or to contact the developers for other issues, 
-write an email to hiperwalk@gmail.com.
-
+===========
 Development
 ===========
+
+To contributing to Hiperwalk, to send a bug report, or to contact the developers, 
+write an email to hiperwalk@gmail.com.
 
 HiperWalk is built upon several Python libraries. 
 Before developing for HiperWalk, these libraries need to be installed. 
