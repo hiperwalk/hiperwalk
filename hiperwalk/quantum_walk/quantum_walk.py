@@ -178,7 +178,7 @@ class QuantumWalk(ABC):
 
     def get_evolution(self):
         r"""
-        Returns the evolution operator.
+        Retrieve the evolution operator.
 
         Returns
         -------
