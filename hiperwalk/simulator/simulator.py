@@ -17,7 +17,16 @@ def pyneblina_imported():
 
 class Simulator():
     r"""
-    TODO: docs
+    Class for simulating the dynamics of an evolution operator.
+
+    Parameters
+    ----------
+    evolution : matrix
+        The matrix that describes the dynamics of the system.
+
+    copy : bool, default=True
+        If ``True`` copies all the data from ``evolution``.
+        Otherwise, a pointer to ``evolution`` is saved.
     """
 
     def __init__(self, evolution):
@@ -91,7 +100,7 @@ class Simulator():
     @staticmethod
     def time_to_tuple(time):
         r"""
-        Clean and format ``time`` to ``(start, end, step)`` format.
+        Convert ``time`` to ``(start, end, step)`` format.
 
         See :meth:`simulate` for valid input format options.
 

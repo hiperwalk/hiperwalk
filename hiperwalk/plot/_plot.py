@@ -880,9 +880,72 @@ def plot_success_probability(time, probabilities, **kwargs):
 def plot_function(qw_iter, x_label, y_label, x_vals, function,
                   *args, **kwargs):
     """
-    ..todo ::
-        Add documentation explaining that it is recommended that
-        ``qw_ter`` is an generator.
+    Calculate and plot given function result for
+    each provided quantum walk.
+
+    The ``function`` is calculated for each quantum walk.
+    The result is stored in ``y`` and associated with ``x_vals``.
+    Each point of the plot correspond to the points
+    ``(x_vals[i], y[i])``.
+
+    Parameters
+    ----------
+    qw_iter : iterable of :class:`QuantumWalk`
+        The code will be execute for each quantum walk in
+        the iterable.
+
+    x_label: str
+        The label of the x-axis of the plot.
+
+    y_label: str
+        The label of the y-axis of the plot.
+
+    x_vals : iterable or callable
+        The x-axis values for each point.
+
+        iterable :
+            An array of values or an iterable.
+            The ``i``-th entry will be used as the
+            x-coordinate of the result of the
+            ``i``-th invocation of ``function``.
+
+        callable :
+            A function that receives a :class:`QuantumWalk` as argument
+            and returns a ``float`` or ``int``.
+
+    function : function
+        A function that receives a :class:`QuantumWalk` as argument and
+        returns a ``float`` or ``int``.
+        Additional positional arguments and
+        keyword arguments may be passed.
+        The expect signature of the function is
+
+        .. code-block:: python
+
+            def function(quantum_walk, arg_1, ..., arg_n,
+                         kwarg_1='default', ..., kwarg_m='default')
+
+        where ``'default'`` is any appropriated default value.
+
+
+    *args : optional
+        Additional positional arguments for ``function``.
+
+    **kwargs : optional
+        Additional keywords arguments for ``function`` or
+        :meth:`matplotlib.plt.plot`.
+        Valid keys for ``function`` are filtered and are
+        not passed to :meth:`matplotlib.plt.plot`.
+
+    Notes
+    -----
+    It is highly recommended to use a generator as
+    the :class:`QuantumWalk` iterable.
+
+    Examples
+    --------
+    .. todo::
+        Examples exhausting all posibilities.
     """
     if hasattr(x_vals, '__iter__'):
         x_vals = iter(x_vals)
@@ -907,20 +970,39 @@ def plot_function(qw_iter, x_label, y_label, x_vals, function,
     plt.ylabel(y_label)
     plt.show()
 
-def plot_optimal_runtime(qw_iter, x_label, x_vals, initial_state=None,
+def plot_optimal_runtime(qw_iter, x_label, x_vals, state=None,
                          **kwargs):
     r"""
+    Calculate and plot the optimal runtime for the given quantum walks.
+
+    For each given quantum walk,
+    the optimal runtime is calculated.
+    Each plot point has format ``(x_vals[i], y[i])``,
+    where ``y[i]`` is the optimal runtime for the
+    ``i``-th quantum walk.
+
     Parameters
     ----------
     qw_iter : iterable of :class:`QuantumWalk`
         The code will be execute for each quantum walk in
         the iterable.
 
-    x_vals :
-        The values to be plotted in the x-axis.
-        Iterable or callable.
+    x_label: str
+        The label of the x-axis of the plot.
 
-    initial_state:
+    x_vals : iterable or callable
+        The values to be plotted in the x-axis.
+
+        iterable :
+            An array of values or an iterable.
+            The ``i``-th entry will be used as the
+            x-coordinate of the result of the ``i``-th simulation.
+
+        callable :
+            A function that receives a :class:`QuantumWalk` as argument
+            and returns a value.
+
+    state:
         The initial state of the simulation.
         If ``None`` uses default argument.
         There are two types allowed.
@@ -934,81 +1016,114 @@ def plot_optimal_runtime(qw_iter, x_label, x_vals, initial_state=None,
             A function that receives a :class:`QuantumWalk` as argument
             and returns a state.
 
-            .. todo::
-                Should the function accept ``*args`` and ``**kwargs``?
+    See Also
+    --------
+    :meth:`hiperwalk.QuantumWalk.optimal_runtime`
+
+    Notes
+    -----
+    It is highly recommended to use a generator as
+    the :class:`QuantumWalk` iterable.
+
+    Examples
+    --------
+    .. todo::
+        examples with callable and iterable.
     """
-    # if hasattr(x_vals, '__iter__'):
-    #     x_vals = iter(x_vals)
+    if hasattr(state, '__iter__'):
+        state = iter(state)
 
-    # if hasattr(initial_state, '__iter__'):
-    #     initial_state = iter(initial_state)
-
-    # valid_opt_run_kwargs = QuantumWalk._get_valid_kwargs(
-    #                                 QuantumWalk.optimal_runtime)
-    # opt_run_kwargs = QuantumWalk._pop_valid_kwargs(kwargs,
-    #                         valid_opt_run_kwargs)
-    # del valid_opt_run_kwargs
-
-    # x = []
-    # t_opt = []
-    # psi0 = None
-
-    # for qw in qw_iter:
-    #     x.append(x_vals(qw)
-    #              if callable(x_vals)
-    #              else next(x_vals))
-
-    #     if initial_state is not None:
-    #         psi0 = (initial_state(qw)
-    #                 if callable(initial_state)
-    #                 else next(initial_state))
-
-    #     t_opt.append(
-    #         qw.optimal_runtime(initial_state=psi0, **opt_run_kwargs))
-
-    # plt.plot(x, t_opt, marker='o')
-    # plt.xlabel(x_label)
-    # plt.ylabel('Optimal runtime')
-    # plt.show()
-
-    if hasattr(initial_state, '__iter__'):
-        initial_state = iter(initial_state)
-
-    def function(qw, initial_state=None, delta_time=1, hpc=True):
+    def function(qw, state=None, delta_time=1, hpc=True):
         psi0 = None
-        if initial_state is not None:
-            psi0 = (initial_state(qw)
-                    if callable(initial_state)
-                    else next(initial_state))
+        if state is not None:
+            psi0 = (state(qw)
+                    if callable(state)
+                    else next(state))
 
-        return qw.optimal_runtime(initial_state=psi0,
+        return qw.optimal_runtime(state=psi0,
                                   delta_time=delta_time,
                                   hpc=hpc)
 
     plot_function(qw_iter, x_label, 'Optimal runtime', x_vals, function,
-                  initial_state=initial_state, **kwargs)
+                  state=state, **kwargs)
 
 def plot_max_success_probability(qw_iter, x_label, x_vals,
-        initial_state=None, **kwargs):
+        state=None, **kwargs):
     r"""
-    TODO
+    Calculate and plot the maximum success probability for
+    the given quantum walks.
+
+    For each given quantum walk,
+    the maximum success probability is calculated.
+    Each plot point has format ``(x_vals[i], y[i])``,
+    where ``y[i]`` is the maximum success probability for the
+    ``i``-th quantum walk.
+
+    Parameters
+    ----------
+    qw_iter : iterable of :class:`QuantumWalk`
+        The code will be execute for each quantum walk in
+        the iterable.
+
+    x_label: str
+        The label of the x-axis of the plot.
+
+    x_vals : iterable or callable
+        The values to be plotted in the x-axis.
+
+        iterable :
+            An array of values or an iterable.
+            The ``i``-th entry will be used as the
+            x-coordinate of the result of the ``i``-th simulation.
+
+        callable :
+            A function that receives a :class:`QuantumWalk` as argument
+            and returns a value.
+
+    state:
+        The initial state of the simulation.
+        If ``None`` uses default argument.
+        There are two types allowed.
+
+        iterable :
+            An array of states or an iterable.
+            The ``i``-th entry will be used as the inital state
+            of the ``i``-th quantum walk.
+
+        callable :
+            A function that receives a :class:`QuantumWalk` as argument
+            and returns a state.
+
+    See Also
+    --------
+    :meth:`hiperwalk.QuantumWalk.max_success_probability`
+
+    Notes
+    -----
+    It is highly recommended to use a generator as
+    the :class:`QuantumWalk` iterable.
+
+    Examples
+    --------
+    .. todo::
+        examples with callable and iterable.
     """
-    if hasattr(initial_state, '__iter__'):
-        initial_state = iter(initial_state)
+    if hasattr(state, '__iter__'):
+        state = iter(state)
 
-    def function(qw, initial_state=None, delta_time=1, hpc=True):
+    def function(qw, state=None, delta_time=1, hpc=True):
         psi0 = None
-        if initial_state is not None:
-            psi0 = (initial_state(qw)
-                    if callable(initial_state)
-                    else next(initial_state))
+        if state is not None:
+            psi0 = (state(qw)
+                    if callable(state)
+                    else next(state))
 
-        return qw.max_success_probability(initial_state=psi0,
+        return qw.max_success_probability(state=psi0,
                                           delta_time=delta_time,
                                           hpc=hpc)
 
     plot_function(qw_iter, x_label, 'Max success probability',
-                  x_vals, function, initial_state=initial_state, **kwargs)
+                  x_vals, function, state=state, **kwargs)
 
 
 if __DEBUG__:

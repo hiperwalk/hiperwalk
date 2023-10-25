@@ -1,13 +1,14 @@
 ==========
-Generators
+Simulators
 ==========
 
 .. currentmodule:: hiperwalk
 
-Functions
----------
+Classes
+-------
 .. autosummary::
     :toctree: generated
     :nosignatures:
 
-    quantum_walk_generator
+    Simulator
+    HamiltonianSimulator

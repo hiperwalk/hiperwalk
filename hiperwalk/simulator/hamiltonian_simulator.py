@@ -4,7 +4,38 @@ from .simulator import *
 
 class HamiltonianSimulator(Simulator):
     r"""
-    TODO: docs
+    Class for simulating the dynamics of a Hamiltonian.
+
+    Parameters
+    ----------
+    hamiltonian : matrix
+        A skew-Hermitian matrix.
+        The Hamiltonian describes the dynamics of a system.
+
+    time : float
+        Time value used to construct the evolution operator.
+
+    terms : int, default=21
+        Number of terms in power series expansion.
+
+    hpc : bool, default=True
+        Determines whether or not to use neblina HPC 
+        functions to generate the evolution operator.
+
+    Notes
+    -----
+    The dynamics of the Hamiltonian is simulating by
+    an unitary operator called the evolution operator,
+
+    .. math::
+        U = e^{-iHt},
+
+    where :math:`U` is the evolution operator,
+    :math:`i` is the imaginary unit,
+    :math:`H` is the Hamiltonian, and
+    :math:`t` is a timestamp.
+    The evolution operator is unitary as long as
+    the Hamiltonian is skew-Hermitian.
     """
 
     def __init__(self, **kwargs):
@@ -16,11 +47,12 @@ class HamiltonianSimulator(Simulator):
     def set_time(self, time=None, hpc=True):
         r"""
         Alias for :meth:`set_evolution`,
-        only changing the ``time`` parameter.
+        but only the ``time`` parameter is changed.
 
         Parameters
         ----------
         time : float
+            Time value used to construct the evolution operator.
 
         ** kwargs :
             Additional arguments for updating the evolution operator.
@@ -35,16 +67,6 @@ class HamiltonianSimulator(Simulator):
         See Also
         --------
         set_evolution
-
-        Notes
-        -----
-        The evolution operator is given by
-
-        .. math::
-            U(t) = e^{-\text{i}tH},
-
-        where :math:`H` is the Hamiltonian, and
-        :math:`t` is the time.
         """
         self.set_evolution(time=time, 
                            hamiltonian=self._hamiltonian,
@@ -52,13 +74,32 @@ class HamiltonianSimulator(Simulator):
                            hpc=hpc)
 
     def get_time(self):
+        r"""
+        Return the ``time`` value used to calculate the evolution operator.
+
+        Returns
+        -------
+        float
+        """
         return self._time
 
     def set_hamiltonian(self, hamiltonian=None, hpc=True):
         r"""
-        Generates the evolution operator with the same
-        previous parameters but changes the Hamiltonian.
-        Hamiltonian is expected to be is skew-Hermitian.
+        Set the Hamiltonian and recalculate the evolution operator.
+
+        Parameters
+        ----------
+        hamiltonian : matrix
+            A skew-Hermitian matrix.
+            The Hamiltonian describes the dynamics of a system.
+
+        hpc : bool, default=True
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
+
+        See Also
+        --------
+        set_evolution
         """
         self.set_evolution(time=self._time,
                            hamiltonian=hamiltonian,
@@ -67,7 +108,18 @@ class HamiltonianSimulator(Simulator):
 
     def get_hamiltonian(self, copy=True):
         r"""
-        TODO
+        Return the ``hamiltonian`` matrix used to
+        calculate the evolution operator.
+
+        Parameters
+        ----------
+        copy : bool, default=True
+            If ``True``, a copy of the matrix is returned.
+            Otherwise, a pointer to the matrix is returned.
+
+        Returns
+        -------
+        :class:`numpy.ndarray` or :class:`scipy.csr_matrix`.
         """
         if not copy:
             return self._hamiltonian
@@ -77,14 +129,21 @@ class HamiltonianSimulator(Simulator):
 
     def set_terms(self, terms=21, hpc=True):
         r"""
+        Set the number of terms used to calculate the
+        evolution operator as a power series.
+
         Parameters
         ----------
-        terms : int
-            Number of terms in Taylor series expansion.
+        terms : int, default=21
+            Number of terms in power series expansion.
 
         hpc : bool, default = True
             Determines whether or not to use neblina HPC 
             functions to generate the evolution operator.
+
+        See Also
+        --------
+        set_evolution
         """
         self.set_evolution(time=self._time,
                            hamiltonian=self._hamiltonian,
@@ -92,23 +151,34 @@ class HamiltonianSimulator(Simulator):
                            hpc=hpc)
 
     def get_terms(self):
+        r"""
+        Number of terms in the power series used to
+        calculate the evolution operator.
+
+        Returns
+        -------
+        int
+
+        See Also
+        --------
+        get_evolution
+        """
         return self._terms
 
     def set_evolution(self, **kwargs):
         r"""
-        Sets the evolution operator.
+        Set the evolution operator.
 
-        Sets Hamiltonian and time.
-        They are set using the appropriate ``**kwargs``.
-        If ``**kwargs`` is empty, the default arguments are used.
-        Then, the evolution operator is constructed using
-        a Taylor series expansion.
+        The evolution operator is completely described by
+        the Hamiltonian and time.
+        The evolution operator is constructed by
+        calculating a power series.
 
         Parameters
         ----------
         **kwargs :
             Key arguments for setting Hamiltonian, time, and
-            number of terms.
+            number of terms in the power series.
             See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`,
             :meth:`hiperwalk.ContinuousTime.set_time`, and
             :meth:`hiperwalk.ContinuousTime.set_terms`.
@@ -300,7 +370,6 @@ class HamiltonianSimulator(Simulator):
         See Also
         --------
         set_time
-        get_time
         hiperwalk.Simulator.siulate
         """
         if time is None:
