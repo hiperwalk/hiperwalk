@@ -115,7 +115,7 @@ class ContinuousTime(QuantumWalk):
         Parameters
         ----------
         gamma : float
-            Gamma value.
+            The value of gamma.
 
         ** kwargs :
             Additional arguments for updating the evolution operator.
@@ -354,7 +354,7 @@ class ContinuousTime(QuantumWalk):
         Defines the Hamiltonian and the evolution operator 
         for a given time t using the time specified in ``**kwargs``.
         If ``**kwargs`` is empty, the default arguments are used
-        (H=A and t=1).
+        (H=-gamma A and t=None).
         Subsequently, the evolution operator is derived 
         through a Taylor series expansion.
 
