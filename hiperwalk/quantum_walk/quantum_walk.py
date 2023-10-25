@@ -123,10 +123,10 @@ class QuantumWalk(ABC):
 
     def set_marked(self, marked=[], **kwargs):
         r"""
-        Sets marked vertices.
+        Set the marked vertices.
 
-        After the marked elements are changed,
-        the evolution operator is updated accordingly.
+        When the marked vertices are updated using this method,
+        the evolution operator adjusts accordingly.
 
         Parameters
         ----------
@@ -148,7 +148,7 @@ class QuantumWalk(ABC):
 
     def get_marked(self):
         r"""
-        Gets marked vertices.
+        Retrieve the marked vertices.
 
         Returns
         -------
@@ -161,9 +161,9 @@ class QuantumWalk(ABC):
     @abstractmethod
     def set_evolution(self, **kwargs):
         """
-        Create the standard evolution operator.
+        Set the standard evolution operator.
 
-        The evolution operator is saved to be used during the simulation.
+        This evolution operator is stored for use in subsequent simulations.
 
         Parameters
         ----------
