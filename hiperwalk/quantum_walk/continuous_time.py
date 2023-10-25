@@ -10,8 +10,7 @@ except:
 
 class ContinuousTime(QuantumWalk):
     r"""
-    Manage an instance of a continuous-time quantum walk
-    on any simple graph.
+    Manage instances of continuous-time quantum walks on simple graphs.
 
     For further implementation details, refer to the Notes Section.
 

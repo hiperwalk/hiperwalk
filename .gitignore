@@ -56,6 +56,7 @@ target/
 # Text Editors / IDE extra files
 .ipynb_checkpoints/
 *.swp
+.vscode/
 
 # Output files
 *.png
