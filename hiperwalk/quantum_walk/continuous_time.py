@@ -27,7 +27,7 @@ class ContinuousTime(QuantumWalk):
             The adjacency matrix of the graph.
 
     gamma : float
-        Gamma value for setting Hamiltonian.
+        The value of gamma for setting Hamiltonian.
 
     **kwargs : optional
         Arguments to set the Hamiltonian and evolution operator.
