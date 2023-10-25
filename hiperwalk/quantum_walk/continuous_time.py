@@ -105,11 +105,12 @@ class ContinuousTime(QuantumWalk):
 
     def set_gamma(self, gamma=None, **kwargs):
         r"""
-        Sets the gamma parameter.
+        Set gamma.
         
-        The gamma parameter is used in the definition of the Hamiltonian.
-        By setting gamma,
-        both the Hamiltonian and evolution operator are updated.
+        Parameter gamma is used in the definition of the
+        Hamiltonian to determine the hopping probability per unit 
+        of time. Upon setting gamma, both the Hamiltonian and evolution 
+        operators are updated.
 
         Parameters
         ----------
@@ -134,7 +135,7 @@ class ContinuousTime(QuantumWalk):
 
     def get_gamma(self):
         r"""
-        Retrieves the gamma value used in
+        Retrieve the value of gamma used in
         the definition of the Hamiltonian.
 
         Returns
@@ -151,7 +152,7 @@ class ContinuousTime(QuantumWalk):
     def _update_hamiltonian(self):
         r"""
         If this method is invoked,
-        the hamiltonian is recalculated
+        The Hamiltonian is recalculated.
         """
         self._hamiltonian = -self._gamma * self._graph.adjacency_matrix()
 
@@ -166,20 +167,20 @@ class ContinuousTime(QuantumWalk):
 
     def set_hamiltonian(self, gamma=None, **kwargs):
         r"""
-        Creates the Hamiltonian.
+        Set the Hamiltonian.
 
-        If no marked vertices is specified,
-        the default value is used.
+        If no marked vertices are specified,
+        the Hamiltonian is the standard one (see Notes).
         After the Hamiltonian is created,
         the evolution operator is updated accordingly.
 
         Parameters
         ----------
         gamma : float
-            Gamma value.
+            Value of gamma.
 
         **kwargs :
-            Used for determining the marked vertices, and
+            Used for setting the marked vertices, and
             the procedure for updating the evolution operator.
             See :meth:`hiperwalk.ContinuousTime.set_marked`, and
             See :meth:`hiperwalk.ContinuousTime.set_evolution`.
@@ -218,7 +219,7 @@ class ContinuousTime(QuantumWalk):
 
     def get_hamiltonian(self):
         r"""
-        Returns the Hamiltonian.
+        Retrieve the Hamiltonian.
 
         Returns
         -------
@@ -240,11 +241,10 @@ class ContinuousTime(QuantumWalk):
 
     def set_time(self, time=None, **kwargs):
         r"""
-        Sets time.
+        Set a time instant.
 
-        Sets time and
-        generates the evolution operator corresponding to
-        the specified time.
+        Defines a time t and calculates the evolution operator U(t) at
+        the specified time (see Notes).
 
         Parameters
         ----------
@@ -349,13 +349,14 @@ class ContinuousTime(QuantumWalk):
 
     def set_evolution(self, hpc=True, terms=21, **kwargs):
         r"""
-        Sets the evolution operator.
+        Set the evolution operator.
 
-        Sets Hamiltonian and time.
-        They are set using the appropriate ``**kwargs``.
-        If ``**kwargs`` is empty, the default arguments are used.
-        Then, the evolution operator is constructed using
-        a Taylor series expansion.
+        Defines the Hamiltonian and the evolution operator 
+        for a given time t using the time specified in ``**kwargs``.
+        If ``**kwargs`` is empty, the default arguments are used
+        (H=A and t=1).
+        Subsequently, the evolution operator is derived 
+        through a Taylor series expansion.
 
         Parameters
         ----------
@@ -364,7 +365,7 @@ class ContinuousTime(QuantumWalk):
             functions to generate the evolution operator.
 
         terms : int
-            Number of terms in Taylor series expansion.
+            Number of terms in the Taylor series expansion.
 
         **kwargs :
             Additional arguments for setting Hamiltonian and time.
@@ -390,7 +391,7 @@ class ContinuousTime(QuantumWalk):
         The Taylor series expansion is given by
 
         .. math::
-            e^{-\text{i}tH} &= \sum_{j = 0}^{n} (\text{i}tH)^j / j!
+            \text{e}^{-\text{i}tH} = \sum_{j = 0}^{n} (\text{i}tH)^j / j!
 
         where :math:`n` is the number of terms minus 1
         (i.e. ``terms - 1``).
