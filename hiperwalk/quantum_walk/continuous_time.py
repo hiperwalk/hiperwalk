@@ -60,13 +60,13 @@ class ContinuousTime(QuantumWalk):
     evolution. To do this, simply pass the desired Hamiltonian in place
     of the adjacency matrix.
 
-    For a more detailed understanding of continuous-time quantum 
+    For a deeper understanding of continuous-time quantum 
     walks, see [1]_.
     
     References
     ----------
     .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision trees". 
-    Physical Review A, 58(2):915–928 (1998), arXiv:quant-ph/9706062.
+    Physical Review A, 58(2):915–928, 1998. ArXiv:quant-ph/9706062.
     """
 
     _valid_kwargs = dict()
@@ -214,15 +214,15 @@ class ContinuousTime(QuantumWalk):
             H = -\gamma A  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`A` is the adjacency matrix, and
-        :math:`M` is the set of marked vertices [1,2]_.
+        :math:`M` is the set of marked vertices [1]_[2]_.
         
         References
         ----------
         .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision trees". 
-        Physical Review A, 58(2):915–928 (1998), arXiv:quant-ph/9706062.
+        Physical Review A, 58(2):915–928, 1998. ArXiv:quant-ph/9706062.
         
-        [2] A. M. Childs and J. Goldstone. "Spatial search by quantum walk",
-        Phys. Rev. A 70, 022314 (2004).
+        .. [2] A. M. Childs and J. Goldstone. "Spatial search by quantum walk",
+        Phys. Rev. A 70, 022314, 2004.
         """
         self._update_gamma(gamma=gamma)
 
