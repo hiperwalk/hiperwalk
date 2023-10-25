@@ -243,10 +243,11 @@ class QuantumWalk(ABC):
 
     def probability(self, states, vertices):
         r"""
-        Computes the sum of probabilities of the given vertices.
+        Computes the sum of probabilities for the specified vertices.
 
-        Computes the probability of the walker being found on a
-        subset of the vertices in the given state(s).
+        Computes the probability of the walker being located on a
+        vertex within the set of provided vertices, given that the walk 
+        is on specified states.
 
         Parameters
         ----------
@@ -291,10 +292,11 @@ class QuantumWalk(ABC):
 
     def probability_distribution(self, states):
         r"""
-        Compute the probability distribution of given state(s).
+        Compute the probability distribution of the given state(s).
 
-        The probability of the walker being found on each vertex
-        for the given state(s).
+        The probability distribution is determined by the
+        state of the walk. It describes the likelihood of the
+        walker being located at each vertex for the specified state(s).
 
         Parameters
         ----------
@@ -319,15 +321,17 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The probability for a given vertex is the absolute square of
-        its amplitude.
+        If the Hilbert space is spanned by the set of vertices,
+        the probability of finding the walker on a given vertex 
+        is the absolute square of its amplitude.
         That is, for an arbitrary superposition
 
         .. math::
             \sum_{v \in V} \alpha_v \ket{v},
 
         the probability associated with vertex :math:`v` is
-        :math:`|\alpha_v|^2`.
+        :math:`|\alpha_v|^2`. The calculation of the probability
+        depends on the specifics of the quantum walk model.
         """
         single_state = False
         try:
@@ -802,14 +806,14 @@ class QuantumWalk(ABC):
 
     def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
         r"""
-        Find the optimal runtime of a quantum walk search.
+        Find the optimal running time of a quantum-walk-based search.
 
-        Simulate the aplication of the previously set evolution operator
-        passing the ``initial_state`` to the simulation.
-        Calculate the success probability of each intermediate state.
-        Fit the probabilities to a sine squared function.
-        The optimal runtime is the point in the domain where the
-        sine squared function attains its first maximum.
+        This method simulates the use of the previously set evolution operator,
+        taking the ``initial_state`` as an input for the simulation. It then
+        calculates the success probability for each intermediate state and fits
+        these probabilities to a sine-squared function. The optimal running time
+        corresponds to the point in the domain where the sine-squared function
+        reaches its first peak.
 
         Parameters
         ----------
@@ -847,8 +851,10 @@ class QuantumWalk(ABC):
     def max_success_probability(self,
         initial_state=None, delta_time=1, hpc=True):
         r"""
-        Find the max success probability.
-        The success probability corresponding to the optimal runtime.
+        Find the maximum success probability.
+        
+        This method returns the success probability that corresponds 
+        to the optimal running time.
 
         Parameters
         ----------
