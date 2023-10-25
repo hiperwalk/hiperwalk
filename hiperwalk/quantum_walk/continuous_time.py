@@ -178,7 +178,7 @@ class ContinuousTime(QuantumWalk):
         Set the Hamiltonian.
 
         If no marked vertices are specified,
-        the Hamiltonian is the standard one (see Notes).
+        the Hamiltonian is the standard one (H=-gamma A, see Notes).
         After the Hamiltonian is created,
         the evolution operator is updated accordingly.
 
