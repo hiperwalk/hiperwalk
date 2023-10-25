@@ -59,6 +59,14 @@ class ContinuousTime(QuantumWalk):
     This class can also facilitate the simulation of any Hamiltonian
     evolution. To do this, simply pass the desired Hamiltonian in place
     of the adjacency matrix.
+
+    For a more detailed understanding of continuous-time quantum 
+    walks, see [1].
+    
+    References
+    ----------
+    .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision trees". 
+    Physical Review A, 58(2):915–928 (1998), arXiv:quant-ph/9706062.
     """
 
     _valid_kwargs = dict()
