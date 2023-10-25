@@ -65,10 +65,8 @@ class ContinuousTime(QuantumWalk):
     
     References
     ----------
-    .. [1] E. Farhi and S. Gutmann.
-        "Quantum computation and decision trees". 
-        Physical Review A, 58(2):915–928, 1998.
-        ArXiv:quant-ph/9706062.
+    .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision trees". 
+        Physical Review A, 58(2):915–928, 1998. ArXiv:quant-ph/9706062.
     """
 
     _valid_kwargs = dict()
