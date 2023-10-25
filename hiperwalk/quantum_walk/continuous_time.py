@@ -214,7 +214,15 @@ class ContinuousTime(QuantumWalk):
             H = -\gamma A  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`A` is the adjacency matrix, and
-        :math:`M` is the set of marked vertices.
+        :math:`M` is the set of marked vertices [1,2].
+        
+        References
+        ----------
+        .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision 
+        trees". Physical Review A, 58(2):915–928 (1998), arXiv:quant-ph/9706062.
+        
+        .. [2] A. M. Childs and J. Goldstone. "Spatial search by quantum walk",
+        Phys. Rev. A 70, 022314 (2004).
         """
         self._update_gamma(gamma=gamma)
 
