@@ -331,7 +331,8 @@ class QuantumWalk(ABC):
 
         the probability associated with vertex :math:`v` is
         :math:`|\alpha_v|^2`. The calculation of the probability
-        depends on the specifics of the quantum walk model.
+        depends on the specifics of the quantum walk model when
+        the Hilbert space is not spanned by the set of vertices.
         """
         single_state = False
         try:
