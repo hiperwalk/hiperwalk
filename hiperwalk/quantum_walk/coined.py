@@ -334,7 +334,7 @@ class Coined(QuantumWalk):
 
     def get_shift(self):
         r"""
-        Return the shift operator.
+        Returns the shift operator.
 
         Shift operator used for constructing the evolution operator.
 
@@ -650,7 +650,7 @@ class Coined(QuantumWalk):
 
     def get_coin(self):
         r"""
-        Return coin used for creating the evolution operator.
+        Returns the coin used for creating the evolution operator.
 
         Returns
         -------
