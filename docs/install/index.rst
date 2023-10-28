@@ -15,15 +15,15 @@ cover identifying the GPU, installing the GPU drivers,
 neblina-core, neblina-opencl-bridge, pyneblina, and
 all necessary Python libraries.
 
-.. warning::
+# .. warning::
 
-   While currently only Ubuntu 20.04 is supported, we are working
-   diligently to extend support to other distributions as soon as
-   possible.
+#   While currently only Ubuntu 20.04 is supported, we are working
+#   diligently to extend support to other distributions as soon as
+#   possible.
 
-   We are developing support for Ubuntu 22.04 with the main challenge
-   being the adaptation of plotting features, which currently work well
-   in Jupyter notebooks.
+#   We are developing support for Ubuntu 22.04 with the main challenge
+#   being the adaptation of plotting features, which currently work well
+#   in Jupyter notebooks.
 
 .. _docs_install_hiperwalk:
 
