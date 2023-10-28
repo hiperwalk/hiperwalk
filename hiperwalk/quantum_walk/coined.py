@@ -761,9 +761,13 @@ class Coined(QuantumWalk):
 
         Subsequently, the evolution operator is constructed by 
         multiplying the shift and coin operators. 
-        If the coin operator isn't an explicit matrix 
-        and a coin for the marked vertices has been specified, 
-        the coin for each marked vertex is replaced.
+        If the coin operator is given as an explicit matrix, 
+        its definition remains unaltered 
+        even in the presence of marked vertices. However, if the coin 
+        operator is defined using coin names, any marked vertices will 
+        prompt an update to the coin operator. Specifically, the coin names 
+        for each marked vertex will default to a replacement with -I, 
+        unless an alternative substitution is provided.
 
         Parameters
         ----------
@@ -788,18 +792,18 @@ class Coined(QuantumWalk):
         The evolution operator is given by
 
         .. math::
-           U = SC'
+           U = SC
 
-        where :math`S` is the shift operator, and
-        :math:`C'` is the coin operator (probably) modified by
-        the marked vertices [1]_.
+        where :math:`S` is the shift operator, and
+        :math:`C` is the coin operator. If there are
+        any marked vertices, the coin operator is
+        modified accordingly [1]_.
 
-        If the coin operator was set as an explicit matrix,
-        the marked vertices to not alter it.
-        If the coin operator was not set as an explicit matrix
-        (e.g. as a list of coins),
-        the coin of each marked vertex is substituted as specified by
-        the last :meth:`set_marked` call.
+        When the coin operator is set as an explicit matrix, it remains 
+        unaltered by marked vertices. However, if it's not provided in 
+        matrix form (e.g., as a list of coins), the coin for each marked 
+        vertex will be substituted based on the most recent 
+        :meth:`set_marked` invocation.
 
         .. todo::
             * Sparse matrix multipliation is not supported yet.
