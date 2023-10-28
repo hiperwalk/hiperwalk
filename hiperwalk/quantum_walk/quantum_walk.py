@@ -530,54 +530,56 @@ class QuantumWalk(ABC):
         return ret
 
 
+
     def simulate(self, time=None, initial_state=None, hpc=True):
         r"""
         Simulates the quantum walk.
 
-        The walk is simulated by repeatedly applying the evolution operator 
-        to the result of the previous application, starting from the initial state.
+        The simulation progresses by iteratively applying 
+        the evolution operator to the outcome of its prior 
+        application, initiating from the specified initial state.
 
         Parameters
         ----------
         time : int, tuple of int, default=None
-            Describes at which time instants the state must be saved.
-            It can be specified in three different ways.
+            Specifies the time instances when the state should be saved.
+            It can be defined in three distinct ways:
             
             * end
-                Save the state at time ``end``.
-                Only the final state is saved.
+                Saves the state at the ``end`` time.
+                Only the final state is retained.
 
             * (end, step)
-                Saves each state from time 0 to time ``end`` (inclusive)
-                that is multiple of ``step``.
+                Retains every state from time 0 to ``end`` (inclusive)
+                that corresponds to a multiple of ``step``.
 
             * (start, end, step)
-                Saves every state from time ``start`` (inclusive)
-                to time ``end`` (inclusive)
-                that is multiple of ``step``.
+                Stores every state from time ``start`` (inclusive)
+                to ``end`` (inclusive)
+                that is a multiple of ``step``.
 
         initial_state : :class:`numpy.array`, default=None
-            The initial state which the evolution operator
-            is going to be applied to.
+            The starting state onto which the evolution operator
+            will be applied.
 
         hpc : bool, default=True
-            Whether or not to use neblina's high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses standalone python.
+            Indicates whether to utilize neblina's high-performance computing
+            for matrix multiplication. 
+            If set to ``hpc=False``, it will use standalone Python.
 
         Returns
         -------
         states : :class:`numpy.ndarray`.
-            States saved during simulation where
-            ``states[i]`` corresponds to the ``i``-th saved state.
+            States retained during the simulation where
+            ``states[i]`` is the ``i``-th saved state.
 
         Raises
         ------
         ValueError
-            If any of the following occurs
+            Triggered if:
             * ``time=None``.
             * ``initial_state=None``.
-            * ``evolution_operator=None`` and it was no set previously.
+            * ``evolution_operator=None`` and hasn't been set before.
 
         See Also
         --------
@@ -586,17 +588,19 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The simulation of the walk uses the expression
-        :math:`|\psi(t)\rangle=U^t|\psi(t)\rangle`, starting from 
-        :math:`|\psi(0)\rangle`.
-        The maximum and intermediate applications
-        are described by ``time``.
+        The walk's simulation leverages the formula
+        :math:`|\psi(t)\rangle=U^t|\psi(t-1)\rangle`.        
+        The states computed and retained 
+        are determined by ``time=(start,end,step)``.
+        Simulation starts from :math:`|\psi(\text{start})\rangle`, and
+        then computes and stores :math:`|\psi(\text{step}+\text{start})`,
+        continuing until :math:`|\psi(\text{end})`.
 
         Examples
         --------
-        If ``time=(0, 13, 3)``, the saved states will be:
-        the initial state (t=0), the intermediate states (t=3, 6, and 9),
-        and the final state (t=12).
+        Given ``time=(0, 13, 3)``, the saved states would include:
+        the initial state (t=0), intermediate states (t=3, 6, and 9),
+        and the concluding state (t=12).
         """
         ############################################
         ### Check if simulation was set properly ###
