@@ -375,7 +375,9 @@ class ContinuousTime(QuantumWalk):
         If ``**kwargs`` is not given, default arguments are used
         (H=-gamma A and t=None). This method determines the 
         Hamiltonian and then derives the evolution operator 
-        using a Taylor series expansion.
+        using a Taylor series expansion. The initial value
+        for ``terms=21`` is enough when the Hamiltonian
+        is obtained from the adjacency matrix and gamma<1.
 
         Parameters
         ----------
