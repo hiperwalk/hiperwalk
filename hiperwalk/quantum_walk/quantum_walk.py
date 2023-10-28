@@ -586,8 +586,9 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The walk is simulated by repeatedly applying the evolution operator 
-        to the result of the previous application, starting from the initial state.
+        The simulation of the walk uses the expression
+        :math:`|\psi(t)\rangle=U^t|\psi(t)\rangle`, starting from 
+        :math:`|\psi(0)\rangle`.
         The maximum and intermediate applications
         are described by ``time``.
 
