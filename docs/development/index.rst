@@ -4,9 +4,6 @@
 Development
 ===========
 
-To contributing to Hiperwalk, to send a bug report, or to contact the developers, 
-write an email to hiperwalk@gmail.com.
-
 HiperWalk is built upon several Python libraries. 
 Before developing for HiperWalk, these libraries need to be installed. 
 The required libraries include
@@ -49,6 +46,12 @@ execute:
 .. code-block:: shell
 
     ./run_nonhpc.sh
+
+Bug Report
+==========
+
+To send a bug report, contribute to Hiperwalk, or contact the developers, 
+write an email to hiperwalk@gmail.com.
 
 Documentation
 =============
