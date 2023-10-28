@@ -593,11 +593,13 @@ class QuantumWalk(ABC):
         The walk's simulation leverages the formula
         :math:`|\psi(t)\rangle=U^t|\psi(\text{start})\rangle`, where
         :math:`|\psi(\text{start})\rangle` is the initial state. 
-        The values of :math:`t` are :math:`t=0,\text{step},\,2\text{step},...`
-        until :math:`t=\text{end}`. That is, the
+        The values of :math:`t` are :math:`t=0,\text{step},\,2\cdot\text{step},...`
+        until the largest multiple of step that is smaller or equal
+        to :math:`t=\text{end}-\text{start}`. That is, the
         simulation starts from :math:`|\psi(\text{start})\rangle`, and
         then computes and stores :math:`|\psi(\text{start}+\text{step})\rangle`,
-        continuing until :math:`|\psi(\text{end})\rangle`.
+        continuing until :math:`|\psi(\text{start}+j\cdot\text{step})\rangle` so
+        that :math:`\text{start}+j\cdot\text{step}\le \text{end}`.
 
         Examples
         --------
