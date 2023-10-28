@@ -61,6 +61,12 @@ you can execute any code found in the
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
 or proceed to the :ref:`docs_tutorial`.
 
+    To update an older version of the hiperwalk packages:
+
+.. code-block:: shell
+
+   pip3 install hiperwalk --upgrade
+
 .. _docs_install_hpc_prerequisites:
 
 HPC Prerequisites
