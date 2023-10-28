@@ -410,7 +410,7 @@ class ContinuousTime(QuantumWalk):
         The Taylor series expansion is given by
 
         .. math::
-            \text{e}^{-\text{i}tH} = \sum_{j = 0}^{n} (\text{i}tH)^j / j!
+            \text{e}^{-\text{i}tH} = \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
 
         where :math:`n` is the number of terms minus 1
         (i.e. ``terms - 1``).
