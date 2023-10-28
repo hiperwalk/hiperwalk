@@ -587,14 +587,16 @@ class QuantumWalk(ABC):
         state
 
         Notes
-        -----
-        The walk's simulation leverages the formula
-        :math:`|\psi(t)\rangle=U^t|\psi(t-1)\rangle`.        
+        -----     
         The states computed and retained 
         are determined by ``time=(start,end,step)``.
+        The walk's simulation leverages the formula
+        :math:`|\psi(\text{end})\rangle=U^t|\psi(\text{start})\rangle`, where
+        :math:`t` is the time and
+        :math:`|\psi(\text{start})\rangle` is the initial state.   
         Simulation starts from :math:`|\psi(\text{start})\rangle`, and
-        then computes and stores :math:`|\psi(\text{step}+\text{start})`,
-        continuing until :math:`|\psi(\text{end})`.
+        then computes and stores :math:`|\psi(\text{start}+\text{step})\rangle`,
+        continuing until :math:`|\psi(\text{end})\rangle`.
 
         Examples
         --------
