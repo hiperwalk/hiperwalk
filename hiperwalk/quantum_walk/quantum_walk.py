@@ -588,24 +588,24 @@ class QuantumWalk(ABC):
 
         Notes
         -----
-        The states that are computed and stored during the simulation 
-        are defined by the parameter ``time=(start,end,step)``.        
+        The states computed and saved during the simulation 
+        are determined by the parameter ``time=(start,end,step)``.        
         
         The simulation of the walk is based on the expression
         :math:`|\psi(t)\rangle=U^t|\psi(\text{start})\rangle`, where
-        :math:`|\psi(\text{start})\rangle` denotes the initial state.
-        
-        The values for :math:`t` progress as :math:`t=0,\text{step},\,2\cdot\text{step},...`, 
+        :math:`|\psi(\text{start})\rangle` denotes the initial state.        
+        The values for :math:`t` progress as 
+        :math:`t=0,\,\text{step},\,2\cdot\text{step},...`, 
         until reaching the highest multiple of step that is less than or equal to 
-        :math:`t=\text{end}-\text{start}`.
+        :math:`\text{end}-\text{start}`.
         
         Specifically, the simulation begins from the state 
         :math:`|\psi(\text{start})\rangle` and 
         sequentially calculates and saves states in the form of 
-        :math:`|\psi(\text{start}+t\cdot\text{step})\rangle`,
-        where the value of :math:`t` ensures that 
-        :math:`\text{start}+t\cdot\text{step}\le \text{end}`.
-
+        :math:`|\psi(\text{start}+j\cdot\text{step})\rangle`,
+        where :math:`j=0,1,...` and the maximum value of :math:`j`
+        ensures that 
+        :math:`\text{start}+j\cdot\text{step}\le \text{end}`.
 
         Examples
         --------
