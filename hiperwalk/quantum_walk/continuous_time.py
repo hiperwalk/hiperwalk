@@ -370,14 +370,15 @@ class ContinuousTime(QuantumWalk):
         r"""
         Set the evolution operator.
 
-        Defines the evolution operator for a specified time 't' 
-        using the time provided in ``**kwargs``.
-        If ``**kwargs`` is not given, default arguments are used
-        (H=-gamma A and t=None). This method determines the 
-        Hamiltonian and then derives the evolution operator 
-        using a Taylor series expansion. The initial value
-        for ``terms=21`` is enough when the Hamiltonian
-        is obtained from the adjacency matrix and gamma<1.
+        This method defines the evolution operator for a specified 
+        time 't' using the time provided in ``**kwargs``.
+        If ``**kwargs`` is not specified, default arguments are 
+        employed (H=-gamma A and t=None). It first determines the 
+        Hamiltonian and subsequently derives the evolution operator 
+        through a Taylor series expansion. The default value
+        of ``terms=21`` is suitable when the Hamiltonian
+        is derived from the adjacency matrix and gamma is less 
+        than 1.
 
         Parameters
         ----------
