@@ -136,7 +136,7 @@ class QuantumWalk(ABC):
 
         ** kwargs :
             Additional arguments for updating the evolution operator.
-            For example, whether to use neblina HPC or not.
+            For example, whether to use HPC or not.
             See :meth:`set_evolution` for more options.
 
         See Also
@@ -563,7 +563,7 @@ class QuantumWalk(ABC):
             will be applied.
 
         hpc : bool, default=True
-            Indicates whether to utilize neblina's high-performance computing
+            Indicates whether to utilize high-performance computing
             for matrix multiplication. 
             If set to ``hpc=False``, it will use standalone Python.
 
@@ -844,7 +844,7 @@ class QuantumWalk(ABC):
             See ``time`` argument in :meth:`simulate` for details.
 
         hpc : boolean
-            Whether or not to use neblina's high-performance computing
+            Whether or not to use high-performance computing
             to perform matrix multiplications.
             If ``hpc=False`` uses standalone python.
 
@@ -885,7 +885,7 @@ class QuantumWalk(ABC):
             See ``time`` argument in :meth:`simulate` for details.
 
         hpc : boolean
-            Whether or not to use neblina's high-performance computing
+            Whether or not to use high-performance computing
             to perform matrix multiplications.
             If ``hpc=False`` uses standalone python.
 
