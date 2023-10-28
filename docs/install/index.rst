@@ -51,7 +51,7 @@ you can execute any code found in the
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
 or proceed to the :ref:`docs_tutorial`.
 
-To update an older version of the hiperwalk packages:
+To update an older version of the hiperwalk package:
 
 .. code-block:: shell
 
