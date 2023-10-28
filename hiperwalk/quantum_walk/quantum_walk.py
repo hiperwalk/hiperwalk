@@ -825,7 +825,7 @@ class QuantumWalk(ABC):
         r"""
         Find the optimal running time of a quantum-walk-based search.
 
-        This method simulates the use of the previously set evolution operator,
+        This method simulates the use of the previously ``set_evolution`` operator,
         taking the ``initial_state`` as an input for the simulation. It then
         calculates the success probability for each intermediate state and fits
         these probabilities to a sine-squared function. The optimal running time
