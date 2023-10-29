@@ -146,7 +146,7 @@ class Graph():
         # TODO:
         # * Check if valid adjacency matrix
         # * Add option: numpy dense matrix as parameters.
-        if type(adj_matrix) == nx.classes.graph.Graph:
+        if all(hasattr(adj_matrix, attr) for attr in ['__len__', 'edges', 'nbunch_iter', 'subgraph', 'is_directed']):
             adj_matrix = nx.convert_matrix.to_scipy_sparse_array(adj_matrix).astype(np.int8)
         if not issparse(adj_matrix):
             adj_matrix = csr_array(adj_matrix, dtype=np.int8)
