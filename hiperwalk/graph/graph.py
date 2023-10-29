@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 from scipy.sparse import issparse, csr_array
 
 def _binary_search(v, elem, start=0, end=None):
@@ -31,7 +32,7 @@ class Graph():
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
+    adj_matrix : :class:`scipy.sparse.csr_array`, :class:`numpy.ndarray` or :class:`networkx.Graph`
         Adjacency matrix of the graph on
         which the quantum walk takes place.
 
@@ -145,7 +146,8 @@ class Graph():
         # TODO:
         # * Check if valid adjacency matrix
         # * Add option: numpy dense matrix as parameters.
-        # * Add option: networkx graph as parameter.
+        if type(adj_matrix) == nx.classes.graph.Graph:
+            adj_matrix = nx.convert_matrix.to_scipy_sparse_array(adj_matrix).astype(np.int8)
         if not issparse(adj_matrix):
             adj_matrix = csr_array(adj_matrix, dtype=np.int8)
 
