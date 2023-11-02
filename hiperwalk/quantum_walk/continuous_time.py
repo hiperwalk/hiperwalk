@@ -258,6 +258,7 @@ class ContinuousTime(QuantumWalk):
         :math:`M` specifies the marked vertices via
         the argument ``marked=M``. For instance, ``marked={0}``
         specifies that :math:`v_0` is the marked vertex.
+        The default is :math:`M=\emptyset`.
         
         References
         ----------
