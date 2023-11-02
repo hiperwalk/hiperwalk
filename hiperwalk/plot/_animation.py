@@ -289,9 +289,12 @@ class Animation:
 
             from ._gtk4_gif_paintable import GifPaintable
 
+            w, h = plt.rcParams["figure.figsize"]
+            dpi = plt.rcParams["figure.dpi"]
+
             def on_activate(app):
                 win = Gtk.ApplicationWindow(application=app)
-                win.set_default_size(400, 300)
+                win.set_default_size(w*dpi, h*dpi)
                 win.set_title("Animation")
 
                 picture = Gtk.Picture()
