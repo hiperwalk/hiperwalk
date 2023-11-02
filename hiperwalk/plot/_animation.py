@@ -286,56 +286,26 @@ class Animation:
                 temp.close()
 
         elif Gtk_version == 4:
-            # creating window
-            window = Gtk.ApplicationWindow(title="Animation")
-            state = window.get_state_flags()
-            # window.override_background_color(state, RGBA(1, 1, 1, 1))
 
-            def configure_gif_window(self):
-                pass
+            from ._gtk4_gif_paintable import GifPaintable
 
-            def configure_video_window(self):
-                pass
-
-            if self.save_path[-4:] == '.gif':
-                configure_gif_window(self)
-            else:
-                configure_video_window(self)
-
-            def on_activate(app, save_path):
+            def on_activate(app):
                 win = Gtk.ApplicationWindow(application=app)
-                ############################
-                from gi.repository import GdkPixbuf
-                pixbuf = GdkPixbuf.PixbufAnimation.new_from_file(save_path)
-                img = Gtk.Image()
-                img.set_from_animation(pixbuf)
-                win.set_child(img)
-                win.present()
-                ############################
-                #img = Gtk.Image.new_from_file(save_path)
-                #win.set_child(img)
-                #win.present()
-                ############################
-                #img = Gtk.Video.new_for_filename(save_path)
-                # img = Gtk.Image.new()
-                # Gtk.Image.set_from_file(img, save_path)
-                #img.set_from_file(save_path)
-                ############################
-                #stream = Gtk.MediaFile.new_for_filename(save_path)
-                #video = Gtk.Video.new_for_media_stream(stream)
-                #video.set_autoplay(True)
-                #video.set_hexpand(True)
-                #video.set_vexpand(True)
-                #win.set_child(video)
-                #win.present() 
+                win.set_default_size(400, 300)
+                win.set_title("Animation")
 
-            app = Gtk.Application()
-            app.connect('activate', on_activate, self.save_path)
+                picture = Gtk.Picture()
+                anim = GifPaintable(self.save_path)
+                picture.set_paintable(anim)
+
+                win.set_child(picture)
+
+                win.show()
+
+            app = Gtk.Application(application_id='org.hiperwalk.animation')
+            app.connect('activate', on_activate)
             app.run(None)
-            # showing window and starting Gtk main loop
-            # window.show_all()
-            # Gtk.main()
-            
+
             if temp is not None:
                 self.save_path = None
                 temp.close()
