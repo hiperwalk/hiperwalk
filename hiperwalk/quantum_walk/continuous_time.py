@@ -419,6 +419,7 @@ class ContinuousTime(QuantumWalk):
         :math:`t` is the time.
 
         The :math:`n\text{th}` partial sum of the Taylor series expansion is given by
+        
         .. math::
             \text{e}^{-\text{i}tH} \approx \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
 
