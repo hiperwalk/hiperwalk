@@ -25,7 +25,7 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Arbitrary simple graph.
+    Arbitrary graph.
 
     The graph on which a quantum walk takes place.
 
@@ -37,7 +37,7 @@ class Graph():
     Raises
     ------
     TypeError
-        if ``adj_matrix`` is not an square matrix.
+        If ``adj_matrix`` is not a square matrix.
 
     Notes
     -----
@@ -49,36 +49,38 @@ class Graph():
     takes place is specified by the
     adjacency matrix, Laplacian matrix, or 
     any Hermitian matrix :math:`C`.
+    Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, where
+    where :math:`n=|V|`.
     Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
     are adjacent if and only if :math:`C_{ij}\neq 0`.
 
-    A wide range of methods are available. 
-    These methods can be used by a quantum walk model 
-    to generate a valid quantum walk.
-    
-    This class can be passed as an argument for plotting functions.
-    In this case,
-    the default representation for the graph will be displayed.
+    The class methods facilitate the construction of a valid quantum walk 
+    and can be provided as parameters to plotting functions. For visualizations, 
+    the default graph representation will be used. Specific classes are available 
+    for well-known graph types, such as hypercubes and lattices.
 
-    The recommended parameter type is
-    :class:`scipy.sparse.csr_array` with ``dtype=np.int8``.
+    The preferred parameter type for the adjacency matrix is
+    :class:`scipy.sparse.csr_matrix` with `dtype=np.int8`.
 
-    Each edge of a given graph :math:`G(V, E)` is associated with
-    two arcs in the symmetric digraph :math:`\vec{G}(V, A)`,
-    where
+    Each edge in the graph :math:`G(V, E)` corresponds 
+    to two arcs in the associated directed 
+    graph :math:`\vec{G}(V, A)`, where
 
     .. math::
         \begin{align*}
-            A = \bigcup_{(v,u) \in E} \{(v, u), (u, v)\}.
+            A = \bigcup_{(v_k,v_\ell) \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
-    An arc can be described either in the arc notation as (tail,head) 
-    or through a numerical label. The ordering of the labels in 
-    the :obj:`Graph` class is as follows: 
-    Consider two arcs, :math:`(v_1, u_1)` and :math:`(v_2, u_2')`, 
-    with numerical labels :math:`a_1` and :math:`a_2` respectively. 
-    Then, :math:`a_1 < a_2` if and only if either :math:`v_1 < v_2` 
-    or :math:`v_1 = v_2` and :math:`u_1 < u_2`.
+    Arcs can be denoted using the (tail,head) notation or with numerical labels. 
+    In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
+    :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
+    :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
+    (:math:`i = k` and :math:`j < \ell`).
+    
+    If ``adj_matrix`` is specified as a Hermitian matrix :math:`C`, 
+    then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
+    This weight is considered a generalized weight when :math:`C_{ij}` is 
+    negative or complex.
 
     .. note::
         The arc ordering may change for graphs defined using specific classes.
