@@ -73,13 +73,18 @@ class ContinuousTime(QuantumWalk):
             0, \text{ otherwise.}
         \end{cases}
 
-    The Hamiltonian's formulation is detailed in :meth:`hiperwalk.ContinuousTime.set_hamiltonian`, 
-    depending on the choice between the adjacency or Laplacian matrix, along with the positioning 
+    The Hamiltonian's formulation is detailed in 
+    :meth:`hiperwalk.ContinuousTime.set_hamiltonian`, 
+    depending on the choice between the adjacency 
+    or Laplacian matrix, along with the positioning 
     of the marked vertices.
 
-    The ``ContinuousTime`` class also supports simulating arbitrary Hamiltonians. 
-    To utilize a specific Hamiltonian, provide it directly as matrix :math:`H` 
-    with the argument ``graph=H``.
+    The ``ContinuousTime`` class also supports simulating 
+    arbitrary Hamiltonians. 
+    To use a specific Hamiltonian :math:`H`, provide it directly 
+    via some Hermitian matrix :math:`C` 
+    using the argument ``graph=C``, 
+    so that :math:`H=-\gamma C`.
 
     For a comprehensive understanding of continuous-time quantum walks, consult reference [1]_. 
     To examine the differences between utilizing the adjacency matrix and the Laplacian matrix, 
@@ -202,10 +207,13 @@ class ContinuousTime(QuantumWalk):
         r"""
         Set the Hamiltonian.
 
-        If no marked vertices are specified,
-        the Hamiltonian is the standard one (H=-gamma A, see Notes).
-        After the Hamiltonian is created,
-        the evolution operator is updated accordingly.
+        The Hamiltonian takes the form of -gamma A, -gamma L, 
+        or -gamma C, where A is the adjacency matrix, L is 
+        the Laplacian matrix, and C is any Hermitian matrix.
+        If marked vertices are specified, the Hamiltonian 
+        is modified as described in the Notes section. 
+        Once the Hamiltonian has been established, 
+        the evolution operator is updated accordingly. 
 
         Parameters
         ----------
@@ -236,9 +244,10 @@ class ContinuousTime(QuantumWalk):
         The Hamiltonian is given by
 
         .. math::
-            H = -\gamma A  - \sum_{m \in M} \ket m \bra m,
+            H = -\gamma C  - \sum_{m \in M} \ket m \bra m,
 
-        where :math:`A` is the adjacency matrix, and
+        where :math:`C` is the adjacency matrix, Laplacian
+        matrix, or any arbitrary Hermitian matrix.
         :math:`M` is the set of marked vertices [1]_ [2]_.
         
         References
