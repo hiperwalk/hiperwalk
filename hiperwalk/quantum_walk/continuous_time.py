@@ -434,15 +434,16 @@ class ContinuousTime(QuantumWalk):
 
         **kwargs :
             Additional arguments for setting Hamiltonian and time.
-            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`, and
-            :meth:`hiperwalk.ContinuousTime.set_time`.
             If omitted, the default arguments are used.
+            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian` and
+            :meth:`hiperwalk.ContinuousTime.set_marked`.
 
         See Also
         --------
         set_hamiltonian
         set_time
         set_marked
+        set_gamma
 
         Notes
         -----
