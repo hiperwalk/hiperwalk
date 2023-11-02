@@ -387,7 +387,6 @@ class ContinuousTime(QuantumWalk):
         in this series is set to ``terms=21``, which is adequate 
         when the Hamiltonian is derived from the adjacency matrix 
         and gamma is less than 1.
-        """
 
         Parameters
         ----------
