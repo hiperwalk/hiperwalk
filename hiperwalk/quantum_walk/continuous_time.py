@@ -40,6 +40,13 @@ class ContinuousTime(QuantumWalk):
     **kwargs : optional
         Additional arguments to set the Hamiltonian and evolution operator.
 
+    Raises
+    ------
+    TypeError
+        If ``gamma`` is ``None`` or complex.
+    ValueError
+        If ``gamma < 0``.
+
     See Also
     --------
     set_hamiltonian
