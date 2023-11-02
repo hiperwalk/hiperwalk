@@ -414,9 +414,8 @@ class ContinuousTime(QuantumWalk):
         Set the evolution operator.
 
         This method defines the evolution operator for a specified 
-        time 't' using the time provided in ``**kwargs``.
-        If ``**kwargs`` is not specified, default arguments are 
-        employed (H=-gamma A and t=None). It first determines the 
+        time t via the argument ``time=t``.
+        It first determines the 
         Hamiltonian and subsequently derives the evolution operator 
         via a truncated Taylor series. The default number of terms 
         in this series is set to ``terms=21``, which is adequate 
@@ -442,6 +441,7 @@ class ContinuousTime(QuantumWalk):
         --------
         set_hamiltonian
         set_time
+        set_marked
 
         Notes
         -----
