@@ -44,23 +44,24 @@ class Graph():
     .. todo::
         Check if it is more efficient to store the adjacency matrix as
         sparse or dense.
-
     
-    The graph on which the quantum walk takes place .
+    The graph :math:`G(V,E)` on which the quantum walk 
+    takes place is specified by the
+    adjacency matrix, Laplacian matrix, or 
+    any Hermitian matrix :math:`C`.
+    Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
+    are adjacent if and only if :math:`C_{ij}\neq 0`.
 
     A wide range of methods are available. 
     These methods can be used by a quantum walk model 
     to generate a valid quantum walk.
     
-    This class can be passed as an argument to plotting functions.
+    This class can be passed as an argument for plotting functions.
     In this case,
     the default representation for the graph will be displayed.
 
     The recommended parameter type is
-    :class:`scipy.sparse.csr_array` with ``dtype=np.int8``,
-    where 1 denotes adjacency and 0 denotes non-adjacency.
-    If any entry differs from 0 or 1,
-    some methods may not operate as expected.
+    :class:`scipy.sparse.csr_array` with ``dtype=np.int8``.
 
     Each edge of a given graph :math:`G(V, E)` is associated with
     two arcs in the symmetric digraph :math:`\vec{G}(V, A)`,
