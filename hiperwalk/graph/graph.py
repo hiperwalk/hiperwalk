@@ -32,7 +32,7 @@ class Graph():
     Parameters
     ----------
     adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
-        Adjacency matrix, Laplacian matrix, or any Hermitian matrix :math:`C`. 
+        Adjacency matrix, Laplacian matrix, or any Hermitian matrix. 
 
     Raises
     ------
