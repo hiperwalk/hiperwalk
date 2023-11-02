@@ -15,7 +15,7 @@ class ContinuousTime(QuantumWalk):
     The continuous-time quantum walk model represents quantum particles 
     evolving on a graph in continuous time, as directed by the Schrödinger 
     equation. The Hamiltonian is usually chosen as the adjacency matrix 
-    or the Laplacian of the graph. A positive parameter, gamma, acts 
+    or the Laplacian of the graph. A positive parameter gamma acts 
     as a weighting factor for the Hamiltonian, adjusting the walk's 
     spreading rate. When marked vertices are present, 
     the Hamiltonian is suitably modified.
@@ -31,14 +31,14 @@ class ContinuousTime(QuantumWalk):
         :class:`hiperwalk.graph.Graph` :
             The graph itself.
 
-        :class:`class:scipy.sparse.csr_array`:
+        :class:`scipy.sparse.csr_array`:
             The adjacency matrix of the graph.
 
     gamma : float
-        The value of gamma for setting Hamiltonian.
+        The value of gamma for setting the Hamiltonian.
 
     **kwargs : optional
-        Arguments to set the Hamiltonian and evolution operator.
+        Additional arguments to set the Hamiltonian and evolution operator.
 
     See Also
     --------
@@ -47,34 +47,51 @@ class ContinuousTime(QuantumWalk):
 
     Notes
     -----
-    The adjacency matrix of a graph :math:`G(V, E)` is
-    the :math:`|V| \times |V|`-dimensional matrix :math:`A` such that
+    The computational basis associated with a graph 
+    :math:`G(V, E)` comprising :math:`n` vertices
+    :math:`v_0, \ldots, v_{n-1}` is spanned by the states 
+    :math:`\ket{i}` for
+    :math:`0 \leq i < n`, where
+    :math:`\ket{i}` describes the walker's position
+    as vertex :math:`v_i`.
+    
+    The adjacency matrix of :math:`G(V, E)` is the 
+    :math:`n`-dimensional matrix :math:`A` such that
     
     .. math::
         A_{i,j} = \begin{cases}
-            1, \text{ if } (i,j) \in E(G),\\
+            1, \text{ if } v_i \text{ is adjacent to } v_j,\\
+            0, \text{ otherwise.}
+        \end{cases}
+        
+    Similarly, the Laplacian matrix is defined as
+    
+    .. math::
+        L_{i,j} = \begin{cases}
+            \text{degree}(v_i), \text{ if } i=j,\\
+            -1, \text{ if } i\neq j \text{ and } v_i \text{ is adjacent to } v_j,\\
             0, \text{ otherwise.}
         \end{cases}
 
-    The Hamiltonian, which depends on the adjacency matrix and the location of 
-    the marked vertices, is described in the
-    :meth:`hiperwalk.ContinuousTime.set_hamiltonian` method.
+    The Hamiltonian's formulation is detailed in :meth:`hiperwalk.ContinuousTime.set_hamiltonian`, 
+    depending on the choice between the adjacency or Laplacian matrix, along with the positioning 
+    of the marked vertices.
 
-    The states of the computational basis are :math:`\ket{i}` for
-    :math:`0 \leq i < |V|`, where
-    :math:`\ket i` is associated with the :math:`i`-th vertex.
+    The ``ContinuousTime`` class also supports simulating arbitrary Hamiltonians. 
+    To utilize a specific Hamiltonian, provide it directly as matrix :math:`H` 
+    with the argument ``graph=H``.
 
-    This class can also facilitate the simulation of any Hamiltonian
-    evolution. To do this, simply pass the desired Hamiltonian in place
-    of the adjacency matrix.
-
-    For a deeper understanding of continuous-time quantum 
-    walks, see [1]_.
+    For a comprehensive understanding of continuous-time quantum walks, consult reference [1]_. 
+    To examine the differences between utilizing the adjacency matrix and the Laplacian matrix, 
+    refer to reference [2]_.
     
     References
     ----------
     .. [1] E. Farhi and S. Gutmann. "Quantum computation and decision trees". 
         Physical Review A, 58(2):915–928, 1998. ArXiv:quant-ph/9706062.
+        
+    .. [2] T. G. Wong, L. Tarrataca, and N. Nahimov. Laplacian versus adjacency 
+    	matrix in quantum walk search. Quantum Inf Process 15, 4029-4048, 2016.
     """
 
     _valid_kwargs = dict()
@@ -383,10 +400,10 @@ class ContinuousTime(QuantumWalk):
         If ``**kwargs`` is not specified, default arguments are 
         employed (H=-gamma A and t=None). It first determines the 
         Hamiltonian and subsequently derives the evolution operator 
-        through a Taylor series expansion. The default value
-        of ``terms=21`` is suitable when the Hamiltonian
-        is derived from the adjacency matrix and gamma is less 
-        than 1.
+        via a truncated Taylor series. The default number of terms 
+        in this series is set to ``terms=21``, which is adequate 
+        when the Hamiltonian is derived from the adjacency matrix 
+        and gamma is less than 1.
 
         Parameters
         ----------
@@ -418,13 +435,12 @@ class ContinuousTime(QuantumWalk):
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
 
-        The Taylor series expansion is given by
-
+        The :math:`n\text{th}` partial sum of the Taylor series expansion is given by
+        
         .. math::
-            \text{e}^{-\text{i}tH} = \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
+            \text{e}^{-\text{i}tH} \approx \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
 
-        where :math:`n` is the number of terms minus 1
-        (i.e. ``terms - 1``).
+        where ``terms``:math:`=n+1`.
 
         .. warning::
             For non-integer time (floating number),
