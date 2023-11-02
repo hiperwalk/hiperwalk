@@ -383,10 +383,11 @@ class ContinuousTime(QuantumWalk):
         If ``**kwargs`` is not specified, default arguments are 
         employed (H=-gamma A and t=None). It first determines the 
         Hamiltonian and subsequently derives the evolution operator 
-        through a Taylor series expansion. The default value
-        of ``terms=21`` is suitable when the Hamiltonian
-        is derived from the adjacency matrix and gamma is less 
-        than 1.
+        via a truncated Taylor series. The default number of terms 
+        in this series is set to ``terms=21``, which is adequate 
+        when the Hamiltonian is derived from the adjacency matrix 
+        and gamma is less than 1.
+        """
 
         Parameters
         ----------
