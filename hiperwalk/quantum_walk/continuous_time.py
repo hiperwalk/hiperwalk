@@ -423,7 +423,7 @@ class ContinuousTime(QuantumWalk):
         .. math::
             \text{e}^{-\text{i}tH} \approx \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
 
-        where :math:`n=```terms``:math:`+1`.
+        where ``terms``:math:`=n+1`.
 
         .. warning::
             For non-integer time (floating number),
