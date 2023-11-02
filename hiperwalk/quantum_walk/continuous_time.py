@@ -52,7 +52,8 @@ class ContinuousTime(QuantumWalk):
     :math:`v_0, \ldots, v_{n-1}` is spanned by the states 
     :math:`\ket{i}` for
     :math:`0 \leq i < n`, where
-    :math:`\ket{i}` is the state corresponding to :math:`v_i`.
+    :math:`\ket{i}` describes the walker's position
+    as vertex :math:`v_i`.
     
     The adjacency matrix of :math:`G(V, E)` is the 
     :math:`n`-dimensional matrix :math:`A` such that
