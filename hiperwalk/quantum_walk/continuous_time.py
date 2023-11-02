@@ -248,14 +248,16 @@ class ContinuousTime(QuantumWalk):
 
         Notes
         -----
-        The Hamiltonian is given by
+        The Hamiltonian is given by [1]_ [2]_
 
         .. math::
             H = -\gamma C  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`C` is the adjacency matrix, Laplacian
-        matrix, or any arbitrary Hermitian matrix.
-        :math:`M` is the set of marked vertices [1]_ [2]_.
+        matrix, or any Hermitian matrix. The set
+        :math:`M` specifies the marked vertices via
+        the argument ``marked=M``. For instance, ``marked={0}``
+        specifies that :math:`v_0` is the marked vertex.
         
         References
         ----------
