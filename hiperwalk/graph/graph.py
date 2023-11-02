@@ -25,15 +25,14 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Arbitrary graph.
+    Arbitrary simple graph.
 
     The graph on which a quantum walk takes place.
 
     Parameters
     ----------
     adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
-        Adjacency matrix of the graph on
-        which the quantum walk takes place.
+        Adjacency matrix, Laplacian matrix, or any Hermitian matrix :math:`C`. 
 
     Raises
     ------
@@ -45,6 +44,9 @@ class Graph():
     .. todo::
         Check if it is more efficient to store the adjacency matrix as
         sparse or dense.
+
+    
+    The graph on which the quantum walk takes place .
 
     A wide range of methods are available. 
     These methods can be used by a quantum walk model 
