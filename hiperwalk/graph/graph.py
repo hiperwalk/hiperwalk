@@ -49,7 +49,7 @@ class Graph():
     takes place is specified by the
     adjacency matrix, Laplacian matrix, or 
     any Hermitian matrix :math:`C`.
-    Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, where
+    Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
     where :math:`n=|V|`.
     Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
     are adjacent if and only if :math:`C_{ij}\neq 0`.
@@ -60,7 +60,7 @@ class Graph():
     for well-known graph types, such as hypercubes and lattices.
 
     The preferred parameter type for the adjacency matrix is
-    :class:`scipy.sparse.csr_matrix` with `dtype=np.int8`.
+    :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
 
     Each edge in the graph :math:`G(V, E)` corresponds 
     to two arcs in the associated directed 
