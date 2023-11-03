@@ -32,7 +32,7 @@ class Graph():
     Parameters
     ----------
     adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
-        Adjacency matrix, Laplacian matrix, or any Hermitian matrix. 
+        Adjacency matrix, Laplacian matrix, or any real Hermitian matrix. 
 
     Raises
     ------
@@ -48,7 +48,7 @@ class Graph():
     The graph :math:`G(V,E)` on which the quantum walk 
     takes place is specified by the
     adjacency matrix, Laplacian matrix, or 
-    any Hermitian matrix :math:`C`.
+    any real Hermitian matrix :math:`C`.
     Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
     where :math:`n=|V|`.
     Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
@@ -77,7 +77,7 @@ class Graph():
     :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
     (:math:`i = k` and :math:`j < \ell`).
     
-    If ``adj_matrix`` is specified as a Hermitian matrix :math:`C`, 
+    If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
     then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
     This weight is considered a generalized weight when :math:`C_{ij}` is 
     negative or complex.
