@@ -25,7 +25,7 @@ class ContinuousTime(QuantumWalk):
             The graph itself.
 
         :class:`scipy.sparse.csr_array`:
-            An adjacency matrix, Laplacian matrix, or any Hermitian matrix.
+            An adjacency matrix, Laplacian matrix, or any real Hermitian matrix.
 
     gamma : float
         The value of gamma for setting the Hamiltonian.
@@ -90,7 +90,7 @@ class ContinuousTime(QuantumWalk):
     The ``ContinuousTime`` class also supports simulating 
     arbitrary Hamiltonians. 
     To use a specific Hamiltonian :math:`H`, provide it directly 
-    via some Hermitian matrix :math:`C` 
+    via some real Hermitian matrix :math:`C` 
     using the argument ``graph=C``, 
     so that :math:`H=-\gamma C`.
 
@@ -217,7 +217,7 @@ class ContinuousTime(QuantumWalk):
 
         The Hamiltonian takes the form of -gamma A, -gamma L, 
         or -gamma C, where A is the adjacency matrix, L is 
-        the Laplacian matrix, and C is any Hermitian matrix.
+        the Laplacian matrix, and C is any real Hermitian matrix.
         If marked vertices are specified, the Hamiltonian 
         is modified as described in the Notes section. 
         Once the Hamiltonian has been established, 
@@ -255,7 +255,7 @@ class ContinuousTime(QuantumWalk):
             H = -\gamma C  - \sum_{m \in M} \ket m \bra m,
 
         where :math:`C` is the adjacency matrix, Laplacian
-        matrix, or any Hermitian matrix. The set
+        matrix, or any real Hermitian matrix. The set
         :math:`M` specifies the marked vertices via
         the argument ``marked=M``. For instance, ``marked={0}``
         specifies that :math:`v_0` is the marked vertex.
