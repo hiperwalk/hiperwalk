@@ -329,7 +329,7 @@ class Graph():
         num_vert = self.number_of_vertices()
         if vertex < 0 or vertex >= num_vert:
             raise ValueError("Vertex label out of range. " +
-                             "Expected integer value from 0 to" +
+                             "Expected integer value from 0 to " +
                              str(num_vert - 1))
         return vertex
 
