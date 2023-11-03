@@ -431,7 +431,7 @@ class ContinuousTime(QuantumWalk):
             functions to generate the evolution operator.
 
         terms : int
-            Number of terms in the Taylor series expansion.
+            Number of terms in the truncated Taylor series expansion.
 
         **kwargs :
             Additional arguments for setting Hamiltonian and time.
