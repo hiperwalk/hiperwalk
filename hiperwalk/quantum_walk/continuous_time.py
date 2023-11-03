@@ -10,17 +10,10 @@ except:
 
 class ContinuousTime(QuantumWalk):
     r"""
-    Manage instances of continuous-time quantum walks on simple graphs.
-
-    The continuous-time quantum walk model represents quantum particles 
-    evolving on a graph in continuous time, as directed by the Schrödinger 
-    equation. The Hamiltonian is usually chosen as the adjacency matrix 
-    or the Laplacian of the graph. A positive parameter gamma acts 
-    as a weighting factor for the Hamiltonian, adjusting the walk's 
-    spreading rate. When marked vertices are present, 
-    the Hamiltonian is suitably modified.
+    Manage instances of continuous-time quantum walks on graphs.
     
-    For further implementation details, refer to the Notes Section.
+    For further implementation details and theoretical background, 
+    refer to the Notes Section.
 
     Parameters
     ----------
@@ -32,7 +25,7 @@ class ContinuousTime(QuantumWalk):
             The graph itself.
 
         :class:`scipy.sparse.csr_array`:
-            The adjacency matrix of the graph.
+            An adjacency matrix, Laplacian matrix, or any Hermitian matrix.
 
     gamma : float
         The value of gamma for setting the Hamiltonian.
@@ -54,6 +47,14 @@ class ContinuousTime(QuantumWalk):
 
     Notes
     -----
+    The continuous-time quantum walk model represents quantum particles 
+    evolving on a graph in continuous time, as directed by the Schrödinger 
+    equation. The Hamiltonian is usually chosen as the adjacency matrix 
+    or the Laplacian of the graph. A positive parameter gamma acts 
+    as a weighting factor for the Hamiltonian, adjusting the walk's 
+    spreading rate. When marked vertices are present, 
+    the Hamiltonian is suitably modified.
+    
     The computational basis associated with a graph 
     :math:`G(V, E)` comprising :math:`n` vertices
     :math:`v_0, \ldots, v_{n-1}` is spanned by the states 
