@@ -2,10 +2,10 @@ import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from ._animation import *
 from .._constants import __DEBUG__
 from ..graph import *
 from ..quantum_walk import QuantumWalk
+from matplotlib.animation import FuncAnimation
 
 if __DEBUG__:
     from time import time
@@ -236,6 +236,14 @@ def plot_probability_distribution(
         valid_plots[4]: _plot_probability_distribution_on_plane
     }
 
+    update_animation = {
+        valid_plots[0]: _update_animation_bars,
+        valid_plots[1]: _update_animation_line,
+        valid_plots[2]: _update_animation_graph,
+        valid_plots[3]: _update_animation_bars,
+        valid_plots[4]: None
+    }
+
     # preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
         probabilities = np.array([probabilities])
@@ -243,23 +251,20 @@ def plot_probability_distribution(
     # passes kwargs by reference to be updated accordingly
     preconfigs[plot](probabilities, kwargs)
 
-    if animate:
-        anim = Animation()
+    if not animate:
+        for i in range(len(probabilities)):
+            # TODO: set figure size according to graph dimensions
+            # TODO: check for kwargs
+            fig, ax = configs[plot](probabilities.shape[1]) 
 
-    for i in range(len(probabilities)):
-        # TODO: set figure size according to graph dimensions
-        # TODO: check for kwargs
-        fig, ax = configs[plot](probabilities.shape[1]) 
+            plot_funcs[plot](probabilities[i], ax, **kwargs)
 
-        plot_funcs[plot](probabilities[i], ax, **kwargs)
+            plt.tight_layout()
 
-        plt.tight_layout()
-
-        # saves or shows image (or both)
-        if not animate:
+            # saves or shows image (or both)
             if filename is not None:
-                # TODO: consider using Python's string formatting operations
-                filename_suffix = str(i).zfill(len(str(len(probabilities) - 1)))
+                filename_suffix = str(i).zfill(
+                        len(str(len(probabilities) - 1)))
                 plt.savefig(filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
@@ -273,9 +278,19 @@ def plot_probability_distribution(
         anim.create_animation(interval)
 
         if filename is not None:
-            anim.save_animation(filename)
+            anim.save(filename)
         if show:
-            anim.show_animation()
+            if _is_in_notebook():
+                from IPython import display
+
+                # embedding animation in jupyter notebook
+                video = anim.to_html5_video()
+                html = display.HTML(video)
+                display.display(html)
+
+                plt.close()
+            else:
+                plt.show()
 
 def _default_graph_kwargs(kwargs, plot):
     if ((plot is None or plot == 'graph' or plot == 'plane')
