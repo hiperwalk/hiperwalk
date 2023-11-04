@@ -2,10 +2,10 @@ import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from ._animation import *
 from .._constants import __DEBUG__
 from ..graph import *
 from ..quantum_walk import QuantumWalk
+from matplotlib.animation import FuncAnimation
 
 if __DEBUG__:
     from time import time
@@ -236,6 +236,14 @@ def plot_probability_distribution(
         valid_plots[4]: _plot_probability_distribution_on_plane
     }
 
+    update_animation = {
+        valid_plots[0]: _update_animation_bars,
+        valid_plots[1]: _update_animation_line,
+        valid_plots[2]: _update_animation_graph,
+        valid_plots[3]: _update_animation_bars,
+        valid_plots[4]: None
+    }
+
     # preparing probabilities to shape requested by called functions
     if len(probabilities.shape) == 1:
         probabilities = np.array([probabilities])
@@ -243,39 +251,74 @@ def plot_probability_distribution(
     # passes kwargs by reference to be updated accordingly
     preconfigs[plot](probabilities, kwargs)
 
-    if animate:
-        anim = Animation()
+    if not animate:
+        for i in range(len(probabilities)):
+            # TODO: set figure size according to graph dimensions
+            # TODO: check for kwargs
+            fig, ax = configs[plot](probabilities.shape[1]) 
 
-    for i in range(len(probabilities)):
-        # TODO: set figure size according to graph dimensions
-        # TODO: check for kwargs
-        fig, ax = configs[plot](probabilities.shape[1]) 
+            plot_funcs[plot](probabilities[i], ax, **kwargs)
 
-        plot_funcs[plot](probabilities[i], ax, **kwargs)
+            plt.tight_layout()
 
-        plt.tight_layout()
-
-        # saves or shows image (or both)
-        if not animate:
+            # saves or shows image (or both)
             if filename is not None:
-                # TODO: consider using Python's string formatting operations
-                filename_suffix = str(i).zfill(len(str(len(probabilities) - 1)))
+                filename_suffix = str(i).zfill(
+                        len(str(len(probabilities) - 1)))
                 plt.savefig(filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
             if show:
                 plt.show()
 
-        else:
-            anim.add_frame(fig)
+    else:
+        fig, ax = configs[plot](probabilities.shape[1]) 
 
-    if animate:
-        anim.create_animation(interval)
+        if plot == 'plane':
+            from functools import partial
+            surf, cbar = plot_funcs[plot](probabilities[0], ax,
+                                          **kwargs)
+
+            anim = FuncAnimation(
+                    fig,
+                    partial(plot_funcs[plot],
+                            ax=ax,
+                            surf=surf,
+                            cbar=cbar,
+                            **kwargs),
+                    frames=probabilities)
+        elif plot == 'graph':
+            from functools import partial
+            ax, cbar = plot_funcs[plot](probabilities[0], ax,
+                                        **kwargs)
+
+            anim = FuncAnimation(
+                    fig,
+                    partial(plot_funcs[plot], ax=ax, cbar=cbar, **kwargs),
+                    frames=probabilities)
+        else:
+            artists = plot_funcs[plot](probabilities[0], ax, **kwargs)
+            anim = FuncAnimation(
+                    fig,
+                    update_animation[plot],
+                    frames=probabilities,
+                    fargs=(artists,
+                           ax if 'min_prob' not in kwargs else None))
 
         if filename is not None:
-            anim.save_animation(filename)
+            anim.save(filename)
         if show:
-            anim.show_animation()
+            if _is_in_notebook():
+                from IPython import display
+
+                # embedding animation in jupyter notebook
+                video = anim.to_html5_video()
+                html = display.HTML(video)
+                display.display(html)
+
+                plt.close()
+            else:
+                plt.show()
 
 def _default_graph_kwargs(kwargs, plot):
     if ((plot is None or plot == 'graph' or plot == 'plane')
@@ -486,9 +529,20 @@ def _plot_probability_distribution_on_bars(
     matplotlib.pyplot.bar
     """
 
-    plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
+    bars = plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
     _posconfigure_plot_figure(ax, len(probabilities), labels, graph,
                              min_prob, max_prob)
+    return [bars]
+
+def _update_animation_bars(frame, bars, ax):
+    bars = bars[0]
+    for i, bar in enumerate(bars):
+        bar.set_height(frame[i])
+
+    if ax is not None:
+        _rescale_axis(ax, 0, frame.max())
+
+    return [bars]
 
 
 def _plot_probability_distribution_on_histogram(
@@ -510,7 +564,7 @@ def _plot_probability_distribution_on_histogram(
     """
     
     kwargs['width'] = 1
-    _plot_probability_distribution_on_bars(
+    return _plot_probability_distribution_on_bars(
         probabilities, ax, labels, graph, min_prob, max_prob, **kwargs
     )
 
@@ -542,11 +596,22 @@ def _plot_probability_distribution_on_line(
 
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
-    plt.plot(np.arange(len(probabilities)), probabilities, **kwargs)
+    line = plt.plot(np.arange(len(probabilities)),
+                     probabilities, **kwargs)
 
     _posconfigure_plot_figure(
         ax, len(probabilities), labels, graph, min_prob, max_prob
     )
+
+    return line
+
+def _update_animation_line(frame, line, ax):
+    line = line[0]
+    line.set_ydata(frame)
+    if ax is not None:
+        _rescale_axis(ax, 0, frame.max())
+
+    return [line]
 
 def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
                               min_prob=None, max_prob=None):
@@ -606,7 +671,11 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             ax.set_xticks(ind)
 
     if min_prob is not None and max_prob is not None:
-        plt.ylim((min_prob, max_prob*1.02))
+        # plt.ylim((min_prob, max_prob*1.02))
+        _rescale_axis(ax, min_prob, max_prob)
+
+def _rescale_axis(ax, min_prob, max_prob):
+    ax.set_ylim((min_prob, max_prob*1.02))
 
 
 def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
@@ -620,7 +689,7 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
     _configure_colorbar
     """
-
+    cbar = kwargs.pop('cbar') if 'cbar' in kwargs else None
     # UpdateNodes may create kwargs['node_size']
     # min_node_size and max_node_size are not valid keys
     # for nx.draw kwargs
@@ -629,6 +698,7 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
 
     vmin = kwargs.pop('min_prob')
     vmax = kwargs.pop('max_prob')
+    ax.clear()
     nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
             vmin=vmin, vmax=vmax, **kwargs)
@@ -639,12 +709,14 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
-        _configure_colorbar(ax, kwargs)
+        cbar = _configure_colorbar(ax, cbar, kwargs)
 
     if __DEBUG__:
         global start
         end = time()
         start = end
+
+    return [ax, cbar]
 
 
 def _configure_nodes(G, probabilities, kwargs):
@@ -740,7 +812,7 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
         ))
 
 
-def _configure_colorbar(ax, kwargs):
+def _configure_colorbar(ax, cbar, kwargs):
     """
     Add a colorbar in the figure besides the given ax
 
@@ -762,15 +834,24 @@ def _configure_colorbar(ax, kwargs):
                            vmax=kwargs['max_prob'])
     )
 
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='2.5%', pad=0.01)
-    cbar = plt.colorbar(
-        sm,
-        ticks=np.linspace(kwargs['min_prob'], kwargs['max_prob'], num=5),
-        cax=cax
-    )
+    if cbar is None:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='2.5%', pad=0.01)
+        cbar = plt.colorbar(
+            sm,
+            ticks=np.linspace(kwargs['min_prob'],
+                              kwargs['max_prob'],
+                              num=5),
+            cax=cax
+        )
+        cbar.ax.tick_params(labelsize=14, length=7)
+    else:
+        cbar.update_normal(sm)
+    return cbar
 
-    cbar.ax.tick_params(labelsize=14, length=7)
+def _update_animation_graph(frame, ax, cax):
+    ax = ax[0]
+    return _plot_probability_distribution_on_graph(frame, ax)
 
 def _default_plane_kwargs(kwargs):
     if not 'cmap' in kwargs:
@@ -792,7 +873,7 @@ def _default_plane_kwargs(kwargs):
         kwargs['alpha'] = 0.5
 
 def _plot_probability_distribution_on_plane(
-        probabilities, ax, labels=None, graph=None,
+        probabilities, ax, surf=None, cbar=None, labels=None, graph=None,
         min_prob=None, max_prob=None, dimensions=None, **kwargs
     ):
     """
@@ -819,16 +900,37 @@ def _plot_probability_distribution_on_plane(
     mappable.set_clim(vmin, vmax)
 
     # division by 4 apparently normalize the colors
-    ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
-                    vmin=vmin/4, vmax=vmax/4,
-                    **kwargs)
+    if surf is None:
+        surf = [0]
+    else:
+        surf[0].remove()
+    surf[0] = ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
+                           vmin=vmin/4, vmax=vmax/4,
+                           **kwargs)
     ax.set_zlim(vmin, vmax)
     kwargs['cmap'] = cmap # reinserts into kwargs
 
-    cbar = plt.colorbar(mappable, ax=ax, shrink=0.4, aspect=20, pad=0.15)
+    if cbar is None:
+        cbar = plt.colorbar(mappable,
+                            shrink=0.4, aspect=20,
+                            pad=0.15)
+    else:
+        cbar.update_normal(mappable)
+
     cbar.ax.tick_params(length=10, width=1, labelsize=16)
 
-###########################################################################
+    return [[surf[0]], cbar]
+
+def _is_in_notebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True
+        return False
+    except:
+        return False
+
+##########################################################################
 
 def plot_success_probability(time, probabilities, **kwargs):
     r"""
