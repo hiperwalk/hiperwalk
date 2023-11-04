@@ -271,11 +271,39 @@ def plot_probability_distribution(
             if show:
                 plt.show()
 
-        else:
-            anim.add_frame(fig)
+    else:
+        fig, ax = configs[plot](probabilities.shape[1]) 
 
-    if animate:
-        anim.create_animation(interval)
+        if plot == 'plane':
+            from functools import partial
+            surf, cbar = plot_funcs[plot](probabilities[0], ax,
+                                          **kwargs)
+
+            anim = FuncAnimation(
+                    fig,
+                    partial(plot_funcs[plot],
+                            ax=ax,
+                            surf=surf,
+                            cbar=cbar,
+                            **kwargs),
+                    frames=probabilities)
+        elif plot == 'graph':
+            from functools import partial
+            ax, cbar = plot_funcs[plot](probabilities[0], ax,
+                                        **kwargs)
+
+            anim = FuncAnimation(
+                    fig,
+                    partial(plot_funcs[plot], ax=ax, cbar=cbar, **kwargs),
+                    frames=probabilities)
+        else:
+            artists = plot_funcs[plot](probabilities[0], ax, **kwargs)
+            anim = FuncAnimation(
+                    fig,
+                    update_animation[plot],
+                    frames=probabilities,
+                    fargs=(artists,
+                           ax if 'min_prob' not in kwargs else None))
 
         if filename is not None:
             anim.save(filename)
