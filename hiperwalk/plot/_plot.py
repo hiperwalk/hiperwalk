@@ -661,7 +661,7 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
     :obj:`networkx.draw <networkx.drawing.nx_pylab.draw>`
     _configure_colorbar
     """
-
+    cbar = kwargs.pop('cbar') if 'cbar' in kwargs else None
     # UpdateNodes may create kwargs['node_size']
     # min_node_size and max_node_size are not valid keys
     # for nx.draw kwargs
@@ -670,6 +670,7 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
 
     vmin = kwargs.pop('min_prob')
     vmax = kwargs.pop('max_prob')
+    ax.clear()
     nx.draw(kwargs.pop('graph'), ax=ax,
             node_size=kwargs.pop('node_size'),
             vmin=vmin, vmax=vmax, **kwargs)
@@ -680,12 +681,14 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
 
     # setting and drawing colorbar
     if 'cmap' in kwargs:
-        _configure_colorbar(ax, kwargs)
+        cbar = _configure_colorbar(ax, cbar, kwargs)
 
     if __DEBUG__:
         global start
         end = time()
         start = end
+
+    return [ax, cbar]
 
 
 def _configure_nodes(G, probabilities, kwargs):
@@ -781,7 +784,7 @@ def _update_nodes(probabilities, min_node_size, max_node_size, kwargs):
         ))
 
 
-def _configure_colorbar(ax, kwargs):
+def _configure_colorbar(ax, cbar, kwargs):
     """
     Add a colorbar in the figure besides the given ax
 
@@ -803,15 +806,24 @@ def _configure_colorbar(ax, kwargs):
                            vmax=kwargs['max_prob'])
     )
 
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('right', size='2.5%', pad=0.01)
-    cbar = plt.colorbar(
-        sm,
-        ticks=np.linspace(kwargs['min_prob'], kwargs['max_prob'], num=5),
-        cax=cax
-    )
+    if cbar is None:
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='2.5%', pad=0.01)
+        cbar = plt.colorbar(
+            sm,
+            ticks=np.linspace(kwargs['min_prob'],
+                              kwargs['max_prob'],
+                              num=5),
+            cax=cax
+        )
+        cbar.ax.tick_params(labelsize=14, length=7)
+    else:
+        cbar.update_normal(sm)
+    return cbar
 
-    cbar.ax.tick_params(labelsize=14, length=7)
+def _update_animation_graph(frame, ax, cax):
+    ax = ax[0]
+    return _plot_probability_distribution_on_graph(frame, ax)
 
 def _default_plane_kwargs(kwargs):
     if not 'cmap' in kwargs:
