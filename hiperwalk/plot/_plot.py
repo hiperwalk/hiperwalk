@@ -845,7 +845,7 @@ def _default_plane_kwargs(kwargs):
         kwargs['alpha'] = 0.5
 
 def _plot_probability_distribution_on_plane(
-        probabilities, ax, labels=None, graph=None,
+        probabilities, ax, surf=None, cbar=None, labels=None, graph=None,
         min_prob=None, max_prob=None, dimensions=None, **kwargs
     ):
     """
@@ -872,16 +872,37 @@ def _plot_probability_distribution_on_plane(
     mappable.set_clim(vmin, vmax)
 
     # division by 4 apparently normalize the colors
-    ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
-                    vmin=vmin/4, vmax=vmax/4,
-                    **kwargs)
+    if surf is None:
+        surf = [0]
+    else:
+        surf[0].remove()
+    surf[0] = ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
+                           vmin=vmin/4, vmax=vmax/4,
+                           **kwargs)
     ax.set_zlim(vmin, vmax)
     kwargs['cmap'] = cmap # reinserts into kwargs
 
-    cbar = plt.colorbar(mappable, shrink=0.4, aspect=20, pad=0.15)
+    if cbar is None:
+        cbar = plt.colorbar(mappable,
+                            shrink=0.4, aspect=20,
+                            pad=0.15)
+    else:
+        cbar.update_normal(mappable)
+
     cbar.ax.tick_params(length=10, width=1, labelsize=16)
 
-#########################################################################################
+    return [[surf[0]], cbar]
+
+def _is_in_notebook():
+    try:
+        shell = get_ipython().__class__.__name__
+        if shell == 'ZMQInteractiveShell':
+            return True
+        return False
+    except:
+        return False
+
+##########################################################################
 
 def plot_success_probability(time, probabilities, **kwargs):
     r"""
