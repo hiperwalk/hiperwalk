@@ -568,11 +568,22 @@ def _plot_probability_distribution_on_line(
 
     if 'marker' not in kwargs:
         kwargs['marker'] = 'o'
-    plt.plot(np.arange(len(probabilities)), probabilities, **kwargs)
+    line = plt.plot(np.arange(len(probabilities)),
+                     probabilities, **kwargs)
 
     _posconfigure_plot_figure(
         ax, len(probabilities), labels, graph, min_prob, max_prob
     )
+
+    return line
+
+def _update_animation_line(frame, line, ax):
+    line = line[0]
+    line.set_ydata(frame)
+    if ax is not None:
+        _rescale_axis(ax, 0, frame.max())
+
+    return [line]
 
 def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
                               min_prob=None, max_prob=None):
@@ -632,7 +643,11 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
             ax.set_xticks(ind)
 
     if min_prob is not None and max_prob is not None:
-        plt.ylim((min_prob, max_prob*1.02))
+        # plt.ylim((min_prob, max_prob*1.02))
+        _rescale_axis(ax, min_prob, max_prob)
+
+def _rescale_axis(ax, min_prob, max_prob):
+    ax.set_ylim((min_prob, max_prob*1.02))
 
 
 def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
