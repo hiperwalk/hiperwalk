@@ -501,9 +501,20 @@ def _plot_probability_distribution_on_bars(
     matplotlib.pyplot.bar
     """
 
-    plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
+    bars = plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
     _posconfigure_plot_figure(ax, len(probabilities), labels, graph,
                              min_prob, max_prob)
+    return [bars]
+
+def _update_animation_bars(frame, bars, ax):
+    bars = bars[0]
+    for i, bar in enumerate(bars):
+        bar.set_height(frame[i])
+
+    if ax is not None:
+        _rescale_axis(ax, 0, frame.max())
+
+    return [bars]
 
 
 def _plot_probability_distribution_on_histogram(
@@ -525,7 +536,7 @@ def _plot_probability_distribution_on_histogram(
     """
     
     kwargs['width'] = 1
-    _plot_probability_distribution_on_bars(
+    return _plot_probability_distribution_on_bars(
         probabilities, ax, labels, graph, min_prob, max_prob, **kwargs
     )
 
