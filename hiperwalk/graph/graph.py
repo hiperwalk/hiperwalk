@@ -1,4 +1,5 @@
 import numpy as np
+import networkx as nx
 from scipy.sparse import issparse, csr_array
 
 def _binary_search(v, elem, start=0, end=None):
@@ -31,8 +32,10 @@ class Graph():
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array` or :class:`numpy.ndarray`
-        Adjacency matrix, Laplacian matrix, or any real Hermitian matrix. 
+    adj_matrix : :class:`scipy.sparse.csr_array`, :class:`numpy.ndarray` or :class:`networkx.Graph`
+        Adjacency matrix, Laplacian matrix, or any real Hermitian matrix.
+
+        If :class:`network.Graph`, the adjacency matrix of the graph is used.
 
     Raises
     ------
@@ -147,10 +150,12 @@ class Graph():
     """
 
     def __init__(self, adj_matrix):
-        # TODO:
-        # * Check if valid adjacency matrix
-        # * Add option: numpy dense matrix as parameters.
-        # * Add option: networkx graph as parameter.
+        if all(hasattr(adj_matrix, attr) for attr in
+               ['__len__', 'edges', 'nbunch_iter', 'subgraph',
+                'is_directed']):
+            adj_matrix = nx.convert_matrix.to_scipy_sparse_array(
+                    adj_matrix).astype(np.int8)
+
         if not issparse(adj_matrix):
             adj_matrix = csr_array(adj_matrix, dtype=np.int8)
 
