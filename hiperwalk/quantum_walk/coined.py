@@ -690,14 +690,17 @@ class Coined(QuantumWalk):
             def get_block(vertex):
                 g = self._graph
                 neighbors = g.neighbors(vertex)
-                start = g.arc_number((vertex, neighbors[0]))
-                end = g.arc_number((vertex, neighbors[-1])) + 1
+                a1 = g.arc_number((vertex, neighbors[0]))
+                a2 = g.arc_number((vertex, neighbors[-1]))
+                # arc order may change
+                start = min(a1, a2)
+                end = max(a1, a2) + 1
 
                 return scipy.sparse.csr_array(self._coin[start:end,
                                                          start:end])
 
-            num_vert = self.number_of_vertices()
-            degree = self.degree
+            num_vert = self._graph.number_of_vertices()
+            degree = self._graph.degree
             oracle_coin = self._oracle_coin
             coin_funcs = Coined._coin_funcs
             blocks = [coin_funcs[oracle_coin[v]](degree(v))
