@@ -65,3 +65,10 @@ class TestCoinedLine(unittest.TestCase):
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
         )
+
+    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
+    def test_set_explicit_coin(self):
+        C = self.qw.get_coin()
+        self.qw.set_coin(coin=C, hpc=False)
+        C2 = self.qw.get_coin()
+        self.assertTrue((C - C2).nnz == 0)
