@@ -12,4 +12,3 @@ aiding the study of quantum walks.
     graph.rst
     quantum_walk.rst
     plot.rst
-    generator.rst
