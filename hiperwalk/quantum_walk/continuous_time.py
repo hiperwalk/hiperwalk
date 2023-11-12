@@ -88,7 +88,7 @@ class ContinuousTime(QuantumWalk):
     of the marked vertices.
 
     The ``ContinuousTime`` class also supports simulating 
-    arbitrary Hamiltonians. 
+    real Hamiltonians. 
     To use a specific Hamiltonian :math:`H`, provide it directly 
     via some real Hermitian matrix :math:`C` 
     using the argument ``graph=C``, 
