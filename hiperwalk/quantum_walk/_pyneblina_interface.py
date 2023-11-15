@@ -86,16 +86,19 @@ def send_vector(v):
     #        if is_complex else neblina.vector_new(n, neblina.FLOAT))
     vec = neblina.vector_new(n, neblina.COMPLEX)
 
-    if is_complex:
+    try:
+        # TODO: Pyneblina needs to accept 3 only arguments
+        # instead of 4?
+        # TODO: check if neblina.vector_set is idetifying
+        # the vector type right (i.e. real and not complex)
         for i in range(n):
             neblina.vector_set(vec, i, v[i].real, v[i].imag)
-    else:
-        for i in range(n):
-            # TODO: Pyneblina needs to accept 3 only arguments
-            # instead of 4?
-            # TODO: check if neblina.vector_set is idetifying
-            # the vector type right (i.e. real and not complex)
-            neblina.vector_set(vec, i, v[i], 0)
+    except AttributeError:
+        print("Error: vector entries must have real and imaginary parts.")
+    except TypeError:
+        print("Error: vector entries must be numbers.")
+    except Exception as e:
+        print("Error: ", e)
 
     # suppose that the vector is going to be used
     # immediately after being transferred
