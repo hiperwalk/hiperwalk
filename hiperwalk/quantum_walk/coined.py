@@ -609,13 +609,13 @@ class Coined(QuantumWalk):
 
         Parameters
         ----------
-        marked : list of int or dict
+        marked : list of vertices or dict
             list of vertices to be marked and
             how they are going to be marked.
             
-            * list of int
-                Given vertices are set as marked but
-                the evolution operator remains unchanged.
+            * list of vertices
+                Given vertices are set as marked.
+                The coin for those vertices is '-I'.
 
             * dict
                 A dictionary with structure
