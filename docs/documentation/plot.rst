@@ -11,11 +11,3 @@ Functions
     :nosignatures:
 
     plot_probability_distribution
-
-Classes
--------
-.. autosummary::
-    :toctree: generated
-    :nosignatures:
-
-    Animation
