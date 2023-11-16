@@ -11,11 +11,7 @@ Functions
     :nosignatures:
 
     plot_probability_distribution
-
-Classes
--------
-.. autosummary::
-    :toctree: generated
-    :nosignatures:
-
-    Animation
+    plot_success_probability
+    plot_function
+    plot_optimal_runtime
+    plot_max_success_probability
