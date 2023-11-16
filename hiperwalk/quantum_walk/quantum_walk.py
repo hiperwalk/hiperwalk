@@ -115,9 +115,6 @@ class QuantumWalk(ABC):
                 / np.sqrt(self.hilb_dim))
 
     def _update_marked(self, marked=[]):
-        if not hasattr(marked, '__iter__'):
-            marked = [marked]
-
         self._marked = set(map(self._graph.vertex_number, marked))
         self._marked = np.sort(list(self._marked))
 
@@ -130,7 +127,7 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        marked : list of int or int
+        marked : list of vertices
             List of vertices to be marked.
             If empty list, no vertex is marked.
 
