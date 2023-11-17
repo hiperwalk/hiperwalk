@@ -126,4 +126,4 @@ class CompleteBipartite(Graph):
         C = np.ones((self._num_vert2, self._num_vert1), dtype=np.int8)
         D = np.zeros((self._num_vert2, self._num_vert2), dtype=np.int8)
         return np.block([[A, B],
-                         [C, D]], dtype=np.int8)
+                         [C, D]])
