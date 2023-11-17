@@ -477,20 +477,20 @@ class QuantumWalk(ABC):
     ### Auxiliary Simulation functions ###
     ######################################
 
-    def _prepare_engine(self, initial_state, hpc):
+    def _prepare_engine(self, state, hpc):
         if self._evolution is None:
             self._evolution = self.get_evolution(hpc=hpc)
 
         if hpc:
             self._simul_mat = nbl.send_matrix(self._evolution)
-            self._simul_vec = nbl.send_vector(initial_state)
+            self._simul_vec = nbl.send_vector(state)
 
         else:
             self._simul_mat = self._evolution
-            self._simul_vec = initial_state
+            self._simul_vec = state
 
         dtype = (np.complex128 if (np.iscomplexobj(self._evolution)
-                             or np.iscomplexobj(initial_state))
+                             or np.iscomplexobj(state))
                  else np.double)
 
         return dtype
@@ -528,7 +528,7 @@ class QuantumWalk(ABC):
 
 
 
-    def simulate(self, time=None, initial_state=None, hpc=True):
+    def simulate(self, time=None, state=None, hpc=True, initial_state=None):
         r"""
         Simulates the quantum walk.
 
@@ -555,7 +555,7 @@ class QuantumWalk(ABC):
                 to ``end`` (inclusive)
                 that is a multiple of ``step``.
 
-        initial_state : :class:`numpy.array`, default=None
+        state : :class:`numpy.array`, default=None
             The starting state onto which the evolution operator
             will be applied.
 
@@ -563,6 +563,12 @@ class QuantumWalk(ABC):
             Indicates whether to utilize high-performance computing
             for matrix multiplication. 
             If set to ``hpc=False``, it will use standalone Python.
+
+        initial_state :
+            .. deprecated: 2.0
+                ``initial_state`` will be removed in version 2.1,
+                it is replaced by ``state`` because
+                the latter is more concise.
 
         Returns
         -------
@@ -575,7 +581,7 @@ class QuantumWalk(ABC):
         ValueError
             Triggered if:
             * ``time=None``.
-            * ``initial_state=None``.
+            * ``state=None``.
             * ``evolution_operator=None`` and hasn't been set before.
 
         See Also
@@ -619,13 +625,20 @@ class QuantumWalk(ABC):
                 + "Must be an int or tuple of int."
             )
 
-        if initial_state is None:
+        if initial_state is not None:
+            warn("``initial_state`` will be removed in version 2.1,"
+                 + "it is replaced by ``state`` because"
+                 + "the latter is more concise.")
+            if state is None:
+                state = initial_state
+
+        if state is None:
             raise ValueError(
-                "``initial_state`` not specified. "
+                "``state`` not specified. "
                 + "Expected a np.array."
             )
 
-        if len(initial_state) != self.hilb_dim:
+        if len(state) != self.hilb_dim:
             raise ValueError(
                 "Initial condition has invalid dimension. "
                 + "Expected an np.array with length " + str(self.hilb_dim)
@@ -646,20 +659,20 @@ class QuantumWalk(ABC):
         if hpc and not self._pyneblina_imported():
             hpc = False
 
-        dtype = self._prepare_engine(initial_state, hpc)
+        dtype = self._prepare_engine(state, hpc)
 
         # number of states to save
         num_states = int(end/step) + 1
         num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
 
         saved_states = np.zeros(
-            (num_states, initial_state.shape[0]), dtype=dtype
+            (num_states, state.shape[0]), dtype=dtype
         )
         state_index = 0 # index of the state to be saved
 
-        # if save_initial_state:
+        # if save_state:
         if start == 0:
-            saved_states[0] = initial_state.copy()
+            saved_states[0] = state.copy()
             state_index += 1
             num_states -= 1
 
@@ -790,22 +803,22 @@ class QuantumWalk(ABC):
     def _number_to_valid_time(self, number):
         raise NotImplementedError()
 
-    def _optimal_runtime(self, initial_state, delta_time, hpc):
+    def _optimal_runtime(self, state, delta_time, hpc):
         r"""
         .. todo::
             Returns all arguments.
             It is used by optinal_runtime and max_p_succ to avoid
             redundant computation.
         """
-        if initial_state is None:
-            initial_state = self.uniform_state()
+        if state is None:
+            state = self.uniform_state()
 
         N = self._graph.number_of_vertices()
         # if search algorithm takes O(N),
         # it is better to use classical computing.
         final_time = self._number_to_valid_time(N/2)
         states = self.simulate(time=(final_time, delta_time),
-                               initial_state=initial_state,
+                               state=state,
                                hpc=hpc)
         p_succ = self.success_probability(states)
         del states
@@ -818,12 +831,12 @@ class QuantumWalk(ABC):
         return self._number_to_valid_time(t_opt), p_succ
 
 
-    def optimal_runtime(self, initial_state=None, delta_time=1, hpc=True):
+    def optimal_runtime(self, state=None, delta_time=1, hpc=True):
         r"""
         Find the optimal running time of a quantum-walk-based search.
 
         This method simulates the use of the ``set_evolution`` operator,
-        taking the ``initial_state`` as an input for the simulation. It then
+        taking the ``state`` as an input for the simulation. It then
         calculates the success probability for each intermediate state and fits
         these probabilities to a sine-squared function. The optimal running time
         corresponds to the point in the domain where the sine-squared function
@@ -831,7 +844,7 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        initial_state : :class:`numpy.ndarray`, default=None
+        state : :class:`numpy.ndarray`, default=None
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
@@ -859,11 +872,11 @@ class QuantumWalk(ABC):
         success_probability
         fit_sin_squared
         """
-        t_opt, _ = self._optimal_runtime(initial_state, delta_time, hpc)
+        t_opt, _ = self._optimal_runtime(state, delta_time, hpc)
         return t_opt
 
     def max_success_probability(self,
-        initial_state=None, delta_time=1, hpc=True):
+        state=None, delta_time=1, hpc=True):
         r"""
         Find the maximum success probability.
         
@@ -872,7 +885,7 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        initial_state : :class:`numpy.ndarray`, default=None
+        state : :class:`numpy.ndarray`, default=None
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
@@ -905,7 +918,7 @@ class QuantumWalk(ABC):
             the max success probability was not obtained in the simulation.
             The simulation must be rerun or interpolated.
         """
-        t_opt, p_succ = self._optimal_runtime(initial_state,
+        t_opt, p_succ = self._optimal_runtime(state,
                                               delta_time, hpc)
         opt_index = int(t_opt / delta_time)
         # TODO: if t_opt / delta_time is not close to an integer,

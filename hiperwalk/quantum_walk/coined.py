@@ -1026,21 +1026,21 @@ class Coined(QuantumWalk):
 
         return ket
 
-    def _prepare_engine(self, initial_state, hpc):
+    def _prepare_engine(self, state, hpc):
         if hpc:
             S = nbl.send_matrix(self.get_shift())
             C = nbl.send_matrix(self.get_coin())
             self._simul_mat = (C, S)
-            self._simul_vec = nbl.send_vector(initial_state)
+            self._simul_vec = nbl.send_vector(state)
 
             dtype = (complex if (S.is_complex or C.is_complex
-                                 or np.iscomplex(initial_state.dtype))
+                                 or np.iscomplex(state.dtype))
                      else np.double)
 
             return dtype
 
         else:
-            return super()._prepare_engine(initial_state, hpc)
+            return super()._prepare_engine(state, hpc)
 
 
     def _simulate_step(self, step, hpc):

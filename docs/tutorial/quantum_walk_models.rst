@@ -354,10 +354,10 @@ Once the evolution operator is set,
 the :meth:`hiperwalk.QuantumWalk.simulate` method 
 needs to be called in order to carry out the simulation. 
 This method primarily requires two arguments: 
-``time`` and ``initial_state``.
+``time`` and ``state``.
 The ``time`` argument specifies when the simulation should 
 stop and which intermediate states need to be stored. 
-The evolution operator will be applied to the ``initial_state``
+The evolution operator will be applied to the ``state``
 as many times as necessary.
 The simulation returns a list of states such that
 the ``i``-th entry corresponds to the ``i``-th saved state.
@@ -373,7 +373,7 @@ There are three argument types for ``time``.
   The final simulation time.
 
   >>> states = coined.simulate(time=10,
-  ...                          initial_state=coined.ket(0))
+  ...                          state=coined.ket(0))
   >>> len(states)
   1
   >>> len(states[0]) == coined.hilbert_space_dimension()
@@ -391,7 +391,7 @@ There are three argument types for ``time``.
   ``[0, 2, 4, 6, 8, 10]``.
 
   >>> states = coined.simulate(time=(10, 2),
-  ...                          initial_state=coined.ket(0))
+  ...                          state=coined.ket(0))
   >>> # single state returned
   >>> len(states)
   6
@@ -406,7 +406,7 @@ There are three argument types for ``time``.
   ``[1, 3, 5, 7, 9]``.
 
   >>> states = coined.simulate(time=(1, 10, 2),
-  ...                          initial_state=coined.ket(0))
+  ...                          state=coined.ket(0))
   >>> # single state returned
   >>> len(states)
   5

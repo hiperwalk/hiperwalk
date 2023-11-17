@@ -481,7 +481,7 @@ class ContinuousTime(QuantumWalk):
             ContinuousTime._valid_kwargs['time']))
         self.set_hamiltonian(**kwargs)
 
-    def simulate(self, time=None, initial_state=None, hpc=True):
+    def simulate(self, time=None, state=None, hpc=True, initial_state=None):
         r"""
         Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
         which accepts float entries for the ``time`` parameter.
@@ -526,7 +526,7 @@ class ContinuousTime(QuantumWalk):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        states = super().simulate(time, initial_state, hpc)
+        states = super().simulate(time, state, hpc, initial_state)
         return states
 
     def _number_to_valid_time(self, number):
