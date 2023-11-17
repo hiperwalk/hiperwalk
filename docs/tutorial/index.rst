@@ -57,8 +57,8 @@ One way to accomplish this is by using the
 which generates a state of the computational basis.
 
 >>> vertex = N // 2
->>> initial_state = qw.ket(vertex, vertex + 1)
->>> initial_state
+>>> state = qw.ket(vertex, vertex + 1)
+>>> state
 array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
        0., 0., 0.])
 
@@ -76,7 +76,7 @@ the :meth:`hiperwalk.Coined.simulate` method will automatically use
 high-performance computing to perform the matrix-vector multiplications.
 
 >>> final_state = qw.simulate(time=N//2,
-...                           initial_state=initial_state)
+...                           state=state)
 
 
 
