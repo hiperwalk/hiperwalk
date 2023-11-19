@@ -159,7 +159,7 @@ class Coined(QuantumWalk):
 
         The persistent shift operator can only be defined in a
         meaningful way for certain specific graphs. For instance,
-        for graphs that can be embedded onto a plane,
+        for graphs that can be embedded onto a plane so that
         directions such as left, right, up, and down
         can be referred to naturally.
         """
@@ -218,7 +218,7 @@ class Coined(QuantumWalk):
         r"""
         Set the shift operator.
 
-        Chooses either the flipflop or the persistent shift operator.
+        Defines either the flipflop or the persistent shift operator.
         Following this, the evolution operator updates accordingly.
 
         Parameters
@@ -253,21 +253,25 @@ class Coined(QuantumWalk):
             Check :class:`Coined` Notes for details
             about the computational basis.
 
-        The persistent shift is sometimes called *moving shift*.
-
-        The flip-flop shift operator :math:`S` is defined such that
+        The flip-flop shift operator :math:`S` is defined as
 
         .. math::
-            \begin{align*}
-                S \ket{(v, u)} &= \ket{(u, v)} \\
-                \implies S\ket i &= \ket j
-            \end{align*}
+            S \ket{v, u} = \ket{u, v},
 
-        where :math:`i` is the label of the edge :math:`(v, u)` and
-        :math:`j` is the label of the edge :math:`(u, v)`.
+        in the context of arc notation, where :math:`(v, u)` and
+        :math:`(u, v)` represent opposite arcs. This can be equivalently 
+        expressed as :math:`S\ket{i} = \ket{j}`, where :math:`i` is the 
+        label of the arc :math:`(v, u)` and :math:`j` is the label of 
+        the arc :math:`(u, v)`. The flip-flop shift satisfies the 
+        property :math:`S^2 = I`.
 
-
-        For a more comprehensive understanding of the flipflop
+        The persistent shift, also known as the *moving shift*, 
+        is defined for graphs with a clear notion of direction or rotation.
+        When the shift operator is applied repeatedly, it causes the walker 
+        to continue moving persistently in the same direction. Unlike the 
+        flip-flop shift, the persistent shift does not satisfy :math:`S^2 = I`.
+        
+        For a more comprehensive understanding of the 
         shift operator, refer to Section 7.2: Coined Walks on Arbitrary
         Graphs in the book "Quantum Walks and Search Algorithms" [1]_.
         
