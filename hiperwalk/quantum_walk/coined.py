@@ -890,21 +890,24 @@ class Coined(QuantumWalk):
 
         Notes
         -----
-        The probability for a given vertex :math:`u` is the sum of the
-        absolute square of the amplitudes of the arcs with tail :math:`u`.
-        That is, for an arbitrary superposition
-
+        The probability for a given vertex :math:`u` is calculated as the sum of the
+        absolute squares of the amplitudes of the arcs originating from :math:`u`.
+        If the state of the walker is represented by
+        
         .. math::
             \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
-
-        -- where :math:`\vec G` is the graph :math:`G` with each
-        edge substituted by two arcs (one for each direction) --
-        the probability associated with vertex :math:`u` is
-
+        
+        where :math:`\vec G` denotes the symmetric directed graph formed by
+        replacing each edge in :math:`G` with two arcs, one for each direction,
+        then the probability associated with vertex :math:`u` is given by
+        
         .. math::
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
-
-        where :math:`N(u)` is the set of neighbors of :math:`u`.
+        
+        with :math:`N(u)` being the set of neighbors of :math:`u`.
+        The probability distribution, which is returned by this
+        method as a ``numpy.ndarray``, is the collection of these
+        probabilities for all vertices.
         """
         if __DEBUG__:
             start = now()
