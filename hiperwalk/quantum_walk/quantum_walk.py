@@ -106,10 +106,10 @@ class QuantumWalk(ABC):
         An example of the uniform state is
 
         .. math::
-
             \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
 
-        where :math:`N` is the dimension of the Hilbert space.
+        where :math:`N` is the dimension of the Hilbert space and 
+        :math:`i` is the label of an arc.
         """
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
