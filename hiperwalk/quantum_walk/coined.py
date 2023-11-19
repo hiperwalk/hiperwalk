@@ -436,13 +436,17 @@ class Coined(QuantumWalk):
         --------
         set_evolution
 
+        
         Notes
         -----
-        Owing to the selected computational basis (refer to the
-        Notes in the :class:`Coined`),
-        the outcome is a block diagonal operator.
-        Each block is a :math:`\deg(v)`-dimensional ``coin``.
-        As a result, there are :math:`|V|` blocks in total.
+        
+        The result of this method is a block-diagonal 
+        operator, a consequence of the ordering of the arcs 
+        in the computational basis 
+        (see Notes in :class:`Coined` for details).        
+        Each block corresponds to a :math:`\deg(v)`-dimensional ``coin``.
+        Consequently, there are a total of :math:`|V|` blocks.
+        
 
         .. todo::
 
