@@ -861,8 +861,9 @@ class QuantumWalk(ABC):
         Returns
         -------
         int or float
-            The optimal runtime found.
-            The returned type depends of the quantum walk model.
+            The optimal runtime that was found after
+            fitting the sine-squared function.
+            The returned type depends on the quantum walk model.
 
 
         See Also
