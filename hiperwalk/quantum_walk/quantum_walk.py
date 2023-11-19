@@ -394,11 +394,11 @@ class QuantumWalk(ABC):
 
     def state(self, *args):
         """
-        Generates a valid state.
+        Generates a state in the Hilbert space.
 
         The state corresponds to the walker being in a superposition
         of the given labels with the given amplitudes.
-        The state is normalized in order to be unitary.
+        The state is normalized in order to have a unitary norm.
 
         Parameters
         ----------
