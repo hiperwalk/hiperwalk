@@ -103,10 +103,10 @@ class QuantumWalk(ABC):
         An example of the uniform state is
 
         .. math::
-
             \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
 
-        where :math:`N` is the dimension of the Hilbert space.
+        where :math:`N` is the dimension of the Hilbert space and 
+        :math:`i` is the label of an arc.
         """
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
@@ -393,11 +393,11 @@ class QuantumWalk(ABC):
 
     def state(self, *args):
         """
-        Generates a valid state.
+        Generates a state in the Hilbert space.
 
         The state corresponds to the walker being in a superposition
         of the given labels with the given amplitudes.
-        The state is normalized in order to be unitary.
+        The state is normalized in order to have a unitary norm.
 
         Parameters
         ----------
@@ -860,8 +860,9 @@ class QuantumWalk(ABC):
         Returns
         -------
         int or float
-            The optimal runtime found.
-            The returned type depends of the quantum walk model.
+            The optimal runtime that was found after
+            fitting the sine-squared function.
+            The returned type depends on the quantum walk model.
 
 
         See Also
