@@ -190,31 +190,57 @@ class Coined(QuantumWalk):
 
     def _set_shift(self, shift='default'):
         valid_vals = ['default', 'flipflop', 'persistent', 'ff', 'p']
-        if shift not in valid_vals:
-            raise ValueError(
-                "Invalid `shift` value. Expected one of "
-                + str(valid_vals) + ". But received '"
-                + str(shift) + "' instead."
-            )
 
-        if shift == 'default':
-            shift = 'p' if self.has_persistent_shift() else 'ff'
+        # check if string
+        try:
+            shift = shift.lower()
 
-        if shift == 'ff':
-            shift = 'flipflop'
-        elif shift == 'p':
-            shift = 'persistent'
+            if shift not in valid_vals:
+                raise ValueError(
+                    "Invalid `shift` value. Expected one of "
+                    + str(valid_vals) + ". But received '"
+                    + str(shift) + "' instead."
+                )
 
-        
-        if shift == 'flipflop':
-            self._set_flipflop_shift()
-        else:
-            self._set_persistent_shift()
+            if shift == 'default':
+                shift = 'p' if self.has_persistent_shift() else 'ff'
 
-        if __DEBUG__:
-            if self._shift is None: raise AssertionError
+            if shift == 'ff':
+                shift = 'flipflop'
+            elif shift == 'p':
+                shift = 'persistent'
 
-    def set_shift(self, shift='default', **kwargs):
+            if str(self._shift) != shift:
+                if shift == 'flipflop':
+                    self._set_flipflop_shift()
+                else:
+                    self._set_persistent_shift()
+                return True
+
+            return False
+
+        except AttributeError:
+            pass
+
+        # check if explict matrix
+        try:
+            shift[0][0] #if this works, then shift is numpy or list of list
+            # convert to sparse
+            shift = scipy.sparse(shift)
+        except NotImplementedError:
+            # already sparse
+            pass
+
+        if (len(shift.shape) != 2 or shift.shape[0] != shift.shape[1]):
+            raise TypeError('Explicit coin is not a square matrix.')
+
+        if (id(self._shift) != id(shift)):
+            self._shift = shift
+            return True
+
+        return False
+
+    def set_shift(self, shift='default', hpc=True):
         r"""
         Set the shift operator.
 
@@ -230,11 +256,10 @@ class Coined(QuantumWalk):
             Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -329,8 +354,10 @@ class Coined(QuantumWalk):
             
             Add persistent example.
         """
-        self._set_shift(shift=shift)
-        self._set_evolution(**kwargs)
+        self.set_evolution(shift=shift,
+                           coin=self._coin,
+                           marked=self._marked,
+                           hpc=hpc)
 
     def get_shift(self):
         r"""
@@ -368,7 +395,7 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             if self._coin is None: raise AssertionError
 
-    def set_coin(self, coin='default', **kwargs):
+    def set_coin(self, coin='default', hpc=True):
         """
         Set the coin operator based on the graph's structure.
 
@@ -414,11 +441,10 @@ class Coined(QuantumWalk):
             * :class:`scipy.sparse.csr_array`
                 The explicit coin operator.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
         --------
@@ -437,12 +463,10 @@ class Coined(QuantumWalk):
             Check if explicit coin is valid.
 
         """
-        for key in kwargs:
-            if key not in Coined._valid_kwargs['evolution']:
-                kwargs.pop(key)
-
-        self._set_coin(coin=coin)
-        self._set_evolution(**kwargs)
+        self.set_evolution(shift=self._shift,
+                           coin=coin,
+                           marked=self._marked,
+                           hpc=hpc)
 
     def default_coin(self):
         r"""
@@ -598,7 +622,7 @@ class Coined(QuantumWalk):
         super()._set_marked(marked=marked)
         self._oracle_coin = coin_list
 
-    def set_marked(self, marked=[], **kwargs):
+    def set_marked(self, marked=[], hpc=True):
         r"""
         Set the marked vertices.
 
@@ -626,18 +650,20 @@ class Coined(QuantumWalk):
                 ``{coin_type : list_of_vertices}``.
                 Analogous to the one accepted by :meth:`set_coin`.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
         --------
         set_coin
         set_evolution
         """
-        super().set_marked(marked=marked, **kwargs)
+        self.set_evolution(shift=self._shift,
+                           coin=self._coin,
+                           marked=marked,
+                           hpc=hpc)
 
     def _coin_list_to_explicit_coin(self, coin_list):
         num_vert = self._graph.number_of_vertices()
