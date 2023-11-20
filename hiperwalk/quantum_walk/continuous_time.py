@@ -109,16 +109,19 @@ class ContinuousTime(QuantumWalk):
 
     _valid_kwargs = dict()
 
-    def __init__(self, graph=None, gamma=None, **kwargs):
+    def __init__(self, graph=None, **kwargs):
 
         super().__init__(graph=graph)
 
         # create attributes
         self.hilb_dim = self._graph.number_of_vertices()
+
         self._gamma = None
+        self._hamil_type = None
+        self._terms = None
         self._hamiltonian = None
-        self._evolution = None
-        self._evolution_time = None
+
+        self._time = None
 
         # import inspect
 
@@ -135,12 +138,9 @@ class ContinuousTime(QuantumWalk):
                     self._set_time),
                 }
 
-        if not 'time' in kwargs:
-            kwargs['time'] = 0
+        self.set_evolution(**kwargs)
 
-        self.set_evolution(gamma=gamma, **kwargs)
-
-    def _set_gamma(self, gamma=None):
+    def _set_gamma(self, gamma=0.1):
         if gamma is None or gamma.imag != 0:
             raise TypeError("Value of 'gamma' is not float.")
 
@@ -149,7 +149,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def set_gamma(self, gamma=None, **kwargs):
+    def set_gamma(self, gamma=0.1, hpc=True):
         r"""
         Set gamma.
         
@@ -160,13 +160,13 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        gamma : float
+        gamma : float, default=0.1
             The value of gamma.
 
-        ** kwargs :
-            Additional arguments for updating the evolution operator.
-            For example, whether to use neblina HPC or not.
-            See :meth:`set_evolution` for more options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -175,9 +175,10 @@ class ContinuousTime(QuantumWalk):
         ValueError
             If ``gamma < 0``.
         """
-        if self._set_gamma(gamma=gamma):
-            self._set_hamiltonian()
-            self._set_evolution(**kwargs)
+        self.set_hamiltonian(gamma=gamma,
+                             type=self._hamil_type,
+                             marked=self._marked,
+                             hpc=hpc)
 
     def get_gamma(self):
         r"""
@@ -190,28 +191,38 @@ class ContinuousTime(QuantumWalk):
         """
         return self._gamma
 
-    def set_marked(self, marked=[], **kwargs):
-        self._set_marked(marked=marked)
-        self._set_hamiltonian()
-        self._set_evolution(**kwargs)
+    def set_marked(self, marked=[], hpc=True):
+        self.set_hamiltonian(gamma=self._gamma,
+                             type=self._hamil_type,
+                             marked=marked,
+                             hpc=hpc)
 
-    def _set_hamiltonian(self):
-        r"""
-        If this method is invoked,
-        The Hamiltonian is recalculated.
-        """
-        self._hamiltonian = -self._gamma * self._graph.adjacency_matrix()
+    def _set_hamiltonian(self, gamma=0.1, type='adjacency', marked=[]):
+        update = self._set_gamma(gamma)
+        update = self._set_hamiltonian_type(type) or update
+        update = self._set_marked(marked) or update
 
-        # creating oracle
-        if len(self._marked) > 0:
-            data = np.ones(len(self._marked), dtype=np.int8)
-            oracle = scipy.sparse.csr_array(
-                    (data, (self._marked, self._marked)),
-                    shape=(self.hilb_dim, self.hilb_dim))
+        if update:
+            if self._hamil_type == 'adjacency':
+                H = -self._gamma * self._graph.adjacency_matrix()
+            else:
+                H = -self._gamma * self._graph.laplacian_matrix()
 
-            self._hamiltonian -= oracle
+            # creating oracle
+            if len(self._marked) > 0:
+                data = np.ones(len(self._marked), dtype=np.int8)
+                oracle = scipy.sparse.csr_array(
+                        (data, (self._marked, self._marked)),
+                        shape=(self.hilb_dim, self.hilb_dim))
 
-    def set_hamiltonian(self, gamma=None, **kwargs):
+                H -= oracle
+
+            self._hamiltonian = H
+
+        return update
+
+    def set_hamiltonian(self, gamma=0.1, type="adjacency", marked=[],
+                        hpc=True):
         r"""
         Set the Hamiltonian.
 
@@ -225,14 +236,21 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        gamma : float
-            Value of gamma.
+        gamma : float, default=0.1
+            The value of gamma.
 
-        **kwargs :
-            Used for setting the marked vertices, and
-            the procedure for updating the evolution operator.
-            See :meth:`hiperwalk.ContinuousTime.set_marked`, and
-            See :meth:`hiperwalk.ContinuousTime.set_evolution`.
+        type: {'adjacency', 'laplacian'}
+            Two types of Hamiltonian used...
+            ``'A'`` is shorthand for ``'adjacency'``.
+            ``'L'`` is shorthand for ``'laplacian'``.
+
+        marked: TODO
+            TODO
+
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -244,6 +262,7 @@ class ContinuousTime(QuantumWalk):
         See Also
         --------
         set_gamma
+        set_hamiltonian_type
         set_marked
         set_evolution
 
@@ -272,14 +291,12 @@ class ContinuousTime(QuantumWalk):
             "Spatial search by quantum walk",
             Phys. Rev. A 70, 022314, 2004.
         """
-        self._set_gamma(gamma=gamma)
-
-        marked_kwargs = ContinuousTime._pop_valid_kwargs(kwargs,
-                ContinuousTime._valid_kwargs['marked'])
-        self._set_marked(**marked_kwargs)
-
-        self._set_hamiltonian()
-        self._set_evolution(**kwargs)
+        self.set_evolution(time=self._time,
+                           terms=self._terms,
+                           gamma=gamma,
+                           type=type,
+                           marked=marked,
+                           hpc=hpc)
 
     def get_hamiltonian(self):
         r"""
@@ -289,21 +306,49 @@ class ContinuousTime(QuantumWalk):
         -------
         :class:`scipy.sparse.csr_array`
         """
-
         return self._hamiltonian
 
-    def _set_time(self, time=None):
+    def _set_hamiltonian_type(self, type='adjacency'):
+        if type.upper() == 'A':
+            type = 'adjacency'
+        elif type.upper() == 'L':
+            type = 'laplacian'
+
+        if type != self._hamil_type:
+            self._hamil_type = type
+            return True
+
+        return False
+
+    def set_hamiltonian_type(self, type='adjacency', hpc=True):
+        r"""
+        Parameters
+        ----------
+        type: {'adjacency', 'laplacian'}
+            Two types of Hamiltonian used...
+            ``'A'`` is shorthand for ``'adjacency'``.
+            ``'L'`` is shorthand for ``'laplacian'``.
+        """
+        self.set_hamiltonian(gamma=self._gamma,
+                             type=type,
+                             marked=self._marked,
+                             hpc=hpc)
+
+    def get_hamiltonian_type():
+        return self._hamil_type
+
+    def _set_time(self, time=1):
         if time is None or time < 0:
             raise ValueError(
                 "Expected non-negative `time` value."
             )
 
-        if time != self._evolution_time:
-            self._evolution_time = time
+        if time != self._time:
+            self._time = time
             return True
         return False
 
-    def set_time(self, time=None, **kwargs):
+    def set_time(self, time=1, hpc=True):
         r"""
         Set a time instant.
 
@@ -312,12 +357,12 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        time : float
+        time : float, default=1
 
-        ** kwargs :
-            Additional arguments for updating the evolution operator.
-            For example, whether to use neblina HPC or not.
-            See :meth:`set_evolution` for more options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -338,15 +383,65 @@ class ContinuousTime(QuantumWalk):
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
         """
-        if self._set_time(time=time):
-            self._set_evolution(**kwargs)
+        self.set_evolution(time=time,
+                           terms=self._terms,
+                           gamma=self._gamma,
+                           type=self._hamil_type,
+                           marked=self._marked,
+                           hpc=hpc)
+
+    def _set_terms(self, terms=21):
+        if self._terms != terms:
+            self._terms = terms
+            return True
+        return False
+
+    def set_terms(self, terms=21, hpc=True):
+        r"""
+        Set the number of terms used to calculate the
+        evolution operator as a power series.
+
+        Parameters
+        ----------
+        terms : int, default=21
+            Number of terms in the truncated Taylor series expansion.
+
+        hpc : bool, default = True
+            Determines whether or not to use neblina HPC 
+            functions to generate the evolution operator.
+
+        See Also
+        --------
+        set_evolution
+        """
+        self.set_evolution(time=self._time,
+                           terms=terms,
+                           gamma=self._gamma,
+                           type=self._hamil_type,
+                           marked=self._marked,
+                           hpc=hpc)
+
+    def get_terms(self):
+        r"""
+        Number of terms in the power series used to
+        calculate the evolution operator.
+
+        Returns
+        -------
+        int
+
+        See Also
+        --------
+        get_evolution
+        """
+        return self._terms
 
     def _set_evolution(self, hpc=True, terms=21):
         r"""
         If this method is invoked,
         the evolution is recalculated
         """
-        time = self._evolution_time
+        time = self._time
 
         if time == 0:
             self._evolution = np.eye(self.hilb_dim)
@@ -411,7 +506,7 @@ class ContinuousTime(QuantumWalk):
 
         self._evolution = U
 
-    def set_evolution(self, hpc=True, terms=21, **kwargs):
+    def set_evolution(self, hpc=True, **kwargs):
         r"""
         Set the evolution operator.
 
@@ -426,25 +521,22 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        hpc : bool, default = True
+        hpc : bool, default=True
             Determines whether or not to use neblina HPC 
             functions to generate the evolution operator.
-
-        terms : int
-            Number of terms in the truncated Taylor series expansion.
 
         **kwargs :
             Additional arguments for setting Hamiltonian and time.
             If omitted, the default arguments are used.
-            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian` and
-            :meth:`hiperwalk.ContinuousTime.set_marked`.
+            See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`,
+            :meth:`hiperwalk.ContinuousTime.set_time`, and
+            :meth:`hiperwalk.ContinuousTime.set_terms`.
 
         See Also
         --------
         set_hamiltonian
         set_time
-        set_marked
-        set_gamma
+        set_terms
 
         Notes
         -----
@@ -476,10 +568,16 @@ class ContinuousTime(QuantumWalk):
             <https://github.com/scipy/scipy/issues/18086>`_
             is solved.
         """
-        self._set_time(**ContinuousTime._pop_valid_kwargs(
-            kwargs,
-            ContinuousTime._valid_kwargs['time']))
-        self.set_hamiltonian(**kwargs)
+        def filter_and_call(method, update):
+            valid = self._get_valid_kwargs(method)
+            filtered = self._filter_valid_kwargs(kwargs, valid)
+            return method(**filtered) or update
+
+        update = filter_and_call(self._set_time, False)
+        update = filter_and_call(self._set_hamiltonian, update)
+        update = filter_and_call(self._set_terms, update)
+        if (update):
+            filter_and_call(self._set_evolution, update)
 
     def simulate(self, time=None, state=None, hpc=True, initial_state=None):
         r"""

@@ -47,9 +47,6 @@ class QuantumWalk(ABC):
             raise TypeError('graph is None')
 
         self._marked = []
-        if 'marked' in kwargs:
-            self._set_marked(kwargs['marked'])
-
         self._evolution = None
 
         ##############################
@@ -115,8 +112,11 @@ class QuantumWalk(ABC):
                 / np.sqrt(self.hilb_dim))
 
     def _set_marked(self, marked=[]):
-        self._marked = set(map(self._graph.vertex_number, marked))
-        self._marked = np.sort(list(self._marked))
+        if (id(marked) != id(self._marked)):
+            self._marked = set(map(self._graph.vertex_number, marked))
+            self._marked = np.sort(list(self._marked))
+            return True
+        return False
 
     def set_marked(self, marked=[], **kwargs):
         r"""
