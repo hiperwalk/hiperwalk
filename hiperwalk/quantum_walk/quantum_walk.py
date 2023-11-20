@@ -48,7 +48,7 @@ class QuantumWalk(ABC):
 
         self._marked = []
         if 'marked' in kwargs:
-            self._update_marked(kwargs['marked'])
+            self._set_marked(kwargs['marked'])
 
         self._evolution = None
 
@@ -114,7 +114,7 @@ class QuantumWalk(ABC):
         return (np.ones(self.hilb_dim, dtype=float)
                 / np.sqrt(self.hilb_dim))
 
-    def _update_marked(self, marked=[]):
+    def _set_marked(self, marked=[]):
         self._marked = set(map(self._graph.vertex_number, marked))
         self._marked = np.sort(list(self._marked))
 
@@ -140,8 +140,7 @@ class QuantumWalk(ABC):
         --------
         set_evolution
         """
-        self._update_marked(marked=marked)
-        self._update_evolution(**kwargs)
+        self.set_evolution(marked=marked, **kwargs)
 
     def get_marked(self):
         r"""
