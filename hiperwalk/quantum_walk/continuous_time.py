@@ -501,7 +501,7 @@ class ContinuousTime(QuantumWalk):
 
         Other Parameters
         ----------------
-        See `hiperwalk.QuantumWalk.simulate`.
+        See :meth:`hiperwalk.QuantumWalk.simulate`.
 
         See Also
         --------
