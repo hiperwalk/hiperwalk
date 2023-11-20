@@ -126,13 +126,13 @@ class ContinuousTime(QuantumWalk):
             # assign static attribute
             ContinuousTime._valid_kwargs = {
                 'gamma': ContinuousTime._get_valid_kwargs(
-                    self._update_gamma),
+                    self._set_gamma),
                 'marked': ContinuousTime._get_valid_kwargs(
-                    self._update_marked),
+                    self._set_marked),
                 'evolution': ContinuousTime._get_valid_kwargs(
-                    self._update_evolution),
+                    self._set_evolution),
                 'time': ContinuousTime._get_valid_kwargs(
-                    self._update_time),
+                    self._set_time),
                 }
 
         if not 'time' in kwargs:
@@ -140,7 +140,7 @@ class ContinuousTime(QuantumWalk):
 
         self.set_evolution(gamma=gamma, **kwargs)
 
-    def _update_gamma(self, gamma=None):
+    def _set_gamma(self, gamma=None):
         if gamma is None or gamma.imag != 0:
             raise TypeError("Value of 'gamma' is not float.")
 
@@ -175,9 +175,9 @@ class ContinuousTime(QuantumWalk):
         ValueError
             If ``gamma < 0``.
         """
-        if self._update_gamma(gamma=gamma):
-            self._update_hamiltonian()
-            self._update_evolution(**kwargs)
+        if self._set_gamma(gamma=gamma):
+            self._set_hamiltonian()
+            self._set_evolution(**kwargs)
 
     def get_gamma(self):
         r"""
@@ -191,11 +191,11 @@ class ContinuousTime(QuantumWalk):
         return self._gamma
 
     def set_marked(self, marked=[], **kwargs):
-        self._update_marked(marked=marked)
-        self._update_hamiltonian()
-        self._update_evolution(**kwargs)
+        self._set_marked(marked=marked)
+        self._set_hamiltonian()
+        self._set_evolution(**kwargs)
 
-    def _update_hamiltonian(self):
+    def _set_hamiltonian(self):
         r"""
         If this method is invoked,
         The Hamiltonian is recalculated.
@@ -272,14 +272,14 @@ class ContinuousTime(QuantumWalk):
             "Spatial search by quantum walk",
             Phys. Rev. A 70, 022314, 2004.
         """
-        self._update_gamma(gamma=gamma)
+        self._set_gamma(gamma=gamma)
 
         marked_kwargs = ContinuousTime._pop_valid_kwargs(kwargs,
                 ContinuousTime._valid_kwargs['marked'])
-        self._update_marked(**marked_kwargs)
+        self._set_marked(**marked_kwargs)
 
-        self._update_hamiltonian()
-        self._update_evolution(**kwargs)
+        self._set_hamiltonian()
+        self._set_evolution(**kwargs)
 
     def get_hamiltonian(self):
         r"""
@@ -292,7 +292,7 @@ class ContinuousTime(QuantumWalk):
 
         return self._hamiltonian
 
-    def _update_time(self, time=None):
+    def _set_time(self, time=None):
         if time is None or time < 0:
             raise ValueError(
                 "Expected non-negative `time` value."
@@ -338,10 +338,10 @@ class ContinuousTime(QuantumWalk):
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
         """
-        if self._update_time(time=time):
-            self._update_evolution(**kwargs)
+        if self._set_time(time=time):
+            self._set_evolution(**kwargs)
 
-    def _update_evolution(self, hpc=True, terms=21):
+    def _set_evolution(self, hpc=True, terms=21):
         r"""
         If this method is invoked,
         the evolution is recalculated
@@ -476,7 +476,7 @@ class ContinuousTime(QuantumWalk):
             <https://github.com/scipy/scipy/issues/18086>`_
             is solved.
         """
-        self._update_time(**ContinuousTime._pop_valid_kwargs(
+        self._set_time(**ContinuousTime._pop_valid_kwargs(
             kwargs,
             ContinuousTime._valid_kwargs['time']))
         self.set_hamiltonian(**kwargs)

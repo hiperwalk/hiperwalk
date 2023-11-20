@@ -86,11 +86,11 @@ class Coined(QuantumWalk):
         if not bool(Coined._valid_kwargs):
             # assign static attribute
             Coined._valid_kwargs = {
-                'shift': Coined._get_valid_kwargs(self._update_shift),
-                'coin': Coined._get_valid_kwargs(self._update_coin),
-                'marked': Coined._get_valid_kwargs(self._update_marked),
+                'shift': Coined._get_valid_kwargs(self._set_shift),
+                'coin': Coined._get_valid_kwargs(self._set_coin),
+                'marked': Coined._get_valid_kwargs(self._set_marked),
                 'evolution': Coined._get_valid_kwargs(
-                    self._update_evolution)
+                    self._set_evolution)
             }
 
         # dict with valid coins as keys and the respective
@@ -188,7 +188,7 @@ class Coined(QuantumWalk):
 
         self._shift = S
 
-    def _update_shift(self, shift='default'):
+    def _set_shift(self, shift='default'):
         valid_vals = ['default', 'flipflop', 'persistent', 'ff', 'p']
         if shift not in valid_vals:
             raise ValueError(
@@ -329,8 +329,8 @@ class Coined(QuantumWalk):
             
             Add persistent example.
         """
-        self._update_shift(shift=shift)
-        self._update_evolution(**kwargs)
+        self._set_shift(shift=shift)
+        self._set_evolution(**kwargs)
 
     def get_shift(self):
         r"""
@@ -344,7 +344,7 @@ class Coined(QuantumWalk):
         """
         return self._shift
 
-    def _update_coin(self, coin='default'):
+    def _set_coin(self, coin='default'):
         try:
             if len(coin.shape) != 2:
                 raise TypeError('Explicit coin is not a matrix.')
@@ -441,8 +441,8 @@ class Coined(QuantumWalk):
             if key not in Coined._valid_kwargs['evolution']:
                 kwargs.pop(key)
 
-        self._update_coin(coin=coin)
-        self._update_evolution(**kwargs)
+        self._set_coin(coin=coin)
+        self._set_evolution(**kwargs)
 
     def default_coin(self):
         r"""
@@ -577,7 +577,7 @@ class Coined(QuantumWalk):
     def _minus_identity_coin(dim):
         return -np.identity(dim)
 
-    def _update_marked(self, marked=[]):
+    def _set_marked(self, marked=[]):
         try:
             marked.get(0) #throws exception if list
         except AttributeError:
@@ -595,7 +595,7 @@ class Coined(QuantumWalk):
         vertices = [v for vlist in vertices for v in vlist ]
         marked = vertices
 
-        super()._update_marked(marked=marked)
+        super()._set_marked(marked=marked)
         self._oracle_coin = coin_list
 
     def set_marked(self, marked=[], **kwargs):
@@ -722,7 +722,7 @@ class Coined(QuantumWalk):
 
         return self._coin_list_to_explicit_coin(coin_list)
 
-    def _update_evolution(self, hpc=True):
+    def _set_evolution(self, hpc=True):
         U = None
         if hpc and not self._pyneblina_imported():
             hpc = False
@@ -839,10 +839,10 @@ class Coined(QuantumWalk):
                               kwargs,
                               Coined._valid_kwargs['marked'])
 
-        self._update_shift(**S_kwargs)
-        self._update_coin(**C_kwargs)
-        self._update_marked(**R_kwargs)
-        self._update_evolution(hpc=hpc)
+        self._set_shift(**S_kwargs)
+        self._set_coin(**C_kwargs)
+        self._set_marked(**R_kwargs)
+        self._set_evolution(hpc=hpc)
 
     def probability_distribution(self, states):
         r"""
