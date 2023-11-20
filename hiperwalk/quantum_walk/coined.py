@@ -48,13 +48,21 @@ class Coined(QuantumWalk):
     Notes
     -----
 
-    The computational basis is spanned by the set of arcs.
-    The cardinality is :math:`2|E|`, where :math:`E`
-    represents the edge set of the graph.
-    For further information regarding the order of the arcs,
-    consult the respective graph descriptions.
-    The Hilbert space of a coined quantum walk is denoted by
-    :math:`\mathcal{H}^{2|E|}`.
+    The coined quantum walk model is a quantum analog of 
+    classical random walks, incorporating an additional 
+    quantum coin-toss mechanism. It uses an extra quantum 
+    internal degree of freedom, represented by the coin state,
+    to determine the direction of the walker's movement 
+    on a graph.
+
+    The computational basis comprises the arc set of the graph.
+    Its cardinality is :math:`2|E|`, where :math:`E`
+    represents the graph's edge set.
+    The arcs are arranged within the computational basis 
+    to ensure that the coin operator adopts a block-diagonal 
+    matrix form.
+    For additional information on the arc ordering,
+    please consult the respective graph descriptions.
 
     For a more detailed understanding of coined quantum walks,
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
@@ -159,7 +167,7 @@ class Coined(QuantumWalk):
 
         The persistent shift operator can only be defined in a
         meaningful way for certain specific graphs. For instance,
-        for graphs that can be embedded onto a plane,
+        for graphs that can be embedded onto a plane so that
         directions such as left, right, up, and down
         can be referred to naturally.
         """
@@ -244,7 +252,7 @@ class Coined(QuantumWalk):
         r"""
         Set the shift operator.
 
-        Chooses either the flipflop or the persistent shift operator.
+        Defines either the flipflop or the persistent shift operator.
         Following this, the evolution operator updates accordingly.
 
         Parameters
@@ -278,21 +286,25 @@ class Coined(QuantumWalk):
             Check :class:`Coined` Notes for details
             about the computational basis.
 
-        The persistent shift is sometimes called *moving shift*.
-
-        The flip-flop shift operator :math:`S` is defined such that
+        The flip-flop shift operator :math:`S` is defined as
 
         .. math::
-            \begin{align*}
-                S \ket{(v, u)} &= \ket{(u, v)} \\
-                \implies S\ket i &= \ket j
-            \end{align*}
+            S \ket{v, u} = \ket{u, v},
 
-        where :math:`i` is the label of the edge :math:`(v, u)` and
-        :math:`j` is the label of the edge :math:`(u, v)`.
+        in the context of arc notation, where :math:`(v, u)` and
+        :math:`(u, v)` represent opposite arcs. This can be equivalently 
+        expressed as :math:`S\ket{i} = \ket{j}`, where :math:`i` is the 
+        label of the arc :math:`(v, u)` and :math:`j` is the label of 
+        the arc :math:`(u, v)`. The flip-flop shift satisfies the 
+        property :math:`S^2 = I`.
 
-
-        For a more comprehensive understanding of the flipflop
+        The persistent shift, also known as the *moving shift*, 
+        is defined for graphs with a clear notion of direction or rotation.
+        When the shift operator is applied repeatedly, it causes the walker 
+        to continue moving persistently in the same direction. Unlike the 
+        flip-flop shift, the persistent shift does not satisfy :math:`S^2 = I`.
+        
+        For a more comprehensive understanding of the 
         shift operator, refer to Section 7.2: Coined Walks on Arbitrary
         Graphs in the book "Quantum Walks and Search Algorithms" [1]_.
         
@@ -450,13 +462,17 @@ class Coined(QuantumWalk):
         --------
         set_evolution
 
+        
         Notes
         -----
-        Owing to the selected computational basis (refer to the
-        Notes in the :class:`Coined`),
-        the outcome is a block diagonal operator.
-        Each block is a :math:`\deg(v)`-dimensional ``coin``.
-        As a result, there are :math:`|V|` blocks in total.
+        
+        The result of this method is a block-diagonal 
+        operator, a consequence of the ordering of the arcs 
+        in the computational basis 
+        (see Notes in :class:`Coined` for details).        
+        Each block corresponds to a :math:`\deg(v)`-dimensional ``coin``.
+        Consequently, there are a total of :math:`|V|` blocks.
+        
 
         .. todo::
 
@@ -900,21 +916,24 @@ class Coined(QuantumWalk):
 
         Notes
         -----
-        The probability for a given vertex :math:`u` is the sum of the
-        absolute square of the amplitudes of the arcs with tail :math:`u`.
-        That is, for an arbitrary superposition
-
+        The probability for a given vertex :math:`u` is calculated as the sum of the
+        absolute squares of the amplitudes of the arcs originating from :math:`u`.
+        If the state of the walker is represented by
+        
         .. math::
             \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
-
-        -- where :math:`\vec G` is the graph :math:`G` with each
-        edge substituted by two arcs (one for each direction) --
-        the probability associated with vertex :math:`u` is
-
+        
+        where :math:`\vec G` denotes the symmetric directed graph formed by
+        replacing each edge in :math:`G` with two arcs, one for each direction,
+        then the probability associated with vertex :math:`u` is given by
+        
         .. math::
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
-
-        where :math:`N(u)` is the set of neighbors of :math:`u`.
+        
+        with :math:`N(u)` being the set of neighbors of :math:`u`.
+        The probability distribution, which is returned by this
+        method as a ``numpy.ndarray``, is the collection of these
+        probabilities for all vertices.
         """
         if __DEBUG__:
             start = now()

@@ -21,19 +21,20 @@ def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
         filename=None, interval=250, **kwargs):
     """
-    Plots probability distribution of quantum walk.
+    Plot the probability distributions of quantum walk states.
 
-    The probability distribution of multiple steps of a quantum walk
-    may be plotted.
-    The generated figures may be shown step-by-step,
-    saved in multiple files, animated or saved as animation.
+    This function allows plotting the probability distributions 
+    for multiple steps of a quantum walk evolution.
+    The generated figures can be displayed step-by-step, 
+    saved as individual files, or used to create and save animations.
 
     Parameters
     ----------
     probabilities : :class:`numpy.ndarray`
-        The probabilities of the walker to be found on each step
-        of the quantum walk.
-        Columns represent vertices and rows represent the walk steps.
+        An array representing the probabilities of the walker being 
+        found at each vertex during the quantum walk evolution.
+        Each column corresponds to a vertex, 
+        while each row represents a step in the walk.
     plot : str, default=None
         The plot type.
         The valid options are
@@ -63,7 +64,7 @@ def plot_probability_distribution(
         if ``animate==True``,
         the entire walk is saved in the ``filename.fig`` file.
     graph : optional
-        The structure of the graph on which the walk occurs.
+        The structure of the graph on which the walk takes place.
         The graph labels are used as plotting labels.
         **Important**: check Graph Plots subsection in other parameters.
 
@@ -72,7 +73,7 @@ def plot_probability_distribution(
         * :class:`hiperwalk.Graph`
             Hiperwalk Graph.
             It is used to generate default plotting for specific graphs.
-            Does not override values explicited by the user.
+            User-specified values are not overridden.
         * :class:`networkx.classes.graph`,
             NetworkX Graph
         * :class:`scipy.sparse.csr_matrix`
@@ -934,10 +935,10 @@ def _is_in_notebook():
 
 def plot_success_probability(time, probabilities, **kwargs):
     r"""
-    Plots the success probability with respect to time.
+    Plot the success probability over time.
 
-    The probabilities must have been calculated previously.
-
+    Assumes that the probabilities have already been calculated.
+    
     Parameters
     ----------
     time:
