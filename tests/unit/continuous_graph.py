@@ -80,7 +80,7 @@ class TestContinuousGraph(unittest.TestCase):
         prev_H = self.qw._hamiltonian
         prev_U = self.qw._evolution
 
-        self.qw.set_evolution(time=1, gamma=1, marked=0, hpc=False)
+        self.qw.set_evolution(time=1, gamma=1, marked=[0], hpc=False)
         U = self.qw.get_evolution()
 
         self.assertTrue(U is not None)

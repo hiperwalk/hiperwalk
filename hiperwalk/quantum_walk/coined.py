@@ -48,13 +48,21 @@ class Coined(QuantumWalk):
     Notes
     -----
 
-    The computational basis is spanned by the set of arcs.
-    The cardinality is :math:`2|E|`, where :math:`E`
-    represents the edge set of the graph.
-    For further information regarding the order of the arcs,
-    consult the respective graph descriptions.
-    The Hilbert space of a coined quantum walk is denoted by
-    :math:`\mathcal{H}^{2|E|}`.
+    The coined quantum walk model is a quantum analog of 
+    classical random walks, incorporating an additional 
+    quantum coin-toss mechanism. It uses an extra quantum 
+    internal degree of freedom, represented by the coin state,
+    to determine the direction of the walker's movement 
+    on a graph.
+
+    The computational basis comprises the arc set of the graph.
+    Its cardinality is :math:`2|E|`, where :math:`E`
+    represents the graph's edge set.
+    The arcs are arranged within the computational basis 
+    to ensure that the coin operator adopts a block-diagonal 
+    matrix form.
+    For additional information on the arc ordering,
+    please consult the respective graph descriptions.
 
     For a more detailed understanding of coined quantum walks,
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
@@ -86,11 +94,11 @@ class Coined(QuantumWalk):
         if not bool(Coined._valid_kwargs):
             # assign static attribute
             Coined._valid_kwargs = {
-                'shift': Coined._get_valid_kwargs(self._update_shift),
-                'coin': Coined._get_valid_kwargs(self._update_coin),
-                'marked': Coined._get_valid_kwargs(self._update_marked),
+                'shift': Coined._get_valid_kwargs(self._set_shift),
+                'coin': Coined._get_valid_kwargs(self._set_coin),
+                'marked': Coined._get_valid_kwargs(self._set_marked),
                 'evolution': Coined._get_valid_kwargs(
-                    self._update_evolution)
+                    self._set_evolution)
             }
 
         # dict with valid coins as keys and the respective
@@ -159,7 +167,7 @@ class Coined(QuantumWalk):
 
         The persistent shift operator can only be defined in a
         meaningful way for certain specific graphs. For instance,
-        for graphs that can be embedded onto a plane,
+        for graphs that can be embedded onto a plane so that
         directions such as left, right, up, and down
         can be referred to naturally.
         """
@@ -188,37 +196,63 @@ class Coined(QuantumWalk):
 
         self._shift = S
 
-    def _update_shift(self, shift='default'):
+    def _set_shift(self, shift='default'):
         valid_vals = ['default', 'flipflop', 'persistent', 'ff', 'p']
-        if shift not in valid_vals:
-            raise ValueError(
-                "Invalid `shift` value. Expected one of "
-                + str(valid_vals) + ". But received '"
-                + str(shift) + "' instead."
-            )
 
-        if shift == 'default':
-            shift = 'p' if self.has_persistent_shift() else 'ff'
+        # check if string
+        try:
+            shift = shift.lower()
 
-        if shift == 'ff':
-            shift = 'flipflop'
-        elif shift == 'p':
-            shift = 'persistent'
+            if shift not in valid_vals:
+                raise ValueError(
+                    "Invalid `shift` value. Expected one of "
+                    + str(valid_vals) + ". But received '"
+                    + str(shift) + "' instead."
+                )
 
-        
-        if shift == 'flipflop':
-            self._set_flipflop_shift()
-        else:
-            self._set_persistent_shift()
+            if shift == 'default':
+                shift = 'p' if self.has_persistent_shift() else 'ff'
 
-        if __DEBUG__:
-            if self._shift is None: raise AssertionError
+            if shift == 'ff':
+                shift = 'flipflop'
+            elif shift == 'p':
+                shift = 'persistent'
 
-    def set_shift(self, shift='default', **kwargs):
+            if str(self._shift) != shift:
+                if shift == 'flipflop':
+                    self._set_flipflop_shift()
+                else:
+                    self._set_persistent_shift()
+                return True
+
+            return False
+
+        except AttributeError:
+            pass
+
+        # check if explict matrix
+        try:
+            shift[0][0] #if this works, then shift is numpy or list of list
+            # convert to sparse
+            shift = scipy.sparse(shift)
+        except NotImplementedError:
+            # already sparse
+            pass
+
+        if (len(shift.shape) != 2 or shift.shape[0] != shift.shape[1]):
+            raise TypeError('Explicit coin is not a square matrix.')
+
+        if (id(self._shift) != id(shift)):
+            self._shift = shift
+            return True
+
+        return False
+
+    def set_shift(self, shift='default', hpc=True):
         r"""
         Set the shift operator.
 
-        Chooses either the flipflop or the persistent shift operator.
+        Defines either the flipflop or the persistent shift operator.
         Following this, the evolution operator updates accordingly.
 
         Parameters
@@ -230,11 +264,10 @@ class Coined(QuantumWalk):
             Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -253,21 +286,25 @@ class Coined(QuantumWalk):
             Check :class:`Coined` Notes for details
             about the computational basis.
 
-        The persistent shift is sometimes called *moving shift*.
-
-        The flip-flop shift operator :math:`S` is defined such that
+        The flip-flop shift operator :math:`S` is defined as
 
         .. math::
-            \begin{align*}
-                S \ket{(v, u)} &= \ket{(u, v)} \\
-                \implies S\ket i &= \ket j
-            \end{align*}
+            S \ket{v, u} = \ket{u, v},
 
-        where :math:`i` is the label of the edge :math:`(v, u)` and
-        :math:`j` is the label of the edge :math:`(u, v)`.
+        in the context of arc notation, where :math:`(v, u)` and
+        :math:`(u, v)` represent opposite arcs. This can be equivalently 
+        expressed as :math:`S\ket{i} = \ket{j}`, where :math:`i` is the 
+        label of the arc :math:`(v, u)` and :math:`j` is the label of 
+        the arc :math:`(u, v)`. The flip-flop shift satisfies the 
+        property :math:`S^2 = I`.
 
-
-        For a more comprehensive understanding of the flipflop
+        The persistent shift, also known as the *moving shift*, 
+        is defined for graphs with a clear notion of direction or rotation.
+        When the shift operator is applied repeatedly, it causes the walker 
+        to continue moving persistently in the same direction. Unlike the 
+        flip-flop shift, the persistent shift does not satisfy :math:`S^2 = I`.
+        
+        For a more comprehensive understanding of the 
         shift operator, refer to Section 7.2: Coined Walks on Arbitrary
         Graphs in the book "Quantum Walks and Search Algorithms" [1]_.
         
@@ -329,8 +366,10 @@ class Coined(QuantumWalk):
             
             Add persistent example.
         """
-        self._update_shift(shift=shift)
-        self._update_evolution(**kwargs)
+        self.set_evolution(shift=shift,
+                           coin=self._coin,
+                           marked=self._marked,
+                           hpc=hpc)
 
     def get_shift(self):
         r"""
@@ -344,7 +383,7 @@ class Coined(QuantumWalk):
         """
         return self._shift
 
-    def _update_coin(self, coin='default'):
+    def _set_coin(self, coin='default'):
         try:
             if len(coin.shape) != 2:
                 raise TypeError('Explicit coin is not a matrix.')
@@ -368,7 +407,7 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             if self._coin is None: raise AssertionError
 
-    def set_coin(self, coin='default', **kwargs):
+    def set_coin(self, coin='default', hpc=True):
         """
         Set the coin operator based on the graph's structure.
 
@@ -414,35 +453,36 @@ class Coined(QuantumWalk):
             * :class:`scipy.sparse.csr_array`
                 The explicit coin operator.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
         --------
         set_evolution
 
+        
         Notes
         -----
-        Owing to the selected computational basis (refer to the
-        Notes in the :class:`Coined`),
-        the outcome is a block diagonal operator.
-        Each block is a :math:`\deg(v)`-dimensional ``coin``.
-        As a result, there are :math:`|V|` blocks in total.
+        
+        The result of this method is a block-diagonal 
+        operator, a consequence of the ordering of the arcs 
+        in the computational basis 
+        (see Notes in :class:`Coined` for details).        
+        Each block corresponds to a :math:`\deg(v)`-dimensional ``coin``.
+        Consequently, there are a total of :math:`|V|` blocks.
+        
 
         .. todo::
 
             Check if explicit coin is valid.
 
         """
-        for key in kwargs:
-            if key not in Coined._valid_kwargs['evolution']:
-                kwargs.pop(key)
-
-        self._update_coin(coin=coin)
-        self._update_evolution(**kwargs)
+        self.set_evolution(shift=self._shift,
+                           coin=coin,
+                           marked=self._marked,
+                           hpc=hpc)
 
     def default_coin(self):
         r"""
@@ -577,7 +617,7 @@ class Coined(QuantumWalk):
     def _minus_identity_coin(dim):
         return -np.identity(dim)
 
-    def _update_marked(self, marked=[]):
+    def _set_marked(self, marked=[]):
         try:
             marked.get(0) #throws exception if list
         except AttributeError:
@@ -595,10 +635,10 @@ class Coined(QuantumWalk):
         vertices = [v for vlist in vertices for v in vlist ]
         marked = vertices
 
-        super()._update_marked(marked=marked)
+        super()._set_marked(marked=marked)
         self._oracle_coin = coin_list
 
-    def set_marked(self, marked=[], **kwargs):
+    def set_marked(self, marked=[], hpc=True):
         r"""
         Set the marked vertices.
 
@@ -626,18 +666,20 @@ class Coined(QuantumWalk):
                 ``{coin_type : list_of_vertices}``.
                 Analogous to the one accepted by :meth:`set_coin`.
 
-        **kwargs:
-            Additional arguments.
-            Used for determining the procedure for
-            updating the evolution operator.
-            See :meth:`hiperwalk.Coined.set_evolution` for valid options.
+        hpc: bool, default=True
+            Whether or not the evolution operator should be
+            updated using nelina's high-performance computing.
+            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
         --------
         set_coin
         set_evolution
         """
-        super().set_marked(marked=marked, **kwargs)
+        self.set_evolution(shift=self._shift,
+                           coin=self._coin,
+                           marked=marked,
+                           hpc=hpc)
 
     def _coin_list_to_explicit_coin(self, coin_list):
         num_vert = self._graph.number_of_vertices()
@@ -722,7 +764,7 @@ class Coined(QuantumWalk):
 
         return self._coin_list_to_explicit_coin(coin_list)
 
-    def _update_evolution(self, hpc=True):
+    def _set_evolution(self, hpc=True):
         U = None
         if hpc and not self._pyneblina_imported():
             hpc = False
@@ -839,10 +881,10 @@ class Coined(QuantumWalk):
                               kwargs,
                               Coined._valid_kwargs['marked'])
 
-        self._update_shift(**S_kwargs)
-        self._update_coin(**C_kwargs)
-        self._update_marked(**R_kwargs)
-        self._update_evolution(hpc=hpc)
+        self._set_shift(**S_kwargs)
+        self._set_coin(**C_kwargs)
+        self._set_marked(**R_kwargs)
+        self._set_evolution(hpc=hpc)
 
     def probability_distribution(self, states):
         r"""
@@ -874,21 +916,24 @@ class Coined(QuantumWalk):
 
         Notes
         -----
-        The probability for a given vertex :math:`u` is the sum of the
-        absolute square of the amplitudes of the arcs with tail :math:`u`.
-        That is, for an arbitrary superposition
-
+        The probability for a given vertex :math:`u` is calculated as the sum of the
+        absolute squares of the amplitudes of the arcs originating from :math:`u`.
+        If the state of the walker is represented by
+        
         .. math::
             \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
-
-        -- where :math:`\vec G` is the graph :math:`G` with each
-        edge substituted by two arcs (one for each direction) --
-        the probability associated with vertex :math:`u` is
-
+        
+        where :math:`\vec G` denotes the symmetric directed graph formed by
+        replacing each edge in :math:`G` with two arcs, one for each direction,
+        then the probability associated with vertex :math:`u` is given by
+        
         .. math::
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
-
-        where :math:`N(u)` is the set of neighbors of :math:`u`.
+        
+        with :math:`N(u)` being the set of neighbors of :math:`u`.
+        The probability distribution, which is returned by this
+        method as a ``numpy.ndarray``, is the collection of these
+        probabilities for all vertices.
         """
         if __DEBUG__:
             start = now()
@@ -1026,21 +1071,21 @@ class Coined(QuantumWalk):
 
         return ket
 
-    def _prepare_engine(self, initial_state, hpc):
+    def _prepare_engine(self, state, hpc):
         if hpc:
             S = nbl.send_matrix(self.get_shift())
             C = nbl.send_matrix(self.get_coin())
             self._simul_mat = (C, S)
-            self._simul_vec = nbl.send_vector(initial_state)
+            self._simul_vec = nbl.send_vector(state)
 
             dtype = (complex if (S.is_complex or C.is_complex
-                                 or np.iscomplex(initial_state.dtype))
+                                 or np.iscomplex(state.dtype))
                      else np.double)
 
             return dtype
 
         else:
-            return super()._prepare_engine(initial_state, hpc)
+            return super()._prepare_engine(state, hpc)
 
 
     def _simulate_step(self, step, hpc):
