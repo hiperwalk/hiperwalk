@@ -57,7 +57,7 @@ the :math:`7 \times 7`-dimensional natural grid.
 >>> qw = hpw.Coined(lat, shift='persistent', coin='grover')
 >>> psi0 = qw.state([0.5, (center, right)],
 ...                 [0.5, (right, center)])
->>> psi = qw.simulate(time=dim//2, initial_state=psi0)
+>>> psi = qw.simulate(time=dim//2, state=psi0)
 >>> prob = qw.probability_distribution(psi)
 >>> prob
 array([[0.       , 0.       , 0.       , 0.0078125, 0.0078125, 0.       ,
@@ -215,7 +215,7 @@ In this tutorial, only two keywords are detailed:
 For better comprehension and visualization,
 the probabilities of the intermediate simulation steps are saved.
 
->>> psi = qw.simulate(time=(dim//2, 1), initial_state=psi0)
+>>> psi = qw.simulate(time=(dim//2, 1), state=psi0)
 >>> prob = qw.probability_distribution(psi)
 
 ``animate``

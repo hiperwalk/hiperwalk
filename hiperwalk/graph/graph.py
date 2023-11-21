@@ -1,6 +1,6 @@
 import numpy as np
 import networkx as nx
-from scipy.sparse import issparse, csr_array
+from scipy.sparse import issparse, csr_array, diags
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -352,3 +352,37 @@ class Graph():
             Add other return types depending on the stored matrix type.
         """
         return self._adj_matrix
+
+    def laplacian_matrix(self):
+        r"""
+        Returns the graph Laplacian matrix.
+
+        See Also
+        --------
+        adjacency_matrix
+
+        Notes
+        -----
+        The Laplacian matrix is given by
+
+        .. math::
+            L = D - A,
+
+        where :math:`D` is the degree matrix
+
+        .. math::
+            D_{i, j} = \begin{case}
+                degree(v_i) &\text{if } i = j
+                0 &\text{otherwise},
+            \end{cases}
+
+        and :math:`A` is the graph adjacency matrix.
+        """
+        A = self.adjacency_matrix()
+        D = A.sum(axis=1)
+        if len(D.shape) == 1:
+            D = np.array(D.ravel())
+        else:
+            D = np.array(D.ravel())[0]
+        D = diags(D)
+        return D - A
