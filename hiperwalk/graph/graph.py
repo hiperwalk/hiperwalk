@@ -402,15 +402,15 @@ class Graph():
         .. math::
             L = D - A,
 
-        where :math:`D` is the degree matrix
+        where :math:`A` is the graph adjacency matrix
+        and :math:`D` is the degree matrix
 
         .. math::
             D_{i, j} = \begin{cases}
                 \deg(v_i), & \text{if } i = j\\
-                0, & \text{otherwise},
+                0, & \text{otherwise}.
             \end{cases}
-
-        and :math:`A` is the graph adjacency matrix.
+            
         """
         A = self.adjacency_matrix()
         D = A.sum(axis=1)
