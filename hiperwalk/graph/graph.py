@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np 
 import networkx as nx
 from scipy.sparse import issparse, csr_array, diags
 
