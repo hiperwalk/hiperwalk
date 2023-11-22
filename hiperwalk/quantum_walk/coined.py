@@ -44,6 +44,8 @@ class Coined(QuantumWalk):
     See Also
     --------
     set_evolution
+    set_shift
+    set_coin
 
     Notes
     -----
