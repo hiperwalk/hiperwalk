@@ -55,9 +55,13 @@ class Coined(QuantumWalk):
     to determine the direction of the walker's movement 
     on a graph.
 
-    The computational basis comprises the arc set of the graph.
-    Its cardinality is :math:`2|E|`, where :math:`E`
+    The computational basis is composed of the graph's arc set.
+    For simple graphs, the cardinality of the computational
+    basis is :math:`2|E|`, where :math:`E`
     represents the graph's edge set.
+    When a loop is added to the graph, the cardinality of the 
+    computational basis increases by one for each loop.
+    
     The arcs are arranged within the computational basis 
     to ensure that the coin operator adopts a block-diagonal 
     matrix form.
@@ -154,7 +158,7 @@ class Coined(QuantumWalk):
 
     def has_persistent_shift(self):
         r"""
-        Checks whether the persistent shift operator is defined
+        Check whether the persistent shift operator is defined
         for the current graph.
 
         Returns
@@ -462,16 +466,19 @@ class Coined(QuantumWalk):
         --------
         set_evolution
 
-        
+            
         Notes
         -----
         
-        The result of this method is a block-diagonal 
-        operator, a consequence of the ordering of the arcs 
+        The output of this method is a block-diagonal 
+        operator, which results from the specific ordering of arcs 
         in the computational basis 
-        (see Notes in :class:`Coined` for details).        
-        Each block corresponds to a :math:`\deg(v)`-dimensional ``coin``.
-        Consequently, there are a total of :math:`|V|` blocks.
+        (refer to the Notes in :class:`Coined` for more details).        
+        Each block is associated with a :math:`\deg(v)`-dimensional ``coin``.
+        As a result, there are :math:`|V|` blocks in total.
+        Note that a loop at a vertex :math:`u` is treated
+        as the arc :math:`(u,u)`, contributing an additional 
+        one to the degree.
         
 
         .. todo::
