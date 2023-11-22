@@ -74,7 +74,7 @@ class Graph():
 
     .. math::
         \begin{align*}
-            A = \bigcup_{v_k v_\ell \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+            A = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
     Arcs can be represented using the (tail,head) notation or with numerical labels. 
@@ -310,8 +310,8 @@ class Graph():
         r"""
         Return the degree of the given vertex.
 
-        The degree of a vertex :math:`u` in a graph, 
-        which may include a loop, is the number of edges 
+        The degree of a vertex :math:`u` in a graph 
+        is the number of edges 
         incident to :math:`u`. Loops at :math:`u` are counted once, 
         reflecting the treatment of a loop at vertex :math:`u` as 
         a single arc :math:`(u, u)`.
@@ -368,7 +368,8 @@ class Graph():
         -----
     
         In a weightless graph :math:`G(V, E)` with :math:`n` vertices
-        :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix of :math:`G(V, E)` is an 
+        :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix 
+        of :math:`G(V, E)` is an 
         :math:`n`-dimensional matrix :math:`A`, defined as follows:
         
         .. math::
@@ -377,7 +378,9 @@ class Graph():
                 0, & \text{otherwise.}
             \end{cases}
     
-        In weighted graphs, the entries of :math:`A` represent the weights of the edges.
+        In weighted graphs, the entries of :math:`A` represent 
+        the weights of the edges. The weight is a non-zero
+        real number.
 
         .. todo::
             Add other return types depending on the stored matrix type.
