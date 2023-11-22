@@ -244,7 +244,8 @@ class Graph():
         Convert a numerical label to arc notation.
     
         Given an integer that represents the numerical label of an arc,
-        this method returns the corresponding arc in ``(tail, head)`` representation.
+        this method returns the corresponding arc in ``(tail, head)`` 
+        representation.
     
         Parameters
         ----------
