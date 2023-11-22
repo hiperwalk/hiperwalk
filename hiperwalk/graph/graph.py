@@ -402,7 +402,7 @@ class Graph():
         .. math::
             L = D - A,
 
-        where :math:`A` is the graph adjacency matrix
+        where :math:`A` is the graph's adjacency matrix
         and :math:`D` is the degree matrix
 
         .. math::
