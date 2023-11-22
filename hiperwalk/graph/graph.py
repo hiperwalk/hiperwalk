@@ -234,23 +234,25 @@ class Graph():
             raise ValueError("Inexistent arc " + str(arc) + ".")
         return arc_number
 
+
     def arc(self, number):
-        r"""
-        Converts the arc number to arc notation.
+    r"""
+    Convert a numerical label to arc notation.
 
-        Given the arc number,
-        returns the arc in the ``(tail, head)`` notation.
+    Given an integer that represents the numerical label of an arc,
+    this method returns the corresponding arc in ``(tail, head)`` format.
 
-        Parameters
-        ----------
-        number: int
-            The arc number
+    Parameters
+    ----------
+    number : int
+        The numerical label of the arc.
 
-        Returns
-        -------
-        (int, int)
-            Arc in the arc notation ``(tail, head)``.
-        """
+    Returns
+    -------
+    (int, int)
+        The arc represented in ``(tail, head)`` notation.
+    """
+
         adj_matrix = self._adj_matrix
         head = adj_matrix.indices[number]
         #TODO: binary search
