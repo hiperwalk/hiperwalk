@@ -406,8 +406,8 @@ class Graph():
 
         .. math::
             D_{i, j} = \begin{cases}
-                degree(v_i) &\text{if } i = j
-                0 &\text{otherwise},
+                \deg(v_i), & \text{if } i = j\\
+                0, & \text{otherwise},
             \end{cases}
 
         and :math:`A` is the graph adjacency matrix.
