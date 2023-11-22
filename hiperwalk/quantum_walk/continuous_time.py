@@ -87,15 +87,21 @@ class ContinuousTime(QuantumWalk):
     or Laplacian matrix, along with the positioning 
     of the marked vertices.
 
-    The ``ContinuousTime`` class also supports simulating 
-    real Hamiltonians. 
-    To use a specific Hamiltonian :math:`H`, provide it directly 
-    via some real Hermitian matrix :math:`C` 
-    using the argument ``graph=C``, 
-    so that :math:`H=-\gamma C`.
-
-    For a comprehensive understanding of continuous-time quantum walks, consult reference [1]_. 
-    To examine the differences between utilizing the adjacency matrix and the Laplacian matrix, 
+    The `ContinuousTime` class enables the simulation of 
+    real Hamiltonians. To specify a particular Hamiltonian :math:`H`, 
+    it can be provided as a real Hermitian matrix :math:`C` 
+    using the `graph=C` parameter. This configuration sets 
+    :math:`H = -\gamma C`. In this case, the adjacency matrix 
+    represents a weighted graph, where the edge weights are 
+    the non-zero real entries of :math:`C`. The adjacency 
+    matrix is adapted accordingly. Additionally, the Laplacian 
+    matrix is computed as :math:`D - A`, with :math:`D` being 
+    the degree matrix.
+    
+    For a comprehensive understanding of continuous-time quantum 
+    walks, consult reference [1]_. 
+    To examine the differences between utilizing 
+    the adjacency matrix and the Laplacian matrix, 
     refer to reference [2]_.
     
     References
