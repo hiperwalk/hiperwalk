@@ -15,11 +15,11 @@ if __DEBUG__:
 
 class Coined(QuantumWalk):
     r"""
-    Manage instances of coined quantum walks on any simple graph.
+    Manage instances of coined quantum walks on arbitrary graphs.
 
     The class provides methods to handle and generate operators in the 
     coined quantum walk model. It also facilitates the simulation of 
-    coined quantum walks with coins on simple graphs.
+    coined quantum walks on graphs.
     
     For additional details about coined quantum walks,
     refer to the Notes Section.
