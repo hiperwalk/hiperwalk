@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import networkx as nx
 from scipy.sparse import issparse, csr_array, diags
 
@@ -26,9 +26,12 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Arbitrary graph.
+    Represents an arbitrary graph.
 
-    The graph on which a quantum walk takes place.
+    This class defines the graph structure used for implementing a 
+    quantum walk. It encapsulates all necessary properties 
+    and functionalities of the graph 
+    required for the quantum walk dynamics.
 
     Parameters
     ----------
@@ -78,7 +81,8 @@ class Graph():
     In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
     :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
     :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
-    (:math:`i = k` and :math:`j < \ell`).
+    (:math:`i = k` and :math:`j < \ell`). 
+    Note that a loop is represented as a single arc.
     
     If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
     then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
@@ -174,13 +178,13 @@ class Graph():
 
     def arc_number(self, *args):
         r"""
-        Returns the numerical label of the arc.
+        Return the numerical label of the arc.
 
         Parameters
         ----------
         *args:
             int:
-                The numerical arc label itself is passed
+                The arc's numerical label itself is passed
                 as argument.
             (tail, head):
                 Arc in arc notation.
@@ -192,7 +196,7 @@ class Graph():
         Returns
         -------
         label: int
-            Arc label.
+            Numerical label of the arc.
 
         Examples
         --------
@@ -240,7 +244,7 @@ class Graph():
     Convert a numerical label to arc notation.
 
     Given an integer that represents the numerical label of an arc,
-    this method returns the corresponding arc in ``(tail, head)`` format.
+    this method returns the corresponding arc in ``(tail, head)`` representation.
 
     Parameters
     ----------
@@ -263,7 +267,7 @@ class Graph():
 
     def neighbors(self, vertex):
         r"""
-        Returns all neighbors of the given vertex.
+        Return all neighbors of the given vertex.
         """
         start = self._adj_matrix.indptr[vertex]
         end = self._adj_matrix.indptr[vertex + 1]
@@ -271,48 +275,53 @@ class Graph():
 
     def arcs_with_tail(self, tail):
         r"""
-        Returns all arcs that have the given tail.
+        Return all arcs that have the given tail.
         """
         arcs_lim = self._adj_matrix.indptr
         return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
 
     def number_of_vertices(self):
         r"""
-        Cardinality of vertex set.
+        Determine the cardinality of the vertex set.
         """
         return self._adj_matrix.shape[0]
 
+
     def number_of_arcs(self):
         r"""
-        Cardinality of arc set.
+        Determine the cardinality of the arc set.
 
-        For simple graphs, the cardinality is twice the number of edges.
+        In simple graphs, the cardinality of the arc set is 
+        equal to twice the number of edges. 
+        However, for graphs containing loops, the 
+        cardinality is incremented by one for each loop.
         """
+
         return self._adj_matrix.sum()
 
     def number_of_edges(self):
         r"""
-        Cardinality of edge set.
+        Determine the cardinality of the edge set.
         """
         return self._adj_matrix.sum() >> 1
 
     def degree(self, vertex):
         r"""
-        Degree of given vertex.
+        Return the degree of the given vertex.
         """
         indptr = self._adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
 
     def vertex_number(self, vertex):
         r"""
-        Returns vertex number given any vertex representation.
+        Return the vertex number given any vertex representation.
 
-        By invoking this method,
-        the vertex number is returned regardless of its representation.
+        This method returns the numerical label of the vertex 
+        regardless of its representation.
         There are some graphs in which a vertex may have multiple
         representations.
         For example, coordinates in a grid.
-        For general graphs,
+        For arbitrary graphs,
         this function returns the argument itself if valid.
 
         Parameters
@@ -342,7 +351,7 @@ class Graph():
 
     def adjacency_matrix(self):
         r"""
-        Returns the graph adjacency matrix.
+        Return the graph's adjacency matrix.
 
         Returns
         -------
@@ -357,7 +366,7 @@ class Graph():
 
     def laplacian_matrix(self):
         r"""
-        Returns the graph Laplacian matrix.
+        Return the graph's Laplacian matrix.
 
         See Also
         --------
