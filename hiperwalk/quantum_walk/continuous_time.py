@@ -90,7 +90,7 @@ class ContinuousTime(QuantumWalk):
     The ``ContinuousTime`` class enables the simulation of 
     real Hamiltonians. To specify a particular Hamiltonian :math:`H`, 
     it can be provided as a real Hermitian matrix :math:`C` 
-    using the `graph=C` parameter. This configuration sets 
+    using the ``graph=C`` parameter. This configuration sets 
     :math:`H = -\gamma C`. In this case, the adjacency matrix 
     represents a weighted graph, where the edge weights are 
     the non-zero real entries of :math:`C`. 
