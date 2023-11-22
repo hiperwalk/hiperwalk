@@ -478,7 +478,7 @@ class Coined(QuantumWalk):
         As a result, there are :math:`|V|` blocks in total.
         Note that a loop at a vertex :math:`u` is treated
         as the arc :math:`(u,u)`, contributing an additional 
-        one to the degree.
+        one to the degree of :math:`u`.
         
 
         .. todo::
