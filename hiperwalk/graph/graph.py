@@ -410,6 +410,9 @@ class Graph():
                 \deg(v_i), & \text{if } i = j\\
                 0, & \text{otherwise}.
             \end{cases}
+
+        The degree is calculated by the :meth:`hiperwalk.Graph.degree`
+        method.
             
         """
         A = self.adjacency_matrix()
