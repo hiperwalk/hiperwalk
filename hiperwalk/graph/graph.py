@@ -70,11 +70,11 @@ class Graph():
 
     Each edge in the graph :math:`G(V, E)` that connects two distinct
     vertices corresponds to a pair of arcs in the associated directed 
-    graph :math:`\vec{G}(V, A)`, where
+    graph :math:`\vec{G}(V, \mathcal{A})`, where
 
     .. math::
         \begin{align*}
-            A = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+            \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
     Arcs can be represented using the (tail,head) notation or with numerical labels. 
@@ -405,7 +405,7 @@ class Graph():
         where :math:`D` is the degree matrix
 
         .. math::
-            D_{i, j} = \begin{case}
+            D_{i, j} = \begin{cases}
                 degree(v_i) &\text{if } i = j
                 0 &\text{otherwise},
             \end{cases}
