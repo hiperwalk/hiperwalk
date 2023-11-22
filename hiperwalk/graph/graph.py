@@ -65,16 +65,16 @@ class Graph():
     The preferred parameter type for the adjacency matrix is
     :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
 
-    Each edge in the graph :math:`G(V, E)` corresponds 
-    to two arcs in the associated directed 
+    Each edge in the graph :math:`G(V, E)` that connects two distinct
+    vertices corresponds to a pair of arcs in the associated directed 
     graph :math:`\vec{G}(V, A)`, where
 
     .. math::
         \begin{align*}
-            A = \bigcup_{(v_k,v_\ell) \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+            A = \bigcup_{v_kv_\ell \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
-    Arcs can be denoted using the (tail,head) notation or with numerical labels. 
+    Arcs can be represented using the (tail,head) notation or with numerical labels. 
     In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
     :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
     :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
@@ -83,7 +83,7 @@ class Graph():
     If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
     then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
     This weight is considered a generalized weight when :math:`C_{ij}` is 
-    negative or complex.
+    negative. 
 
     .. note::
         The arc ordering may change for graphs defined using specific classes.
