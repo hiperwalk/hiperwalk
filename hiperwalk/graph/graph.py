@@ -74,7 +74,7 @@ class Graph():
 
     .. math::
         \begin{align*}
-            A = \bigcup_{v_kv_\ell \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+            A = \bigcup_{v_k v_\ell \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
     Arcs can be represented using the (tail,head) notation or with numerical labels. 
