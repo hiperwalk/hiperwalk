@@ -308,6 +308,12 @@ class Graph():
     def degree(self, vertex):
         r"""
         Return the degree of the given vertex.
+
+        The degree of a vertex :math:`u` in a graph, 
+        which may include a loop, is the number of edges 
+        incident to :math:`u`. Loops at :math:`u` are counted once, 
+        reflecting the treatment of a loop at vertex :math:`u` as 
+        a single arc :math:`(u, u)`.
         """
         indptr = self._adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
