@@ -240,22 +240,22 @@ class Graph():
 
 
     def arc(self, number):
-    r"""
-    Convert a numerical label to arc notation.
-
-    Given an integer that represents the numerical label of an arc,
-    this method returns the corresponding arc in ``(tail, head)`` representation.
-
-    Parameters
-    ----------
-    number : int
-        The numerical label of the arc.
-
-    Returns
-    -------
-    (int, int)
-        The arc represented in ``(tail, head)`` notation.
-    """
+        r"""
+        Convert a numerical label to arc notation.
+    
+        Given an integer that represents the numerical label of an arc,
+        this method returns the corresponding arc in ``(tail, head)`` representation.
+    
+        Parameters
+        ----------
+        number : int
+            The numerical label of the arc.
+    
+        Returns
+        -------
+        (int, int)
+            The arc represented in ``(tail, head)`` notation.
+        """
 
         adj_matrix = self._adj_matrix
         head = adj_matrix.indices[number]
@@ -365,6 +365,19 @@ class Graph():
 
         Notes
         -----
+    
+        In a weightless graph :math:`G(V, E)` with :math:`n` vertices
+        :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix of :math:`G(V, E)` is an 
+        :math:`n`-dimensional matrix :math:`A`, defined as follows:
+        
+        .. math::
+            A_{i,j} = \begin{cases}
+                1, & \text{if } v_i \text{ is adjacent to } v_j,\\
+                0, & \text{otherwise.}
+            \end{cases}
+    
+        In weighted graphs, the entries of :math:`A` represent the weights of the edges.
+
         .. todo::
             Add other return types depending on the stored matrix type.
         """
