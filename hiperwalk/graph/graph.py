@@ -55,10 +55,15 @@ class Graph():
     takes place is specified by the
     adjacency matrix, Laplacian matrix, or 
     any real Hermitian matrix :math:`C`.
+    
     Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
-    where :math:`n=|V|`.
-    Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
+    where :math:`n=|V|`.    
+    If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
+    two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
     are adjacent if and only if :math:`C_{ij}\neq 0`.
+    :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
+    This weight is considered a generalized weight when :math:`C_{ij}` is 
+    negative. 
 
     The class methods facilitate the construction of a valid quantum walk 
     and can be provided as parameters to plotting functions. For visualizations, 
@@ -68,26 +73,31 @@ class Graph():
     The preferred parameter type for the adjacency matrix is
     :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
 
-    Each edge in the graph :math:`G(V, E)` that connects two distinct
-    vertices corresponds to a pair of arcs in the associated directed 
-    graph :math:`\vec{G}(V, \mathcal{A})`, where
+    The treatment of the graph depends on the quantum walk model. 
+    In the coined model, the graph is interpreted 
+    as a directed graph as follows:
+    Each edge in :math:`G(V, E)` connecting two distinct vertices 
+    translates into a pair of arcs in the directed graph
+    :math:`\vec{G}(V, \mathcal{A})`, where
 
     .. math::
         \begin{align*}
             \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
-    Arcs can be represented using the (tail,head) notation or with numerical labels. 
+    Arcs are represented using either
+    the (tail,head) notation or numerical labels. 
     In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
     :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
     :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
     (:math:`i = k` and :math:`j < \ell`). 
-    Note that a loop is represented as a single arc.
+    Loops are depicted as single arcs, 
+    affecting the dimension of the associated Hilbert space.
+    In coined quantum walks, the weights of arcs do not influence the dynamics.
     
-    If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
-    then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
-    This weight is considered a generalized weight when :math:`C_{ij}` is 
-    negative. 
+    In the continuous-time quantum walk model, the graph is treated 
+    as a weighted graph without considering edges as composed of two 
+    opposite arcs.
 
     .. note::
         The arc ordering may change for graphs defined using specific classes.
