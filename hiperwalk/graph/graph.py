@@ -56,12 +56,14 @@ class Graph():
     adjacency matrix, Laplacian matrix, or 
     any real Hermitian matrix :math:`C`.
     
-    Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
-    where :math:`n=|V|`.    
-    If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
-    two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
-    are adjacent if and only if :math:`C_{ij}\neq 0`.
-    :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
+    Let :math:`V` denote the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
+    where :math:`n = |V|`. If the ``adj_matrix`` is defined as a real 
+    Hermitian matrix :math:`C`, then two distinct vertices :math:`v_i` and 
+    :math:`v_j` in :math:`V` are considered adjacent if and only if 
+    :math:`C_{ij} \neq 0`. In this matrix, :math:`C_{ij}` represents 
+    the weight of the edge connecting :math:`v_i` and :math:`v_j`. 
+    Diagonal entries :math:`C_{ii}` correspond to the weights of loops 
+    at vertex :math:`v_i`.
     This weight is considered a generalized weight when :math:`C_{ij}` is 
     negative. 
 
