@@ -88,7 +88,7 @@ class QuantumWalk(ABC):
 
     def uniform_state(self):
         r"""
-        Creates a uniform state.
+        Create a uniform state.
 
         The state is constructed based on the ``hilb_dim`` attribute.
         The uniform state is a unit vector with entries 
@@ -105,7 +105,11 @@ class QuantumWalk(ABC):
         .. math::
             \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
 
-        where :math:`N` is the dimension of the Hilbert space and 
+        where :math:`N` represents the dimension of the Hilbert space, and 
+        :math:`i` is a label within the graph. 
+        In the continuous-time quantum walk model, 
+        :math:`i` corresponds to the label of a vertex, 
+        while in the coined quantum walk model, 
         :math:`i` is the label of an arc.
         """
         return (np.ones(self.hilb_dim, dtype=float)
