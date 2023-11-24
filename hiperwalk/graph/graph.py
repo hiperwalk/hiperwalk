@@ -26,7 +26,7 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Represents an arbitrary graph.
+    Constructs an arbitrary graph.
 
     This class defines the graph structure used for implementing a 
     quantum walk. It encapsulates all necessary properties 
