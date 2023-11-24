@@ -1110,3 +1110,40 @@ class Coined(QuantumWalk):
 
     def _number_to_valid_time(self, number):
         return int(number)
+
+    def probability(self, states, vertices):
+        r"""
+        Computes the sum of probabilities for the specified vertices.
+
+        Computes the probability of the walker being located on a
+        vertex within the set of provided vertices, given that the walk 
+        is on specified states.
+
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray`
+            The state(s) used to compute the probability.
+            ``states`` can be a single state or a list of states.
+
+        vertices: list of int
+           The subset of vertices. 
+
+        Returns
+        -------
+        probabilities : float or :class:`numpy.ndarray`
+            float:
+                If ``states`` is a single state.
+            :class:`numpy.ndarray`:
+                If ``states`` is a list of states,
+                ``probabilities[i]`` is the probability
+                corresponding to the ``i``-th state.
+
+        See Also
+        --------
+        simulate
+
+        Notes
+        -----
+
+        """
+        return super().probability(states, vertices)
