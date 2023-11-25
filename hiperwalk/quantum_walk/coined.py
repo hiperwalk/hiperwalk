@@ -911,12 +911,12 @@ class Coined(QuantumWalk):
         -----
         The probability for a given vertex :math:`u` is calculated as the sum of the
         absolute squares of the amplitudes of the arcs originating from :math:`u`.
-        More precisely, if the state of the walker is represented by
+        More precisely, if the state of the walker is
         
         .. math::
             \sum_{(v, w) \in \mathcal{A}(\vec G)} \alpha_{v,w} \ket{v,w},
         
-        where :math:`\mathcal{A}(\vec G)}` is the set of arcs of
+        where :math:`\mathcal{A}(\vec G)` is the set of arcs of
         the symmetric directed graph formed by
         replacing each edge in :math:`G` with two arcs, one for each direction,
         then the probability associated with vertex :math:`u` is given by
