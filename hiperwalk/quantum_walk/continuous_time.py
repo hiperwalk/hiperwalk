@@ -317,6 +317,10 @@ class ContinuousTime(QuantumWalk):
         Returns
         -------
         :class:`scipy.sparse.csr_array`
+
+        See Also
+        --------
+        set_hamiltonian
         """
         return self._hamiltonian
 
@@ -449,7 +453,7 @@ class ContinuousTime(QuantumWalk):
 
     def get_terms(self):
         r"""
-        Number of terms in the power series used to
+        Retrieve the number of terms in the power series used to
         calculate the evolution operator.
 
         Returns
@@ -458,7 +462,8 @@ class ContinuousTime(QuantumWalk):
 
         See Also
         --------
-        get_evolution
+        set_terms
+        set_evolution
         """
         return self._terms
 
