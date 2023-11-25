@@ -904,16 +904,17 @@ class Coined(QuantumWalk):
 
         See Also
         --------
+        probability
         simulate
 
         Notes
         -----
         The probability for a given vertex :math:`u` is calculated as the sum of the
         absolute squares of the amplitudes of the arcs originating from :math:`u`.
-        If the state of the walker is represented by
+        More precisely, if the state of the walker is represented by
         
         .. math::
-            \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
+            \sum_{(v, w) \in A(\vec G)} \alpha_{v,w} \ket{v,w},
         
         where :math:`\vec G` denotes the symmetric directed graph formed by
         replacing each edge in :math:`G` with two arcs, one for each direction,
@@ -922,7 +923,7 @@ class Coined(QuantumWalk):
         .. math::
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
         
-        with :math:`N(u)` being the set of neighbors of :math:`u`.
+        with :math:`N(u)` being the set of out neighbors of :math:`u`.
         The probability distribution, which is returned by this
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
