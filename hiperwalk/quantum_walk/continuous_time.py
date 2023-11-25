@@ -252,8 +252,8 @@ class ContinuousTime(QuantumWalk):
             The value of gamma.
 
         type: {'adjacency', 'laplacian'}
-            Two types of Hamiltonian used...
-            ``'A'`` is shorthand for ``'adjacency'``.
+            Two types of Hamiltonian are used:
+            ``'A'`` is shorthand for ``'adjacency'`` (default).
             ``'L'`` is shorthand for ``'laplacian'``.
 
         marked: TODO
@@ -291,6 +291,9 @@ class ContinuousTime(QuantumWalk):
         the argument ``marked=M``. For instance, ``marked={0}``
         specifies that :math:`v_0` is the marked vertex.
         The default is :math:`M=\emptyset`.
+
+        If the type of the Hamiltonian is set ``'adjacency'`` 
+        (default), 
         
         References
         ----------
