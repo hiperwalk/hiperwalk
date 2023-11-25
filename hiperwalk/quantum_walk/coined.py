@@ -386,6 +386,10 @@ class Coined(QuantumWalk):
         Returns
         -------
         scipy.sparse.csr_array
+
+        See Also
+        --------
+        set_shift
         """
         return self._shift
 
@@ -709,27 +713,6 @@ class Coined(QuantumWalk):
         See Also
         --------
         set_coin
-        
-        Notes
-        -----
-        The final coin :math:`C'` is obtained by multiplying the
-        coin operator :math:`C` and the oracle :math:`R`.
-        That is,
-
-        .. math::
-            
-            C' = CR .
-
-        The oracle is not explicitly saved.
-        Instead, the oracle coins are saved -- i.e.
-        which coin is going to be applied to each marked vertices.
-        To generate :math:`C'` we simply substitute the original coin
-        by the oracle coin in all marked vertices.
-
-        Examples
-        --------
-        .. todo::
-            examples
         """
         if scipy.sparse.issparse(self._coin):
             if not bool(self._oracle_coin):
