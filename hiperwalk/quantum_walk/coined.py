@@ -1145,5 +1145,7 @@ class Coined(QuantumWalk):
         Notes
         -----
 
+        Testing ...
+
         """
         return super().probability(states, vertices)
