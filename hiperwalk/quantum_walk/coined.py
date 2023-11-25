@@ -914,9 +914,10 @@ class Coined(QuantumWalk):
         More precisely, if the state of the walker is represented by
         
         .. math::
-            \sum_{(v, w) \in A(\vec G)} \alpha_{v,w} \ket{v,w},
+            \sum_{(v, w) \in \mathcal{A}(\vec G)} \alpha_{v,w} \ket{v,w},
         
-        where :math:`\vec G` denotes the symmetric directed graph formed by
+        where :math:`\mathcal{A}(\vec G)}` is the set of arcs of
+        the symmetric directed graph formed by
         replacing each edge in :math:`G` with two arcs, one for each direction,
         then the probability associated with vertex :math:`u` is given by
         
@@ -924,6 +925,7 @@ class Coined(QuantumWalk):
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
         
         with :math:`N(u)` being the set of out neighbors of :math:`u`.
+        A loop at :math:`u` is the arc :math:`(u,u)`. 
         The probability distribution, which is returned by this
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
