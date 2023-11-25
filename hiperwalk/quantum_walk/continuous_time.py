@@ -351,6 +351,10 @@ class ContinuousTime(QuantumWalk):
         See Also
         --------
         set_hamiltonian_type
+        
+        Returns
+        -------
+        type: {'adjacency', 'laplacian'}
         """
         return self._hamil_type
 
