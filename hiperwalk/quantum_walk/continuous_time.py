@@ -330,6 +330,8 @@ class ContinuousTime(QuantumWalk):
 
     def set_hamiltonian_type(self, type='adjacency', hpc=True):
         r"""
+        Set the type of the Hamiltonian.
+        
         Parameters
         ----------
         type: {'adjacency', 'laplacian'}
@@ -343,7 +345,15 @@ class ContinuousTime(QuantumWalk):
                              hpc=hpc)
 
     def get_hamiltonian_type():
+        r"""
+        Retrieve the type of the Hamiltonian.
+        
+        See Also
+        --------
+        set_hamiltonian_type
+        """
         return self._hamil_type
+
 
     def _set_time(self, time=1):
         if time is None or time < 0:
