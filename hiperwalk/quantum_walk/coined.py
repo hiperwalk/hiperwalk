@@ -926,6 +926,7 @@ class Coined(QuantumWalk):
         
         with :math:`N(u)` being the set of out neighbors of :math:`u`.
         A loop at :math:`u` is the arc :math:`(u,u)`. 
+        
         The probability distribution, which is returned by this
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
