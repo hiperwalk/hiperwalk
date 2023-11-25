@@ -1147,11 +1147,11 @@ class Coined(QuantumWalk):
         
         The probability of finding the walker on vertex 
         :math:`v`, given the state of the walk
-        :math:`\psi`, is calculated as
+        :math:`|\psi \rangle`, is calculated as
 
         .. math::
             \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \, 
-            \left|\langle{a}|{\psi}\rangle\right|^2,
+            \left|{\langle a} | {\psi \rangle}\right|^2,
 
         where :math:`\mathcal{A}` denotes the set of arcs.        
         """
