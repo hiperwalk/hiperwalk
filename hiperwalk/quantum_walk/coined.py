@@ -1151,7 +1151,7 @@ class Coined(QuantumWalk):
 
         .. math::
             \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \, 
-            \left|\braket{a}{\psi}\right|^2,
+            \left|\langle{a}|{\psi}\rangle\right|^2,
 
         where :math:`\mathcal{A}` denotes the set of arcs.        
         """
