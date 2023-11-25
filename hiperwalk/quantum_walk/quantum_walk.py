@@ -155,6 +155,10 @@ class QuantumWalk(ABC):
         List of int
             List of marked vertices.
             If no vertex is marked, returns the empty list.
+
+        See Also
+        --------
+        set_marked
         """
         return self._marked
 
