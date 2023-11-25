@@ -1145,7 +1145,10 @@ class Coined(QuantumWalk):
         Notes
         -----
         
-        Testing ...
+        The probability
+
+        .. math::
+        \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \! \left|\braket{a}{\psi}\right|^2.
         
         """
         return super().probability(states, vertices)
