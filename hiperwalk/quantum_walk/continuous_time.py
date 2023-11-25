@@ -196,6 +196,10 @@ class ContinuousTime(QuantumWalk):
         Returns
         -------
         float
+        
+        See Also
+        --------
+        set_gamma
         """
         return self._gamma
 
@@ -335,7 +339,7 @@ class ContinuousTime(QuantumWalk):
         Parameters
         ----------
         type: {'adjacency', 'laplacian'}
-            Two types of Hamiltonian used...
+            Two types of Hamiltonian are used:
             ``'A'`` is shorthand for ``'adjacency'``.
             ``'L'`` is shorthand for ``'laplacian'``.
         """
