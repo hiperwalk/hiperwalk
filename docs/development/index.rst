@@ -50,9 +50,9 @@ execute:
 Bug Report and Contact
 ======================
 
-To send a bug report, write an email to issues@hiperwalk.org. 
-To contribute to Hiperwalk or contact the developers, 
-write an email to contact@hiperwalk.org.
+To send a bug report or
+contribute to Hiperwalk or contact the developers, 
+write an email to hiperwalk@gmail.org.
 
 Documentation
 =============
