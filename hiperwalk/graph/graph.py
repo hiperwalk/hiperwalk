@@ -26,9 +26,12 @@ def _binary_search(v, elem, start=0, end=None):
 
 class Graph():
     r"""
-    Arbitrary graph.
+    Constructs an arbitrary graph.
 
-    The graph on which a quantum walk takes place.
+    This class defines the graph structure used for implementing a 
+    quantum walk. It encapsulates all necessary properties 
+    and functionalities of the graph 
+    required for the quantum walk dynamics.
 
     Parameters
     ----------
@@ -52,10 +55,17 @@ class Graph():
     takes place is specified by the
     adjacency matrix, Laplacian matrix, or 
     any real Hermitian matrix :math:`C`.
-    Let :math:`V` be the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
-    where :math:`n=|V|`.
-    Two distinct vertices :math:`v_i` and :math:`v_j` in :math:`V`
-    are adjacent if and only if :math:`C_{ij}\neq 0`.
+    
+    Let :math:`V` denote the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
+    where :math:`n = |V|`. If the ``adj_matrix`` is defined as a real 
+    Hermitian matrix :math:`C`, then two distinct vertices :math:`v_i` and 
+    :math:`v_j` in :math:`V` are considered adjacent if and only if 
+    :math:`C_{ij} \neq 0`. In this matrix, :math:`C_{ij}` represents 
+    the weight of the edge connecting :math:`v_i` and :math:`v_j`. 
+    Diagonal entries :math:`C_{ii}` correspond to the weights of loops 
+    at vertex :math:`v_i`.
+    This weight is considered a generalized weight when :math:`C_{ij}` is 
+    negative. 
 
     The class methods facilitate the construction of a valid quantum walk 
     and can be provided as parameters to plotting functions. For visualizations, 
@@ -65,25 +75,31 @@ class Graph():
     The preferred parameter type for the adjacency matrix is
     :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
 
-    Each edge in the graph :math:`G(V, E)` corresponds 
-    to two arcs in the associated directed 
-    graph :math:`\vec{G}(V, A)`, where
+    The treatment of the graph depends on the quantum walk model. 
+    In the coined model, the graph is interpreted 
+    as a directed graph as follows:
+    Each edge in :math:`G(V, E)` connecting two distinct vertices 
+    translates into a pair of arcs in the directed graph
+    :math:`\vec{G}(V, \mathcal{A})`, where
 
     .. math::
         \begin{align*}
-            A = \bigcup_{(v_k,v_\ell) \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+            \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
         \end{align*}
 
-    Arcs can be denoted using the (tail,head) notation or with numerical labels. 
+    Arcs are represented using either
+    the (tail,head) notation or numerical labels. 
     In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
     :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
     :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
-    (:math:`i = k` and :math:`j < \ell`).
+    (:math:`i = k` and :math:`j < \ell`). 
+    Loops are depicted as single arcs, 
+    affecting the dimension of the associated Hilbert space.
+    In coined quantum walks, the weights of arcs do not influence the dynamics.
     
-    If ``adj_matrix`` is specified as a real Hermitian matrix :math:`C`, 
-    then :math:`C_{ij}` represents the weight of the arc :math:`(v_i, v_j)`. 
-    This weight is considered a generalized weight when :math:`C_{ij}` is 
-    negative or complex.
+    In the continuous-time quantum walk model, the graph is treated 
+    as a weighted graph without considering edges as composed of two 
+    opposite arcs.
 
     .. note::
         The arc ordering may change for graphs defined using specific classes.
@@ -174,13 +190,13 @@ class Graph():
 
     def arc_number(self, *args):
         r"""
-        Returns the numerical label of the arc.
+        Return the numerical label of the arc.
 
         Parameters
         ----------
         *args:
             int:
-                The numerical arc label itself is passed
+                The arc's numerical label itself is passed
                 as argument.
             (tail, head):
                 Arc in arc notation.
@@ -192,7 +208,7 @@ class Graph():
         Returns
         -------
         label: int
-            Arc label.
+            Numerical label of the arc.
 
         Examples
         --------
@@ -234,23 +250,26 @@ class Graph():
             raise ValueError("Inexistent arc " + str(arc) + ".")
         return arc_number
 
+
     def arc(self, number):
         r"""
-        Converts the arc number to arc notation.
-
-        Given the arc number,
-        returns the arc in the ``(tail, head)`` notation.
-
+        Convert a numerical label to arc notation.
+    
+        Given an integer that represents the numerical label of an arc,
+        this method returns the corresponding arc in ``(tail, head)`` 
+        representation.
+    
         Parameters
         ----------
-        number: int
-            The arc number
-
+        number : int
+            The numerical label of the arc.
+    
         Returns
         -------
         (int, int)
-            Arc in the arc notation ``(tail, head)``.
+            The arc represented in ``(tail, head)`` notation.
         """
+
         adj_matrix = self._adj_matrix
         head = adj_matrix.indices[number]
         #TODO: binary search
@@ -261,7 +280,7 @@ class Graph():
 
     def neighbors(self, vertex):
         r"""
-        Returns all neighbors of the given vertex.
+        Return all neighbors of the given vertex.
         """
         start = self._adj_matrix.indptr[vertex]
         end = self._adj_matrix.indptr[vertex + 1]
@@ -269,48 +288,59 @@ class Graph():
 
     def arcs_with_tail(self, tail):
         r"""
-        Returns all arcs that have the given tail.
+        Return all arcs that have the given tail.
         """
         arcs_lim = self._adj_matrix.indptr
         return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
 
     def number_of_vertices(self):
         r"""
-        Cardinality of vertex set.
+        Determine the cardinality of the vertex set.
         """
         return self._adj_matrix.shape[0]
 
+
     def number_of_arcs(self):
         r"""
-        Cardinality of arc set.
+        Determine the cardinality of the arc set.
 
-        For simple graphs, the cardinality is twice the number of edges.
+        In simple graphs, the cardinality of the arc set is 
+        equal to twice the number of edges. 
+        However, for graphs containing loops, the 
+        cardinality is incremented by one for each loop.
         """
+
         return self._adj_matrix.sum()
 
     def number_of_edges(self):
         r"""
-        Cardinality of edge set.
+        Determine the cardinality of the edge set.
         """
         return self._adj_matrix.sum() >> 1
 
     def degree(self, vertex):
         r"""
-        Degree of given vertex.
+        Return the degree of the given vertex.
+
+        The degree of a vertex :math:`u` in a graph 
+        is the number of edges 
+        incident to :math:`u`. Loops at :math:`u` are counted once, 
+        reflecting the treatment of a loop at vertex :math:`u` as 
+        a single arc :math:`(u, u)`.
         """
         indptr = self._adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
 
     def vertex_number(self, vertex):
         r"""
-        Returns vertex number given any vertex representation.
+        Return the vertex number given any vertex representation.
 
-        By invoking this method,
-        the vertex number is returned regardless of its representation.
+        This method returns the numerical label of the vertex 
+        regardless of its representation.
         There are some graphs in which a vertex may have multiple
         representations.
         For example, coordinates in a grid.
-        For general graphs,
+        For arbitrary graphs,
         this function returns the argument itself if valid.
 
         Parameters
@@ -340,7 +370,7 @@ class Graph():
 
     def adjacency_matrix(self):
         r"""
-        Returns the graph adjacency matrix.
+        Return the graph's adjacency matrix.
 
         Returns
         -------
@@ -348,6 +378,22 @@ class Graph():
 
         Notes
         -----
+    
+        In a weightless graph :math:`G(V, E)` with :math:`n` vertices
+        :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix 
+        of :math:`G(V, E)` is an 
+        :math:`n`-dimensional matrix :math:`A`, defined as follows:
+        
+        .. math::
+            A_{i,j} = \begin{cases}
+                1, & \text{if } v_i \text{ is adjacent to } v_j,\\
+                0, & \text{otherwise.}
+            \end{cases}
+    
+        In weighted graphs, the entries of :math:`A` represent 
+        the weights of the edges. The weight is a non-zero
+        real number.
+
         .. todo::
             Add other return types depending on the stored matrix type.
         """
@@ -355,7 +401,7 @@ class Graph():
 
     def laplacian_matrix(self):
         r"""
-        Returns the graph Laplacian matrix.
+        Return the graph's Laplacian matrix.
 
         See Also
         --------
@@ -368,15 +414,18 @@ class Graph():
         .. math::
             L = D - A,
 
-        where :math:`D` is the degree matrix
+        where :math:`A` is the graph's adjacency matrix
+        and :math:`D` is the degree matrix
 
         .. math::
-            D_{i, j} = \begin{case}
-                degree(v_i) &\text{if } i = j
-                0 &\text{otherwise},
+            D_{i, j} = \begin{cases}
+                \deg(v_i), & \text{if } i = j\\
+                0, & \text{otherwise}.
             \end{cases}
 
-        and :math:`A` is the graph adjacency matrix.
+        The degree is calculated by the :meth:`hiperwalk.Graph.degree`
+        method.
+            
         """
         A = self.adjacency_matrix()
         D = A.sum(axis=1)

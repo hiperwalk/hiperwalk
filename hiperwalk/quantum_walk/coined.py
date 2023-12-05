@@ -15,11 +15,11 @@ if __DEBUG__:
 
 class Coined(QuantumWalk):
     r"""
-    Manage instances of coined quantum walks on any simple graph.
+    Manage instances of coined quantum walks on arbitrary graphs.
 
     The class provides methods to handle and generate operators in the 
     coined quantum walk model. It also facilitates the simulation of 
-    coined quantum walks with coins on simple graphs.
+    coined quantum walks on graphs.
     
     For additional details about coined quantum walks,
     refer to the Notes Section.
@@ -44,6 +44,8 @@ class Coined(QuantumWalk):
     See Also
     --------
     set_evolution
+    set_shift
+    set_coin
 
     Notes
     -----
@@ -55,9 +57,13 @@ class Coined(QuantumWalk):
     to determine the direction of the walker's movement 
     on a graph.
 
-    The computational basis comprises the arc set of the graph.
-    Its cardinality is :math:`2|E|`, where :math:`E`
+    The computational basis is composed of the graph's arc set.
+    For simple graphs, the cardinality of the computational
+    basis is :math:`2|E|`, where :math:`E`
     represents the graph's edge set.
+    When a loop is added to the graph, the cardinality of the 
+    computational basis increases by one for each loop.
+    
     The arcs are arranged within the computational basis 
     to ensure that the coin operator adopts a block-diagonal 
     matrix form.
@@ -154,7 +160,7 @@ class Coined(QuantumWalk):
 
     def has_persistent_shift(self):
         r"""
-        Checks whether the persistent shift operator is defined
+        Check whether the persistent shift operator is defined
         for the current graph.
 
         Returns
@@ -380,6 +386,10 @@ class Coined(QuantumWalk):
         Returns
         -------
         scipy.sparse.csr_array
+
+        See Also
+        --------
+        set_shift
         """
         return self._shift
 
@@ -462,16 +472,19 @@ class Coined(QuantumWalk):
         --------
         set_evolution
 
-        
+            
         Notes
         -----
         
-        The result of this method is a block-diagonal 
-        operator, a consequence of the ordering of the arcs 
+        The output of this method is a block-diagonal 
+        operator, which results from the specific ordering of arcs 
         in the computational basis 
-        (see Notes in :class:`Coined` for details).        
-        Each block corresponds to a :math:`\deg(v)`-dimensional ``coin``.
-        Consequently, there are a total of :math:`|V|` blocks.
+        (refer to the Notes in :class:`Coined` for more details).        
+        Each block is associated with a :math:`\deg(v)`-dimensional ``coin``.
+        As a result, there are :math:`|V|` blocks in total.
+        Note that a loop at a vertex :math:`u` is treated
+        as the arc :math:`(u,u)`, contributing an additional 
+        one to the degree of :math:`u`.
         
 
         .. todo::
@@ -700,27 +713,6 @@ class Coined(QuantumWalk):
         See Also
         --------
         set_coin
-        
-        Notes
-        -----
-        The final coin :math:`C'` is obtained by multiplying the
-        coin operator :math:`C` and the oracle :math:`R`.
-        That is,
-
-        .. math::
-            
-            C' = CR .
-
-        The oracle is not explicitly saved.
-        Instead, the oracle coins are saved -- i.e.
-        which coin is going to be applied to each marked vertices.
-        To generate :math:`C'` we simply substitute the original coin
-        by the oracle coin in all marked vertices.
-
-        Examples
-        --------
-        .. todo::
-            examples
         """
         if scipy.sparse.issparse(self._coin):
             if not bool(self._oracle_coin):
@@ -912,25 +904,29 @@ class Coined(QuantumWalk):
 
         See Also
         --------
+        probability
         simulate
 
         Notes
         -----
         The probability for a given vertex :math:`u` is calculated as the sum of the
         absolute squares of the amplitudes of the arcs originating from :math:`u`.
-        If the state of the walker is represented by
+        More precisely, if the state of the walker is
         
         .. math::
-            \sum_{(u, v) \in A(\vec G)} \alpha_{u,v} \ket{u,v},
+            \sum_{(v, w) \in \mathcal{A}(\vec G)} \alpha_{v,w} \ket{v,w},
         
-        where :math:`\vec G` denotes the symmetric directed graph formed by
+        where :math:`\mathcal{A}(\vec G)` is the set of arcs of
+        the symmetric directed graph formed by
         replacing each edge in :math:`G` with two arcs, one for each direction,
         then the probability associated with vertex :math:`u` is given by
         
         .. math::
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
         
-        with :math:`N(u)` being the set of neighbors of :math:`u`.
+        with :math:`N(u)` being the set of out neighbors of :math:`u`.
+        A loop at :math:`u` is the arc :math:`(u,u)`. 
+        
         The probability distribution, which is returned by this
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
@@ -1101,3 +1097,49 @@ class Coined(QuantumWalk):
 
     def _number_to_valid_time(self, number):
         return int(number)
+
+    def probability(self, states, vertices):
+        r"""
+        Computes the sum of probabilities for the specified vertices.
+        
+        Computes the probability of the walker being located on a
+        vertex within the set of provided vertices, given that the walk 
+        is on specified states.
+        
+        Parameters
+        ----------
+        states : :class:`numpy.ndarray`
+            The state(s) used to compute the probability.
+            ``states`` can be a single state or a list of states.
+        
+        vertices: list of int
+           The subset of vertices. 
+        
+        Returns
+        -------
+        probabilities : float or :class:`numpy.ndarray`
+            float:
+                If ``states`` is a single state.
+            :class:`numpy.ndarray`:
+                If ``states`` is a list of states,
+                ``probabilities[i]`` is the probability
+                corresponding to the ``i``-th state.
+        
+        See Also
+        --------
+        simulate
+        
+        Notes
+        -----
+        
+        The probability of finding the walker on vertex 
+        :math:`v`, given the state of the walk
+        :math:`|\psi \rangle`, is calculated as
+
+        .. math::
+            \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \, 
+            \left|{\langle a} | {\psi \rangle}\right|^2,
+
+        where :math:`\mathcal{A}` denotes the set of arcs.        
+        """
+        return super().probability(states, vertices)

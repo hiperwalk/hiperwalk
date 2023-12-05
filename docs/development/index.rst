@@ -47,11 +47,12 @@ execute:
 
     ./run_nonhpc.sh
 
-Bug Report
-==========
+Bug Report and Contact
+======================
 
-To send a bug report, contribute to Hiperwalk, or contact the developers, 
-write an email to hiperwalk@gmail.com.
+To send a bug report or
+contribute to Hiperwalk or contact the developers, 
+write an email to hiperwalk@gmail.org.
 
 Documentation
 =============
