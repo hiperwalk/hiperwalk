@@ -313,7 +313,7 @@ def plot_probability_distribution(
                 from IPython import display
 
                 # embedding animation in jupyter notebook
-                video = anim.to_html5_video()
+                video = anim.to_jshtml()
                 html = display.HTML(video)
                 display.display(html)
 
@@ -923,9 +923,14 @@ def _plot_probability_distribution_on_plane(
     return [[surf[0]], cbar]
 
 def _is_in_notebook():
+    ipython_shells = (
+        'XPythonShell',        # jupyterlite-xeus-python
+        'Interpreter',         # jupyterlite-pyodide-kernel
+        'ZMQInteractiveShell', # ipykernel
+    )
     try:
         shell = get_ipython().__class__.__name__
-        if shell == 'ZMQInteractiveShell':
+        if shell in ipython_shells:
             return True
         return False
     except:

@@ -87,15 +87,23 @@ class ContinuousTime(QuantumWalk):
     or Laplacian matrix, along with the positioning 
     of the marked vertices.
 
-    The ``ContinuousTime`` class also supports simulating 
-    real Hamiltonians. 
-    To use a specific Hamiltonian :math:`H`, provide it directly 
-    via some real Hermitian matrix :math:`C` 
-    using the argument ``graph=C``, 
-    so that :math:`H=-\gamma C`.
-
-    For a comprehensive understanding of continuous-time quantum walks, consult reference [1]_. 
-    To examine the differences between utilizing the adjacency matrix and the Laplacian matrix, 
+    The ``ContinuousTime`` class enables the simulation of 
+    real Hamiltonians. To specify a particular Hamiltonian :math:`H`, 
+    it can be provided as a real Hermitian matrix :math:`C` 
+    using the ``graph=C`` parameter. This configuration sets 
+    :math:`H = -\gamma C`. In this case, the adjacency matrix 
+    represents a weighted graph, where the edge weights are 
+    the non-zero real entries of :math:`C`. 
+    Additionally, the Laplacian matrix is computed 
+    as :math:`D - A`, with :math:`D` being 
+    the degree matrix. 
+    See :meth:`hiperwalk.Graph.adjacency_matrix`
+    and :meth:`hiperwalk.Graph.laplacian_matrix`.
+    
+    For a comprehensive understanding of continuous-time quantum 
+    walks, consult reference [1]_. 
+    To examine the differences between utilizing 
+    the adjacency matrix and the Laplacian matrix, 
     refer to reference [2]_.
     
     References
@@ -188,6 +196,10 @@ class ContinuousTime(QuantumWalk):
         Returns
         -------
         float
+        
+        See Also
+        --------
+        set_gamma
         """
         return self._gamma
 
@@ -240,8 +252,8 @@ class ContinuousTime(QuantumWalk):
             The value of gamma.
 
         type: {'adjacency', 'laplacian'}
-            Two types of Hamiltonian used...
-            ``'A'`` is shorthand for ``'adjacency'``.
+            Two types of Hamiltonian are used:
+            ``'A'`` is shorthand for ``'adjacency'`` (default).
             ``'L'`` is shorthand for ``'laplacian'``.
 
         marked: TODO
@@ -279,6 +291,9 @@ class ContinuousTime(QuantumWalk):
         the argument ``marked=M``. For instance, ``marked={0}``
         specifies that :math:`v_0` is the marked vertex.
         The default is :math:`M=\emptyset`.
+
+        If the type of the Hamiltonian is set ``'adjacency'`` 
+        (default), 
         
         References
         ----------
@@ -305,6 +320,10 @@ class ContinuousTime(QuantumWalk):
         Returns
         -------
         :class:`scipy.sparse.csr_array`
+
+        See Also
+        --------
+        set_hamiltonian
         """
         return self._hamiltonian
 
@@ -322,10 +341,12 @@ class ContinuousTime(QuantumWalk):
 
     def set_hamiltonian_type(self, type='adjacency', hpc=True):
         r"""
+        Set the type of the Hamiltonian.
+        
         Parameters
         ----------
         type: {'adjacency', 'laplacian'}
-            Two types of Hamiltonian used...
+            Two types of Hamiltonian are used:
             ``'A'`` is shorthand for ``'adjacency'``.
             ``'L'`` is shorthand for ``'laplacian'``.
         """
@@ -335,7 +356,19 @@ class ContinuousTime(QuantumWalk):
                              hpc=hpc)
 
     def get_hamiltonian_type():
+        r"""
+        Retrieve the type of the Hamiltonian.
+        
+        See Also
+        --------
+        set_hamiltonian_type
+        
+        Returns
+        -------
+        type: {'adjacency', 'laplacian'}
+        """
         return self._hamil_type
+
 
     def _set_time(self, time=1):
         if time is None or time < 0:
@@ -423,7 +456,7 @@ class ContinuousTime(QuantumWalk):
 
     def get_terms(self):
         r"""
-        Number of terms in the power series used to
+        Retrieve the number of terms in the power series used to
         calculate the evolution operator.
 
         Returns
@@ -432,7 +465,8 @@ class ContinuousTime(QuantumWalk):
 
         See Also
         --------
-        get_evolution
+        set_terms
+        set_evolution
         """
         return self._terms
 
