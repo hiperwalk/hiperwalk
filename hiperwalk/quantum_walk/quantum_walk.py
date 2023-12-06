@@ -52,7 +52,29 @@ class QuantumWalk(ABC):
         # Should be different from None during simulation only.
         self._simul_vec = None
 
-        self._graph = graph
+
+        # TODO: create sparse matrix from graph or dense adjacency matrix
+        try:
+            if(hasattr(graph, '_adj_matrix') and (len(graph._adj_matrix.shape)!=2 or graph._adj_matrix.shape[0]!=graph._adj_matrix.shape[1])):
+                raise ValueError(
+                    "Adjacency matrix is not a square matrix."
+                )
+            if(not hasattr(graph, '_adj_matrix')):
+                raise AttributeError(
+                    "Graph does not have an adjacency matrix as attribute."
+                )
+            try:
+                self._graph = Graph(graph)
+            except:
+                self._graph = graph
+        except:
+            raise TypeError(
+                "Invalid `graph` type."
+                + " Expected 'hiperwalk.Graph' or "
+                + "'scipy.sparse.csr_array', but received "
+                + str(type(graph)) + ', instead.'
+            )
+
         self.hilb_dim = 0
 
 
