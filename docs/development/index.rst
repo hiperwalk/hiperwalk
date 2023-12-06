@@ -52,7 +52,7 @@ Bug Report and Contact
 
 To send a bug report or
 contribute to Hiperwalk or contact the developers, 
-write an email to hiperwalk@gmail.org.
+write an email to hiperwalk@gmail.com.
 
 Documentation
 =============
