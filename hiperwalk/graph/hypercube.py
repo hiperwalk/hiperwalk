@@ -84,7 +84,7 @@ class Hypercube(Graph):
         try:
             direction = direction.bit_length() - 1
         except:
-            direction = np.log2(direction)
+            direction = int(np.log2(direction))
 
         if count != 1 or direction < 0 or direction >= self._dimension:
             raise ValueError("Arc " + str(arc) + " does not exist.")
