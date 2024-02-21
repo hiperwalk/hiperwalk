@@ -188,22 +188,18 @@ class Graph():
         self._adj_matrix = adj_matrix
         self._coloring = None
 
-    def arc_number(self, *args):
+    def arc_number(self, arc):
         r"""
         Return the numerical label of the arc.
 
         Parameters
         ----------
-        *args:
+        arc:
             int:
                 The arc's numerical label itself is passed
                 as argument.
             (tail, head):
                 Arc in arc notation.
-            tail, head:
-                Arc in arc notation,
-                but ``tail`` and ``head`` are passed as
-                different arguments, not as a tuple.
 
         Returns
         -------
@@ -229,11 +225,7 @@ class Graph():
         0
         >>> graph.arc_number((0, 1)) #arc as tuple
         0
-        >>> graph.arc_number(0, 1) #tail and head in separate arguments
-        0
         """
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
         if not hasattr(arc, '__iter__'):
             num_arcs = self.number_of_arcs()
             if arc < 0 and arc >= num_arcs:
@@ -242,12 +234,18 @@ class Graph():
                                  + str(num_arcs - 1))
             return int(arc)
 
-        tail, head = arc
-        arc_number = _binary_search(self._adj_matrix.indices, head,
-                                   start = self._adj_matrix.indptr[tail],
-                                   end = self._adj_matrix.indptr[tail + 1])
-        if arc_number == -1:
+        tail = self._graph.vertex_number(arc[0])
+        head = self._graph.vertex_number(arc[1])
+        # TODO: the behavior may change after updating neighbors()
+        # TODO: the behavior will change for multigraphs
+        arc_number = self._adj_matrix.indptr[tail]
+
+        offset = np.where(self.neighbors(head) == tail)
+        if len(offset) != 1:
             raise ValueError("Inexistent arc " + str(arc) + ".")
+        offset = offset[0]
+
+        arc_number += offset
         return arc_number
 
 
