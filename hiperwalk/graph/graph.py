@@ -1,5 +1,4 @@
 import numpy as np
-import networkx as nx
 from scipy.sparse import issparse, csr_array, diags
 
 def _binary_search(v, elem, start=0, end=None):
@@ -51,22 +50,6 @@ class Graph():
         Check if it is more efficient to store the adjacency matrix as
         sparse or dense.
     
-    The graph :math:`G(V,E)` on which the quantum walk 
-    takes place is specified by the
-    adjacency matrix, Laplacian matrix, or 
-    any real Hermitian matrix :math:`C`.
-    
-    Let :math:`V` denote the vertex set :math:`\{v_0,...,v_{n-1}\}`, 
-    where :math:`n = |V|`. If the ``adj_matrix`` is defined as a real 
-    Hermitian matrix :math:`C`, then two distinct vertices :math:`v_i` and 
-    :math:`v_j` in :math:`V` are considered adjacent if and only if 
-    :math:`C_{ij} \neq 0`. In this matrix, :math:`C_{ij}` represents 
-    the weight of the edge connecting :math:`v_i` and :math:`v_j`. 
-    Diagonal entries :math:`C_{ii}` correspond to the weights of loops 
-    at vertex :math:`v_i`.
-    This weight is considered a generalized weight when :math:`C_{ij}` is 
-    negative. 
-
     The class methods facilitate the construction of a valid quantum walk 
     and can be provided as parameters to plotting functions. For visualizations, 
     the default graph representation will be used. Specific classes are available 
@@ -76,101 +59,17 @@ class Graph():
     :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
 
     The treatment of the graph depends on the quantum walk model. 
-    In the coined model, the graph is interpreted 
-    as a directed graph as follows:
-    Each edge in :math:`G(V, E)` connecting two distinct vertices 
-    translates into a pair of arcs in the directed graph
-    :math:`\vec{G}(V, \mathcal{A})`, where
-
-    .. math::
-        \begin{align*}
-            \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
-        \end{align*}
-
-    Arcs are represented using either
-    the (tail,head) notation or numerical labels. 
-    In the :obj:`Graph` class, the arc labels are ordered such that for two arcs, 
-    :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and 
-    :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or 
-    (:math:`i = k` and :math:`j < \ell`). 
-    Loops are depicted as single arcs, 
-    affecting the dimension of the associated Hilbert space.
-    In coined quantum walks, the weights of arcs do not influence the dynamics.
-    
-    In the continuous-time quantum walk model, the graph is treated 
-    as a weighted graph without considering edges as composed of two 
-    opposite arcs.
-
-    .. note::
-        The arc ordering may change for graphs defined using specific classes.
-
-    For example, the graph :math:`G(V, E)` shown in
-    Figure 1 has an adjacency matrix ``adj_matrix``.
-
-    .. testsetup::
-
-        import numpy as np
-
-    >>> adj_matrix = np.array([
-    ...     [0, 1, 0, 0],
-    ...     [1, 0, 1, 1],
-    ...     [0, 1, 0, 1],
-    ...     [0, 1, 1, 0]])
-    >>> adj_matrix
-    array([[0, 1, 0, 0],
-           [1, 0, 1, 1],
-           [0, 1, 0, 1],
-           [0, 1, 1, 0]])
-
-    .. graphviz:: ../../graphviz/graph-example.dot
-        :align: center
-        :layout: neato
-        :caption: Figure 1
-
-    The arcs of the associated digraph in the arc notation are
-
-    >>> arcs = [(i, j) for i in range(4)
-    ...                for j in range(4) if adj_matrix[i,j] == 1]
-    >>> arcs
-    [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
-
-    Note that ``arcs`` is already sorted, hence the associated 
-    numeric labels are
-
-    >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
-    >>> arcs_labels
-    {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
-
-    The numeric labels are depicted in Figure 2.
-
-    .. graphviz:: ../../graphviz/graph-arcs.dot
-        :align: center
-        :layout: neato
-        :caption: Figure 2
-
-    If we insert the labels of the arcs into the adjacency matrix,
-    we obtain matrix ``adj_labels`` as follows:
-
-    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
-    ...                                   else '' for j in range(4)]
-    ...               for i in range(4)]
-    >>> adj_labels = np.matrix(adj_labels)
-    >>> adj_labels
-    matrix([['', '0', '', ''],
-            ['1', '', '2', '3'],
-            ['', '4', '', '5'],
-            ['', '6', '7', '']], dtype='<U21')
-
-    Note that, intuitively,
-    the arcs are labeled in left-to-right and top-to-bottom fashion.
+    .. todo::
+        Reference new part of documentation.
     """
 
     def __init__(self, adj_matrix):
-        if all(hasattr(adj_matrix, attr) for attr in
-               ['__len__', 'edges', 'nbunch_iter', 'subgraph',
-                'is_directed']):
-            adj_matrix = nx.convert_matrix.to_scipy_sparse_array(
-                    adj_matrix).astype(np.int8)
+        try:
+            adj_matrix.adj #throws AttributeError if not networkx graph
+            import networkx as nx
+            adj_matrix = nx.adjacency_matrix(adj_matrix, dtype=np.int8)
+        except AttributeError:
+            pass
 
         if not issparse(adj_matrix):
             adj_matrix = csr_array(adj_matrix, dtype=np.int8)
@@ -395,6 +294,7 @@ class Graph():
         .. todo::
             Add other return types depending on the stored matrix type.
         """
+        # TODO: return hard copy depending on argument
         return self._adj_matrix
 
     def laplacian_matrix(self):
