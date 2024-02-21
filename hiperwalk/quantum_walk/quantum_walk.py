@@ -63,11 +63,14 @@ class QuantumWalk(ABC):
 
         # TODO: create sparse matrix from graph or dense adjacency matrix
         try:
-            if(hasattr(graph, 'adj_matrix') and (len(graph.adj_matrix.shape)!=2 or graph.adj_matrix.shape[0]!=graph.adj_matrix.shape[1])):
+            if (hasattr(graph, '_adj_matrix')
+               and (len(graph._adj_matrix.shape)!=2
+               or graph._adj_matrix.shape[0]!=graph._adj_matrix.shape[1])
+               ):
                 raise ValueError(
                     "Adjacency matrix is not a square matrix."
                 )
-            if(not hasattr(graph, 'adj_matrix')):
+            if (not hasattr(graph, '_adj_matrix')):
                 raise AttributeError(
                     "Graph does not have an adjacency matrix as attribute."
                 )
@@ -399,7 +402,7 @@ class QuantumWalk(ABC):
             return state
         return state / norm
 
-    def state(self, *args):
+    def state(self, entries):
         """
         Generates a state in the Hilbert space.
 
@@ -409,10 +412,9 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        *args
+        entries : list of entry
             Each entry is a 2-tuple or array with format
             ``(amplitude, vertex)``.
-            An entry may be an array of such tuples.
 
         Returns
         -------
@@ -425,33 +427,30 @@ class QuantumWalk(ABC):
 
         Examples
         --------
+        .. TODO:
+            Consider the Graph...
+
         The following commands generate the same state.
 
-        >>> psi = qw.state([1, 0], (1, 1), (1, 2)) #doctest: +SKIP
-        >>> psi1 = qw.state([1, 0], [(1, 1), (1, 2)]) #doctest: +SKIP
-        >>> psi2 = qw.state(([1, 0], (1, 1)), (1, 2)) #doctest: +SKIP
-        >>> psi3 = qw.state([[1, 0], (1, 1), (1, 2)]) #doctest: +SKIP
-        >>> np.all(psi == ps1) #doctest: +SKIP
+        >>> psi = qw.state([[1, 0], [1, 1], [1, 2]])
+        >>> psi1 = qw.state([[1, 0], (1, 1), (1, 2)])
+        >>> psi2 = qw.state(([1, 0], (1, 1), (1, 2)))
+        >>> psi3 = qw.state(((1, 0), (1, 1), (1, 2)))
+        >>> np.all(psi == ps1)
         True
-        >>> np.all(psi1 == ps2) #doctest: +SKIP
+        >>> np.all(psi1 == ps2)
         True
-        >>> np.all(psi2 == ps3) #doctest: +SKIP
+        >>> np.all(psi2 == ps3)
         True
         """
-        if len(args) == 0:
+        if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
-        state = [0] * self.hilb_dim
+        state = np.zeros(self.hilb_dim)
 
-        for arg in args:
-            if hasattr(arg[0],'__iter__'):
-                for ampl, v in arg:
-                    state[self._graph.vertex_number(v)] = ampl
-            else:
-                ampl, v = arg
-                state[self._graph.vertex_number(v)] = ampl
+        for ampl, vertex in entries:
+            state[self._graph.vertex_number(vertex)] = ampl
 
-        state = np.array(state)
         return self._normalize(state)
 
     def ket(self, label):
