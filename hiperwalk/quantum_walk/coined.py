@@ -724,6 +724,8 @@ class Coined(QuantumWalk):
             def get_block(vertex):
                 g = self._graph
                 neighbors = g.neighbors(vertex)
+                # TODO: this technique wont work after the behavior of
+                # neighbors() change.
                 a1 = g.arc_number((vertex, neighbors[0]))
                 a2 = g.arc_number((vertex, neighbors[-1]))
                 # arc order may change
@@ -952,7 +954,7 @@ class Coined(QuantumWalk):
 
         return prob
 
-    def state(self, *args):
+    def state(self, entries):
         """
         Generates a valid state.
 
@@ -963,11 +965,10 @@ class Coined(QuantumWalk):
 
         Parameters
         ----------
-        *args
+        entries : list of entry
             Each entry is a tuple (or array).
-            An entry can be specified in three different ways:
-            ``(amplitude, (tail, head))``,
-            ``(amplitude, tail, head)``, and
+            An entry can be specified in two different ways:
+            ``(amplitude, (tail, head))``, and
             ``(amplitude, arc_number)``.
 
             amplitude
@@ -976,10 +977,10 @@ class Coined(QuantumWalk):
                 The vertex corresponding to the position of the walker
                 in the superposition.
                 In other words, the tail of the arc.
+                The tuple ``(tail, head)`` must be a valid arc.
             head
                 The vertex to which the coin is pointing.
-                That is, the tuple
-                ``(tail, head)`` must be a valid arc.
+                The tuple ``(tail, head)`` must be a valid arc.
             arc_number
                 The numerical arc label with respect to the arc ordering
                 given by the computational basis.
@@ -1004,38 +1005,26 @@ class Coined(QuantumWalk):
             g = hpw.Grid((dim, dim))
             qw = hpw.Coined(graph=g)
 
-        >>> psi = qw.state((1, (0, 1)), [1, 1], (1, 2))
-        >>> psi1 = qw.state((1, ([0, 0], [1, 0])),
-        ...                 [[1, (0, dim - 1)],
+        >>> psi = qw.state([(1, (0, 1)), [1, 1], (1, 2)])
+        >>> psi1 = qw.state([(1, ([0, 0], [1, 0])),
+        ...                  [1, (0, dim - 1)],
         ...                  (1, [(0, 0), [0, 1]])])
         >>> psi2 = qw.state([(1, [0, 0], [1, 0]),
-        ...                  [1, 0, dim - 1]],
-        ...                 (1, (0, 0), [0, 1]))
+        ...                  [1, (0, dim - 1)],
+        ...                  (1, [(0, 0), [0, 1]])])
         >>> np.all(psi == psi1)
         True
         >>> np.all(psi1 == psi2)
         True
         """
-        if len(args) == 0:
+        if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
-        state = [0] * self.hilb_dim
+        state = np.zeros(self.hilb_dim)
 
-        def add_entry(entry):
-            ampl = entry[0]
-            arc = entry[1:]
-            if len(arc) == 1:
-                arc = arc[0]
+        for ampl, arc in entries:
             state[self._graph.arc_number(arc)] = ampl
 
-        for arg in args:
-            if hasattr(arg[0],'__iter__'):
-                for entry in arg:
-                    add_entry(entry)
-            else:
-                add_entry(arg)
-
-        state = np.array(state)
         return self._normalize(state)
 
     def ket(self, *args):
