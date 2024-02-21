@@ -1027,24 +1027,21 @@ class Coined(QuantumWalk):
 
         return self._normalize(state)
 
-    def ket(self, *args):
+    def ket(self, arc):
         r"""
         Create a computational basis state.
 
         Parameters
         ----------
-        *args
+        arc: int or tuple of int
             The ket label.
-            There are three different labels acceptable.
+            There are two different labels acceptable.
 
             (tail, head)
                 The arc notation.
-            tail, head
-                The arc notation with ``tail`` and ``head`` as
-                separate arguments.
             arc_number
                 The label of the arc.
-                Its number according to the computational basis order.
+                The number according to the computational basis order.
 
         Examples
         --------
@@ -1052,7 +1049,7 @@ class Coined(QuantumWalk):
             valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
-        ket[self._graph.arc_number(*args)] = 1
+        ket[self._graph.arc_number(arc)] = 1
 
         return ket
 
