@@ -24,16 +24,9 @@ class Complete(Graph):
         self._adj_matrix = None
         self._coloring = None
 
-    def arc_number(self, *args):
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
-            num_arcs = self.number_of_arcs()
-            if arc < 0 and arc >= num_arcs:
-                raise ValueError("Arc value out of range. "
-                                 + "Expected arc value from 0 to "
-                                 + str(num_arcs - 1))
-            return int(arc)
+            return super().arc_number(arc)
 
         tail, head = arc
         arc_number = (self._num_vert - 1) * tail + head
