@@ -1,7 +1,7 @@
 from scipy.sparse import csr_array
-from .lattice import *
+from .square_lattice import *
 
-class Cycle(Lattice):
+class Cycle(SquareLattice):
     r"""
     Cycle graph.
 
