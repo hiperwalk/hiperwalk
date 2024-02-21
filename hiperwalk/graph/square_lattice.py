@@ -4,9 +4,9 @@ import scipy.sparse
 from .graph import Graph
 from warnings import warn
 
-class Lattice(ABC, Graph):
+class SquareLattice(Graph):
     r"""
-    Abstract class for Lattice graphs.
+    Class for Square Lattice graphs.
 
     Lattice graphs are embedabble in a Euclidian Space,
     forming a regular tiling.
@@ -17,7 +17,9 @@ class Lattice(ABC, Graph):
     directions can be assigned to the arcs.
     """
 
-    @abstractmethod
+    def __init__(dim):
+        raise NotImplementedError
+
     def next_arc(self, arc):
         r"""
         Next arc with respect to the default embedding.
@@ -44,7 +46,6 @@ class Lattice(ABC, Graph):
         """
         raise NotImplementedError
 
-    @abstractmethod
     def previous_arc(self, arc):
         r"""
         Previous arc with respect to the default embedding.
