@@ -57,6 +57,30 @@ class Coined(QuantumWalk):
     to determine the direction of the walker's movement 
     on a graph.
 
+    In the coined model, the graph is interpreted
+    as a directed graph as follows:
+    Each edge in :math:`G(V, E)` connecting two distinct vertices
+    translates into a pair of arcs in the directed graph
+    :math:`\vec{G}(V, \mathcal{A})`, where
+
+    .. math::
+        \begin{align*}
+            \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+        \end{align*}
+
+    .. note::
+        The arc ordering may change for graphs defined using specific classes.
+
+    Arcs are represented using either
+    the (tail,head) notation or numerical labels.
+    In the :obj:`Graph` class, the arc labels are ordered such that for two arcs,
+    :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and
+    :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or
+    (:math:`i = k` and :math:`j < \ell`).
+    Loops are depicted as single arcs,
+    affecting the dimension of the associated Hilbert space.
+    In coined quantum walks, the weights of arcs do not influence the dynamics.
+
     The computational basis is composed of the graph's arc set.
     For simple graphs, the cardinality of the computational
     basis is :math:`2|E|`, where :math:`E`
@@ -73,6 +97,67 @@ class Coined(QuantumWalk):
     For a more detailed understanding of coined quantum walks,
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
     found in the book  'Quantum Walks and Search Algorithms' [1]_.
+
+
+    For example, the graph :math:`G(V, E)` shown in
+    Figure 1 has an adjacency matrix ``adj_matrix``.
+
+    .. testsetup::
+
+        import numpy as np
+
+    >>> adj_matrix = np.array([
+    ...     [0, 1, 0, 0],
+    ...     [1, 0, 1, 1],
+    ...     [0, 1, 0, 1],
+    ...     [0, 1, 1, 0]])
+    >>> adj_matrix
+    array([[0, 1, 0, 0],
+           [1, 0, 1, 1],
+           [0, 1, 0, 1],
+           [0, 1, 1, 0]])
+
+    .. graphviz:: ../../graphviz/graph-example.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1
+
+    The arcs of the associated digraph in the arc notation are
+
+    >>> arcs = [(i, j) for i in range(4)
+    ...                for j in range(4) if adj_matrix[i,j] == 1]
+    >>> arcs
+    [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+
+    Note that ``arcs`` is already sorted, hence the associated
+    numeric labels are
+
+    >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
+    >>> arcs_labels
+    {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
+
+    The numeric labels are depicted in Figure 2.
+
+    .. graphviz:: ../../graphviz/graph-arcs.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 2
+
+    If we insert the labels of the arcs into the adjacency matrix,
+    we obtain matrix ``adj_labels`` as follows:
+
+    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
+    ...                                   else '' for j in range(4)]
+    ...               for i in range(4)]
+    >>> adj_labels = np.matrix(adj_labels)
+    >>> adj_labels
+    matrix([['', '0', '', ''],
+            ['1', '', '2', '3'],
+            ['', '4', '', '5'],
+            ['', '6', '7', '']], dtype='<U21')
+
+    Note that, intuitively,
+    the arcs are labeled in left-to-right and top-to-bottom fashion.
 
     References
     ----------
