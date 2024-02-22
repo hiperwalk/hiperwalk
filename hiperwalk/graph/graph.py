@@ -190,6 +190,39 @@ class Graph():
             return False # u or v is not a valid vertex
         return self._adj_matrix[u, v] != 0
 
+    def _neighbor_index(self, vertex, neigh):
+        r"""
+        Return the index of `neigh` in the neihborhood list of `vertex`.
+
+        The returned index satisfies
+        ``adj_matrix.indices[adj_matrix.indptr[vertex] + index] == neigh``.
+
+        This is useful for graphs where the adjacency is not listed in
+        ascending order.
+        It is recommended to override this method for specific graphs.
+        """
+        # TODO test this function
+        # TODO write unitary tests
+        if __DEBUG__:
+            assert self.adjacent(vertex, neigh)
+
+        adj_matrix = self._adj_matrix
+        start = adj_matrix.indptr[vertex]
+        end = adj_matrix.indptr[vertex + 1]
+
+        # if indices is in ascending order
+        if adj_matrix.has_sorted_indices:
+            index = _binary_search(adj_matrix.indices,
+                                   neigh,
+                                   start=start,
+                                   end=end)
+            return index - start
+
+        # indices is not in ascending order
+        for i in range(start, end):
+            if adj_matrix.indices[i] == neigh:
+                return i - start
+
     def neighbors(self, vertex):
         r"""
         Return all neighbors of the given vertex.
