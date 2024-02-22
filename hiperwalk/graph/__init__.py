@@ -1,5 +1,5 @@
 from .graph import *
-from .lattice import *
+from .square_lattice import *
 from .cycle import *
 from .line import *
 from .grid import *
