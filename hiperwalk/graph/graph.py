@@ -175,6 +175,21 @@ class Graph():
                 break
         return (tail, head)
 
+    def adjacent(self, u, v):
+        r"""
+        Return True if vertex ``u`` is adjacent to ``v``.
+        """
+        # TODO: check implementation of adj_matrix[u, v]
+        # if adj_matrix.has_sorted_index, probably scipy is more efficient.
+        # if indices are not sorted, scipy probably does a linear search,
+        # and a graph-dependent implementation may be more efficient.
+        try:
+            u = self.vertex_number(u)
+            v = self.vertex_number(v)
+        except ValueError:
+            return False # u or v is not a valid vertex
+        return self._adj_matrix[u, v] != 0
+
     def neighbors(self, vertex):
         r"""
         Return all neighbors of the given vertex.
