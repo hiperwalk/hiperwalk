@@ -267,6 +267,11 @@ class Graph():
         int
             Vertex number.
 
+        Raises
+        ------
+        ValueError
+            If ``vertex`` is not valid.
+
         Notes
         -----
         It is useful to have this function implemented for general graphs
