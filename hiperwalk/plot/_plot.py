@@ -952,7 +952,7 @@ def _is_in_notebook():
 
 ##########################################################################
 
-def plot_success_probability(time, probabilities, **kwargs):
+def plot_success_probability(time, probabilities, figsize=(12, 10), **kwargs):
     r"""
     Plot the success probability over time.
 
@@ -979,6 +979,17 @@ def plot_success_probability(time, probabilities, **kwargs):
     QuantumWalk.success_probability
     matplotlib.pyplot.plot
     """
+
+    # Figure size
+
+    if len(figsize) == 2:
+        fig_width, fig_height = figsize
+    else:
+        raise ValueError(
+            'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+        )
+
+    _configure_figure(fig_width, fig_height)
 
     time = QuantumWalk._time_to_tuple(time)
     time[1] += time[2]
