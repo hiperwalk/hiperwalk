@@ -34,10 +34,20 @@ class Graph():
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`, :class:`numpy.ndarray` or :class:`networkx.Graph`
-        Adjacency matrix, Laplacian matrix, or any real Hermitian matrix.
+    adj_matrix :
+        The adjacency matrix of the graph
+        (any integer Hermitian matrix).
+        Two input types are accepted:
 
-        If :class:`network.Graph`, the adjacency matrix of the graph is used.
+        * Any matrix -- for instance,
+            * :class:`scipy.sparse.csr_array`,
+            * :class:`numpy.ndarray`,
+            * list of lists.
+        * :class:`network.Graph`.
+            * The adjacency matrix is extracted from the graph.
+
+    copy : bool, default=False
+        If ``True``, a hard copy of ``adj_matrix`` is stored.
 
     Raises
     ------
@@ -46,24 +56,33 @@ class Graph():
 
     Notes
     -----
-    .. todo::
-        Check if it is more efficient to store the adjacency matrix as
-        sparse or dense.
-    
     The class methods facilitate the construction of a valid quantum walk 
     and can be provided as parameters to plotting functions. For visualizations, 
     the default graph representation will be used. Specific classes are available 
     for well-known graph types, such as hypercubes and lattices.
 
-    The preferred parameter type for the adjacency matrix is
-    :class:`scipy.sparse.csr_matrix` with ``dtype=np.int8``.
+    The adjacency matrix is always stored as a
+    :class:`scipy.sparse.csr_array`.
+    If ``adj_matrix`` is sparse and ``copy=False``,
+    the argument will be changed for more efficient manipulation.
+
+    .. warning::
+
+        To reduce memory usage, ``adj_matrix.data`` is set to ``None``.
+        This is possible because ``adj_matrix.data`` should be an
+        array of ones.
+
+        If the user wishes to keep the original ``adj_matrix``,
+        the argument ``copy`` must be set to ``True``.
+
+
 
     The treatment of the graph depends on the quantum walk model. 
     .. todo::
         Reference new part of documentation.
     """
 
-    def __init__(self, adj_matrix):
+    def __init__(self, adj_matrix, copy=False):
         try:
             adj_matrix.adj #throws AttributeError if not networkx graph
             import networkx as nx
@@ -77,103 +96,13 @@ class Graph():
         if adj_matrix.shape[0] != adj_matrix.shape[1]:
             raise TypeError("Adjacency matrix is not square.")
 
-        # the following is commented because the current way to
-        # implement Laplacian in ContinuousTime quantum walks is by
-        # passing the Laplacian as adjacency matrix
-        # if adj_matrix.data.min() != 1 or adj_matrix.data.max() != 1:
-        #     raise ValueError("Adjacency matrix must only have 0's "
-        #                      + "and 1's as entries.")
+        if copy:
+            adj_matrix = adj_matrix.copy()
 
+        del adj_matrix.data
+        adj_matrix.data = None
         self._adj_matrix = adj_matrix
         self._coloring = None
-
-    def arc_number(self, arc):
-        r"""
-        Return the numerical label of the arc.
-
-        Parameters
-        ----------
-        arc:
-            int:
-                The arc's numerical label itself is passed
-                as argument.
-            (tail, head):
-                Arc in arc notation.
-
-        Returns
-        -------
-        label: int
-            Numerical label of the arc.
-
-        Examples
-        --------
-        If arc ``(0, 1)`` exists, the following commands return
-        the same result.
-
-        .. testsetup::
-
-            import networkx as nx
-            from sys import path
-            path.append('../..')
-            import hiperwalk as hpw
-            nxg = nx.cycle_graph(10)
-            adj_matrix = nx.adjacency_matrix(nxg)
-            graph = hpw.Graph(adj_matrix)
-
-        >>> graph.arc_number(0) #arc number 0
-        0
-        >>> graph.arc_number((0, 1)) #arc as tuple
-        0
-        """
-        if not hasattr(arc, '__iter__'):
-            num_arcs = self.number_of_arcs()
-            if arc < 0 and arc >= num_arcs:
-                raise ValueError("Arc value out of range. "
-                                 + "Expected arc value from 0 to "
-                                 + str(num_arcs - 1))
-            return int(arc)
-
-        tail = self._graph.vertex_number(arc[0])
-        head = self._graph.vertex_number(arc[1])
-        # TODO: the behavior may change after updating neighbors()
-        # TODO: the behavior will change for multigraphs
-        arc_number = self._adj_matrix.indptr[tail]
-
-        offset = np.where(self.neighbors(head) == tail)
-        if len(offset) != 1:
-            raise ValueError("Inexistent arc " + str(arc) + ".")
-        offset = offset[0]
-
-        arc_number += offset
-        return arc_number
-
-
-    def arc(self, number):
-        r"""
-        Convert a numerical label to arc notation.
-    
-        Given an integer that represents the numerical label of an arc,
-        this method returns the corresponding arc in ``(tail, head)`` 
-        representation.
-    
-        Parameters
-        ----------
-        number : int
-            The numerical label of the arc.
-    
-        Returns
-        -------
-        (int, int)
-            The arc represented in ``(tail, head)`` notation.
-        """
-
-        adj_matrix = self._adj_matrix
-        head = adj_matrix.indices[number]
-        #TODO: binary search
-        for tail in range(len(adj_matrix.indptr)):
-            if adj_matrix.indptr[tail + 1] > number:
-                break
-        return (tail, head)
 
     def adjacent(self, u, v):
         r"""
@@ -188,7 +117,8 @@ class Graph():
             v = self.vertex_number(v)
         except ValueError:
             return False # u or v is not a valid vertex
-        return self._adj_matrix[u, v] != 0
+        A = self._adj_matrix
+        return v in A.indices[A[u]:A[u+1]]
 
     def _neighbor_index(self, vertex, neigh):
         r"""
@@ -231,37 +161,17 @@ class Graph():
         end = self._adj_matrix.indptr[vertex + 1]
         return self._adj_matrix.indices[start:end]
 
-    def arcs_with_tail(self, tail):
-        r"""
-        Return all arcs that have the given tail.
-        """
-        arcs_lim = self._adj_matrix.indptr
-        return np.arange(arcs_lim[tail], arcs_lim[tail + 1])
-
     def number_of_vertices(self):
         r"""
         Determine the cardinality of the vertex set.
         """
         return self._adj_matrix.shape[0]
 
-
-    def number_of_arcs(self):
-        r"""
-        Determine the cardinality of the arc set.
-
-        In simple graphs, the cardinality of the arc set is 
-        equal to twice the number of edges. 
-        However, for graphs containing loops, the 
-        cardinality is incremented by one for each loop.
-        """
-
-        return self._adj_matrix.sum()
-
     def number_of_edges(self):
         r"""
         Determine the cardinality of the edge set.
         """
-        return self._adj_matrix.sum() >> 1
+        return len(self._adj_matrix.indices) >> 1
 
     def degree(self, vertex):
         r"""
@@ -347,8 +257,11 @@ class Graph():
         .. todo::
             Add other return types depending on the stored matrix type.
         """
-        # TODO: return hard copy depending on argument
-        return self._adj_matrix
+        data = np.ones(len(self._adj_matrix.indices), dtype=np.int8)
+        indices = self._adj_matrix.indices
+        indptr = self._adj_matrix.indptr
+        # TODO: copy or not?
+        return csr_array((data, indices, indptr))
 
     def laplacian_matrix(self):
         r"""
