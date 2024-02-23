@@ -53,12 +53,8 @@ class SDMultigraph(Graph):
 
         Parameters
         ----------
-        arc:
-            int:
-                The arc's numerical label itself is passed
-                as argument.
-            (tail, head):
-                Arc in arc notation.
+        arc: (int, int)
+            Arc in arc notation, i.e. (tail, head).
 
         Returns
         -------
@@ -85,27 +81,24 @@ class SDMultigraph(Graph):
         >>> graph.arc_number((0, 1)) #arc as tuple
         0
         """
-        if not hasattr(arc, '__iter__'):
-            num_arcs = self.number_of_arcs()
-            if arc < 0 and arc >= num_arcs:
-                raise ValueError("Arc value out of range. "
-                                 + "Expected arc value from 0 to "
-                                 + str(num_arcs - 1))
-            return int(arc)
+        if self.graph.is_simple():
+            # if not hasattr(arc, '__iter__'):
+            #     num_arcs = self.number_of_arcs()
+            #     if arc < 0 and arc >= num_arcs:
+            #         raise ValueError("Arc value out of range. "
+            #                          + "Expected arc value from 0 to "
+            #                          + str(num_arcs - 1))
+            #     return int(arc)
 
-        tail = self._graph.vertex_number(arc[0])
-        head = self._graph.vertex_number(arc[1])
-        # TODO: the behavior may change after updating neighbors()
-        # TODO: the behavior will change for multigraphs
-        arc_number = self._adj_matrix.indptr[tail]
+            tail = self.graph.vertex_number(arc[0])
+            head = self.graph.vertex_number(arc[1])
 
-        offset = np.where(self.neighbors(head) == tail)
-        if len(offset) != 1:
-            raise ValueError("Inexistent arc " + str(arc) + ".")
-        offset = offset[0]
+            first_arc = self._adj_matrix.indptr[tail]
+            offset = self.graph._neighbor_index(tail, head)
 
-        arc_number += offset
-        return arc_number
+            return first_arc + offset
+
+        raise NotImplementedError("arc_number() for multigraphs.")
 
     def arcs_with_tail(self, tail):
         r"""
