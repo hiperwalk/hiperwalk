@@ -6,3 +6,4 @@ from .grid import *
 from .hypercube import *
 from .complete import *
 from .complete_bipartite import *
+from ._sym_dir_multigraph import *
