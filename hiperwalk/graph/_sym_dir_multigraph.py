@@ -32,13 +32,20 @@ class SDMultigraph(Graph):
             The arc represented in ``(tail, head)`` notation.
         """
 
-        adj_matrix = self._adj_matrix
-        head = adj_matrix.indices[number]
-        #TODO: binary search
-        for tail in range(len(adj_matrix.indptr)):
-            if adj_matrix.indptr[tail + 1] > number:
-                break
-        return (tail, head)
+        if self.graph.is_simple():
+            adj_matrix = self._adj_matrix
+            head = adj_matrix.indices[number]
+
+            from warnings import warn
+            warn("Use interval_binary_search")
+
+            for tail in range(len(adj_matrix.indptr)):
+                if adj_matrix.indptr[tail + 1] > number:
+                    break
+            return (tail, head)
+
+        raise NotImplementedError("arc() for multigraphs")
+        # Use interval_binary_search
 
     def arc_number(self, arc):
         r"""
@@ -125,3 +132,5 @@ class SDMultigraph(Graph):
         """
 
         return self._adj_matrix.sum()
+
+    # TODO: override self.graph methods
