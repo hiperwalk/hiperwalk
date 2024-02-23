@@ -270,8 +270,7 @@ def plot_probability_distribution(
         for i in range(len(probabilities)):
             # TODO: set figure size according to graph dimensions
             # TODO: check for kwargs
-            fig, ax = configs[plot](probabilities.shape[1],
-                                    fig_width=fig_width,
+            fig, ax = configs[plot](fig_width=fig_width,
                                     fig_height=fig_height)
 
             plot_funcs[plot](probabilities[i], ax, **kwargs)
@@ -289,8 +288,7 @@ def plot_probability_distribution(
                 plt.show()
 
     else:
-        fig, ax = configs[plot](probabilities.shape[1],
-                                fig_width=fig_width,
+        fig, ax = configs[plot](fig_width=fig_width,
                                 fig_height=fig_height)
 
         if plot == 'plane':
@@ -452,7 +450,7 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes(kwargs['graph'], probabilities, kwargs)
 
 
-def _configure_figure(num_vert, fig_width=None, fig_height=None):
+def _configure_figure(fig_width=None, fig_height=None):
     """
     Set basic figure configuration.
 
@@ -485,12 +483,12 @@ def _configure_figure(num_vert, fig_width=None, fig_height=None):
     return fig, ax
 
 
-def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
+def _configure_plot_figure(fig_width=None, fig_height=None):
     """
     Set basic figure configuration for matplotlib plots.
     """
     
-    fig, ax = _configure_figure(num_vert, fig_width, fig_height)
+    fig, ax = _configure_figure(fig_width, fig_height)
 
     plt.xlabel("Vertex", size=18)
     plt.ylabel("Probability", size=18)
@@ -500,11 +498,11 @@ def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
     return fig, ax
 
 
-def _configure_graph_figure(num_vert=None, fig_width=None,
+def _configure_graph_figure(fig_width=None,
                             fig_height=None):
-    return _configure_figure(num_vert, fig_width, fig_height)
+    return _configure_figure(fig_width, fig_height)
 
-def _configure_plane_figure(num_vert=None, fig_width=None,
+def _configure_plane_figure(fig_width=None,
                            fig_height=None):
     if fig_width is None:
         fig_width = plt.rcParams["figure.figsize"][0]
