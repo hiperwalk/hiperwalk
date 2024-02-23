@@ -57,9 +57,10 @@ class Graph():
     Notes
     -----
     The class methods facilitate the construction of a valid quantum walk 
-    and can be provided as parameters to plotting functions. For visualizations, 
-    the default graph representation will be used. Specific classes are available 
-    for well-known graph types, such as hypercubes and lattices.
+    and can be provided as parameters to plotting functions.
+    For visualizations, the default graph representation will be used.
+    Specific classes are available for well-known graph types,
+    such as hypercubes and lattices.
 
     The adjacency matrix is always stored as a
     :class:`scipy.sparse.csr_array`.
@@ -102,7 +103,6 @@ class Graph():
         del adj_matrix.data
         adj_matrix.data = None
         self._adj_matrix = adj_matrix
-        self._coloring = None
 
     def adjacent(self, u, v):
         r"""
@@ -157,6 +157,7 @@ class Graph():
         r"""
         Return all neighbors of the given vertex.
         """
+        vertex = self.vertex_number(vertex)
         start = self._adj_matrix.indptr[vertex]
         end = self._adj_matrix.indptr[vertex + 1]
         return self._adj_matrix.indices[start:end]
@@ -178,11 +179,20 @@ class Graph():
         Return the degree of the given vertex.
 
         The degree of a vertex :math:`u` in a graph 
-        is the number of edges 
-        incident to :math:`u`. Loops at :math:`u` are counted once, 
-        reflecting the treatment of a loop at vertex :math:`u` as 
-        a single arc :math:`(u, u)`.
+        is the number of edges  incident to :math:`u`.
+        Loops at :math:`u` are counted once.
+
+        Parameters
+        ----------
+        vertex :
+            Any valid vertex representation.
+
+        Notes
+        -----
+        .. todo::
+            Will we accept loops in simple graphs?
         """
+        vertex = self.vertex_number(vertex)
         indptr = self._adj_matrix.indptr
         return indptr[vertex + 1] - indptr[vertex]
 
