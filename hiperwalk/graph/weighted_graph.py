@@ -52,4 +52,7 @@ class WeigthedGraph(Graph):
 
         self._adj_matrix = adj_matrix
 
+    def is_simple(self):
+        return False
+
     # TODO: add functions to manage weights

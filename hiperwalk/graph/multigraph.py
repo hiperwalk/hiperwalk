@@ -76,3 +76,6 @@ class Multigraph(Graph):
         return adj_matrix.data[end] - adj_matrix.data[start]
     
     # TODO: add functions to manage multiedges
+
+    def is_simple(self):
+        return False
