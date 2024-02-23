@@ -309,3 +309,14 @@ class Graph():
             D = np.array(D.ravel())[0]
         D = diags(D)
         return D - A
+
+    def is_simple(self):
+        r"""
+        Return True if instance of simple graph.
+
+        Notes
+        -----
+        .. todo::
+            Decide if simple graph implementation accepts loops.
+        """
+        return True
