@@ -108,7 +108,7 @@ class SDMultigraph(Graph):
         indptr = self.graph._adj_matrix.indptr
 
         if self.is_underlying_simple():
-            indptr = self._adj_matrix.indptr
+            indptr = self.graph._adj_matrix.indptr
             return np.arange(indptr[tail], indptr[tail + 1])
 
         data = self.graph._adj_matrix.data
@@ -125,6 +125,9 @@ class SDMultigraph(Graph):
         However, for graphs containing loops, the 
         cardinality is incremented by one for each loop.
         """
+        if self.is_underlying_simple():
+            return self.number_of_edges() << 1
+
         return self.graph._adj_matrix.data[-1]
 
     def is_underlying_simple(self):
@@ -157,10 +160,10 @@ class SDMultigraph(Graph):
         return self.graph.number_of_edges()
 
     def degree(self, vertex):
-        return self.graph.degree()
+        return self.graph.degree(vertex)
 
     def vertex_number(self, vertex):
-        return self.graph.vertex_number()
+        return self.graph.vertex_number(vertex)
 
     def laplacian_matrix(self):
         return self.graph.laplacian_matrix()

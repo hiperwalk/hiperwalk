@@ -3,6 +3,8 @@ import scipy
 import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
+#from ..graph import _sym_dir_multigraph
+from ..graph import SDMultigraph
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
 try:
@@ -28,8 +30,12 @@ class Coined(QuantumWalk):
     ----------
     graph
         Graph on which the quantum walk takes place.
-        It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
-        its adjacency matrix (:class:`scipy.sparse.csr_array`).
+        Two types of entries are accepted:
+
+        * Simple graph (:class:`hiperwalk.graph.Graph`);
+        * Multigraph (:class:`hiperwalk.graph.Multigraph`);
+
+        A symmetric directed multigraph is created based on the input.
 
     **kwargs : optional
         Optional arguments for setting the non-default evolution operator.
@@ -174,16 +180,19 @@ class Coined(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
+        # create symmetric directed multigraph from input
+        sdmg = SDMultigraph(graph)
+
+        super().__init__(graph=sdmg)
+        self.hilb_dim = self._graph.number_of_arcs()
+
+        # Specific coined quantum walk attributes
         self._shift = None
         self._coin = None
         self._oracle_coin = []
-        super().__init__(graph=graph)
 
-        # Expects adjacency matrix with only 0 and 1 as entries
-        self.hilb_dim = self._graph.number_of_arcs()
-
+        # create static dicts
         if not bool(Coined._valid_kwargs):
-            # assign static attribute
             Coined._valid_kwargs = {
                 'shift': Coined._get_valid_kwargs(self._set_shift),
                 'coin': Coined._get_valid_kwargs(self._set_coin),
