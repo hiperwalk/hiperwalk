@@ -125,7 +125,6 @@ class SDMultigraph(Graph):
         However, for graphs containing loops, the 
         cardinality is incremented by one for each loop.
         """
-
-        return self._adj_matrix.sum()
+        return self.graph._adj_matrix.data[-1]
 
     # TODO: override self.graph methods
