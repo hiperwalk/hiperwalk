@@ -32,7 +32,7 @@ class SDMultigraph(Graph):
             The arc represented in ``(tail, head)`` notation.
         """
 
-        if self.graph.is_simple():
+        if self.is_underlying_simple():
             adj_matrix = self._adj_matrix
             head = adj_matrix.indices[number]
 
@@ -81,7 +81,7 @@ class SDMultigraph(Graph):
         >>> graph.arc_number((0, 1)) #arc as tuple
         0
         """
-        if self.graph.is_simple():
+        if self.is_underlying_simple():
             # if not hasattr(arc, '__iter__'):
             #     num_arcs = self.number_of_arcs()
             #     if arc < 0 and arc >= num_arcs:
@@ -90,11 +90,11 @@ class SDMultigraph(Graph):
             #                          + str(num_arcs - 1))
             #     return int(arc)
 
-            tail = self.graph.vertex_number(arc[0])
-            head = self.graph.vertex_number(arc[1])
+            tail = self.vertex_number(arc[0])
+            head = self.vertex_number(arc[1])
 
-            first_arc = self._adj_matrix.indptr[tail]
-            offset = self.graph._neighbor_index(tail, head)
+            first_arc = self.graph._adj_matrix.indptr[tail]
+            offset = self._neighbor_index(tail, head)
 
             return first_arc + offset
 
@@ -104,14 +104,14 @@ class SDMultigraph(Graph):
         r"""
         Return all arcs that have the given tail.
         """
-        tail = self._graph.vertex_number(tail)
+        tail = self.vertex_number(tail)
         indptr = self.graph._adj_matrix.indptr
 
-        if self.graph.is_simple():
+        if self.is_underlying_simple():
             indptr = self._adj_matrix.indptr
             return np.arange(indptr[tail], indptr[tail + 1])
 
-        data = self.graph.data
+        data = self.graph._adj_matrix.data
         first_arc = data[indptr[tail] - 1] if tail > 0 else 0
         last_arc = data[indptr[tail + 1] - 1]
         return np.arange(first_arc, last_arc)
@@ -127,4 +127,46 @@ class SDMultigraph(Graph):
         """
         return self.graph._adj_matrix.data[-1]
 
-    # TODO: override self.graph methods
+    def is_underlying_simple(self):
+        r"""
+        Return if the underlying (multi)graph is simple.
+        """
+        return self.graph.is_simple()
+
+    #####################################
+    ### Overriding self.graph methods ###
+    #####################################
+
+
+    def adjacent(self, u, v):
+        return self.graph.adjacent(u, v)
+
+    def _neighbor_index(self, vertex, neigh):
+        return self.graph._neighbor_index(vertex, neigh)
+
+    def neighbors(self, vertex):
+        return self.graph.neighbors(vertex)
+
+    def number_of_vertices(self):
+        return self.graph.number_of_vertices()
+
+    def number_of_edges(self):
+        r"""
+        Return number of edges of the underlying (multi)graph.
+        """
+        return self.graph.number_of_edges()
+
+    def degree(self, vertex):
+        return self.graph.degree()
+
+    def vertex_number(self, vertex):
+        return self.graph.vertex_number()
+
+    def laplacian_matrix(self):
+        return self.graph.laplacian_matrix()
+
+    def is_simple(self):
+        r"""
+        Directed multigraph is not simple
+        """
+        return False
