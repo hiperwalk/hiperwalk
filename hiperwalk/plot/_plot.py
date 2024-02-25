@@ -15,11 +15,11 @@ plt.rcParams["figure.figsize"] = (12, 10)
 plt.rcParams["figure.dpi"] = 100
 
 
-# TODO: add option for changing figsize and dpi
+# TODO: add option for changing dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
-        filename=None, interval=250, **kwargs):
+        filename=None, interval=250, figsize=None, **kwargs):
     """
     Plot the probability distributions of quantum walk states.
 
@@ -97,6 +97,9 @@ def plot_probability_distribution(
         If ``True``, each quantum walk step is used as an animation frame.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
+    figsize : tuple, default=None
+        Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
         Valid arguments depend on ``plot``.
@@ -197,6 +200,17 @@ def plot_probability_distribution(
     .. todo::
         probabilities expects numpy array or matrix
     """
+    # Figure size
+
+    fig_width = fig_height = None
+    if figsize is not None:
+        if len(figsize) == 2:
+            fig_width, fig_height = figsize
+        else:
+            raise ValueError(
+                'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+            )
+
     # passes kwargs by reference to be updated accordingly
 
     if 'graph' in kwargs:
@@ -256,7 +270,9 @@ def plot_probability_distribution(
         for i in range(len(probabilities)):
             # TODO: set figure size according to graph dimensions
             # TODO: check for kwargs
-            fig, ax = configs[plot](probabilities.shape[1]) 
+            fig, ax = configs[plot](probabilities.shape[1],
+                                    fig_width=fig_width,
+                                    fig_height=fig_height)
 
             plot_funcs[plot](probabilities[i], ax, **kwargs)
 
@@ -273,7 +289,9 @@ def plot_probability_distribution(
                 plt.show()
 
     else:
-        fig, ax = configs[plot](probabilities.shape[1]) 
+        fig, ax = configs[plot](probabilities.shape[1],
+                                fig_width=fig_width,
+                                fig_height=fig_height)
 
         if plot == 'plane':
             from functools import partial

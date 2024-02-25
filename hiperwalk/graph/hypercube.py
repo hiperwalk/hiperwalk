@@ -84,16 +84,14 @@ class Hypercube(Graph):
         try:
             direction = direction.bit_length() - 1
         except:
-            direction = np.log2(direction)
+            direction = int(np.log2(direction))
 
         if count != 1 or direction < 0 or direction >= self._dimension:
             raise ValueError("Arc " + str(arc) + " does not exist.")
 
         return direction
 
-    def arc_number(self, *args):
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
             return super().arc_number(arc)
 

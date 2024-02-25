@@ -1,9 +1,9 @@
 import numpy as np
 import scipy.sparse
-from .lattice import Lattice
+from .square_lattice import SquareLattice
 from warnings import warn
 
-class Grid(Lattice):
+class Grid(SquareLattice):
     r"""
     Two-dimensionsal grid.
 
@@ -354,9 +354,7 @@ class Grid(Lattice):
         return (y << 1) + x
 
 
-    def arc_number(self, *args):
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
             return super().arc_number(arc)
 

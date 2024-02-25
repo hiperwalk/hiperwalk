@@ -1,7 +1,7 @@
 from scipy.sparse import csr_array
-from .lattice import *
+from .square_lattice import *
 
-class Cycle(Lattice):
+class Cycle(SquareLattice):
     r"""
     Cycle graph.
 
@@ -44,9 +44,7 @@ class Cycle(Lattice):
         # initializing
         super().__init__(adj_matrix)
 
-    def arc_number(self, *args):
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
             return super().arc_number(arc)
 

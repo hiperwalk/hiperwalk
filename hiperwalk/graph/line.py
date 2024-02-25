@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.sparse import csr_array
 from sys import path as sys_path
-from .lattice import Lattice
+from .square_lattice import SquareLattice
 
-class Line(Lattice):
+class Line(SquareLattice):
     r"""
     Finite line graph (path graph).
 
@@ -55,9 +55,7 @@ class Line(Lattice):
         # initializing
         super().__init__(adj_matrix)
 
-    def arc_number(self, *args):
-        arc = (args[0], args[1]) if len(args) == 2 else args[0]
-
+    def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):
             return super().arc_number(arc)
 

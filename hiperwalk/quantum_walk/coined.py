@@ -3,6 +3,8 @@ import scipy
 import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
+#from ..graph import _sym_dir_multigraph
+from ..graph import SDMultigraph
 from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
 from scipy.linalg import hadamard, dft
 try:
@@ -28,8 +30,12 @@ class Coined(QuantumWalk):
     ----------
     graph
         Graph on which the quantum walk takes place.
-        It can be the graph itself (:class:`hiperwalk.graph.Graph`) or
-        its adjacency matrix (:class:`scipy.sparse.csr_array`).
+        Two types of entries are accepted:
+
+        * Simple graph (:class:`hiperwalk.graph.Graph`);
+        * Multigraph (:class:`hiperwalk.graph.Multigraph`);
+
+        A symmetric directed multigraph is created based on the input.
 
     **kwargs : optional
         Optional arguments for setting the non-default evolution operator.
@@ -57,6 +63,30 @@ class Coined(QuantumWalk):
     to determine the direction of the walker's movement 
     on a graph.
 
+    In the coined model, the graph is interpreted
+    as a directed graph as follows:
+    Each edge in :math:`G(V, E)` connecting two distinct vertices
+    translates into a pair of arcs in the directed graph
+    :math:`\vec{G}(V, \mathcal{A})`, where
+
+    .. math::
+        \begin{align*}
+            \mathcal{A} = \bigcup_{v_k v_\ell\, \in E} \{(v_k, v_\ell), (v_\ell, v_k)\}.
+        \end{align*}
+
+    .. note::
+        The arc ordering may change for graphs defined using specific classes.
+
+    Arcs are represented using either
+    the (tail,head) notation or numerical labels.
+    In the :obj:`Graph` class, the arc labels are ordered such that for two arcs,
+    :math:`(v_i, v_j)` and :math:`(v_k, v_\ell)`, with labels :math:`a_1` and
+    :math:`a_2` respectively, :math:`a_1 < a_2` if and only if :math:`i < k` or
+    (:math:`i = k` and :math:`j < \ell`).
+    Loops are depicted as single arcs,
+    affecting the dimension of the associated Hilbert space.
+    In coined quantum walks, the weights of arcs do not influence the dynamics.
+
     The computational basis is composed of the graph's arc set.
     For simple graphs, the cardinality of the computational
     basis is :math:`2|E|`, where :math:`E`
@@ -74,6 +104,67 @@ class Coined(QuantumWalk):
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
     found in the book  'Quantum Walks and Search Algorithms' [1]_.
 
+
+    For example, the graph :math:`G(V, E)` shown in
+    Figure 1 has an adjacency matrix ``adj_matrix``.
+
+    .. testsetup::
+
+        import numpy as np
+
+    >>> adj_matrix = np.array([
+    ...     [0, 1, 0, 0],
+    ...     [1, 0, 1, 1],
+    ...     [0, 1, 0, 1],
+    ...     [0, 1, 1, 0]])
+    >>> adj_matrix
+    array([[0, 1, 0, 0],
+           [1, 0, 1, 1],
+           [0, 1, 0, 1],
+           [0, 1, 1, 0]])
+
+    .. graphviz:: ../../graphviz/graph-example.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 1
+
+    The arcs of the associated digraph in the arc notation are
+
+    >>> arcs = [(i, j) for i in range(4)
+    ...                for j in range(4) if adj_matrix[i,j] == 1]
+    >>> arcs
+    [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
+
+    Note that ``arcs`` is already sorted, hence the associated
+    numeric labels are
+
+    >>> arcs_labels = {arcs[i]: i for i in range(len(arcs))}
+    >>> arcs_labels
+    {(0, 1): 0, (1, 0): 1, (1, 2): 2, (1, 3): 3, (2, 1): 4, (2, 3): 5, (3, 1): 6, (3, 2): 7}
+
+    The numeric labels are depicted in Figure 2.
+
+    .. graphviz:: ../../graphviz/graph-arcs.dot
+        :align: center
+        :layout: neato
+        :caption: Figure 2
+
+    If we insert the labels of the arcs into the adjacency matrix,
+    we obtain matrix ``adj_labels`` as follows:
+
+    >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
+    ...                                   else '' for j in range(4)]
+    ...               for i in range(4)]
+    >>> adj_labels = np.matrix(adj_labels)
+    >>> adj_labels
+    matrix([['', '0', '', ''],
+            ['1', '', '2', '3'],
+            ['', '4', '', '5'],
+            ['', '6', '7', '']], dtype='<U21')
+
+    Note that, intuitively,
+    the arcs are labeled in left-to-right and top-to-bottom fashion.
+
     References
     ----------
     .. [1] R. Portugal. "Quantum walks and search algorithms", 2nd edition,
@@ -89,16 +180,19 @@ class Coined(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
+        # create symmetric directed multigraph from input
+        sdmg = SDMultigraph(graph)
+
+        super().__init__(graph=sdmg)
+        self.hilb_dim = self._graph.number_of_arcs()
+
+        # Specific coined quantum walk attributes
         self._shift = None
         self._coin = None
         self._oracle_coin = []
-        super().__init__(graph=graph)
 
-        # Expects adjacency matrix with only 0 and 1 as entries
-        self.hilb_dim = self._graph.number_of_arcs()
-
+        # create static dicts
         if not bool(Coined._valid_kwargs):
-            # assign static attribute
             Coined._valid_kwargs = {
                 'shift': Coined._get_valid_kwargs(self._set_shift),
                 'coin': Coined._get_valid_kwargs(self._set_coin),
@@ -724,6 +818,8 @@ class Coined(QuantumWalk):
             def get_block(vertex):
                 g = self._graph
                 neighbors = g.neighbors(vertex)
+                # TODO: this technique wont work after the behavior of
+                # neighbors() change.
                 a1 = g.arc_number((vertex, neighbors[0]))
                 a2 = g.arc_number((vertex, neighbors[-1]))
                 # arc order may change
@@ -952,7 +1048,7 @@ class Coined(QuantumWalk):
 
         return prob
 
-    def state(self, *args):
+    def state(self, entries):
         """
         Generates a valid state.
 
@@ -963,11 +1059,10 @@ class Coined(QuantumWalk):
 
         Parameters
         ----------
-        *args
+        entries : list of entry
             Each entry is a tuple (or array).
-            An entry can be specified in three different ways:
-            ``(amplitude, (tail, head))``,
-            ``(amplitude, tail, head)``, and
+            An entry can be specified in two different ways:
+            ``(amplitude, (tail, head))``, and
             ``(amplitude, arc_number)``.
 
             amplitude
@@ -976,10 +1071,10 @@ class Coined(QuantumWalk):
                 The vertex corresponding to the position of the walker
                 in the superposition.
                 In other words, the tail of the arc.
+                The tuple ``(tail, head)`` must be a valid arc.
             head
                 The vertex to which the coin is pointing.
-                That is, the tuple
-                ``(tail, head)`` must be a valid arc.
+                The tuple ``(tail, head)`` must be a valid arc.
             arc_number
                 The numerical arc label with respect to the arc ordering
                 given by the computational basis.
@@ -1004,58 +1099,43 @@ class Coined(QuantumWalk):
             g = hpw.Grid((dim, dim))
             qw = hpw.Coined(graph=g)
 
-        >>> psi = qw.state((1, (0, 1)), [1, 1], (1, 2))
-        >>> psi1 = qw.state((1, ([0, 0], [1, 0])),
-        ...                 [[1, (0, dim - 1)],
+        >>> psi = qw.state([(1, (0, 1)), [1, 1], (1, 2)])
+        >>> psi1 = qw.state([(1, ([0, 0], [1, 0])),
+        ...                  [1, (0, dim - 1)],
         ...                  (1, [(0, 0), [0, 1]])])
         >>> psi2 = qw.state([(1, [0, 0], [1, 0]),
-        ...                  [1, 0, dim - 1]],
-        ...                 (1, (0, 0), [0, 1]))
+        ...                  [1, (0, dim - 1)],
+        ...                  (1, [(0, 0), [0, 1]])])
         >>> np.all(psi == psi1)
         True
         >>> np.all(psi1 == psi2)
         True
         """
-        if len(args) == 0:
+        if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
-        state = [0] * self.hilb_dim
+        state = np.zeros(self.hilb_dim)
 
-        def add_entry(entry):
-            ampl = entry[0]
-            arc = entry[1:]
-            if len(arc) == 1:
-                arc = arc[0]
+        for ampl, arc in entries:
             state[self._graph.arc_number(arc)] = ampl
 
-        for arg in args:
-            if hasattr(arg[0],'__iter__'):
-                for entry in arg:
-                    add_entry(entry)
-            else:
-                add_entry(arg)
-
-        state = np.array(state)
         return self._normalize(state)
 
-    def ket(self, *args):
+    def ket(self, arc):
         r"""
         Create a computational basis state.
 
         Parameters
         ----------
-        *args
+        arc: int or tuple of int
             The ket label.
-            There are three different labels acceptable.
+            There are two different labels acceptable.
 
             (tail, head)
                 The arc notation.
-            tail, head
-                The arc notation with ``tail`` and ``head`` as
-                separate arguments.
             arc_number
                 The label of the arc.
-                Its number according to the computational basis order.
+                The number according to the computational basis order.
 
         Examples
         --------
@@ -1063,7 +1143,7 @@ class Coined(QuantumWalk):
             valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
-        ket[self._graph.arc_number(*args)] = 1
+        ket[self._graph.arc_number(arc)] = 1
 
         return ket
 
