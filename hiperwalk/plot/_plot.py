@@ -1011,13 +1011,24 @@ def plot_success_probability(time, probabilities, figsize=(12, 10), **kwargs):
     plt.show()
 
 def plot_function(qw_iter, x_label, y_label, x_vals, function,
-                  *args, **kwargs):
+                  figsize=(12, 10), *args, **kwargs):
     # TODO: any situation where *y_args and **y_kwargs are iterable?
 
     # y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
     # plt.plot(x_arg, y_vals)
     # plt.show()
     #######################################
+    # Figure size
+
+    if len(figsize) == 2:
+        fig_width, fig_height = figsize
+    else:
+        raise ValueError(
+            'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+        )
+
+    _configure_figure(fig_width, fig_height)
+
     if hasattr(x_vals, '__iter__'):
         x_vals = iter(x_vals)
 
