@@ -97,8 +97,10 @@ def plot_probability_distribution(
         If ``True``, each quantum walk step is used as an animation frame.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
-    figsize : tuple, default=None
+    figsize : tuple, default=(12, 10)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+    dpi : float, default=100
+        Figure resolution in dots-per-inch.
 
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
@@ -973,6 +975,10 @@ def plot_success_probability(time, probabilities, figsize=(12, 10), dpi=100, **k
         Success probabilities with respect to ``time``,
         such that ``probabilities[i]`` corresponds to ``i``-th
         timestamp described by ``time``.
+    figsize : tuple, default=(12, 10)
+        Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+    dpi : float, default=100
+        Figure resolution in dots-per-inch.
 
     **kwargs:
         Additional arguments to customize plot.
