@@ -10,12 +10,6 @@ from matplotlib.animation import FuncAnimation
 if __DEBUG__:
     from time import time
 
-# TODO: move to constants
-plt.rcParams["figure.figsize"] = (12, 10)
-plt.rcParams["figure.dpi"] = 100
-
-
-# TODO: add option for changing dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
