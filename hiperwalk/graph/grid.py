@@ -1,7 +1,6 @@
 import numpy as np
 import scipy.sparse
 from .square_lattice import SquareLattice
-from warnings import warn
 
 class Grid(SquareLattice):
     r"""
