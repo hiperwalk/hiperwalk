@@ -77,7 +77,9 @@ class Graph():
         If the user wishes to keep the original ``adj_matrix``,
         the argument ``copy`` must be set to ``True``.
 
-
+    .. todo::
+        check if it is more efficient to store adj_matrix as numpy array.
+        Add numpy array manipulation
 
     The treatment of the graph depends on the quantum walk model. 
     .. todo::
