@@ -41,16 +41,16 @@ def __generate_valid_basis(euc_dim, basis=None):
 
     if len(basis.shape) == 1:
         # generate standard basis
-        _basis = np.zeros((basis.shape[0], euc_dim), dtype=np.int8)
+        basis = np.zeros((basis.shape[0], euc_dim), dtype=np.int8)
 
         for i in range(basis.shape[0]):
             entry = basis[i]
             positive = entry > 0
             entry = entry if positive else -entry
             entry = entry - 1
-            _basis[i, entry] = 1 if positive else - 1
+            basis[i, entry] = 1 if positive else - 1
 
-    return _basis
+    return basis
 
 def __create_adj_matrix(graph):
     num_vert = graph.number_of_vertices()
@@ -170,12 +170,29 @@ def vertex_coordinates(self, vertex):
 
     return coordinates
 
+def dimensions(self):
+    return self._dim
+
+def neighbors(self, vertex):
+    v_num = self.vertex_number(vertex)
+    start = self._adj_matrix.indptr[v_num]
+    end = self._adj_matrix.indptr[v_num + 1]
+    neighs = self._adj_matrix.indices[start:end]
+
+    if hasattr(vertex, '__iter__'):
+        neighs = np.array([self.vertex_coordinates(n) for n in neighs],
+                           dtype=neighs.dtype)
+
+    return neighs
+
 def SquareLattice(dim, basis=None, periodic=True,
                   weights=None, multiedges=None):
-
     r"""
     TODO docs
     """
+    if weights is not None or multiedges is not None:
+        raise NotImplementedError()
+
     if not hasattr(dim, '__iter__'):
         dim = [dim]
     dim = np.array(dim)
@@ -196,6 +213,7 @@ def SquareLattice(dim, basis=None, periodic=True,
     g.__valid_vertex = MethodType(__valid_vertex, g)
     g.vertex_number = MethodType(vertex_number, g)
     g.vertex_coordinates = MethodType(vertex_coordinates, g)
+    g.dimensions = MethodType(dimensions, g)
 
     #create adjacency matrix
     g._adj_matrix = __create_adj_matrix(g)
