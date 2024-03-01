@@ -2,7 +2,7 @@ from .graph import *
 from .square_lattice import *
 from .cycle import *
 from .line import *
-from .grid import *
+from .grid import Grid
 from .hypercube import Hypercube
 from .complete import *
 from .complete_bipartite import *
