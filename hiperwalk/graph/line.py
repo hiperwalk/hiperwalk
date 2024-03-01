@@ -1,9 +1,9 @@
 import numpy as np
 from scipy.sparse import csr_array
-from sys import path as sys_path
+from .graph import Graph
 from .square_lattice import SquareLattice
 
-class Line(SquareLattice):
+class Line(Graph):
     r"""
     Finite line graph (path graph).
 

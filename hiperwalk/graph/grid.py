@@ -1,8 +1,9 @@
 import numpy as np
 import scipy.sparse
+from .graph import Graph
 from .square_lattice import SquareLattice
 
-class Grid(SquareLattice):
+class Grid(Graph):
     r"""
     Two-dimensionsal grid.
 

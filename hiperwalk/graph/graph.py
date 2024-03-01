@@ -115,11 +115,8 @@ class Graph():
         # if adj_matrix.has_sorted_index, probably scipy is more efficient.
         # if indices are not sorted, scipy probably does a linear search,
         # and a graph-dependent implementation may be more efficient.
-        try:
-            u = self.vertex_number(u)
-            v = self.vertex_number(v)
-        except ValueError:
-            return False # u or v is not a valid vertex
+        u = self.vertex_number(u)
+        v = self.vertex_number(v)
         A = self._adj_matrix
         return v in A.indices[A[u]:A[u+1]]
 
