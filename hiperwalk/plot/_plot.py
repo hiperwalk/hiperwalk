@@ -446,7 +446,7 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes(kwargs['graph'], probabilities, kwargs)
 
 
-def _configure_figure(fig_width=None, fig_height=None, dpi=100):
+def _configure_figure(fig_width, fig_height, dpi):
     """
     Set basic figure configuration.
 
@@ -479,7 +479,7 @@ def _configure_figure(fig_width=None, fig_height=None, dpi=100):
     return fig, ax
 
 
-def _configure_plot_figure(fig_width=None, fig_height=None, dpi=100):
+def _configure_plot_figure(fig_width, fig_height, dpi):
     """
     Set basic figure configuration for matplotlib plots.
     """
@@ -494,14 +494,14 @@ def _configure_plot_figure(fig_width=None, fig_height=None, dpi=100):
     return fig, ax
 
 
-def _configure_graph_figure(fig_width=None,
-                            fig_height=None,
-                            dpi=100):
+def _configure_graph_figure(fig_width,
+                            fig_height,
+                            dpi):
     return _configure_figure(fig_width, fig_height, dpi)
 
-def _configure_plane_figure(fig_width=None,
-                           fig_height=None,
-                           dpi=100):
+def _configure_plane_figure(fig_width,
+                            fig_height,
+                            dpi):
     if fig_width is None:
         fig_width = plt.rcParams["figure.figsize"][0]
     if fig_height is None:
