@@ -65,7 +65,7 @@ def __create_adj_matrix(graph):
                           for i in range(len(graph._basis))])
 
         if not graph._periodic:
-            adj = [graph.__valid_vertex(n, raise_exception=False)
+            adj = [graph._valid_vertex(n, exception=False)
                    for n in neigh]
             neigh = neigh[adj]
 
@@ -82,11 +82,11 @@ def __create_adj_matrix(graph):
     adj_matrix = csr_array((data, indices, indptr), copy=False)
     return adj_matrix
 
-def __valid_vertex(self, vertex, raise_exception=False):
+def _valid_vertex(self, vertex, exception=False):
     try:
         # coordinates
         if len(vertex) != self._euc_dim:
-            if not raise_exception:
+            if not exception:
                 return False
             raise ValueError("Vertex is not a "
                              + str(self._euc_dim)
@@ -97,7 +97,7 @@ def __valid_vertex(self, vertex, raise_exception=False):
 
         for i in range(self._euc_dim):
             if vertex[i] < 0 or vertex[i] >= self._dim[i]:
-                if not raise_exception:
+                if not exception:
                     return False
                 raise ValueError("Inexistent vertex"
                                  + str(vertex) + ". "
@@ -106,19 +106,19 @@ def __valid_vertex(self, vertex, raise_exception=False):
     except TypeError:
         # number
         if vertex < 0 or vertex >= self.number_of_vertices():
-            if not raise_exception:
+            if not exception:
                 return False
             raise ValueError("Inexistent vertex " + str(vertex))
 
     return True
 
 def vertex_number(self, coordinates):
-    self.__valid_vertex(coordinates, raise_exception=True)
+    self._valid_vertex(coordinates, exception=True)
     # number
     try:
         len(coordinates)
     except TypeError:
-        return number
+        return coordinates
 
     # coordinates
     dim = self._dim
@@ -134,7 +134,7 @@ def vertex_number(self, coordinates):
     return number
 
 def vertex_coordinates(self, vertex):
-    self.__valid_vertex(vertex, raise_exception=True)
+    self._valid_vertex(vertex, exception=True)
 
     dim = self._dim.copy()
 
@@ -210,7 +210,7 @@ def SquareLattice(dim, basis=None, periodic=True,
     g._basis = __generate_valid_basis(g._euc_dim, basis)
 
     # bind methods before updating adjacency matrix
-    g.__valid_vertex = MethodType(__valid_vertex, g)
+    g._valid_vertex = MethodType(_valid_vertex, g)
     g.vertex_number = MethodType(vertex_number, g)
     g.vertex_coordinates = MethodType(vertex_coordinates, g)
     g.dimensions = MethodType(dimensions, g)
