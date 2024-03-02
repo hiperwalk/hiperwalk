@@ -26,7 +26,7 @@ def __degree(self, vertex):
 def __number_of_vertices(self):
     return 1 << self._dim
 
-def __number_of_edge(self):
+def __number_of_edges(self):
     return 1 << (self._dim - 1) * self._dim
 
 def __degree(self, vertex):
@@ -112,6 +112,7 @@ def Hypercube(dim, weights=None, multiedges=None):
     g._neighbor_index = MethodType(__neighbor_index, g)
     g.degree = MethodType(__degree, g)
     g.number_of_vertices = MethodType(__number_of_vertices, g)
+    g.number_of_edges = MethodType(__number_of_edges, g)
     g.degree = MethodType(__degree, g)
     g.dimension = MethodType(__dimension, g)
 
