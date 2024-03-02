@@ -271,7 +271,7 @@ class Coined(QuantumWalk):
         directions such as left, right, up, and down
         can be referred to naturally.
         """
-        return 'previous_arc' in dir(self._graph)
+        return self._graph.previous_arc(0) is not None
 
     def _set_persistent_shift(self):
         r"""
@@ -334,7 +334,7 @@ class Coined(QuantumWalk):
         try:
             shift[0][0] #if this works, then shift is numpy or list of list
             # convert to sparse
-            shift = scipy.sparse(shift)
+            shift = scipy.sparse.csr_array(shift)
         except NotImplementedError:
             # already sparse
             pass

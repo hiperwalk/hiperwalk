@@ -2,60 +2,6 @@ from numpy import array as np_array
 from .square_lattice import SquareLattice
 from types import MethodType
 
-def vertex_coordinates(self, label):
-    r"""
-    Returns vertex (x, y)-coordinates given its label.
-
-    Parameters
-    ----------
-    label : int
-        Vertex label.
-
-    Returns
-    -------
-    x : int
-        Vertex X-coordinate.
-    y : int
-        Vertex Y-coordinate.
-
-    See Also
-    --------
-    vertex_number
-    """
-    return (label % self._dim[0], label // self._dim[0])
-
-def vertex_number(self, vertex):
-    r"""
-    Returns vertex number given any vertex representation.
-
-    By invoking this method,
-    the vertex number is returned regardless of its representation.
-    The representation may be the vertex number itself or
-    the vertex coordinates.
-
-    Parameters
-    ----------
-    vertex: int or tuple of int
-        * int :
-            The vertex number.
-        * (int, int):
-            The vertex coordinates in ``(x, y)`` format.
-
-    Returns
-    -------
-    int
-        Vertex label.
-
-    See Also
-    --------
-    vertex_coordinates
-    """
-    if not hasattr(vertex, '__iter__'):
-        return vertex
-
-    x, y = vertex
-    return (x + self._dim[0]*y) % self.number_of_vertices()
-
 def _neighbor_index(self, vertex, neigh):
     r"""
     Return arc direction.
@@ -292,8 +238,7 @@ def Grid(dim, periodic=True, diagonal=False,
                           [-1, 1], [-1, -1]])
 
     g = SquareLattice(dim, basis, periodic, weights, multiedges)
-    g.vertex_coordinates = MethodType(vertex_coordinates, g)
-    g.vertex_number = MethodType(vertex_number, g)
     g._neighbor_index = MethodType(_neighbor_index, g)
+    g.diagonal = diagonal
 
     return g
