@@ -41,14 +41,16 @@ def __generate_valid_basis(euc_dim, basis=None):
 
     if len(basis.shape) == 1:
         # generate standard basis
-        basis = np.zeros((basis.shape[0], euc_dim), dtype=np.int8)
+        valid_basis = np.zeros((basis.shape[0], euc_dim), dtype=np.int8)
 
         for i in range(basis.shape[0]):
             entry = basis[i]
             positive = entry > 0
             entry = entry if positive else -entry
             entry = entry - 1
-            basis[i, entry] = 1 if positive else - 1
+            valid_basis[i, entry] = 1 if positive else - 1
+
+        basis = valid_basis
 
     return basis
 
