@@ -27,7 +27,7 @@ def __number_of_vertices(self):
     return 1 << self._dim
 
 def __number_of_edges(self):
-    return 1 << (self._dim - 1) * self._dim
+    return (1 << (self._dim - 1)) * self._dim
 
 def __degree(self, vertex):
     return self._dim
