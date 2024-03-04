@@ -1,5 +1,5 @@
 import numpy as np
-from .graph import Graph, _interval_binary_search
+from .graph import Graph
 
 class SDMultigraph(Graph):
     r"""
@@ -12,7 +12,6 @@ class SDMultigraph(Graph):
     def __init__(self, graph):
         # underlying multigraph
         self.graph = graph
-        # TODO: different behavior if graph is simple or multigraph
 
     def arc(self, number):
         r"""
@@ -32,17 +31,11 @@ class SDMultigraph(Graph):
         (int, int)
             The arc represented in ``(tail, head)`` notation.
         """
-
         if self.is_underlying_simple():
-            adj_matrix = self.graph._adj_matrix
+            return self.graph._find_entry(number)
 
-            head = adj_matrix.indices[number]
-            tail = _interval_binary_search(adj_matrix.indptr, number)
-
-            return (tail, head)
-
-        raise NotImplementedError("arc() for multigraphs")
-        # Use interval_binary_search
+        # multiarc
+        raise NotImplementedError()
 
     def arc_number(self, arc):
         r"""
