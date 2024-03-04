@@ -43,7 +43,7 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
     It is used to improve the time complexity of the search process.
     """
     if elem < v[start]:
-        raise ValueError("The element is less than"
+        raise ValueError("The element is less than "
                          + "the minimum value in the array.")
     
     if end is None:
@@ -156,10 +156,38 @@ class Graph():
         # if adj_matrix.has_sorted_index, probably scipy is more efficient.
         # if indices are not sorted, scipy probably does a linear search,
         # and a graph-dependent implementation may be more efficient.
+        # If adj_matrix.has_sorted_index and
+        # scipy does not do binary search, implement it.
+
+        # this function is reimplemented because data=None
+        # to use less memory
         u = self.vertex_number(u)
         v = self.vertex_number(v)
         A = self._adj_matrix
+
+        if has_sorted_indices(A):
+            i = self._binary_search(A.indices, v, start=A[u],
+                                    end=A[u + 1])
+            return i != -1
+
         return v in A.indices[A[u]:A[u+1]]
+
+    def _find_entry(self, entry):
+        r"""
+        Find the corresponding line and columns of the given entry.
+
+        Notes
+        -----
+        The adjacency matrix is not stored as a list of 1's.
+        Instead, each entry represents the number of ones up
+        to that point.
+        """
+        adj_matrix = self._adj_matrix
+
+        head = adj_matrix.indices[entry]
+        tail = _interval_binary_search(adj_matrix.indptr, entry)
+
+        return (tail, head)
 
     def _neighbor_index(self, vertex, neigh):
         r"""
