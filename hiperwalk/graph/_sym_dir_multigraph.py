@@ -1,4 +1,5 @@
-from .graph import *
+import numpy as np
+from .graph import Graph, _interval_binary_search
 
 class SDMultigraph(Graph):
     r"""
@@ -34,14 +35,10 @@ class SDMultigraph(Graph):
 
         if self.is_underlying_simple():
             adj_matrix = self.graph._adj_matrix
+
             head = adj_matrix.indices[number]
+            tail = _interval_binary_search(adj_matrix.indptr, number)
 
-            from warnings import warn
-            warn("Use interval_binary_search")
-
-            for tail in range(len(adj_matrix.indptr)):
-                if adj_matrix.indptr[tail + 1] > number:
-                    break
             return (tail, head)
 
         raise NotImplementedError("arc() for multigraphs")
@@ -126,7 +123,7 @@ class SDMultigraph(Graph):
         cardinality is incremented by one for each loop.
         """
         if self.is_underlying_simple():
-            return self.number_of_edges() << 1
+            return self.graph._adj_matrix.indptr[-1]
 
         return self.graph._adj_matrix.data[-1]
 
