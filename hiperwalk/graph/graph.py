@@ -26,16 +26,25 @@ def _binary_search(v, elem, start=0, end=None):
 
 def _interval_binary_search(v, elem, start = 0, end = None) -> int:
     r"""
-    This function expects a sorted array and performs a binary search on the subarray
-    v[start:end], looking for the interval with minimum length that contains the element.
-    If the element is greater or equal than the element of index i and less than the element of index i+1, the function returns i.
-    If the element is less than the minimum value in the array, the function raises a ValueError.
-    If the element is greater or equal than the maximum value in the array, the function returns the index of the maximum value.
-    If, for some reason, the element is not found, the function returns -1.
+    This function expects a sorted array and performs a
+    binary search on the subarray v[start:end],
+    looking for the interval with minimum length that
+    contains the element.
+    If the element is greater or equal than the element of index i
+    and less than the element of index i+1,
+    the function returns i.
+    If the element is less than the minimum value in the array,
+    the function raises a ValueError.
+    If the element is greater or equal than the maximum
+    value in the array,
+    the function returns the index of the maximum value.
+    If, for some reason, the element is not found,
+    the function returns -1.
     It is used to improve the time complexity of the search process.
     """
     if elem < v[start]:
-        raise ValueError("The element is less than the minimum value in the array.")
+        raise ValueError("The element is less than"
+                         + "the minimum value in the array.")
     
     if end is None:
         end = len(v)
