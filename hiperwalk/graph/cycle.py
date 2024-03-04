@@ -1,7 +1,8 @@
 from scipy.sparse import csr_array
-from .square_lattice import *
+from .graph import Graph
+from .square_lattice import SquareLattice
 
-class Cycle(SquareLattice):
+class Cycle(Graph):
     r"""
     Cycle graph.
 
@@ -33,16 +34,22 @@ class Cycle(SquareLattice):
         # Creating adjacency matrix
         # Every vertex is adjacent to two vertices.
         data = np.ones(2*num_vert, dtype=np.int8)
-        # upper diagonal
-        row_ind = [lin for lin in range(num_vert)
-                       for twice in range(2)]
-        # lower digonal
-        col_ind = [(col-shift) % num_vert for col in range(num_vert)
-                             for shift in [-1, 1]]
-        adj_matrix = csr_array((data, (row_ind, col_ind)))
+        indptr = 2*np.arange(num_vert + 1)
+
+        indices = np.zeros(len(data))
+        right = 1
+        left = num_vert - 1
+        for i in range(num_vert):
+            indices[2*i] = right
+            indices[2*i + 1] = left
+            right = (right + 1) % num_vert
+            left = (left + 1) % num_vert
+
+        adj_matrix = csr_array((data, indices, indptr))
+        self._adj_matrix = adj_matrix
     
         # initializing
-        super().__init__(adj_matrix)
+        #super().__init__(adj_matrix)
 
     def arc_number(self, arc):
         if not hasattr(arc, '__iter__'):

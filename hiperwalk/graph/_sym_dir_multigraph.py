@@ -33,7 +33,7 @@ class SDMultigraph(Graph):
         """
 
         if self.is_underlying_simple():
-            adj_matrix = self._adj_matrix
+            adj_matrix = self.graph._adj_matrix
             head = adj_matrix.indices[number]
 
             from warnings import warn
@@ -173,3 +173,22 @@ class SDMultigraph(Graph):
         Directed multigraph is not simple
         """
         return False
+
+    def previous_arc(self, arc):
+        g = self.graph
+
+        if (not g.is_simple() or not hasattr(g, '_basis')):
+            return None
+
+        arc = self.arc(arc)
+
+        tail = g.vertex_coordinates(arc[0])
+        head = g.vertex_coordinates(arc[1])
+        direction = head - tail
+
+        prev_head = tail
+        prev_tail = tail - direction
+        if not g._valid_vertex(prev_tail, exception=False):
+            prev_tail = head
+
+        return self.arc_number((prev_tail, prev_head))

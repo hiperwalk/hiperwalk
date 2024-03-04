@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.sparse import issparse, csr_array, diags
+from .._constants import __DEBUG__
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -76,7 +77,9 @@ class Graph():
         If the user wishes to keep the original ``adj_matrix``,
         the argument ``copy`` must be set to ``True``.
 
-
+    .. todo::
+        check if it is more efficient to store adj_matrix as numpy array.
+        Add numpy array manipulation
 
     The treatment of the graph depends on the quantum walk model. 
     .. todo::
@@ -112,11 +115,8 @@ class Graph():
         # if adj_matrix.has_sorted_index, probably scipy is more efficient.
         # if indices are not sorted, scipy probably does a linear search,
         # and a graph-dependent implementation may be more efficient.
-        try:
-            u = self.vertex_number(u)
-            v = self.vertex_number(v)
-        except ValueError:
-            return False # u or v is not a valid vertex
+        u = self.vertex_number(u)
+        v = self.vertex_number(v)
         A = self._adj_matrix
         return v in A.indices[A[u]:A[u+1]]
 
@@ -149,9 +149,12 @@ class Graph():
             return index - start
 
         # indices is not in ascending order
-        for i in range(start, end):
-            if adj_matrix.indices[i] == neigh:
-                return i - start
+        for index in range(start, end):
+            if adj_matrix.indices[index] == neigh:
+                return index - start
+
+        raise ValueError("Vertices " + str(vertex) + " and "
+                         + str(neigh) + " are not adjacent.")
 
     def neighbors(self, vertex):
         r"""

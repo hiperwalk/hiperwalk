@@ -351,33 +351,39 @@ def _default_graph_kwargs(kwargs, plot):
 
     graph = kwargs['graph']
 
-    # hiperwalk graph
-    if isinstance(graph, Grid):
+    # Hiperwalk Grid
+    if hasattr(graph, '_euc_dim') and graph._euc_dim == 2:
         if plot is None:
             plot = 'plane'
         if plot == 'plane' and 'dimensions' not in kwargs:
             kwargs['dimensions'] = graph.dimensions()
         return plot
 
-    if isinstance(graph, Hypercube):
-        if plot is None:
-            plot = 'graph'
+    # Hiperwalk Hypercube
+    is_hypercube = False
+    try:
+        is_hypercube = graph.degree(0) == graph.dimension()
+    except AttributeError:
+        pass
 
-            nx_graph = nx.from_scipy_sparse_array(graph.adjacency_matrix())
-            for v in nx_graph:
-                try:
-                    nx_graph.nodes[v]["subset"] = v.bit_count()
-                except AttributeError:
-                    nx_graph.nodes[v]["subset"] = bin(v).count('1')
+    if is_hypercube and plot is None:
+        plot = 'graph'
 
-            kwargs['pos'] = nx.multipartite_layout(nx_graph)
-            dim = graph.dimension()
-            kwargs['graph'] = nx_graph
-            kwargs['edge_color'] = (0, 0, 0, max(0.002, 2**(-dim/2)))
-            kwargs['labels'] = {0: 0, 2**dim - 1 : 2**dim - 1}
-            kwargs['min_node_size'] = 1
-            kwargs['max_node_size'] = 1000
-            kwargs['edgecolors'] = None
+        nx_graph = nx.from_scipy_sparse_array(graph.adjacency_matrix())
+        for v in nx_graph:
+            try:
+                nx_graph.nodes[v]["subset"] = v.bit_count()
+            except AttributeError:
+                nx_graph.nodes[v]["subset"] = bin(v).count('1')
+
+        kwargs['pos'] = nx.multipartite_layout(nx_graph)
+        dim = graph.dimension()
+        kwargs['graph'] = nx_graph
+        kwargs['edge_color'] = (0, 0, 0, max(0.002, 2**(-dim/2)))
+        kwargs['labels'] = {0: 0, 2**dim - 1 : 2**dim - 1}
+        kwargs['min_node_size'] = 1
+        kwargs['max_node_size'] = 1000
+        kwargs['edgecolors'] = None
 
     return 'graph' if plot is None else plot
 

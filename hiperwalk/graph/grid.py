@@ -1,9 +1,62 @@
-import numpy as np
-import scipy.sparse
+from numpy import array as np_array
 from .square_lattice import SquareLattice
-from warnings import warn
+from types import MethodType
 
-class Grid(SquareLattice):
+def _neighbor_index(self, vertex, neigh):
+    r"""
+    Return arc direction.
+
+    Parameters
+    ----------
+    arc
+        Any of the following notations are acceptable.
+        
+        * ((int, int), (int, int))
+            Arc notation with vertices' coordinates.
+        * (int, int)
+            Arc notation with vertices' labels.
+        * int
+            Arc label.
+
+    Returns
+    -------
+    int
+        If natural (not diagonal) grid:
+            * 0: right
+            * 1: left
+            * 2: up
+            * 3: down
+
+        If diagonal grid:
+            * 0: right, up
+            * 1: right, down
+            * 2: left, up
+            * 3: left, down
+
+    Notes
+    -----
+    Does not check if arc exists.
+    """
+    # dealing with coordinates
+    vertex = self.vertex_coordinates(vertex)
+    neigh = self.vertex_coordinates(neigh)
+
+    if self.diagonal:
+        x_diff = neigh[0] - vertex[0]
+        y_diff = neigh[1] - vertex[1]
+        x = 0 if (x_diff == 1 or x_diff == -self._dim[0] + 1) else 1
+        y = 0 if (y_diff == 1 or y_diff == -self._dim[1] + 1) else 1
+        return (x << 1) + y
+
+    y = vertex[1] != neigh[1]
+    x = ((vertex[1] - neigh[1]) % self._dim[1] == 1
+         if y else
+         (vertex[0] - neigh[0]) % self._dim[0] == 1)
+
+    return (y << 1) + x
+
+def Grid(dim, periodic=True, diagonal=False,
+         weights=None, multiedges=None):
     r"""
     Two-dimensionsal grid.
 
@@ -19,7 +72,7 @@ class Grid(SquareLattice):
     Parameters
     ----------
     dimensions : int or tuple of int
-        Grid dimensions in ``(x_dim, y_dim)`` format.
+        Grid dimensions in ``(_dim[0], _dim[1])`` format.
         If ``dimensions`` is an integer, creates a square grid.
 
     periodic : bool, default=True
@@ -169,427 +222,23 @@ class Grid(SquareLattice):
             :name: fig-even-dim-diagonal
             :caption: Figure: 4x4-grid with cyclic boundary conditions.
     """
-    def __init__(self, dimensions, periodic=True, diagonal=False):
-        try:
-            x_dim, y_dim = dimensions
-        except TypeError:
-            x_dim = y_dim = dimensions
-
-        num_vert = x_dim * y_dim
-        num_arcs = (4*num_vert if periodic
-                    else 4*num_vert - 2*(x_dim + y_dim))
-        num_edges = num_arcs >> 1
-
-        data = np.ones(num_arcs, np.int8)
-        indptr = np.zeros(num_vert + 1)
-        indices = np.zeros(num_arcs)
-        arc_count = 0
-
-        if not periodic and not diagonal:
-            for v in range(num_vert):
-                #indptr
-                indptr[v + 1] = indptr[v] + 4
-                x = v % x_dim
-                y = v // x_dim
-                if x == 0 or x == x_dim - 1:
-                    indptr[v + 1] -= 1
-                if y == 0 or y == y_dim - 1:
-                    indptr[v + 1] -= 1
-
-                #indices
-                for coin in [3, 1, 0, 2]: #stay in order
-                    head = v + (-1)**(coin % 2) * x_dim**(coin // 2)
-
-                    if (head >= 0 and head < num_vert
-                        and not (head % x_dim == 0 and head - v == 1)
-                        and not (v % x_dim == 0 and v - head == 1)
-                    ):
-                        indices[arc_count] = head
-                        arc_count += 1
-
-        if not periodic and diagonal:
-            raise NotImplementedError
-
-        if periodic:
-            indptr = np.arange(0, num_arcs + 1, 4)
-
-            for v in range(num_vert):
-                cols = (np.array(
-                            [v - v % x_dim
-                             + (v % x_dim + (-1)**(coin % 2)) % x_dim
-                             if coin < 2 else
-                             (v + x_dim*(-1)**(coin % 2)) % num_vert
-                             for coin in range(4)])
-                        if not diagonal
-                        else np.array(
-                            [((v % x_dim + (-1)**(coin // 2)) % x_dim
-                              + x_dim*(v // x_dim + (-1)**(coin % 2)))
-                             % num_vert
-                             for coin in range(4)]))
-                indices[arc_count:arc_count + 4] = cols
-                arc_count += 4
-
-            # TODO: use spdiags
-
-        adj_matrix = scipy.sparse.csr_array((data, indices, indptr),
-                                            shape=(num_vert, num_vert))
-        super().__init__(adj_matrix)
-        self.x_dim = x_dim
-        self.y_dim = y_dim
-        self.periodic = periodic
-        self.diagonal = diagonal
-
-    def vertex_coordinates(self, label):
-        r"""
-        Returns vertex (x, y)-coordinates given its label.
-
-        Parameters
-        ----------
-        label : int
-            Vertex label.
-
-        Returns
-        -------
-        x : int
-            Vertex X-coordinate.
-        y : int
-            Vertex Y-coordinate.
-
-        See Also
-        --------
-        vertex_number
-        """
-        return (label % self.x_dim, label // self.x_dim)
-
-
-    def vertex_number(self, vertex):
-        r"""
-        Returns vertex number given any vertex representation.
-
-        By invoking this method,
-        the vertex number is returned regardless of its representation.
-        The representation may be the vertex number itself or
-        the vertex coordinates.
-
-        Parameters
-        ----------
-        vertex: int or tuple of int
-            * int :
-                The vertex number.
-            * (int, int):
-                The vertex coordinates in ``(x, y)`` format.
-
-        Returns
-        -------
-        int
-            Vertex label.
-
-        See Also
-        --------
-        vertex_coordinates
-        """
-        if not hasattr(vertex, '__iter__'):
-            return super().vertex_number(vertex)
-
-        x, y = vertex
-        return (x + self.x_dim*y) % self.number_of_vertices()
-
-    def arc_direction(self, arc):
-        r"""
-        Return arc direction.
-
-        Parameters
-        ----------
-        arc
-            Any of the following notations are acceptable.
-            
-            * ((int, int), (int, int))
-                Arc notation with vertices' coordinates.
-            * (int, int)
-                Arc notation with vertices' labels.
-            * int
-                Arc label.
-
-        Returns
-        -------
-        int
-            If natural (not diagonal) grid:
-                * 0: right
-                * 1: left
-                * 2: up
-                * 3: down
-
-            If diagonal grid:
-                * 0: right, up
-                * 1: right, down
-                * 2: left, up
-                * 3: left, down
-
-        Notes
-        -----
-        Does not check if arc exists.
-        """
-        # dealing with coordinates
-        try:
-            tail, head = arc
-            if not hasattr(tail, '__iter__'):
-                tail = self.vertex_coordinates(tail)
-            if not hasattr(head, '__iter__'):
-                head = self.vertex_coordinates(head)
-        except TypeError:
-            tail, head = self.arc(arc)
-
-        if self.diagonal:
-            x_diff = head[0] - tail[0]
-            y_diff = head[1] - tail[1]
-            x = 0 if (x_diff == 1 or x_diff == -self.x_dim + 1) else 1
-            y = 0 if (y_diff == 1 or y_diff == -self.y_dim + 1) else 1
-            return (x << 1) + y
-
-        y = tail[1] != head[1]
-        x = ((tail[1] - head[1]) % self.y_dim == 1
-             if y else
-             (tail[0] - head[0]) % self.x_dim == 1)
-
-        return (y << 1) + x
-
-
-    def arc_number(self, arc):
-        if not hasattr(arc, '__iter__'):
-            return super().arc_number(arc)
-
-        tail, head = arc
-        tail = self.vertex_number(tail)
-        head = self.vertex_number(head)
-
-        if self._adj_matrix[tail, head] == 0:
-            raise ValueError('Inexistent arc ' + str((tail, head)) + '.')
-
-        if self.periodic:
-            return 4*tail + self.arc_direction((tail, head))
-
-        label = self._adj_matrix.indptr[tail]
-        direction = self.arc_direction((tail, head))
-        if self.diagonal:
-            raise NotImplementedError
-
-        sub_x = (1 if ((tail % self.x_dim == 0
-                        or tail % self.x_dim == self.x_dim - 1)
-                       and direction > 0)
-                 else 0)
-            
-        sub_y = (1 if ((tail // self.x_dim == 0
-                        or tail // self.x_dim == self.x_dim - 1)
-                       and direction > 2)
-                 else 0)
-        return label + direction - sub_x - sub_y
-
-    def arc(self, number, coordinates=True):
-        r"""
-        Arc in arc notation.
-
-        Given the numerical arc label,
-        returns the arc in the ``(tail, head)`` notation.
-
-        Parameters
-        ----------
-        number : int
-            Numerical arc label.
-
-        coordinates : bool, default=True
-            Whether the vertices are returned as coordinates or as
-            a single number.
-
-        Returns
-        -------
-        (tail, head)
-            There are two possible formats for the vertices
-            ``tail`` and ``head``.
-
-            (vertex_x, vertex_y) : (int, int)
-                If ``coordinates=True``.
-            number : int
-                If ``coordinates=False``.
-        """
-        if not self.periodic and self.diagonal:
-            raise NotImplementedError
-
-        if self.periodic:
-            tail = number // 4
-            coin = number % 4
-            num_vert = self.number_of_vertices()
-            x_dim = self.x_dim
-            if self.diagonal:
-                head = (((tail % x_dim + (-1)**(coin // 2)) % x_dim
-                          + x_dim*(tail // x_dim + (-1)**(coin % 2)))
-                        % num_vert)
-            else:
-                head = (tail - tail % x_dim
-                        + (tail % x_dim + (-1)**(coin % 2)) % x_dim
-                        if coin < 2 else
-                        (tail + x_dim*(-1)**(coin % 2)) % num_vert)
-
-        else:
-            # not diagonal
-            tail, _ = super().arc(number)
-            diff = number - self._adj_matrix.indptr[tail]
-            num_vert = self.number_of_vertices()
-
-            for coin in range(4):
-                head = tail + (-1)**(coin % 2) * self.x_dim**(coin // 2)
-
-                if (head >= 0 and head < num_vert
-                    and not (head % self.x_dim == 0 and head - tail == 1)
-                    and not (tail % self.x_dim == 0 and tail - head == 1)
-                ):
-                    if diff == 0:
-                        break
-                    diff -= 1
-
-        arc = (tail, head)
-
-        if not coordinates:
-            return arc
-        return (self.vertex_coordinates(arc[0]),
-                self.vertex_coordinates(arc[1]))
-
-    def neighbors(self, vertex):
-        iterable = hasattr(vertex, '__iter__')
-        if iterable:
-            vertex = self.vertex_number(vertex)
-
-        neigh = super().neighbors(vertex)
-
-        if iterable:
-            return list(map(self.vertex_coordinates, neigh))
-        return neigh
-
-    def arcs_with_tail(self, tail):
-        try:
-            tail = self.vertex_number(tail)
-        except TypeError:
-            pass
-
-        return super().arcs_with_tail(tail)
-
-    def degree(self, vertex):
-        try:
-            vertex = self.vertex_number(vertex)
-        except TypeError:
-            pass
-
-        return super().degree(vertex)
-
-    def next_arc(self, arc):
-        try:
-            tail, head = arc
-        except TypeError:
-            tail, head = self.arc(arc)
-
-        iterable = hasattr(tail, '__iter__')
-        
-        if not iterable:
-            tail = self.vertex_coordinates(tail)
-            head = self.vertex_coordinates(head)
-
-        # get direction
-        direction = self.arc_direction(arc)
-
-        if self.diagonal:
-            if not self.periodic:
-                raise NotImplementedError
-
-            tail = head
-            x = direction // 2
-            y = direction % 2
-            head = ((head[0] + (-1)**x) % self.x_dim,
-                    (head[1] + (-1)**y) % self.y_dim)
-        else:
-            y_axis = direction // 2
-            exp = direction % 2
-            if self.periodic:
-                tail = head
-                head = ((head[0], (head[1] + (-1)**exp) % self.x_dim)
-                        if y_axis else
-                        ((head[0] + (-1)**exp) % self.y_dim, head[1]))
-            else:
-                new_head = ((head[0], head[1] + (-1)**exp) if y_axis
-                            else (head[0] + (-1)**exp, head[1]))
-
-                if (new_head[0] < 0 or new_head[0] >= self.x_dim
-                    or new_head[1] < 0 or new_head[1] >= self.y_dim
-                ):
-                    # out of bounds. Rebound
-                    new_head = tail
-
-                tail = head
-                head = new_head
-
-        if not iterable:
-            tail = self.vertex_number(tail)
-            head = self.vertex_number(head)
-        return (tail, head)
-
-    def previous_arc(self, arc):
-        arc_iterable = hasattr(arc, '__iter__')
-        if arc_iterable:
-            tail, head = arc
-        else:
-            tail, head = self.arc(arc)
-
-        vertex_iterable = hasattr(tail, '__iter__')
-        if not vertex_iterable:
-            tail = self.vertex_coordinates(tail)
-            head = self.vertex_coordinates(head)
-
-        direction = self.arc_direction(arc)
-        if self.diagonal:
-            if not self.periodic:
-                raise NotImplementedError
-
-            x = direction // 2
-            y = direction % 2
-            head = tail
-            tail = ((tail[0] - (-1)**x) % self.x_dim,
-                    (tail[1] - (-1)**y) % self.y_dim)
-        else:
-            y_axis = direction // 2
-            exp = direction % 2
-            if self.periodic:
-                head = tail
-                tail = ((tail[0], (tail[1] - (-1)**exp) % self.x_dim)
-                        if y_axis else
-                        ((tail[0] - (-1)**exp) % self.y_dim, tail[1]))
-            else:
-                new_tail = ((tail[0], tail[1] - (-1)**exp) if y_axis
-                            else (tail[0] - (-1)**exp, tail[1]))
-
-                if (new_tail[0] < 0 or new_tail[0] >= self.x_dim
-                    or new_tail[1] < 0 or new_tail[1] >= self.y_dim
-                ):
-                    # out of bounds. Rebound
-                    new_tail = head
-
-                head = tail
-                tail = new_tail
-
-        if not vertex_iterable:
-            tail = self.vertex_number(tail),
-            head = self.vertex_number(head)
-
-        if not arc_iterable:
-            return self.arc_number((tail, head))
-        return (tail, head)
-
-    def dimensions(self):
-        r"""
-        Grid dimensions.
-
-        Returns
-        -------
-        x_dim : int
-            Dimension alongside de X axis.
-        y_dim : int
-            Dimension alongside de Y axis.
-        """
-        return (self.x_dim, self.y_dim)
+    try:
+        if len(dim) != 2:
+            raise ValueError("Expected 2-dimensional tuple. "
+                             + "Received " + str(dim)
+                             + " instead.")
+    except TypeError:
+        # then int
+        dim = (dim, dim)
+
+    if not diagonal:
+        basis = [1, -1, 2, -2]
+    else:
+        basis = np_array([[1, 1], [1, -1],
+                          [-1, 1], [-1, -1]])
+
+    g = SquareLattice(dim, basis, periodic, weights, multiedges)
+    g._neighbor_index = MethodType(_neighbor_index, g)
+    g.diagonal = diagonal
+
+    return g

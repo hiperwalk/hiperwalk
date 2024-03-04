@@ -1,9 +1,56 @@
-import numpy as np
-import scipy.sparse
-from .graph import *
-from warnings import warn
+def __adjacent(self, u, v):
+    x = u ^ v #bitwise xor
+    return x != 0 and x & (x - 1) == 0
 
-class Hypercube(Graph):
+    # TODO: check if the following strategy is faster
+    # try:
+    #     # python >= 3.10
+    #     count = x.bit_count()
+    # except:
+    #     count = bin(x).count('1')
+    # return count == 1
+
+def __neighbor_index(self, vertex, neigh):
+    # TODO: how to use __debug__?
+    # how to unable __debug__ when uploading to pip?
+    if __debug__:
+        assert self.adjacent(vertex, neigh)
+
+    # it is supposed that vertex and neigh are adjacent
+    x = vertex ^ neigh
+    return x.bit_length() - 1
+
+def __degree(self, vertex):
+    return self._dimension
+
+def __number_of_vertices(self):
+    return 1 << self._dim
+
+def __number_of_edges(self):
+    return (1 << (self._dim - 1)) * self._dim
+
+def __degree(self, vertex):
+    return self._dim
+
+def __dimension(self):
+    r"""
+    Hypercube dimension.
+
+    .. todo::
+        How to add to docs?
+
+    Returns
+    -------
+    int
+    """
+    return self._dim
+
+# graph constructor
+import numpy as np
+from scipy.sparse import csr_array
+from types import MethodType
+from .graph import Graph
+def Hypercube(dim, weights=None, multiedges=None):
     r"""
     Hypercube graph.
 
@@ -14,6 +61,10 @@ class Hypercube(Graph):
     Two vertices are adjacent
     if and only if the corresponding binary tuples
     differ by only one bit, indicating a Hamming distance of 1.
+
+    .. todo::
+        Update docs.
+        Create generic constructor docs.
 
     Parameters
     ----------
@@ -37,83 +88,32 @@ class Hypercube(Graph):
     if either :math:`u < v` is true, or
     both :math:`u = v` and :math:`i < j` are true.
     """
-    def __init__(self, dimension):
-        num_vert = 1 << dimension
-        num_arcs = dimension*num_vert
+    if weights is not None or multiedges is not None:
+        raise NotImplementedError()
 
-        data = np.ones(num_arcs, dtype=np.int8)
-        indptr = np.arange(0, num_arcs + 1, dimension)
-        indices = np.array([v ^ 1 << shift for v in range(num_vert)
-                                           for shift in range(dimension)])
+    # adjacency matrix
+    num_vert = 1 << dim
+    num_arcs = dim*num_vert
 
-        adj_matrix = scipy.sparse.csr_array((data, indices, indptr),
-                                            shape=(num_vert, num_vert))
+    data = np.ones(num_arcs, dtype=np.int8)
+    indptr = np.arange(0, num_arcs + 1, dim)
+    indices = np.array([v ^ 1 << shift for v in range(num_vert)
+                                       for shift in range(dim)])
+    adj_matrix = csr_array((data, indices, indptr),
+                           shape=(num_vert, num_vert))
 
-        super().__init__(adj_matrix)
-        self._dimension = int(dimension)
+    g = Graph(adj_matrix, copy=False)
 
-    def arc_direction(self, arc):
-        r"""
-        Returns the arc direction.
+    # Binding particular attributes and methods
+    # TODO: add to docs
+    g._dim = int(dim)
 
-        The arc direction of ``(tail, head)`` is the number ``i``
-        such that ``tail == head ^ 2**i``.
+    g.adjacent = MethodType(__adjacent, g)
+    g._neighbor_index = MethodType(__neighbor_index, g)
+    g.degree = MethodType(__degree, g)
+    g.number_of_vertices = MethodType(__number_of_vertices, g)
+    g.number_of_edges = MethodType(__number_of_edges, g)
+    g.degree = MethodType(__degree, g)
+    g.dimension = MethodType(__dimension, g)
 
-        Parameters
-        ----------
-        arc
-            The arc can be represented in either arc notation (``(tail, head)``)
-            or by using the numerical label  (``int``).
-
-        Returns
-        -------
-        int
-        """
-        try:
-            tail, head = arc
-        except TypeError:
-            tail, head = self.arc(arc)
-
-        direction = tail ^ head
-        try:
-            # python >= 3.10
-            count = direction.bit_count()
-        except:
-            count = bin(direction).count('1')
-
-        try:
-            direction = direction.bit_length() - 1
-        except:
-            direction = int(np.log2(direction))
-
-        if count != 1 or direction < 0 or direction >= self._dimension:
-            raise ValueError("Arc " + str(arc) + " does not exist.")
-
-        return direction
-
-    def arc_number(self, arc):
-        if not hasattr(arc, '__iter__'):
-            return super().arc_number(arc)
-
-        tail, head = arc
-        direction = self.arc_direction((tail, head))
-        return tail*self._dimension + direction
-
-    def arc(self, number):
-        tail = number // self._dimension
-        direction = number - tail*self._dimension
-        head = tail ^ (1 << direction)
-        return (tail, head)
-
-    def degree(self, vertex):
-        return self._dimension
-
-    def dimension(self):
-        r"""
-        Hypercube dimension.
-
-        Returns
-        -------
-        int
-        """
-        return self._dimension
+    return g
