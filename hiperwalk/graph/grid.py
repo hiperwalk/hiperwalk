@@ -2,59 +2,6 @@ from numpy import array as np_array
 from .square_lattice import SquareLattice
 from types import MethodType
 
-def _neighbor_index(self, vertex, neigh):
-    r"""
-    Return arc direction.
-
-    Parameters
-    ----------
-    arc
-        Any of the following notations are acceptable.
-        
-        * ((int, int), (int, int))
-            Arc notation with vertices' coordinates.
-        * (int, int)
-            Arc notation with vertices' labels.
-        * int
-            Arc label.
-
-    Returns
-    -------
-    int
-        If natural (not diagonal) grid:
-            * 0: right
-            * 1: left
-            * 2: up
-            * 3: down
-
-        If diagonal grid:
-            * 0: right, up
-            * 1: right, down
-            * 2: left, up
-            * 3: left, down
-
-    Notes
-    -----
-    Does not check if arc exists.
-    """
-    # dealing with coordinates
-    vertex = self.vertex_coordinates(vertex)
-    neigh = self.vertex_coordinates(neigh)
-
-    if self.diagonal:
-        x_diff = neigh[0] - vertex[0]
-        y_diff = neigh[1] - vertex[1]
-        x = 0 if (x_diff == 1 or x_diff == -self._dim[0] + 1) else 1
-        y = 0 if (y_diff == 1 or y_diff == -self._dim[1] + 1) else 1
-        return (x << 1) + y
-
-    y = vertex[1] != neigh[1]
-    x = ((vertex[1] - neigh[1]) % self._dim[1] == 1
-         if y else
-         (vertex[0] - neigh[0]) % self._dim[0] == 1)
-
-    return (y << 1) + x
-
 def Grid(dim, periodic=True, diagonal=False,
          weights=None, multiedges=None):
     r"""
@@ -238,7 +185,7 @@ def Grid(dim, periodic=True, diagonal=False,
                           [-1, 1], [-1, -1]])
 
     g = SquareLattice(dim, basis, periodic, weights, multiedges)
-    g._neighbor_index = MethodType(_neighbor_index, g)
+    # g._neighbor_index = MethodType(_neighbor_index, g)
     g.diagonal = diagonal
 
     return g
