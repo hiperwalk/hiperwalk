@@ -1,9 +1,6 @@
-import numpy as np
-from scipy.sparse import csr_array
-from .graph import Graph
 from .square_lattice import SquareLattice
 
-class Line(Graph):
+def Line(num_vert):
     r"""
     Finite line graph (path graph).
 
@@ -39,86 +36,6 @@ class Line(Graph):
         :caption: Figure 1.
     """
 
-    def __init__(self, num_vert):
-        # Creating adjacency matrix
-        # The end vertices are only adjacent to 1 vertex.
-        # Every other vertex is adjacent to two vertices.
-        data = np.ones(2*(num_vert-1), dtype=np.int8)
-        # upper diagonal
-        row_ind = [lin+shift for shift in range(2)
-                             for lin in range(num_vert - 1)]
-        # lower digonal
-        col_ind = [col+shift for shift in [1, 0]
-                             for col in range(num_vert - 1)]
-        adj_matrix = csr_array((data, (row_ind, col_ind)))
-    
-        # initializing
-        super().__init__(adj_matrix)
-
-    def arc_number(self, arc):
-        if not hasattr(arc, '__iter__'):
-            return super().arc_number(arc)
-
-        tail, head = arc
-        diff = head - tail
-        if diff != 1 and diff != -1:
-            raise ValueError('Invalid arc.')
-
-        num_vert = self.number_of_vertices()
-        return (2*tail - 1 if (diff == 1 and tail != 0
-                               or tail == num_vert - 1)
-                else tail*2)
-
-    def arc(self, number):
-        number += 1
-        tail = number//2
-        num_vert = self.number_of_vertices()
-        head = (tail + (-1)**(number % 2)
-                if tail != 0 and tail != num_vert - 1
-                else tail - (-1)**(number % 2))
-        return (tail, head)
-
-    def next_arc(self, arc):
-        try:
-            tail, head = arc
-            diff = head - tail
-            if diff != 1 and diff != -1:
-                raise ValueError('Invalid arc')
-
-            if head == 0 or head == self.number_of_vertices() - 1:
-                return (head, tail)
-            
-            return ((tail + 1, head + 1) if diff == 1
-                    else (tail - 1, head - 1))
-        except TypeError:
-            if arc == 0:
-                return 1
-            num_arcs = self.number_of_arcs()
-            if arc == num_arcs - 1:
-                return num_arcs - 2
-            return arc + 2 if arc % 2 == 1 else arc - 2
-
-    def previous_arc(self, arc):
-        try:
-            tail, head = arc
-            diff = head - tail
-            if diff != 1 and diff != -1:
-                raise ValueError('Invalid arc')
-
-            if tail == 0 or tail == self.number_of_vertices() - 1:
-                return (head, tail)
-            
-            return ((tail - 1, head - 1) if diff == 1
-                    else (tail + 1, head + 1))
-        except TypeError:
-            num_arcs = self.number_of_arcs()
-            if arc < 0 or arc >= num_arcs:
-                raise ValueError('Invalid arc')
-
-            arc = arc + 2 if arc % 2 == 0 else arc - 2
-            if arc < 0:
-                arc += 1
-            elif arc >= num_arcs:
-                arc -= 1
-
-            return arc
+    basis = [1, -1]
+    g = SquareLattice(num_vert, basis, False, weights, multiedges)
+    return g
