@@ -6,6 +6,7 @@ from .._constants import __DEBUG__
 from ..graph import *
 from ..quantum_walk import QuantumWalk
 from matplotlib.animation import FuncAnimation
+from scipy.sparse import csr_array
 
 if __DEBUG__:
     from time import time
@@ -440,7 +441,7 @@ def _preconfigure_graph_plot(probabilities, kwargs):
         raise KeyError("'graph' kwarg not provided.")
 
     graph = kwargs['graph']
-    if isinstance(graph, scipy.sparse.csr_array):
+    if isinstance(graph, csr_array):
         kwargs['graph'] = nx.from_scipy_sparse_array(graph)
     elif isinstance(graph, Graph):
         adj_matrix = graph.adjacency_matrix()
