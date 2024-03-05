@@ -123,7 +123,11 @@ class SDMultigraph(Graph):
         cardinality is incremented by one for each loop.
         """
         if self.is_underlying_simple():
-            return self.graph._adj_matrix.indptr[-1]
+            try:
+                return self.graph._adj_matrix.indptr[-1]
+            except AttributeError:
+                # this does not work if graph has loops
+                return self.number_of_edges() << 1
 
         return self.graph._adj_matrix.data[-1]
 
