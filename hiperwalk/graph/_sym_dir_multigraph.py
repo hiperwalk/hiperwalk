@@ -96,16 +96,22 @@ class SDMultigraph(Graph):
         Return all arcs that have the given tail.
         """
         tail = self.vertex_number(tail)
-        indptr = self.graph._adj_matrix.indptr
-
-        if self.is_underlying_simple():
+        try:
             indptr = self.graph._adj_matrix.indptr
-            return np.arange(indptr[tail], indptr[tail + 1])
 
-        data = self.graph._adj_matrix.data
-        first_arc = data[indptr[tail] - 1] if tail > 0 else 0
-        last_arc = data[indptr[tail + 1] - 1]
-        return np.arange(first_arc, last_arc)
+            if self.is_underlying_simple():
+                indptr = self.graph._adj_matrix.indptr
+                return np.arange(indptr[tail], indptr[tail + 1])
+
+            data = self.graph._adj_matrix.data
+            first_arc = data[indptr[tail] - 1] if tail > 0 else 0
+            last_arc = data[indptr[tail + 1] - 1]
+            return np.arange(first_arc, last_arc)
+        except:
+            neigh = self.graph.neighbors(tail)
+            arcs = np.array([self.arc_number((tail, n)) for n in neigh])
+            return arcs
+
 
     def number_of_arcs(self):
         r"""
