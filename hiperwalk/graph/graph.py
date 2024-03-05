@@ -172,6 +172,17 @@ class Graph():
 
         return v in A.indices[A[u]:A[u+1]]
 
+    def _entry(self, lin, col):
+        print(">entry")
+        print(lin)
+        print(self._adj_matrix.indptr[lin])
+        entry = self._adj_matrix.indptr[lin] + 1
+        print("indptr")
+        offset = self._neighbor_index(lin, col)
+        print("index")
+
+        return entry + offset
+
     def _find_entry(self, entry):
         r"""
         Find the corresponding line and columns of the given entry.

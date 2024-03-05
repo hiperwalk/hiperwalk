@@ -80,13 +80,14 @@ class SDMultigraph(Graph):
             #                          + str(num_arcs - 1))
             #     return int(arc)
 
-            tail = self.vertex_number(arc[0])
-            head = self.vertex_number(arc[1])
+            try:
+                tail = self.vertex_number(arc[0])
+                head = self.vertex_number(arc[1])
 
-            first_arc = self.graph._adj_matrix.indptr[tail]
-            offset = self._neighbor_index(tail, head)
-
-            return first_arc + offset
+                entry = self.graph._entry(tail, head) - 1
+                return entry
+            except TypeError:
+                return arc
 
         raise NotImplementedError("arc_number() for multigraphs.")
 
