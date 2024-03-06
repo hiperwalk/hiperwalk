@@ -1,7 +1,81 @@
 import numpy as np
 from .graph import Graph
+from types import MethodType
+from scipy.sparse import eye
 
-class CompleteBipartite(Graph):
+def adjacent(self, u, v):
+    if u >= self._num_vert or v >= self._num_vert:
+        raise ValueError("Received vertices " + str(u) + " and " + str(v)
+                         + ". Maximum expected value is "
+                         + str(self._num_vert - 1) + ".")
+    return ((u < self._num_vert1 and v >= self._num_vert1)
+            or (v < self._num_vert1 and u >= self._num_vert2))
+
+def _entry(self, lin, col):
+    entry = 1
+    if lin < self._num_vert1:
+        entry += lin*self._num_vert2
+        entry += col - self._num_vert1
+        return entry
+
+    entry += self.number_of_edges()
+    entry += (lin - self._num_vert1)*self._num_vert1
+    entry += col
+    return entry
+
+
+def _find_entry(self, entry):
+    num_edges = self.number_of_edges()
+    if entry < num_edges:
+        lin = entry // self._num_vert1
+        col = entry % self._num_vert1
+        return (lin, col)
+
+    entry -= num_edges
+    lin = entry // self._num_vert2
+    col = entry % self._num_vert2
+    return (lin, col)
+
+def _neighbor_index(self, vertex, neigh):
+    if neigh < self._num_vert1:
+        return neigh
+    return neigh - self._num_vert1
+
+def neighbors(self, vertex):
+    if vertex >= self._num_vert1:
+        return np.arange(self._num_vert1)
+    return np.arange(self._num_vert1, self._num_vert)
+
+def number_of_vertices(self):
+    return self._num_vert
+
+def number_of_edges(self):
+    return self._num_vert1*self._num_vert2
+
+def degree(self, vertex):
+    if vertex >= 0 and vertex < self._num_vert1:
+        return self._num_vert2
+    if vertex >= self._num_vert1 and vertex < self._num_vert: 
+        return self._num_vert1
+
+    raise ValueError("Vertex out of range. Expected value from 0 to "
+                     + str(self._num_vert - 1) + ". But received "
+                     + str(vertex) + " instead.")
+
+def adjacency_matrix(self):
+    # it is more efficient to store the dense adj matrix than
+    # the sparse one when explicit values are used
+    A = np.zeros((self._num_vert1, self._num_vert1), dtype=np.int8)
+    B = np.ones((self._num_vert1, self._num_vert2), dtype=np.int8)
+    C = np.ones((self._num_vert2, self._num_vert1), dtype=np.int8)
+    D = np.zeros((self._num_vert2, self._num_vert2), dtype=np.int8)
+    return np.block([[A, B],
+                     [C, D]])
+
+def laplacian_matrix(self):
+    raise NotImplementedError()
+
+def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
     r"""
     Complete bipartite graph.
 
@@ -20,103 +94,33 @@ class CompleteBipartite(Graph):
     ``num_vert1`` to ``num_vert1 + num_vert2 - 1``.
     """
 
-    def __init__(self, num_vert1, num_vert2):
-        self._adj_matrix = None
-        self._coloring = None
-        if num_vert1 <= 0 or num_vert2 <= 0:
-            raise ValueError("There must be at least one vertex "
-                             + "in each partition.")
+    if weights is not None or multiedges is not None:
+        raise NotImplementedError()
 
-        self._num_vert1 = int(num_vert1)
-        self._num_vert2 = int(num_vert2)
-        self._num_vert = self._num_vert1 + self._num_vert2
+    if num_vert1 <= 0 or num_vert2 <= 0:
+        raise ValueError("There must be at least one vertex "
+                         + "in each partition.")
 
-    def arc_number(self, arc):
-        if not hasattr(arc, '__iter__'):
-            return super().arc_number(arc)
+    # toy graph
+    g = Graph(eye(num_vert1 + num_vert2))
 
-        tail, head = arc
-        if tail >= self._num_vert or head >= self._num_vert:
-            raise ValueError("Vertices should range from 0 to "
-                             + str(self._num_vert - 1)
-                             + ". But values " + str(tail) + " and " +
-                             str(head) + " were received.")
+    # changes attributes
+    del g._adj_matrix
+    g._adj_matrix = None
 
-        arc_number = None
-        if tail < self._num_vert1 and head >= self._num_vert1:
-            head -= self._num_vert1
-            arc_number = tail*self._num_vert2 + head
-        elif tail >= self._num_vert1 and head < self._num_vert1: 
-            tail -= self._num_vert1
-            arc_number = tail*self._num_vert1 + head
-            arc_number += self.number_of_edges()
-        else:
-            raise ValueError("Inexistent arc " + str(arc)
-                             + ". Tail and head in the same partition.")
+    g._num_vert1 = int(num_vert1)
+    g._num_vert2 = int(num_vert2)
+    g._num_vert = g._num_vert1 + g._num_vert2
 
-        return arc_number
+    g.adjacent = MethodType(adjacent, g)
+    g._entry = MethodType(_entry, g)
+    g._find_entry = MethodType(_find_entry, g)
+    g._neighbor_index = MethodType(_neighbor_index, g)
+    g.neighbors = MethodType(neighbors, g)
+    g.number_of_vertices = MethodType(number_of_vertices, g)
+    g.number_of_edges = MethodType(number_of_edges, g)
+    g.degree = MethodType(degree, g)
+    g.adjacency_matrix = MethodType(adjacency_matrix, g)
+    g.laplacian_matrix = MethodType(laplacian_matrix, g)
 
-    def arc(self, number):
-        if number < 0 or number >= self.number_of_arcs():
-            raise ValueError("Inexistent arc. Expected value from 0 to"
-                             + str(self.number_of_arcs()) + ".")
-
-        tail = None
-        head = None
-        num_edges = self.number_of_edges()
-        if number < num_edges:
-            # tail in V_1 and head in V_2
-            tail = number // self._num_vert2
-            head = number % self._num_vert2
-            head += self._num_vert1
-        else:
-            # tail in V_2 and head in V_1
-            number -= num_edges
-            tail = number // self._num_vert1
-            tail += self._num_vert1
-            head = number % self._num_vert1
-
-        return (tail, head)
-
-    def neighbors(self, vertex):
-        if vertex >= self._num_vert1:
-            return np.arange(self._num_vert1)
-        return np.arange(self._num_vert1, self._num_vert)
-
-    def arcs_with_tail(self, tail):
-        if tail < self._num_vert1:
-            start = tail*self._num_vert2
-            end = start + self._num_vert2
-            return np.arange(start, end)
-
-        tail -= self._num_vert1
-        start = tail*self._num_vert1 + self.number_of_edges()
-        end = start + self._num_vert1
-        return np.arange(start, end)
-
-    def number_of_vertices(self):
-        return self._num_vert
-
-    def number_of_arcs(self):
-        return 2*self._num_vert1*self._num_vert2
-
-    def number_of_edges(self):
-        return self._num_vert1*self._num_vert2
-
-    def degree(self, vertex):
-        if vertex > 0 and vertex < self._num_vert1:
-            return self._num_vert2
-        if vertex >= self._num_vert1 and vertex < self._num_vert: 
-            return self._num_vert1
-
-        raise ValueError("Vertex out of range. Expected value from 0 to"
-                         + str(self._num_vert) + ". But received "
-                         + str(vertex) + " instead.")
-
-    def adjacency_matrix(self):
-        A = np.zeros((self._num_vert1, self._num_vert1), dtype=np.int8)
-        B = np.ones((self._num_vert1, self._num_vert2), dtype=np.int8)
-        C = np.ones((self._num_vert2, self._num_vert1), dtype=np.int8)
-        D = np.zeros((self._num_vert2, self._num_vert2), dtype=np.int8)
-        return np.block([[A, B],
-                         [C, D]])
+    return g
