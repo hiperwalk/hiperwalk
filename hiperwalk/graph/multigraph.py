@@ -54,6 +54,10 @@ class Multigraph(Graph):
         if copy:
             adj_matrix = adj_matrix.copy()
 
+        loops = [A[v, v] for v in range(adj_matrix.shape[0])]
+        self._num_loops = np.sum(loops)
+        del loops
+
         # manipulate data
         data = adj_matrix.data
         for i in range(1, len(data)):
@@ -63,20 +67,44 @@ class Multigraph(Graph):
 
         # TODO: is it useful to store the underlying simple graph?
 
+    def _entry(self, lin, col):
+        return self._adj_matrix[lin, col]
+
+    def _find_entry(self, entry):
+        adj_matrix = self._adj_matrix
+        index = _interval_binary_search(adj_matrix.data, entry) + 1
+
+        col = adj_matrix.indices[index]
+        lin = _interval_binary_search(adj_matrix.indptr, index)
+
+        return (lin, col)
+
     def number_of_edges(self):
-        return self._adj_matrix.data[-1] >> 1
+        non_loops = self._adj_matrix.data[-1] - self._num_loops
+        num_edges = non_loops >> 1
+        return  num_edges + self._num_loops
 
     def degree(self, vertex):
         vertex = self.vertex_number(vertex)
-
-        if vertex == 0:
-            return adj_matrix.data[1]
 
         start = self._adj_matrix.indptr[vertex]
         end = self._adj_matrix.indptr[vertex + 1]
         return adj_matrix.data[end] - adj_matrix.data[start]
     
     # TODO: add functions to manage multiedges
+
+    def adjacency_matrix(self):
+        data = np.copy(self._adj_matrix.data)
+        for i in range(1, len(data)):
+            data[i] -= data[i - 1]
+
+        indices = self._adj_matrix.indices
+        indptr = self._adj_matrix.indptr
+        adj_matrix = csr_array((data, indices indptr))
+        return adj_matrix
+
+    def laplacian_matrix(self):
+        raise NotImplementedError()
 
     def is_simple(self):
         return False
