@@ -126,8 +126,8 @@ class SDMultigraph(Graph):
             try:
                 return self.graph._adj_matrix.indptr[-1]
             except AttributeError:
-                # this does not work if graph has loops
-                return self.number_of_edges() << 1
+                num_edges = self.number_of_edges() << 1
+                return  num_edges - self.number_of_loops()
 
         return self.graph._adj_matrix.data[-1]
 
@@ -159,6 +159,9 @@ class SDMultigraph(Graph):
         Return number of edges of the underlying (multi)graph.
         """
         return self.graph.number_of_edges()
+
+    def number_of_loops(self):
+        return self.graph.number_of_loops()
 
     def degree(self, vertex):
         return self.graph.degree(vertex)

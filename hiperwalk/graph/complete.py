@@ -92,6 +92,7 @@ def Complete(num_vert, weights=None, multiedges=None):
     del g._adj_matrix
     g._adj_matrix = None
     g._num_vert = num_vert
+    g._num_loops = 0
 
     g.adjacent = MethodType(adjacent, g)
     g._entry = MethodType(_entry, g)

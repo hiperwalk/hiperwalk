@@ -4,14 +4,14 @@ from .._constants import __DEBUG__
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
-    This function expects a sorted array and performs a binary search on the subarray 
-    v[start:end], looking for the element 'elem'. 
-    If the element is found, the function returns the index of the element. 
-    If the element is not found, the function returns -1.    
-    This is an implementation of binary search following Cormen's algorithm. 
+    This function expects a sorted array and
+    performs a binary search on the subarray
+    v[start:end], looking for the element 'elem'.
+    If the element is found, the function returns the index of the element.
+    If the element is not found, the function returns -1.
+    This binary search implementation follows Cormen's algorithm.
     It is used to improve the time complexity of the search process.
     """
-
     if end == None:
         end = len(v)
     
@@ -67,7 +67,7 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
 
 class Graph():
     r"""
-    Constructs an arbitrary graph.
+    Constructs an arbitrary simple graph with loops.
 
     This class defines the graph structure used for implementing a 
     quantum walk. It encapsulates all necessary properties 
@@ -109,6 +109,8 @@ class Graph():
     If ``adj_matrix`` is sparse and ``copy=False``,
     the argument will be changed for more efficient manipulation.
 
+    Each vertex has at most one loop.
+
     .. warning::
 
         To reduce memory usage, ``adj_matrix.data`` is set to ``None``.
@@ -143,6 +145,10 @@ class Graph():
 
         if copy:
             adj_matrix = adj_matrix.copy()
+
+        loops = [A[v, v] == 0 for v in range(adj_matrix.shape[0])]
+        self._num_loops = np.sum(loops)
+        del loops
 
         del adj_matrix.data
         adj_matrix.data = None
@@ -250,7 +256,15 @@ class Graph():
         r"""
         Determine the cardinality of the edge set.
         """
-        return len(self._adj_matrix.indices) >> 1
+        non_loops = len(self._adj_matrix.indices) - self._num_loops
+        num_edges = non_loops >> 1
+        return  num_edges + self._num_loops
+
+    def number_of_loops(self):
+        r"""
+        Return the number of loops in the graph.
+        """
+        return self._num_loops
 
     def degree(self, vertex):
         r"""

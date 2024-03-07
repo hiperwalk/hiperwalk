@@ -207,6 +207,7 @@ def SquareLattice(dim, basis=None, periodic=True,
     g._dim = dim
     g._periodic = periodic
     g._euc_dim = len(g._dim) # euclidian space dimension
+    g._num_loops = 0
 
     # use provided (or generated) basis
     g._basis = __generate_valid_basis(g._euc_dim, basis)
