@@ -34,17 +34,14 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
     and less than the element of index i+1,
     the function returns i.
     If the element is less than the minimum value in the array,
-    the function raises a ValueError.
+    the function `start - 1`.
     If the element is greater or equal than the maximum
     value in the array,
     the function returns the index of the maximum value.
-    If, for some reason, the element is not found,
-    the function returns -1.
     It is used to improve the time complexity of the search process.
     """
     if elem < v[start]:
-        raise ValueError("The element is less than "
-                         + "the minimum value in the array.")
+        start - 1
     
     if end is None:
         end = len(v)
@@ -62,8 +59,7 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
             start = mid + 1
         else:
             end = mid
-    return index if index is not None else -1
-
+    return index
 
 class Graph():
     r"""
