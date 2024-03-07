@@ -107,6 +107,7 @@ def Hypercube(dim, weights=None, multiedges=None):
     # Binding particular attributes and methods
     # TODO: add to docs
     g._dim = int(dim)
+    g._num_loops = 0
 
     g.adjacent = MethodType(__adjacent, g)
     g._neighbor_index = MethodType(__neighbor_index, g)

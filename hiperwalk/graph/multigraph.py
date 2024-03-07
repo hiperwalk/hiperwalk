@@ -45,6 +45,7 @@ class Multigraph(Graph):
             pass
 
         if not issparse(adj_matrix):
+            # TODO: verify which representation occupies less space
             adj_matrix = csr_array(adj_matrix)
 
         if adj_matrix.shape[0] != adj_matrix.shape[1]:

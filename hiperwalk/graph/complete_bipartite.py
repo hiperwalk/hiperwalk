@@ -107,6 +107,7 @@ def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
     # changes attributes
     del g._adj_matrix
     g._adj_matrix = None
+    g._num_loops = 0
 
     g._num_vert1 = int(num_vert1)
     g._num_vert2 = int(num_vert2)
