@@ -1,4 +1,5 @@
 import numpy as np
+from .graph import Graph
 from scipy.sparse import issparse, csr_array, diags
 
 class Multigraph(Graph):
@@ -52,14 +53,17 @@ class Multigraph(Graph):
             raise TypeError("Adjacency matrix is not square.")
 
         if copy:
-            adj_matrix = adj_matrix.copy()
+            adj_matrix = adj_matrix.copy(dtype=np.int32)
 
-        loops = [A[v, v] for v in range(adj_matrix.shape[0])]
+        loops = [adj_matrix[v, v]
+                 for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
         del loops
 
         # manipulate data
-        data = adj_matrix.data
+        if not np.issubdtype(adj_matrix.dtype, np.integer):
+            adj_matrix = adj_matrix.astype(np.int32)
+        data = adj_matrix.data.astype(np.int32, copy=False)
         for i in range(1, len(data)):
             data[i] += data[i - 1]
 
@@ -100,7 +104,7 @@ class Multigraph(Graph):
 
         indices = self._adj_matrix.indices
         indptr = self._adj_matrix.indptr
-        adj_matrix = csr_array((data, indices indptr))
+        adj_matrix = csr_array((data, indices, indptr))
         return adj_matrix
 
     def laplacian_matrix(self):
