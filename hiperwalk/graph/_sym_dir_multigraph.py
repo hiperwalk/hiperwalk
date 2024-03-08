@@ -71,23 +71,23 @@ class SDMultigraph(Graph):
         >>> graph.arc_number((0, 1)) #arc as tuple
         0
         """
-        if self.is_underlying_simple():
-            # if not hasattr(arc, '__iter__'):
-            #     num_arcs = self.number_of_arcs()
-            #     if arc < 0 and arc >= num_arcs:
-            #         raise ValueError("Arc value out of range. "
-            #                          + "Expected arc value from 0 to "
-            #                          + str(num_arcs - 1))
-            #     return int(arc)
+        try:
+            tail = self.vertex_number(arc[0])
+            head = self.vertex_number(arc[1])
+            out_degree = 1
+            multiedge = 0
 
-            try:
-                tail = self.vertex_number(arc[0])
-                head = self.vertex_number(arc[1])
+            if not self.is_underlying_simple():
+                # multigraph
+                out_degree = self.graph.number_of_multiedges(tail, head)
+                multiedge = arc[2]
 
-                entry = self.graph._entry(tail, head) - 1
-                return entry
-            except TypeError:
-                return arc
+            entry = self.graph._entry(tail, head)
+            entry += multiedge - out_degree
+            return entry
+
+        except TypeError:
+            return arc
 
         raise NotImplementedError("arc_number() for multigraphs.")
 
