@@ -196,3 +196,6 @@ class SDMultigraph(Graph):
             prev_tail = head
 
         return self.arc_number((prev_tail, prev_head))
+
+    def number_of_multiedges(self, u, v):
+        return self.graph.number_of_multiedges(u, v)
