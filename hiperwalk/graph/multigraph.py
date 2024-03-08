@@ -90,9 +90,13 @@ class Multigraph(Graph):
 
     def degree(self, vertex):
         vertex = self.vertex_number(vertex)
+        adj_matrix = self._adj_matrix
 
-        start = self._adj_matrix.indptr[vertex]
-        end = self._adj_matrix.indptr[vertex + 1]
+        start = adj_matrix.indptr[vertex] - 1
+        end = adj_matrix.indptr[vertex + 1] - 1
+
+        if start < 0:
+            return adj_matrix.data[end]
         return adj_matrix.data[end] - adj_matrix.data[start]
     
     # TODO: add functions to manage multiedges
