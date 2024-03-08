@@ -142,7 +142,8 @@ class Graph():
         if copy:
             adj_matrix = adj_matrix.copy()
 
-        loops = [A[v, v] == 0 for v in range(adj_matrix.shape[0])]
+        loops = [adj_matrix[v, v] == 0
+                 for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
         del loops
 
