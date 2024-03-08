@@ -112,3 +112,18 @@ class Multigraph(Graph):
 
     def is_simple(self):
         return False
+
+    def number_of_multiedges(self, u, v):
+        r"""
+        Number of multiedges that connecet vertices u and v.
+        """
+        indptr = self._adj_matrix.indptr
+        data = self._adj_matrix.data
+
+        index = indptr[u]
+        index += self._neighbor_index(u, v)
+
+        out_degree = (data[index] - data[index - 1]
+                      if index > 0
+                      else data[index])
+        return out_degree
