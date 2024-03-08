@@ -234,13 +234,19 @@ class Coined(QuantumWalk):
         The operator is configured for future use. If an evolution
         operator was set earlier, it will be unset to maintain coherence.
         """
+        g = self._graph
+        num_vert = g.number_of_vertices()
+        num_arcs = g.number_of_arcs()
 
-        num_vert = self._graph.number_of_vertices()
-        num_arcs = self._graph.number_of_arcs()
-
-        S_cols = [self._graph.arc_number((j, i))
-                  for i in range(num_vert)
-                  for j in self._graph.neighbors(i)]
+        if g.is_underlying_simple():
+            S_cols = [g.arc_number((j, i))
+                      for i in range(num_vert)
+                      for j in g.neighbors(i)]
+        else:
+            S_cols = [g.arc_number((j, i, e))
+                      for i in range(num_vert)
+                      for j in g.neighbors(i)
+                      for e in range(g.number_of_multiedges(j, i))]
 
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
