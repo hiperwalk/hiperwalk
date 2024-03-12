@@ -51,8 +51,12 @@ class WeigthedGraph(Graph):
     def adjacent(self, u, v):
         return self._adj_matrix[u, v] != 0
 
-    def _find_entry(self, entry):
+    def _entry(self, entry):
         return self._adj_matrix[u, v]
+
+    def _find_entry(self, entry):
+        # this should not be invoked
+        raise AttributeError("WeightedGraph has no `_find_entry` method.")
 
     def is_simple(self):
         return False
