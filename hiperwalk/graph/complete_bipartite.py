@@ -73,7 +73,12 @@ def adjacency_matrix(self):
                      [C, D]])
 
 def laplacian_matrix(self):
-    raise NotImplementedError()
+    A = self._num_vert2 * np.eye(self._num_vert1, dtype=np.int32)
+    B = -np.ones((self._num_vert1, self._num_vert2), dtype=np.int32)
+    C = -np.ones((self._num_vert2, self._num_vert1), dtype=np.int32)
+    D = self._num_vert1 * np.eye(self._num_vert2, dtype=np.int32)
+    return np.block([[A, B],
+                     [C, D]])
 
 def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
     r"""
