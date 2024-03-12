@@ -18,6 +18,11 @@ def __neighbor_index(self, vertex, neigh):
 
     # it is supposed that vertex and neigh are adjacent
     x = vertex ^ neigh
+
+    # numpy integers do not have bit_length
+    # TODO: check if it is faster fo convert or to calculate
+    # np.ceil(np.log2(x + 1)).astype(int)
+    x = int(x)
     return x.bit_length() - 1
 
 def __degree(self, vertex):

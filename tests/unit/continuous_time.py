@@ -8,13 +8,13 @@ from test_constants import *
 import hiperwalk as hpw
 import unittest
 
-class TestContinuousGraph(unittest.TestCase):
+class TestContinuousTime(unittest.TestCase):
 
     def setUp(self):
         self.num_vert = 40
         nx_graph = nx.ladder_graph(self.num_vert // 2)
         self.adj = nx.adjacency_matrix(nx_graph)
-        self.g = hpw.Graph(self.adj)
+        self.g = hpw.Graph(self.adj, copy=True)
         self.gamma = 1/2
         self.qw = hpw.ContinuousTime(self.g, gamma=self.gamma)
 

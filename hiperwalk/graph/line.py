@@ -1,6 +1,6 @@
 from .square_lattice import SquareLattice
 
-def Line(num_vert):
+def Line(num_vert, weights=None, multiedges=None):
     r"""
     Finite line graph (path graph).
 

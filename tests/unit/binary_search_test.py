@@ -13,14 +13,13 @@ class TestBinarySearch(unittest.TestCase):
         self.end = 8
     
     def test_binary_search_element_less_than_the_minimum_value_in_the_array(self):
-        with self.assertRaises(ValueError) as e:
-            _interval_binary_search(self.sorted_array, 0)
-        self.assertEqual(str(e.exception), "The element is less than the minimum value in the array.")
+        self.assertEqual(_interval_binary_search(self.sorted_array, 0), -1)
+        self.assertEqual(_interval_binary_search(
+                            self.sorted_array3, -1, start=1, end=4),
+                         0)
     
     def test_binary_search_first_element_in_the_array(self):
         self.assertEqual(_interval_binary_search(self.sorted_array, 1), 1)
-    
-    def test_binary_search_first_element_in_the_array2(self):
         self.assertEqual(_interval_binary_search(self.sorted_array2, 1), 0)
     
     def test_binary_search_element_greater_than_the_maximum_value_in_the_array(self):
@@ -28,30 +27,12 @@ class TestBinarySearch(unittest.TestCase):
     
     def test_binary_search_element_in_the_middle_of_the_array(self):
         self.assertEqual(_interval_binary_search(self.sorted_array, 4), 6)
-    
-    def test_binary_search_element_in_the_middle_of_the_array2(self):
         self.assertEqual(_interval_binary_search(self.sorted_array2, 5), 6)
-    
-    def test_binary_search_element_in_the_middle_of_the_array3(self):
         self.assertEqual(_interval_binary_search(self.sorted_array2, 6), 6)
-    
-    def test_binary_search_element_in_the_middle_of_the_array4(self):
         self.assertEqual(_interval_binary_search(self.sorted_array2, 7), 7)
-    
-    def test_binary_search_element_in_the_middle_of_the_array5(self):
         self.assertEqual(_interval_binary_search(self.sorted_array, 8), 9)
-    
-    def test_binary_search_element_in_the_middle_of_the_array6(self):
         self.assertEqual(_interval_binary_search(self.sorted_array3, 0, self.start, self.end), 4)
-    
-    def test_binary_search_element_in_the_middle_of_the_array7(self):
         self.assertEqual(_interval_binary_search(self.sorted_array3, 2, self.start, self.end), 5)
-    
-    def test_binary_search_element_in_the_middle_of_the_array8(self):
         self.assertEqual(_interval_binary_search(self.sorted_array3, 4, self.start, self.end), 6)
-    
-    def test_binary_search_element_in_the_middle_of_the_array9(self):
         self.assertEqual(_interval_binary_search(self.sorted_array3, 6, self.start, self.end), 7)
-    
-    def test_binary_search_element_in_the_middle_of_the_array10(self):
         self.assertEqual(_interval_binary_search(self.sorted_array3, 40, self.start, self.end), 7)

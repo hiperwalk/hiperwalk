@@ -52,7 +52,7 @@ class TestGraph(unittest.TestCase):
 
     def test_init_with_csr_array(self):
         sparse_matrix = scipy.sparse.csr_array(self.adj_matrix)
-        g = hpw.Graph(sparse_matrix)
+        g = hpw.Graph(sparse_matrix, copy=True)
         adj_matrix = g.adjacency_matrix()
         self.assertTrue(scipy.sparse.issparse(adj_matrix))
 
