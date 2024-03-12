@@ -467,12 +467,6 @@ def _configure_figure(fig_width, fig_height, dpi):
     ax : current figure axes
     """
 
-    #TODO: set figure size according to graph dimensions
-    if fig_width is None:
-        fig_width = plt.rcParams["figure.figsize"][0]
-    if fig_height is None:
-        fig_height = plt.rcParams["figure.figsize"][1]
-
     fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
     ax = plt.gca()
 
@@ -502,10 +496,6 @@ def _configure_graph_figure(fig_width,
 def _configure_plane_figure(fig_width,
                             fig_height,
                             dpi):
-    if fig_width is None:
-        fig_width = plt.rcParams["figure.figsize"][0]
-    if fig_height is None:
-        fig_height = plt.rcParams["figure.figsize"][1]
 
     #fig, ax =_configure_figure(num_vert, fig_width, fig_height) 
     #ax = fig.add_subplot(projection='3d')
