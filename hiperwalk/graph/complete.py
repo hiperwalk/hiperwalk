@@ -59,8 +59,8 @@ def adjacency_matrix(self):
     return adj_matrix
 
 def laplacian_matrix(self):
-    lpl_matrix = np.ones((self._num_vert, self._num_vert),
-                         dtype=np.int32)
+    lpl_matrix = - np.ones((self._num_vert, self._num_vert),
+                           dtype=np.int32)
     for i in range(self._num_vert):
         lpl_matrix[i, i] = self._num_vert - 1
 
@@ -86,7 +86,7 @@ def Complete(num_vert, weights=None, multiedges=None):
                          + " Received " + str(num_vert) + "instead.")
 
     # toy graph
-    g = Graph(eye(num_vert))
+    g = Graph(eye(num_vert).tocsr())
 
     # changes attributes
     del g._adj_matrix

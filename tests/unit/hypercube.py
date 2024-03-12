@@ -10,13 +10,14 @@ class TestHypercube(unittest.TestCase):
     
     def setUp(self):
         self.dim = 10
-        self.g = hpw.Hypercube(self.dim)
+        hypercube = hpw.Hypercube(self.dim)
+        self.g = hpw.SDMultigraph(hypercube)
 
     def tearDown(self):
         del self.g
 
     def test_arc_direction(self):
-        array = [self.g.arc_direction(a)
+        array = [self.g._neighbor_index(*self.g.arc(a))
                  for a in range(self.g.number_of_arcs())]
         num_vert = self.g.number_of_vertices()
         self.assertTrue(array == list(range(self.dim))*num_vert)

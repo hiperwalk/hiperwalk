@@ -107,7 +107,7 @@ def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
                          + "in each partition.")
 
     # toy graph
-    g = Graph(eye(num_vert1 + num_vert2))
+    g = Graph(eye(num_vert1 + num_vert2).tocsr())
 
     # changes attributes
     del g._adj_matrix

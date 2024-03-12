@@ -21,7 +21,7 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([1, (0, 1)])
+        init_state = self.qw.state([[1, (0, 1)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate(num_steps, init_state, hpc=False)
@@ -40,7 +40,7 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_marked([])
 
         init_state = self.qw.state(
-            [1, (self.num_vert - 1, self.num_vert - 2)])
+            [[1, (self.num_vert - 1, self.num_vert - 2)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate(num_steps, init_state, hpc=False)

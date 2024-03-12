@@ -20,7 +20,7 @@ class TestCoinedCycle(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([1, (0, 1)])
+        init_state = self.qw.state([[1, (0, 1)]])
 
         num_steps = self.num_vert
         final_state = self.qw.simulate(num_steps, init_state, hpc=False)[0]
@@ -33,7 +33,7 @@ class TestCoinedCycle(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([1, (0, self.num_vert - 1)])
+        init_state = self.qw.state([[1, (0, self.num_vert - 1)]])
 
         num_steps = self.num_vert
         final_state = self.qw.simulate(num_steps, init_state, hpc=False)[0]
@@ -42,7 +42,7 @@ class TestCoinedCycle(unittest.TestCase):
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hadamard_evolution_operator(self):
-        init_state = self.qw.state((1, (0, 1)))
+        init_state = self.qw.state([(1, (0, 1))])
 
         num_steps = 2*self.num_vert
         states = self.qw.simulate((num_steps, 1), init_state, hpc=False)

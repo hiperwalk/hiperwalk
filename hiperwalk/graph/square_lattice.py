@@ -201,7 +201,7 @@ def SquareLattice(dim, basis=None, periodic=True,
     num_vert = np.prod(dim)
 
     # create toy graph
-    g = Graph(sparse_eye(num_vert))
+    g = Graph(sparse_eye(num_vert).tocsr())
 
     # modify toy graph to SquareLattice
     g._dim = dim

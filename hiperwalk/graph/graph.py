@@ -41,7 +41,7 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
     It is used to improve the time complexity of the search process.
     """
     if elem < v[start]:
-        start - 1
+        return start - 1
     
     if end is None:
         end = len(v)
@@ -86,6 +86,9 @@ class Graph():
 
     copy : bool, default=False
         If ``True``, a hard copy of ``adj_matrix`` is stored.
+        If ``False``,
+        the pointer to ``adj_matrix`` is stored and
+        the ``adj_matrix``'s data is changed.
 
     Raises
     ------
@@ -142,7 +145,7 @@ class Graph():
         if copy:
             adj_matrix = adj_matrix.copy()
 
-        loops = [adj_matrix[v, v] == 0
+        loops = [adj_matrix[v, v] != 0
                  for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
         del loops
