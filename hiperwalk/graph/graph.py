@@ -128,16 +128,32 @@ class Graph():
         Reference new part of documentation.
     """
 
+    def __default_dtype(self):
+        return np.int8
+
+    def __count_loops(self, adj_matrix):
+        loops = [adj_matrix[v, v] != 0
+                 for v in range(adj_matrix.shape[0])]
+        self._num_loops = np.sum(loops)
+
+    def __manipulate_adj_matrix_data(self, adj_matrix):
+        del adj_matrix.data
+        adj_matrix.data = None
+        self._adj_matrix = adj_matrix
+
     def __init__(self, adj_matrix, copy=False):
         try:
             adj_matrix.adj #throws AttributeError if not networkx graph
             import networkx as nx
-            adj_matrix = nx.adjacency_matrix(adj_matrix, dtype=np.int8)
+            adj_matrix = nx.adjacency_matrix(adj_matrix,
+                                             dtype=self.__default_dtype())
         except AttributeError:
             pass
 
+        # TODO: store numpy matrix
         if not issparse(adj_matrix):
-            adj_matrix = csr_array(adj_matrix, dtype=np.int8)
+            adj_matrix = csr_array(adj_matrix,
+                                   dtype=self.__default_dtype())
 
         if adj_matrix.shape[0] != adj_matrix.shape[1]:
             raise TypeError("Adjacency matrix is not square.")
@@ -145,14 +161,8 @@ class Graph():
         if copy:
             adj_matrix = adj_matrix.copy()
 
-        loops = [adj_matrix[v, v] != 0
-                 for v in range(adj_matrix.shape[0])]
-        self._num_loops = np.sum(loops)
-        del loops
-
-        del adj_matrix.data
-        adj_matrix.data = None
-        self._adj_matrix = adj_matrix
+        self.__count_loops(adj_matrix)
+        self.__manipulate_adj_matrix_data(adj_matrix)
 
     def adjacent(self, u, v):
         r"""
