@@ -37,38 +37,25 @@ class Multigraph(Graph):
     call :meth:`adjacency_matrix()` after creating the multigraph.
     """
 
-    def __init__(self, adj_matrix, copy=False):
-        try:
-            adj_matrix.adj #throws AttributeError if not networkx graph
-            import networkx as nx
-            adj_matrix = nx.adjacency_matrix(adj_matrix, dtype=np.int8)
-        except AttributeError:
-            pass
+    def __default_dtype(self):
+        return np.int32
 
-        if not issparse(adj_matrix):
-            # TODO: verify which representation occupies less space
-            adj_matrix = csr_array(adj_matrix)
-
-        if adj_matrix.shape[0] != adj_matrix.shape[1]:
-            raise TypeError("Adjacency matrix is not square.")
-
-        if copy:
-            adj_matrix = adj_matrix.copy(dtype=np.int32)
-
+    def __count_loops(self, adj_matrix):
         loops = [adj_matrix[v, v]
                  for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
-        del loops
 
-        # manipulate data
+    def __manipulate_adj_matrix_data(self, adj_matrix):
         if not np.issubdtype(adj_matrix.dtype, np.integer):
-            adj_matrix = adj_matrix.astype(np.int32)
-        data = adj_matrix.data.astype(np.int32, copy=False)
+            adj_matrix = adj_matrix.astype(self.__default_dtype())
+
+        data = adj_matrix.data.astype(self.__default_dtype(),
+                                      copy=False)
         for i in range(1, len(data)):
             data[i] += data[i - 1]
 
-        self._adj_matrix = adj_matrix
-
+    def __init__(self, adj_matrix, copy=False):
+        super().__init__(adj_matrix, copy)
         # TODO: is it useful to store the underlying simple graph?
 
     def _entry(self, lin, col):

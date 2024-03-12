@@ -7,11 +7,21 @@ class WeigthedGraph(Graph):
 
     Parameters
     ----------
-    adj_matrix : :class:`scipy.sparse.csr_array`, :class:`numpy.ndarray` or :class:`networkx.Graph`
-        Any real Hermitian matrix or
-        an instance of :class:`networkx.Graph`.
-        If :class:`network.Graph`,
-        the adjacency matrix of the graph is used.
+    adj_matrix :
+        The adjacency matrix of the graph
+        (any integer Hermitian matrix).
+        Two input types are accepted:
+
+        * Any matrix -- for instance,
+            * :class:`scipy.sparse.csr_array`,
+            * :class:`numpy.ndarray`,
+            * list of lists.
+        * :class:`network.Graph`.
+            * The adjacency matrix is extracted from the graph.
+
+    copy : bool, default=False
+        If ``True``, a hard copy of ``adj_matrix`` is stored.
+        If ``False``, the pointer to ``adj_matrix`` is stored.
 
     Raises
     ------
@@ -29,28 +39,20 @@ class WeigthedGraph(Graph):
     any real Hermitian matrix :math:`C`.
     """
 
-    def __init__(self, adj_matrix):
-        try:
-            adj_matrix.adj #throws AttributeError if not networkx graph
-            import networkx as nx
-            adj_matrix = nx.adjacency_matrix(adj_matrix)
-        except AttributeError:
-            pass
+    def __default_dtype(self):
+        return np.float32
 
-        if not issparse(adj_matrix):
-            adj_matrix = csr_array(adj_matrix)
+    def __manipulate_adj_matrix_data(self, adj_matrix):
+        return
 
-        if adj_matrix.shape[0] != adj_matrix.shape[1]:
-            raise TypeError("Adjacency matrix is not square.")
+    def __init__(self, adj_matrix, copy=False):
+        super().__init__(adj_matrix, copy)
 
-        # the following is commented because the current way to
-        # implement Laplacian in ContinuousTime quantum walks is by
-        # passing the Laplacian as adjacency matrix
-        # if adj_matrix.data.min() != 1 or adj_matrix.data.max() != 1:
-        #     raise ValueError("Adjacency matrix must only have 0's "
-        #                      + "and 1's as entries.")
+    def adjacent(self, u, v):
+        return self._adj_matrix[u, v] != 0
 
-        self._adj_matrix = adj_matrix
+    def _find_entry(self, entry):
+        return self._adj_matrix[u, v]
 
     def is_simple(self):
         return False
