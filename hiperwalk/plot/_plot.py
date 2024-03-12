@@ -11,16 +11,10 @@ from scipy.sparse import csr_array
 if __DEBUG__:
     from time import time
 
-# TODO: move to constants
-plt.rcParams["figure.figsize"] = (12, 10)
-plt.rcParams["figure.dpi"] = 100
-
-
-# TODO: add option for changing dpi
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
-        filename=None, interval=250, figsize=None, **kwargs):
+        filename=None, interval=250, figsize=(12, 10), dpi=100, **kwargs):
     """
     Plot the probability distributions of quantum walk states.
 
@@ -98,8 +92,10 @@ def plot_probability_distribution(
         If ``True``, each quantum walk step is used as an animation frame.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
-    figsize : tuple, default=None
+    figsize : tuple, default=(12, 10)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+    dpi : float, default=100
+        Figure resolution in dots-per-inch.
 
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
@@ -203,14 +199,12 @@ def plot_probability_distribution(
     """
     # Figure size
 
-    fig_width = fig_height = None
-    if figsize is not None:
-        if len(figsize) == 2:
-            fig_width, fig_height = figsize
-        else:
-            raise ValueError(
-                'figsize must be a tuple in the format (WIDTH, HEIGHT)'
-            )
+    if len(figsize) == 2:
+        fig_width, fig_height = figsize
+    else:
+        raise ValueError(
+            'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+        )
 
     # passes kwargs by reference to be updated accordingly
 
@@ -271,9 +265,9 @@ def plot_probability_distribution(
         for i in range(len(probabilities)):
             # TODO: set figure size according to graph dimensions
             # TODO: check for kwargs
-            fig, ax = configs[plot](probabilities.shape[1],
-                                    fig_width=fig_width,
-                                    fig_height=fig_height)
+            fig, ax = configs[plot](fig_width=fig_width,
+                                    fig_height=fig_height,
+                                    dpi=dpi)
 
             plot_funcs[plot](probabilities[i], ax, **kwargs)
 
@@ -290,9 +284,9 @@ def plot_probability_distribution(
                 plt.show()
 
     else:
-        fig, ax = configs[plot](probabilities.shape[1],
-                                fig_width=fig_width,
-                                fig_height=fig_height)
+        fig, ax = configs[plot](fig_width=fig_width,
+                                fig_height=fig_height,
+                                dpi=dpi)
 
         if plot == 'plane':
             from functools import partial
@@ -459,7 +453,7 @@ def _preconfigure_graph_plot(probabilities, kwargs):
     _configure_nodes(kwargs['graph'], probabilities, kwargs)
 
 
-def _configure_figure(num_vert, fig_width=None, fig_height=None):
+def _configure_figure(fig_width, fig_height, dpi):
     """
     Set basic figure configuration.
 
@@ -480,24 +474,18 @@ def _configure_figure(num_vert, fig_width=None, fig_height=None):
     ax : current figure axes
     """
 
-    #TODO: set figure size according to graph dimensions
-    if fig_width is None:
-        fig_width = plt.rcParams["figure.figsize"][0]
-    if fig_height is None:
-        fig_height = plt.rcParams["figure.figsize"][1]
-
-    fig = plt.figure(figsize=(fig_width, fig_height))
+    fig = plt.figure(figsize=(fig_width, fig_height), dpi=dpi)
     ax = plt.gca()
 
     return fig, ax
 
 
-def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
+def _configure_plot_figure(fig_width, fig_height, dpi):
     """
     Set basic figure configuration for matplotlib plots.
     """
     
-    fig, ax = _configure_figure(num_vert, fig_width, fig_height)
+    fig, ax = _configure_figure(fig_width, fig_height, dpi)
 
     plt.xlabel("Vertex", size=18)
     plt.ylabel("Probability", size=18)
@@ -507,21 +495,20 @@ def _configure_plot_figure(num_vert, fig_width=None, fig_height=None):
     return fig, ax
 
 
-def _configure_graph_figure(num_vert=None, fig_width=None,
-                            fig_height=None):
-    return _configure_figure(num_vert, fig_width, fig_height)
+def _configure_graph_figure(fig_width,
+                            fig_height,
+                            dpi):
+    return _configure_figure(fig_width, fig_height, dpi)
 
-def _configure_plane_figure(num_vert=None, fig_width=None,
-                           fig_height=None):
-    if fig_width is None:
-        fig_width = plt.rcParams["figure.figsize"][0]
-    if fig_height is None:
-        fig_height = plt.rcParams["figure.figsize"][1]
+def _configure_plane_figure(fig_width,
+                            fig_height,
+                            dpi):
 
     #fig, ax =_configure_figure(num_vert, fig_width, fig_height) 
     #ax = fig.add_subplot(projection='3d')
     fig, ax = plt.subplots(figsize=(fig_width, fig_height),
-                           subplot_kw={"projection": "3d"})
+                           subplot_kw={"projection": "3d"},
+                           dpi=dpi)
 
     ax.tick_params(length=10, width=1, labelsize=16, pad=10)
     ax.set_xlabel('Vertex X', labelpad=15, fontsize=18)
@@ -963,7 +950,7 @@ def _is_in_notebook():
 
 ##########################################################################
 
-def plot_success_probability(time, probabilities, **kwargs):
+def plot_success_probability(time, probabilities, figsize=(12, 10), dpi=100, **kwargs):
     r"""
     Plot the success probability over time.
 
@@ -979,6 +966,10 @@ def plot_success_probability(time, probabilities, **kwargs):
         Success probabilities with respect to ``time``,
         such that ``probabilities[i]`` corresponds to ``i``-th
         timestamp described by ``time``.
+    figsize : tuple, default=(12, 10)
+        Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+    dpi : float, default=100
+        Figure resolution in dots-per-inch.
 
     **kwargs:
         Additional arguments to customize plot.
@@ -990,6 +981,17 @@ def plot_success_probability(time, probabilities, **kwargs):
     QuantumWalk.success_probability
     matplotlib.pyplot.plot
     """
+
+    # Figure size
+
+    if len(figsize) == 2:
+        fig_width, fig_height = figsize
+    else:
+        raise ValueError(
+            'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+        )
+
+    _configure_figure(fig_width, fig_height, dpi)
 
     time = QuantumWalk._time_to_tuple(time)
     time[1] += time[2]
@@ -1011,13 +1013,24 @@ def plot_success_probability(time, probabilities, **kwargs):
     plt.show()
 
 def plot_function(qw_iter, x_label, y_label, x_vals, function,
-                  *args, **kwargs):
+                  figsize=(12, 10), dpi=100, *args, **kwargs):
     # TODO: any situation where *y_args and **y_kwargs are iterable?
 
     # y_vals = [y_func(qw, *y_args, **y_kwargs) for qw in qw_gen]
     # plt.plot(x_arg, y_vals)
     # plt.show()
     #######################################
+    # Figure size
+
+    if len(figsize) == 2:
+        fig_width, fig_height = figsize
+    else:
+        raise ValueError(
+            'figsize must be a tuple in the format (WIDTH, HEIGHT)'
+        )
+
+    _configure_figure(fig_width, fig_height, dpi)
+
     if hasattr(x_vals, '__iter__'):
         x_vals = iter(x_vals)
 
