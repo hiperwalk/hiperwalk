@@ -93,8 +93,12 @@ def Hypercube(dim, weights=None, multiedges=None):
     if either :math:`u < v` is true, or
     both :math:`u = v` and :math:`i < j` are true.
     """
-    if weights is not None or multiedges is not None:
-        raise NotImplementedError()
+    if weights is not None and multiedges is not None:
+        raise ValueError(
+            "Both `weights` and `multiedges` arguments were set. "
+            + "Cannot decide whether to create a weighted graph or "
+            + "a multigraph."
+        )
 
     # adjacency matrix
     num_vert = 1 << dim
@@ -107,7 +111,18 @@ def Hypercube(dim, weights=None, multiedges=None):
     adj_matrix = csr_array((data, indices, indptr),
                            shape=(num_vert, num_vert))
 
+    data = None
     g = Graph(adj_matrix, copy=False)
+    if weights is not None:
+        g.__rearrange_matrix_indices(weights)
+        data = weights
+        del g
+        g = WeigthedGraph(data, copy=False)
+    elif multiedges is not None:
+        g.__rearrange_matrix_indices(multiedges)
+        data = multiedges
+        del g
+        g = Multigraph(data, copy=False)
 
     # Binding particular attributes and methods
     # TODO: add to docs
