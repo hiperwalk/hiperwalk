@@ -219,8 +219,6 @@ def SquareLattice(dim, basis=None, periodic=True,
     g.dimensions = MethodType(dimensions, g)
 
     #create adjacency matrix
-    g._adj_matrix = __create_adj_matrix(g)
-    del g._adj_matrix.data
-    g._adj_matrix.data = None
+    g._set_adj_matrix(__create_adj_matrix(g))
 
     return g
