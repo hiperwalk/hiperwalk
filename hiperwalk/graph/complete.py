@@ -6,20 +6,20 @@ from scipy.sparse import eye
 def adjacent(self, u, v):
     return u != v
 
-def _entry(self, lin, col):
-    entry = lin*(self._num_vert - 1) + col
-    if col < lin:
+def _entry(self, row, col):
+    entry = row*(self._num_vert - 1) + col
+    if col < row:
         entry += 1
 
     return entry
 
 def _find_entry(self, entry):
-    # lin = (entry - 1) % (self._num_vert - 1) 
-    # col = entry - lin*(self._num_vert - 1)
-    # if lin >= col:
+    # row = (entry - 1) % (self._num_vert - 1)
+    # col = entry - row*(self._num_vert - 1)
+    # if row >= col:
     #     col -= 1
 
-    # return (lin, col)
+    # return (row, col)
     tail = entry // (self._num_vert - 1)
     head = entry % (self._num_vert - 1)
     if head >= tail:

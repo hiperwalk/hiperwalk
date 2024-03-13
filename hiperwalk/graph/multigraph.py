@@ -58,17 +58,17 @@ class Multigraph(Graph):
         super().__init__(adj_matrix, copy)
         # TODO: is it useful to store the underlying simple graph?
 
-    def _entry(self, lin, col):
-        return self._adj_matrix[lin, col]
+    def _entry(self, row, col):
+        return self._adj_matrix[row, col]
 
     def _find_entry(self, entry):
         adj_matrix = self._adj_matrix
         index = _interval_binary_search(adj_matrix.data, entry) + 1
 
         col = adj_matrix.indices[index]
-        lin = _interval_binary_search(adj_matrix.indptr, index)
+        row = _interval_binary_search(adj_matrix.indptr, index)
 
-        return (lin, col)
+        return (row, col)
 
     def number_of_edges(self):
         non_loops = self._adj_matrix.data[-1] - self._num_loops

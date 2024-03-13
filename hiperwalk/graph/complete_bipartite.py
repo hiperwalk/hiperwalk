@@ -11,15 +11,15 @@ def adjacent(self, u, v):
     return ((u < self._num_vert1 and v >= self._num_vert1)
             or (v < self._num_vert1 and u >= self._num_vert2))
 
-def _entry(self, lin, col):
+def _entry(self, row, col):
     entry = 1
-    if lin < self._num_vert1:
-        entry += lin*self._num_vert2
+    if row < self._num_vert1:
+        entry += row*self._num_vert2
         entry += col - self._num_vert1
         return entry
 
     entry += self.number_of_edges()
-    entry += (lin - self._num_vert1)*self._num_vert1
+    entry += (row - self._num_vert1)*self._num_vert1
     entry += col
     return entry
 
@@ -27,14 +27,14 @@ def _entry(self, lin, col):
 def _find_entry(self, entry):
     num_edges = self.number_of_edges()
     if entry < num_edges:
-        lin = entry // self._num_vert1
+        row = entry // self._num_vert1
         col = entry % self._num_vert1
-        return (lin, col)
+        return (row, col)
 
     entry -= num_edges
-    lin = entry // self._num_vert2
+    row = entry // self._num_vert2
     col = entry % self._num_vert2
-    return (lin, col)
+    return (row, col)
 
 def _neighbor_index(self, vertex, neigh):
     if neigh < self._num_vert1:
