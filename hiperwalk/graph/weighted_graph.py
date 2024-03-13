@@ -42,8 +42,8 @@ class WeigthedGraph(Graph):
     def __default_dtype(self):
         return np.float32
 
-    def __manipulate_adj_matrix_data(self, adj_matrix):
-        return
+    def _set_adj_matrix(self, adj_matrix):
+        self._adj_matrix = adj_matrix
 
     def __init__(self, adj_matrix, copy=False):
         super().__init__(adj_matrix, copy)

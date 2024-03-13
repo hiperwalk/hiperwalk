@@ -45,14 +45,15 @@ class Multigraph(Graph):
                  for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
 
-    def __manipulate_adj_matrix_data(self, adj_matrix):
-        if not np.issubdtype(adj_matrix.dtype, np.integer):
+    def _set_adj_matrix(self, adj_matrix):
+        if not np.issubdtype(adj_matrix.dtype, self.__default_dtype()):
             adj_matrix = adj_matrix.astype(self.__default_dtype())
 
-        data = adj_matrix.data.astype(self.__default_dtype(),
-                                      copy=False)
+        data = adj_matrix.data
         for i in range(1, len(data)):
             data[i] += data[i - 1]
+
+        self._adj_matrix = adj_matrix
 
     def __init__(self, adj_matrix, copy=False):
         super().__init__(adj_matrix, copy)

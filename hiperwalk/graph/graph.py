@@ -136,7 +136,7 @@ class Graph():
                  for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
 
-    def __manipulate_adj_matrix_data(self, adj_matrix):
+    def _set_adj_matrix(self, adj_matrix):
         del adj_matrix.data
         adj_matrix.data = None
         self._adj_matrix = adj_matrix
@@ -162,14 +162,15 @@ class Graph():
             adj_matrix = adj_matrix.copy()
 
         self.__count_loops(adj_matrix)
-        self.__manipulate_adj_matrix_data(adj_matrix)
+        self._set_adj_matrix(adj_matrix)
 
     def adjacent(self, u, v):
         r"""
         Return True if vertex ``u`` is adjacent to ``v``.
         """
         # TODO: check implementation of adj_matrix[u, v]
-        # if adj_matrix.has_sorted_index, probably scipy is more efficient.
+        # if adj_matrix.has_sorted_indices,
+        # probably scipy is more efficient.
         # if indices are not sorted, scipy probably does a linear search,
         # and a graph-dependent implementation may be more efficient.
         # If adj_matrix.has_sorted_index and
@@ -398,10 +399,6 @@ class Graph():
                 \deg(v_i), & \text{if } i = j\\
                 0, & \text{otherwise}.
             \end{cases}
-
-        The degree is calculated by the :meth:`hiperwalk.Graph.degree`
-        method.
-            
         """
         A = self.adjacency_matrix()
         D = A.sum(axis=1)
