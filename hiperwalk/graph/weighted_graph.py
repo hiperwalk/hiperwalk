@@ -58,6 +58,39 @@ class WeigthedGraph(Graph):
         # this should not be invoked
         raise AttributeError("WeightedGraph has no `_find_entry` method.")
 
+    def laplacian_matrix(self):
+        r"""
+        Return the graph's Laplacian matrix.
+
+        See Also
+        --------
+        adjacency_matrix
+
+        Notes
+        -----
+        The Laplacian matrix is given by
+
+        .. math::
+            L = W - A,
+
+        where :math:`A` is the graph's adjacency matrix
+        and :math:`W` is a diagonal matrix whose entries are
+        the sum of the weights of the edges incident to
+        a given vertex.
+
+        .. math::
+            W_{i, j} = \begin{cases}
+                \sum_{k = 0}^{|V| - 1}A_{ik}, & \text{if } i = j\\
+                0, & \text{otherwise}.
+            \end{cases}
+
+        .. todo::
+            See
+            https://people.eecs.berkeley.edu/~satishr/cs270/sp11/rough-notes/Tree-metrics.pdf
+            as reference
+        """
+        return super().laplacian_matrix()
+
     def is_simple(self):
         return False
 
