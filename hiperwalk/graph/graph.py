@@ -419,3 +419,36 @@ class Graph():
             Decide if simple graph implementation accepts loops.
         """
         return True
+
+    def __rearrange_matrix_indices(self, matrix):
+        r"""
+        Rearrange `matrix.indices` accoring to the
+        Graph's neighbor order.
+        """
+        print("Check if `has_sorted_indices` changes")
+        print(matrix.has_sorted_indices)
+
+        indices = matrix.indices
+        adj_indices = self._adj_matrix.indices
+
+        for row in range(len(self._adj_matrix.indptr) - 1):
+            start = self._adj_matrix.indptr[row]
+            end = self._adj_matrix.indptr[row + 1]
+
+            for i in range(start, end):
+                if indices[i] != adj_indices[i]:
+                    # find right position
+                    j = np.where(indices[start:end] == adj_indices[i])
+                    j = j[0][0]
+
+                    # swap indices
+                    temp = indices[i]
+                    indices[i] = indices[j]
+                    indices[j] = temp
+
+                    # swap data
+                    temp = matrix.data[i]
+                    matrix.data[i] = matrix.data[j]
+                    matrix.data[j] = temp
+
+        print(matrix.has_sorted_indices)
