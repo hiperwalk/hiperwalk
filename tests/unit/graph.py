@@ -58,7 +58,7 @@ class TestGraph(unittest.TestCase):
 
         self.assertTrue((sparse_matrix - adj_matrix).nnz == 0)
     
-    def test_with_networkx_graph(self):
+    def test_init_with_networkx_graph(self):
         numpy_matrix = np.array(self.adj_matrix)
         graph = nx.Graph(numpy_matrix)
         g = hpw.Graph(graph)
