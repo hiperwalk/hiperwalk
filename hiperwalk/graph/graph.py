@@ -128,10 +128,10 @@ class Graph():
         Reference new part of documentation.
     """
 
-    def __default_dtype(self):
+    def _default_dtype(self):
         return np.int8
 
-    def __count_loops(self, adj_matrix):
+    def _count_loops(self, adj_matrix):
         loops = [adj_matrix[v, v] != 0
                  for v in range(adj_matrix.shape[0])]
         self._num_loops = np.sum(loops)
@@ -146,14 +146,14 @@ class Graph():
             adj_matrix.adj #throws AttributeError if not networkx graph
             import networkx as nx
             adj_matrix = nx.adjacency_matrix(adj_matrix,
-                                             dtype=self.__default_dtype())
+                                             dtype=self._default_dtype())
         except AttributeError:
             pass
 
         # TODO: store numpy matrix
         if not issparse(adj_matrix):
             adj_matrix = csr_array(adj_matrix,
-                                   dtype=self.__default_dtype())
+                                   dtype=self._default_dtype())
 
         if adj_matrix.shape[0] != adj_matrix.shape[1]:
             raise TypeError("Adjacency matrix is not square.")
@@ -161,7 +161,7 @@ class Graph():
         if copy:
             adj_matrix = adj_matrix.copy()
 
-        self.__count_loops(adj_matrix)
+        self._count_loops(adj_matrix)
         self._set_adj_matrix(adj_matrix)
 
     def adjacent(self, u, v):
@@ -420,7 +420,7 @@ class Graph():
         """
         return True
 
-    def __rearrange_matrix_indices(self, matrix):
+    def _rearrange_matrix_indices(self, matrix):
         r"""
         Rearrange `matrix.indices` accoring to the
         Graph's neighbor order.
