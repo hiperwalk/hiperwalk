@@ -246,7 +246,7 @@ class Coined(QuantumWalk):
             S_cols = [g.arc_number((j, i, e))
                       for i in range(num_vert)
                       for j in g.neighbors(i)
-                      for e in range(g.number_of_multiedges(j, i))]
+                      for e in range(g.number_of_edges(j, i))]
 
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column

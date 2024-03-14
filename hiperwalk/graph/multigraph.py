@@ -71,10 +71,43 @@ class Multigraph(Graph):
 
         return (row, col)
 
-    def number_of_edges(self):
-        non_loops = self._adj_matrix.data[-1] - self._num_loops
-        num_edges = non_loops >> 1
-        return  num_edges + self._num_loops
+    def number_of_edges(self, u=None, v=None):
+        r"""
+        Return number of edges.
+
+        Return number of edges in the multigraph if
+        ``u is None`` and ``v is None``.
+        Otherwise,
+        return the number of edges incident to both ``u`` and ``v``.
+
+        Parameters
+        ----------
+        u, v : default=None
+            Vertices of the Graph.
+
+        Returns
+        -------
+        Number of edges in the graph
+        """
+        if u is None and v is None:
+            non_loops = self._adj_matrix.data[-1] - self._num_loops
+            num_edges = non_loops >> 1
+            return  num_edges + self._num_loops
+
+        # number of edges incident to both u and v
+        indptr = self._adj_matrix.indptr
+        data = self._adj_matrix.data
+
+        index = indptr[u]
+        try:
+            index += self._neighbor_index(u, v)
+        except ValueError:
+            return 0
+
+        out_degree = (data[index] - data[index - 1]
+                      if index > 0
+                      else data[index])
+        return out_degree
 
     def degree(self, vertex):
         vertex = self.vertex_number(vertex)
@@ -91,7 +124,7 @@ class Multigraph(Graph):
 
     def adjacency_matrix(self):
         data = np.copy(self._adj_matrix.data)
-        for i in range(1, len(data)):
+        for i in range(len(data) - 1, 0, -1):
             data[i] -= data[i - 1]
 
         indices = self._adj_matrix.indices
@@ -104,18 +137,3 @@ class Multigraph(Graph):
 
     def is_simple(self):
         return False
-
-    def number_of_multiedges(self, u, v):
-        r"""
-        Number of multiedges that connecet vertices u and v.
-        """
-        indptr = self._adj_matrix.indptr
-        data = self._adj_matrix.data
-
-        index = indptr[u]
-        index += self._neighbor_index(u, v)
-
-        out_degree = (data[index] - data[index - 1]
-                      if index > 0
-                      else data[index])
-        return out_degree

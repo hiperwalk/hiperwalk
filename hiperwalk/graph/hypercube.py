@@ -13,6 +13,7 @@ def __adjacent(self, u, v):
 def __neighbor_index(self, vertex, neigh):
     # TODO: how to use __debug__?
     # how to unable __debug__ when uploading to pip?
+    # TODO: throw value error if not adjacent
     if __debug__:
         assert self.adjacent(vertex, neigh)
 
