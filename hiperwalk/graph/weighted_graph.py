@@ -39,7 +39,7 @@ class WeigthedGraph(Graph):
     any real Hermitian matrix :math:`C`.
     """
 
-    def __default_dtype(self):
+    def _default_dtype(self):
         return np.float32
 
     def _set_adj_matrix(self, adj_matrix):
