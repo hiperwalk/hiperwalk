@@ -15,14 +15,15 @@ def _binary_search(v, elem, start=0, end=None):
     if end == None:
         end = len(v)
     
-    while start < end:
-        mid = int((start + end)/2)
+    index = end
+    while start < index:
+        mid = int((start + index)/2)
         if elem <= v[mid]:
-            end = mid
+            index = mid
         else:
             start = mid + 1
 
-    return end if v[end] == elem else -1
+    return index if index < end and v[index] == elem else -1
 
 def _interval_binary_search(v, elem, start = 0, end = None) -> int:
     r"""
@@ -238,7 +239,9 @@ class Graph():
                                    neigh,
                                    start=start,
                                    end=end)
-            return index - start
+            if index >= 0:
+                return index - start
+            index = end # will raise ValueError down below
 
         # indices is not in ascending order
         for index in range(start, end):
