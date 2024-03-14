@@ -37,6 +37,7 @@ def _find_entry(self, entry):
     return (row, col)
 
 def _neighbor_index(self, vertex, neigh):
+    # TODO: throw value error if not adjacent
     if neigh < self._num_vert1:
         return neigh
     return neigh - self._num_vert1
