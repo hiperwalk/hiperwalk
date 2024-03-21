@@ -5,7 +5,7 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 #from ..graph import _sym_dir_multigraph
 from ..graph import SDMultigraph
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG, HPC
 from scipy.linalg import hadamard, dft
 try:
     from . import _pyneblina_interface as nbl
@@ -354,7 +354,7 @@ class Coined(QuantumWalk):
 
         return False
 
-    def set_shift(self, shift='default', hpc=True):
+    def set_shift(self, shift='default', hpc=HPC.CPU):
         r"""
         Set the shift operator.
 
@@ -370,9 +370,10 @@ class Coined(QuantumWalk):
             Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
 
-        hpc: bool, default=True
+        hpc: Enum, default=HPC.CPU
             Whether or not the evolution operator should be
-            updated using nelina's high-performance computing.
+            updated using nelina's high-performance computing with
+            CPU or GPU.
             See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
@@ -517,7 +518,7 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             if self._coin is None: raise AssertionError
 
-    def set_coin(self, coin='default', hpc=True):
+    def set_coin(self, coin='default', hpc=HPC.CPU):
         """
         Set the coin operator based on the graph's structure.
 
@@ -563,9 +564,10 @@ class Coined(QuantumWalk):
             * :class:`scipy.sparse.csr_array`
                 The explicit coin operator.
 
-        hpc: bool, default=True
+        hpc: Enum, default=HPC.CPU
             Whether or not the evolution operator should be
-            updated using nelina's high-performance computing.
+            updated using nelina's high-performance computing
+            CPU or GPU.
             See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
@@ -751,7 +753,7 @@ class Coined(QuantumWalk):
         super()._set_marked(marked=marked)
         self._oracle_coin = coin_list
 
-    def set_marked(self, marked=[], hpc=True):
+    def set_marked(self, marked=[], hpc=HPC.CPU):
         r"""
         Set the marked vertices.
 
@@ -779,9 +781,10 @@ class Coined(QuantumWalk):
                 ``{coin_type : list_of_vertices}``.
                 Analogous to the one accepted by :meth:`set_coin`.
 
-        hpc: bool, default=True
+        hpc: Enum, default=HPC.CPU
             Whether or not the evolution operator should be
-            updated using nelina's high-performance computing.
+            updated using nelina's high-performance computing
+            using CPU or GPU.
             See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         See Also
@@ -858,15 +861,17 @@ class Coined(QuantumWalk):
 
         return self._coin_list_to_explicit_coin(coin_list)
 
-    def _set_evolution(self, hpc=True):
+    def _set_evolution(self, hpc=HPC.CPU):
         U = None
         if hpc and not self._pyneblina_imported():
-            hpc = False
+            hpc = HPC.NONE
+        else:
+            nbl.set_hpc_type(hpc)
 
         S = self.get_shift()
         C = self.get_coin()
 
-        if hpc:
+        if hpc != HPC.NONE:
 
             S = S.todense()
             C = C.todense()
@@ -889,7 +894,7 @@ class Coined(QuantumWalk):
         self._evolution = U
         return U
 
-    def set_evolution(self, hpc=True, **kwargs):
+    def set_evolution(self, hpc=HPC.CPU, **kwargs):
         """
         Set the evolution operator.
 
@@ -915,9 +920,10 @@ class Coined(QuantumWalk):
             Accepts any valid keywords from
             :meth:`set_shift` :meth:`set_coin`, and :meth:`set_marked`.
 
-        hpc : bool, default=True
+        hpc : Enum, default=HPC.CPU
             Whether or not the evolution operator should be
-            constructed using nelina's high-performance computing.
+            constructed using nelina's high-performance computing
+            using CPU or GPU.
 
         See Also
         --------
@@ -1154,7 +1160,8 @@ class Coined(QuantumWalk):
         return ket
 
     def _prepare_engine(self, state, hpc):
-        if hpc:
+        if hpc != HPC.NONE:
+            nbl.set_hpc_type(hpc)
             S = nbl.send_matrix(self.get_shift())
             C = nbl.send_matrix(self.get_coin())
             self._simul_mat = (C, S)
@@ -1171,7 +1178,8 @@ class Coined(QuantumWalk):
 
 
     def _simulate_step(self, step, hpc):
-        if hpc:
+        if hpc != HPC.NONE:
+            nbl.set_hpc_type(hpc)
             for i in range(step):
                 self._simul_vec = nbl.multiply_matrix_vector(
                     self._simul_mat[0], self._simul_vec)

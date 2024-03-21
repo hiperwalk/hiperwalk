@@ -3,6 +3,7 @@ import numpy as np
 import scipy.sparse
 from warnings import warn
 from .._constants import *
+from .._constants import HPC
 from .._constants import __DEBUG__
 
 ############################################
@@ -10,6 +11,10 @@ from .._constants import __DEBUG__
 import atexit
 
 __engine_initiated = False
+__hpc_type = HPC.NONE
+
+def set_hpc_type(hpc: Enum):
+    __hpc_type = hpc
 
 def exit_handler():
     global __engine_initiated
@@ -44,7 +49,7 @@ def _init_engine():
     """
     global __engine_initiated
     if not __engine_initiated:
-        neblina.init_engine(neblina.CPU, 0)
+        neblina.init_engine(__hpc_type, 0)
         __engine_initiated = True
 
 def send_vector(v):

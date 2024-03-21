@@ -1,4 +1,5 @@
 import hiperwalk as hpw
+from hiperwalk._constants import HPC
 import numpy as np
 
 dim = 121
@@ -9,7 +10,7 @@ psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
                    [-0.5, (center, center + (1, -1))],
                    [-0.5, (center, center + (-1, 1))],
                    [0.5, (center, center + (-1, -1))]])
-psi_final = dtqw.simulate(time=dim // 2, state=psi0, hpc=False)
+psi_final = dtqw.simulate(time=dim // 2, state=psi0, hpc=HPC.NONE)
 prob = dtqw.probability_distribution(psi_final)
 hpw.plot_probability_distribution(prob, graph=grid)
 

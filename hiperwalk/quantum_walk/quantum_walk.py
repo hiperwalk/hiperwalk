@@ -3,7 +3,7 @@ import numpy as np
 import scipy.sparse
 import inspect
 from sys import modules as sys_modules
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG, HPC
 from warnings import warn
 from ..graph import Graph
 import scipy.optimize
@@ -454,7 +454,8 @@ class QuantumWalk(ABC):
         if self._evolution is None:
             self._evolution = self.get_evolution(hpc=hpc)
 
-        if hpc:
+        if hpc != HPC.NONE:
+            nbl.set_hpc_type(hpc)
             self._simul_mat = nbl.send_matrix(self._evolution)
             self._simul_vec = nbl.send_vector(state)
 
@@ -474,7 +475,8 @@ class QuantumWalk(ABC):
         to the simulation vector.
         Simulation vector is then updated.
         """
-        if hpc:
+        if hpc != HPC.NONE:
+            nbl.set_hpc_type(hpc)
             # TODO: request multiple multiplications at once
             #       to neblina-core
             # TODO: check if intermediate states are being freed
@@ -490,7 +492,8 @@ class QuantumWalk(ABC):
     def _save_simul_vec(self, hpc):
         ret = None
 
-        if hpc:
+        if hpc != HPC.NONE:
+            nbl.set_hpc_type(hpc)
             # TODO: check if vector must be deleted or
             #       if it can be reused via neblina-core commands.
             ret = nbl.retrieve_vector(self._simul_vec)
@@ -501,7 +504,7 @@ class QuantumWalk(ABC):
 
 
 
-    def simulate(self, time=None, state=None, hpc=True, initial_state=None):
+    def simulate(self, time=None, state=None, hpc=HPC.CPU, initial_state=None):
         r"""
         Simulates the quantum walk.
 
@@ -532,10 +535,10 @@ class QuantumWalk(ABC):
             The starting state onto which the evolution operator
             will be applied.
 
-        hpc : bool, default=True
+        hpc : Enum, default=HPC.CPU
             Indicates whether to utilize high-performance computing
-            for matrix multiplication. 
-            If set to ``hpc=False``, it will use standalone Python.
+            for matrix multiplication using CPU or GPU. 
+            If set to ``hpc=HPC.NONE``, it will use standalone Python.
 
         initial_state :
             .. deprecated: 2.0
@@ -629,8 +632,10 @@ class QuantumWalk(ABC):
         start, end, step = time
 
         
-        if hpc and not self._pyneblina_imported():
-            hpc = False
+        if hpc != HPC.NONE and not self._pyneblina_imported():
+            hpc = HPC.NONE
+        else:
+            nbl.set_hpc_type(hpc)
 
         dtype = self._prepare_engine(state, hpc)
 
@@ -804,7 +809,7 @@ class QuantumWalk(ABC):
         return self._number_to_valid_time(t_opt), p_succ
 
 
-    def optimal_runtime(self, state=None, delta_time=1, hpc=True):
+    def optimal_runtime(self, state=None, delta_time=1, hpc=HPC.CPU):
         r"""
         Find the optimal running time of a quantum-walk-based search.
 
@@ -826,10 +831,10 @@ class QuantumWalk(ABC):
             to be saved by the simulation.
             See ``time`` argument in :meth:`simulate` for details.
 
-        hpc : boolean
+        hpc : Enum
             Whether or not to use high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses standalone python.
+            to perform matrix multiplications using CPU or GPU.
+            If ``hpc=HPC.NONE`` uses standalone python.
 
         Returns
         -------
@@ -850,7 +855,7 @@ class QuantumWalk(ABC):
         return t_opt
 
     def max_success_probability(self,
-        state=None, delta_time=1, hpc=True):
+        state=None, delta_time=1, hpc=HPC.CPU):
         r"""
         Find the maximum success probability.
         
@@ -868,10 +873,10 @@ class QuantumWalk(ABC):
             to be saved by the simulation.
             See ``time`` argument in :meth:`simulate` for details.
 
-        hpc : boolean
+        hpc : Enum
             Whether or not to use high-performance computing
-            to perform matrix multiplications.
-            If ``hpc=False`` uses standalone python.
+            to perform matrix multiplications using CPU or GPU.
+            If ``hpc=HPC.NONE`` uses standalone python.
 
         Returns
         -------
