@@ -1,4 +1,5 @@
 import hiperwalk as hpw
+from hiperwalk._constants import HPC
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
@@ -11,7 +12,7 @@ psi0 = qw.uniform_state()
 num_steps = int(1.5*np.sqrt(N*np.log(N)))
 states = qw.simulate(time=(num_steps, 1),
                      state=psi0,
-                     hpc=False)
+                     hpc=HPC.NONE)
 succ_prob = qw.success_probability(states)
 plt.plot(list(range(num_steps + 1)), succ_prob,
          marker='o')

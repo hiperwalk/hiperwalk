@@ -1,6 +1,7 @@
 __version__ = '2.0b0'
 
 from sys import modules as sys_modules
+from enum import Enum
 
 __USING_PDB__ = 'pdb' in sys_modules
 __GENERATING_DOCS__ = 'sphinx' in sys_modules
@@ -13,3 +14,8 @@ PYNEBLINA_IMPORT_ERROR_MSG =  (
     + "\n#######################\n"
     + "Continuing without hpc."
     + "\n#######################\n" )
+
+class HPC(Enum):
+    NONE = 1
+    CPU = 2
+    GPU = 3

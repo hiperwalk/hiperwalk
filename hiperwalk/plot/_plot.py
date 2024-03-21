@@ -2,7 +2,7 @@ import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from .._constants import __DEBUG__
+from .._constants import __DEBUG__, HPC
 from ..graph import *
 from ..quantum_walk import QuantumWalk
 from matplotlib.animation import FuncAnimation
@@ -1087,7 +1087,7 @@ def plot_optimal_runtime(qw_iter, x_label, x_vals, state=None,
     if hasattr(state, '__iter__'):
         state = iter(state)
 
-    def function(qw, state=None, delta_time=1, hpc=True):
+    def function(qw, state=None, delta_time=1, hpc=HPC.CPU):
         psi0 = None
         if state is not None:
             psi0 = (state(qw)
@@ -1109,7 +1109,7 @@ def plot_max_success_probability(qw_iter, x_label, x_vals,
     if hasattr(state, '__iter__'):
         state = iter(state)
 
-    def function(qw, state=None, delta_time=1, hpc=True):
+    def function(qw, state=None, delta_time=1, hpc=HPC.CPU):
         psi0 = None
         if state is not None:
             psi0 = (state(qw)
