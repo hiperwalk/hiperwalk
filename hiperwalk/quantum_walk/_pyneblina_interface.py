@@ -13,8 +13,21 @@ import atexit
 __engine_initiated = False
 __hpc_type = HPC.NONE
 
-def set_hpc_type(hpc: Enum):
-    __hpc_type = hpc
+def set_hpc_type(hpc: str):
+    global __hpc_type
+    orig_hpc = hpc
+
+    hpc = hpc.lower()
+    hpc = hpc.strip()
+    if hpc == 'cpu':
+        __hpc_type = HPC.CPU
+    elif hpc == 'gpu':
+        __hpc_type = HPC.GPU
+    else:
+        raise ValueError(
+                'Unexpected value of `hpc`: '
+                + orig_hpc + '. '
+                + "Expected a value in ['cpu', 'gpu'].")
 
 def exit_handler():
     global __engine_initiated
