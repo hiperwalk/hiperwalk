@@ -3,7 +3,6 @@ from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
 from test_constants import *
-from hiperwalk._constants import HPC
 import hiperwalk as hpw
 import unittest
 
@@ -24,7 +23,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = self.qw.state([[1, (0, 1)]])
 
         num_steps = self.num_vert
-        final_state = self.qw.simulate(num_steps, init_state, hpc=HPC.NONE)[0]
+        final_state = self.qw.simulate(num_steps, init_state, hpc=None)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -37,7 +36,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = self.qw.state([[1, (0, self.num_vert - 1)]])
 
         num_steps = self.num_vert
-        final_state = self.qw.simulate(num_steps, init_state, hpc=HPC.NONE)[0]
+        final_state = self.qw.simulate(num_steps, init_state, hpc=None)[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -46,7 +45,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = self.qw.state([(1, (0, 1))])
 
         num_steps = 2*self.num_vert
-        states = self.qw.simulate((num_steps, 1), init_state, hpc=HPC.NONE)
+        states = self.qw.simulate((num_steps, 1), init_state, hpc=None)
         states = states.real
 
         def recursive_expression():
@@ -81,7 +80,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = self.qw.state([1, (0, 1)])
 
         num_steps = self.num_vert
-        final_state = self.qw.simulate(num_steps, init_state, hpc=HPC.CPU)[0]
+        final_state = self.qw.simulate(num_steps, init_state, hpc='cpu')[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -94,7 +93,7 @@ class TestCoinedCycle(unittest.TestCase):
         init_state = self.qw.state([1, (0, self.num_vert - 1)])
 
         num_steps = self.num_vert
-        final_state = self.qw.simulate(num_steps, init_state, hpc=HPC.CPU)[0]
+        final_state = self.qw.simulate(num_steps, init_state, hpc='cpu')[0]
 
         self.assertTrue(np.all(init_state == final_state))
 
@@ -104,9 +103,9 @@ class TestCoinedCycle(unittest.TestCase):
         num_steps = 2*self.num_vert
 
         states = self.qw.simulate(
-            (num_steps, 1), init_state, hpc=HPC.NONE)
+            (num_steps, 1), init_state, hpc=None)
         hpc_states = self.qw.simulate(
-            (num_steps, 1), init_state, hpc=HPC.CPU)
+            (num_steps, 1), init_state, hpc='cpu')
         
         self.assertTrue(np.allclose(states, hpc_states,
                                     rtol=1e-15, atol=1e-15))
@@ -114,6 +113,6 @@ class TestCoinedCycle(unittest.TestCase):
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_set_explicit_coin(self):
         C = self.qw.get_coin()
-        self.qw.set_coin(coin=C, hpc=HPC.NONE)
+        self.qw.set_coin(coin=C, hpc=None)
         C2 = self.qw.get_coin()
         self.assertTrue((C - C2).nnz == 0)
