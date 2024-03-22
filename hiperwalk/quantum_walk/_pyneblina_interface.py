@@ -14,25 +14,31 @@ __engine_initiated = False
 __hpc_type = HPC.NONE
 
 def set_hpc_type(hpc: str):
-    global __hpc_type
-    orig_hpc = hpc
+    new_hpc = hpc
 
     hpc = hpc.lower()
     hpc = hpc.strip()
+
     if hpc == 'cpu':
-        __hpc_type = HPC.CPU
+        new_hpc = HPC.CPU
     elif hpc == 'gpu':
-        __hpc_type = HPC.GPU
+        new_hpc = HPC.GPU
     else:
         raise ValueError(
                 'Unexpected value of `hpc`: '
-                + orig_hpc + '. '
+                + new_hpc + '. '
                 + "Expected a value in ['cpu', 'gpu'].")
+
+    global __hpc_type
+    if __hpc_type != new_hpc:
+        exit_handler()
+        __hpc_type = new_hpc
 
 def exit_handler():
     global __engine_initiated
     if __engine_initiated:
         neblina.stop_engine()
+        __engine_initiated = False
 
 atexit.register(exit_handler)
 ############################################
