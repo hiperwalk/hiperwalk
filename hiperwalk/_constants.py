@@ -16,6 +16,6 @@ PYNEBLINA_IMPORT_ERROR_MSG =  (
     + "\n#######################\n" )
 
 class HPC(Enum):
-    NONE = 1
-    CPU = 2
-    GPU = 3
+    NONE = 2
+    CPU = 0
+    GPU = 1

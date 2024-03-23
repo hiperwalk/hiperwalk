@@ -3,7 +3,6 @@ import numpy as np
 import scipy.sparse
 from warnings import warn
 from .._constants import *
-from .._constants import HPC
 from .._constants import __DEBUG__
 
 ############################################
@@ -11,7 +10,7 @@ from .._constants import __DEBUG__
 import atexit
 
 __engine_initiated = False
-__hpc_type = HPC.NONE
+__hpc_type = -1
 
 def set_hpc_type(hpc: str):
     new_hpc = hpc
@@ -20,9 +19,9 @@ def set_hpc_type(hpc: str):
     hpc = hpc.strip()
 
     if hpc == 'cpu':
-        new_hpc = HPC.CPU
+        new_hpc = 0
     elif hpc == 'gpu':
-        new_hpc = HPC.GPU
+        new_hpc = 1
     else:
         raise ValueError(
                 'Unexpected value of `hpc`: '
