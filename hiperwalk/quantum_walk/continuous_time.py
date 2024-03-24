@@ -509,7 +509,7 @@ class ContinuousTime(QuantumWalk):
 
         self._evolution = U
 
-    def set_evolution(self, hpc=None, **kwargs):
+    def set_evolution(self, **kwargs):
         r"""
         Set the evolution operator.
 
@@ -524,12 +524,6 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        hpc : str, default=None
-            Determines whether or not to use neblina HPC 
-            functions to generate the evolution operator
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-
         **kwargs :
             Additional arguments for setting Hamiltonian and time.
             If omitted, the default arguments are used.
@@ -586,8 +580,7 @@ class ContinuousTime(QuantumWalk):
         if (update):
             filter_and_call(self._set_evolution, update)
 
-    def simulate(self, time=None, state=None, hpc=None,
-                 initial_state=None):
+    def simulate(self, time=None, state=None, initial_state=None):
         r"""
         Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
         which accepts float entries for the ``time`` parameter.
@@ -632,7 +625,7 @@ class ContinuousTime(QuantumWalk):
                 else int(np.ceil(val/time[2]))
                 for val in time]
 
-        states = super().simulate(time, state, hpc, initial_state)
+        states = super().simulate(time, state, initial_state)
         return states
 
     def _number_to_valid_time(self, number):
