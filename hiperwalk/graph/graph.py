@@ -183,12 +183,12 @@ class Graph():
         v = self.vertex_number(v)
         A = self._adj_matrix
 
-        if has_sorted_indices(A):
+        if A.has_sorted_indices:
             i = self._binary_search(A.indices, v, start=A[u],
                                     end=A[u + 1])
             return i != -1
 
-        return v in A.indices[A[u]:A[u+1]]
+        return v in A.indices[A.indptr[u]:A.indptr[u+1]]
 
     def _entry(self, lin, col):
         entry = self._adj_matrix.indptr[lin] + 1
@@ -428,8 +428,7 @@ class Graph():
         Rearrange `matrix.indices` accoring to the
         Graph's neighbor order.
         """
-        print("Check if `has_sorted_indices` changes")
-        print(matrix.has_sorted_indices)
+        # TODO: Check if `has_sorted_indices` changes
 
         indices = matrix.indices
         adj_indices = self._adj_matrix.indices
@@ -453,5 +452,3 @@ class Graph():
                     temp = matrix.data[i]
                     matrix.data[i] = matrix.data[j]
                     matrix.data[j] = temp
-
-        print(matrix.has_sorted_indices)
