@@ -2,11 +2,7 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
-from .._constants import PYNEBLINA_IMPORT_ERROR_MSG
-try:
-    from . import _pyneblina_interface as nbl
-except:
-    pass
+from . import _pyneblina_interface as nbl
 
 class ContinuousTime(QuantumWalk):
     r"""
@@ -157,7 +153,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def set_gamma(self, gamma=0.1, hpc=None):
+    def set_gamma(self, gamma=0.1):
         r"""
         Set gamma.
         
@@ -171,13 +167,6 @@ class ContinuousTime(QuantumWalk):
         gamma : float, default=0.1
             The value of gamma.
 
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.ContinuousTime.set_evolution` for details.
-
         Raises
         ------
         TypeError
@@ -187,8 +176,7 @@ class ContinuousTime(QuantumWalk):
         """
         self.set_hamiltonian(gamma=gamma,
                              type=self._hamil_type,
-                             marked=self._marked,
-                             hpc=hpc)
+                             marked=self._marked)
 
     def get_gamma(self):
         r"""
@@ -205,11 +193,10 @@ class ContinuousTime(QuantumWalk):
         """
         return self._gamma
 
-    def set_marked(self, marked=[], hpc=None):
+    def set_marked(self, marked=[]):
         self.set_hamiltonian(gamma=self._gamma,
                              type=self._hamil_type,
-                             marked=marked,
-                             hpc=hpc)
+                             marked=marked)
 
     def _set_hamiltonian(self, gamma=0.1, type='adjacency', marked=[]):
         update = self._set_gamma(gamma)
@@ -235,8 +222,7 @@ class ContinuousTime(QuantumWalk):
 
         return update
 
-    def set_hamiltonian(self, gamma=0.1, type="adjacency", marked=[],
-                        hpc=None):
+    def set_hamiltonian(self, gamma=0.1, type="adjacency", marked=[]):
         r"""
         Set the Hamiltonian.
 
@@ -260,13 +246,6 @@ class ContinuousTime(QuantumWalk):
 
         marked: TODO
             TODO
-
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.ContinuousTime.set_evolution` for details.
 
         Raises
         ------
@@ -314,8 +293,7 @@ class ContinuousTime(QuantumWalk):
                            terms=self._terms,
                            gamma=gamma,
                            type=type,
-                           marked=marked,
-                           hpc=hpc)
+                           marked=marked)
 
     def get_hamiltonian(self):
         r"""
@@ -343,7 +321,7 @@ class ContinuousTime(QuantumWalk):
 
         return False
 
-    def set_hamiltonian_type(self, type='adjacency', hpc=None):
+    def set_hamiltonian_type(self, type='adjacency'):
         r"""
         Set the type of the Hamiltonian.
         
@@ -356,8 +334,7 @@ class ContinuousTime(QuantumWalk):
         """
         self.set_hamiltonian(gamma=self._gamma,
                              type=type,
-                             marked=self._marked,
-                             hpc=hpc)
+                             marked=self._marked)
 
     def get_hamiltonian_type():
         r"""
@@ -385,7 +362,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def set_time(self, time=1, hpc=None):
+    def set_time(self, time=1):
         r"""
         Set a time instant.
 
@@ -395,13 +372,6 @@ class ContinuousTime(QuantumWalk):
         Parameters
         ----------
         time : float, default=1
-
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.ContinuousTime.set_evolution` for details.
 
         Raises
         ------
@@ -426,8 +396,7 @@ class ContinuousTime(QuantumWalk):
                            terms=self._terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
-                           marked=self._marked,
-                           hpc=hpc)
+                           marked=self._marked)
 
     def _set_terms(self, terms=21):
         if self._terms != terms:
@@ -435,7 +404,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def set_terms(self, terms=21, hpc=None):
+    def set_terms(self, terms=21):
         r"""
         Set the number of terms used to calculate the
         evolution operator as a power series.
@@ -445,12 +414,6 @@ class ContinuousTime(QuantumWalk):
         terms : int, default=21
             Number of terms in the truncated Taylor series expansion.
 
-        hpc : str, default=None
-            Determines whether or not to use neblina HPC 
-            functions to generate the evolution operator
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-
         See Also
         --------
         set_evolution
@@ -459,8 +422,7 @@ class ContinuousTime(QuantumWalk):
                            terms=terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
-                           marked=self._marked,
-                           hpc=hpc)
+                           marked=self._marked)
 
     def get_terms(self):
         r"""
@@ -478,7 +440,7 @@ class ContinuousTime(QuantumWalk):
         """
         return self._terms
 
-    def _set_evolution(self, hpc=None, terms=21):
+    def _set_evolution(self, terms=21):
         r"""
         If this method is invoked,
         the evolution is recalculated
@@ -492,11 +454,7 @@ class ContinuousTime(QuantumWalk):
         n = terms - 1
         H = self.get_hamiltonian()
 
-        if hpc is not None and not self._pyneblina_imported():
-            hpc = None
-
-        if hpc is not None:
-            nbl.set_hpc_type(hpc)
+        hpc = nbl.get_hpc()
 
         #TODO: when scipy issue 18086 is solved,
         # invoke scipy.linalg.expm to calculate power series

@@ -11,6 +11,7 @@ import unittest
 class TestContinuousTime(unittest.TestCase):
 
     def setUp(self):
+        hpw.set_hpc(None)
         self.num_vert = 40
         nx_graph = nx.ladder_graph(self.num_vert // 2)
         self.adj = nx.adjacency_matrix(nx_graph)
@@ -52,8 +53,7 @@ class TestContinuousTime(unittest.TestCase):
         U = self.qw._evolution
 
         self.assertRaises(ValueError, self.qw.set_evolution,
-                          time=-1, gamma=self.qw.get_gamma(),
-                          hpc=None)
+                          time=-1, gamma=self.qw.get_gamma())
 
         self.assertTrue(id(marked) == id(self.qw._marked))
         self.assertTrue(id(H) == id(self.qw._hamiltonian))
@@ -65,7 +65,7 @@ class TestContinuousTime(unittest.TestCase):
         prev_H = self.qw._hamiltonian
         prev_U = self.qw._evolution
 
-        self.qw.set_evolution(time=1, hpc=None, gamma=1, marked=[])
+        self.qw.set_evolution(time=1, gamma=1, marked=[])
         U = self.qw.get_evolution()
 
         self.assertTrue(U is not None)
@@ -80,7 +80,7 @@ class TestContinuousTime(unittest.TestCase):
         prev_H = self.qw._hamiltonian
         prev_U = self.qw._evolution
 
-        self.qw.set_evolution(time=1, gamma=1, marked=[0], hpc=None)
+        self.qw.set_evolution(time=1, gamma=1, marked=[0])
         U = self.qw.get_evolution()
 
         self.assertTrue(U is not None)
@@ -91,8 +91,7 @@ class TestContinuousTime(unittest.TestCase):
 
     @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_unitary(self):
-        U = self.qw.set_evolution(gamma=self.qw.get_gamma(),
-                time=1, hpc=None)
+        U = self.qw.set_evolution(gamma=self.qw.get_gamma(), time=1)
         U = self.qw.get_evolution()
 
         self.assertTrue(np.allclose(
@@ -101,7 +100,8 @@ class TestContinuousTime(unittest.TestCase):
 
     @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
     def test_hpc_evolution_unitary(self):
-        self.qw.set_time(time=1, hpc='cpu')
+        hpw.set_hpc('cpu')
+        self.qw.set_time(time=1)
         U = self.qw.get_evolution()
 
         self.assertTrue(np.allclose(

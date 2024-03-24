@@ -1,4 +1,7 @@
-import neblina
+try:
+    import neblina
+except ModuleNotFoundError:
+    pass
 import numpy as np
 import scipy.sparse
 from warnings import warn
@@ -10,28 +13,46 @@ from .._constants import __DEBUG__
 import atexit
 
 __engine_initiated = False
-__hpc_type = -1
+__hpc_type = None
 
-def set_hpc_type(hpc: str):
+def set_hpc(hpc: str):
+    r"""
+    hpc : str, default=None
+        Indicates whether to utilize high-performance computing
+        for matrix multiplication using CPU or GPU.
+        If set to ``hpc=None``, it will use standalone Python.
+    """
     new_hpc = hpc
 
-    hpc = hpc.lower()
-    hpc = hpc.strip()
+    if hpc is not None:
+        hpc = hpc.lower()
+        hpc = hpc.strip()
 
-    if hpc == 'cpu':
-        new_hpc = 0
-    elif hpc == 'gpu':
-        new_hpc = 1
-    else:
-        raise ValueError(
-                'Unexpected value of `hpc`: '
-                + new_hpc + '. '
-                + "Expected a value in ['cpu', 'gpu'].")
+        if hpc == 'cpu':
+            new_hpc = 0
+        elif hpc == 'gpu':
+            new_hpc = 1
+        else:
+            raise ValueError(
+                    'Unexpected value of `hpc`: '
+                    + new_hpc + '. Expected a value in '
+                    + "[None, 'cpu', 'gpu'].")
 
     global __hpc_type
     if __hpc_type != new_hpc:
         exit_handler()
         __hpc_type = new_hpc
+        _init_engine()
+
+def get_hpc():
+    global __hpc_type
+
+    if __hpc_type == 0:
+        return 'cpu'
+    if __hpc_type == 1:
+        return 'gpu'
+
+    return None
 
 def exit_handler():
     global __engine_initiated
@@ -66,8 +87,19 @@ def _init_engine():
     Initiates the engine if it was not previously initiated
     """
     global __engine_initiated
-    if not __engine_initiated:
-        neblina.init_engine(__hpc_type, 0)
+    global __hpc_type
+    if not __engine_initiated and __hpc_type is not None:
+        # TODO: if not 'neblina' in sys.modules raise ModuleNotFoundError
+        neblina_imported = True
+        try:
+            neblina.init_engine(__hpc_type, 0)
+        except NameError:
+            neblina_imported = False
+        if not neblina_imported:
+            raise ModuleNotFoundError(
+                "Module neblina was not imported. "
+                + "Do you have neblina-core and pyneblina installed?"
+            )
         __engine_initiated = True
 
 def send_vector(v):
@@ -85,7 +117,6 @@ def send_vector(v):
     thus twice the memory needed is being used
     """
 
-    _init_engine()
     # TODO: check if complex automatically?
     is_complex = isinstance(v.dtype, complex)
 
@@ -174,8 +205,6 @@ def _send_sparse_matrix(M, is_complex):
       In order to avoid double memory usage
     """
     
-    _init_engine()
-
     # TODO: check if complex automatically?
     n = M.shape[0]
 
@@ -217,8 +246,6 @@ def _send_sparse_matrix(M, is_complex):
     return PyNeblinaMatrix(smat, M.shape, is_complex, True)
 
 def _send_dense_matrix(M, is_complex):
-    _init_engine()
-
     num_rows, num_cols = M.shape
     mat = (neblina.matrix_new(num_rows, num_cols, neblina.COMPLEX)
            if is_complex
@@ -358,7 +385,6 @@ def matrix_power_series(A, n):
             + "Converting to dense."
         )
 
-    _init_engine()
     pynbl_A = send_matrix(A)
     pynbl_Term = send_matrix(np.eye(A.shape[0], dtype=A.dtype))
     pynbl_M = send_matrix(np.eye(A.shape[0], dtype=A.dtype))
