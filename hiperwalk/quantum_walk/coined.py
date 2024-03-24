@@ -4,12 +4,9 @@ import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__
 from scipy.linalg import hadamard, dft
-try:
-    from . import _pyneblina_interface as nbl
-except:
-    pass
+from . import _pyneblina_interface as nbl
 
 if __DEBUG__:
     from time import time as now
@@ -353,7 +350,7 @@ class Coined(QuantumWalk):
 
         return False
 
-    def set_shift(self, shift='default', hpc=None):
+    def set_shift(self, shift='default'):
         r"""
         Set the shift operator.
 
@@ -368,13 +365,6 @@ class Coined(QuantumWalk):
             otherwise creates the flip flop shift.
             Argument ``'ff'`` is an alias for ``'flipflop'``.
             Argument ``'p'`` is an alias for ``'persistent'``.
-
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing with
-            CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.Coined.set_evolution` for details.
 
         Raises
         ------
@@ -475,8 +465,7 @@ class Coined(QuantumWalk):
         """
         self.set_evolution(shift=shift,
                            coin=self._coin,
-                           marked=self._marked,
-                           hpc=hpc)
+                           marked=self._marked)
 
     def get_shift(self):
         r"""
@@ -518,7 +507,7 @@ class Coined(QuantumWalk):
         if __DEBUG__:
             if self._coin is None: raise AssertionError
 
-    def set_coin(self, coin='default', hpc=None):
+    def set_coin(self, coin='default'):
         """
         Set the coin operator based on the graph's structure.
 
@@ -564,13 +553,6 @@ class Coined(QuantumWalk):
             * :class:`scipy.sparse.csr_array`
                 The explicit coin operator.
 
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing
-            CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.Coined.set_evolution` for details.
-
         See Also
         --------
         set_evolution
@@ -597,8 +579,7 @@ class Coined(QuantumWalk):
         """
         self.set_evolution(shift=self._shift,
                            coin=coin,
-                           marked=self._marked,
-                           hpc=hpc)
+                           marked=self._marked)
 
     def default_coin(self):
         r"""
@@ -754,7 +735,7 @@ class Coined(QuantumWalk):
         super()._set_marked(marked=marked)
         self._oracle_coin = coin_list
 
-    def set_marked(self, marked=[], hpc=None):
+    def set_marked(self, marked=[]):
         r"""
         Set the marked vertices.
 
@@ -782,13 +763,6 @@ class Coined(QuantumWalk):
                 ``{coin_type : list_of_vertices}``.
                 Analogous to the one accepted by :meth:`set_coin`.
 
-        hpc: str, default=None
-            Whether or not the evolution operator should be
-            updated using nelina's high-performance computing
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
-            See :meth:`hiperwalk.Coined.set_evolution` for details.
-
         See Also
         --------
         set_coin
@@ -796,8 +770,7 @@ class Coined(QuantumWalk):
         """
         self.set_evolution(shift=self._shift,
                            coin=self._coin,
-                           marked=marked,
-                           hpc=hpc)
+                           marked=marked)
 
     def _coin_list_to_explicit_coin(self, coin_list):
         num_vert = self._graph.number_of_vertices()
@@ -863,19 +836,15 @@ class Coined(QuantumWalk):
 
         return self._coin_list_to_explicit_coin(coin_list)
 
-    def _set_evolution(self, hpc=None):
+    def _set_evolution(self):
         # TODO: Check if matrix is sparse in pynelibna interface
         # TODO: Check if matrices are deleted from memory and GPU.
         U = None
-        if hpc is not None and not self._pyneblina_imported():
-            hpc = None
 
         S = self.get_shift()
         C = self.get_coin()
 
-        if hpc is not None:
-            nbl.set_hpc_type(hpc)
-
+        if nbl.get_hpc() is not None:
             # TODO: implement sparse matrix multiplication with hpc
             S = S.todense()
             C = C.todense()
@@ -898,7 +867,7 @@ class Coined(QuantumWalk):
         self._evolution = U
         return U
 
-    def set_evolution(self, hpc=None, **kwargs):
+    def set_evolution(self, **kwargs):
         """
         Set the evolution operator.
 
@@ -923,12 +892,6 @@ class Coined(QuantumWalk):
             Arguments for setting the evolution operator.
             Accepts any valid keywords from
             :meth:`set_shift` :meth:`set_coin`, and :meth:`set_marked`.
-
-        hpc : str, default=None
-            Whether or not the evolution operator should be
-            constructed using nelina's high-performance computing
-            using CPU or GPU.
-            If ``None``, Python's matrix multiplation is used.
 
         See Also
         --------
@@ -988,7 +951,7 @@ class Coined(QuantumWalk):
         self._set_shift(**S_kwargs)
         self._set_coin(**C_kwargs)
         self._set_marked(**R_kwargs)
-        self._set_evolution(hpc=hpc)
+        self._set_evolution()
 
     def probability_distribution(self, states):
         r"""
@@ -1165,7 +1128,6 @@ class Coined(QuantumWalk):
 
     def _prepare_engine(self, state, hpc):
         if hpc is not None:
-            nbl.set_hpc_type(hpc)
             S = nbl.send_matrix(self.get_shift())
             C = nbl.send_matrix(self.get_coin())
             self._simul_mat = (C, S)

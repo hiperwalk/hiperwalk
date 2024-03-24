@@ -3,14 +3,11 @@ import numpy as np
 import scipy.sparse
 import inspect
 from sys import modules as sys_modules
-from .._constants import __DEBUG__, PYNEBLINA_IMPORT_ERROR_MSG
+from .._constants import __DEBUG__
 from warnings import warn
 from ..graph import Graph
 import scipy.optimize
-try:
-    from . import _pyneblina_interface as nbl
-except ModuleNotFoundError:
-    warn(PYNEBLINA_IMPORT_ERROR_MSG)
+from . import _pyneblina_interface as nbl
 
 class QuantumWalk(ABC):
     """
@@ -438,24 +435,15 @@ class QuantumWalk(ABC):
         ket[label] = 1
         return ket
 
-    def _pyneblina_imported(self):
-        """
-        Expects pyneblina interface to be imported as nbl
-        """
-        return ('hiperwalk.quantum_walk._pyneblina_interface'
-                in sys_modules)
-
-
     ######################################
     ### Auxiliary Simulation functions ###
     ######################################
 
     def _prepare_engine(self, state, hpc):
         if self._evolution is None:
-            self._evolution = self.get_evolution(hpc=hpc)
+            self._evolution = self.get_evolution()
 
         if hpc is not None:
-            nbl.set_hpc_type(hpc)
             self._simul_mat = nbl.send_matrix(self._evolution)
             self._simul_vec = nbl.send_vector(state)
 
@@ -502,8 +490,7 @@ class QuantumWalk(ABC):
 
 
 
-    def simulate(self, time=None, state=None, hpc=None,
-                 initial_state=None):
+    def simulate(self, time=None, state=None, initial_state=None):
         r"""
         Simulates the quantum walk.
 
@@ -533,11 +520,6 @@ class QuantumWalk(ABC):
         state : :class:`numpy.array`, default=None
             The starting state onto which the evolution operator
             will be applied.
-
-        hpc : str, default=None
-            Indicates whether to utilize high-performance computing
-            for matrix multiplication using CPU or GPU.
-            If set to ``hpc=None``, it will use standalone Python.
 
         initial_state :
             .. deprecated: 2.0
@@ -629,14 +611,7 @@ class QuantumWalk(ABC):
             raise ValueError("`time` has non-int entry.")
 
         start, end, step = time
-
-        
-        if hpc is not None and not self._pyneblina_imported():
-            hpc = None
-
-        if hpc is not None:
-            nbl.set_hpc_type(hpc)
-
+        hpc = nbl.get_hpc()
         dtype = self._prepare_engine(state, hpc)
 
         # number of states to save
@@ -781,7 +756,7 @@ class QuantumWalk(ABC):
     def _number_to_valid_time(self, number):
         raise NotImplementedError()
 
-    def _optimal_runtime(self, state, delta_time, hpc):
+    def _optimal_runtime(self, state, delta_time):
         r"""
         .. todo::
             Returns all arguments.
@@ -796,8 +771,7 @@ class QuantumWalk(ABC):
         # it is better to use classical computing.
         final_time = self._number_to_valid_time(N/2)
         states = self.simulate(time=(final_time, delta_time),
-                               state=state,
-                               hpc=hpc)
+                               state=state)
         p_succ = self.success_probability(states)
         del states
 
@@ -809,7 +783,7 @@ class QuantumWalk(ABC):
         return self._number_to_valid_time(t_opt), p_succ
 
 
-    def optimal_runtime(self, state=None, delta_time=1, hpc=None):
+    def optimal_runtime(self, state=None, delta_time=1):
         r"""
         Find the optimal running time of a quantum-walk-based search.
 
@@ -831,11 +805,6 @@ class QuantumWalk(ABC):
             to be saved by the simulation.
             See ``time`` argument in :meth:`simulate` for details.
 
-        hpc : str, default=None
-            Whether or not to use high-performance computing
-            to perform matrix multiplications using CPU or GPU.
-            If ``hpc=None`` uses standalone python.
-
         Returns
         -------
         int or float
@@ -851,10 +820,10 @@ class QuantumWalk(ABC):
         success_probability
         fit_sin_squared
         """
-        t_opt, _ = self._optimal_runtime(state, delta_time, hpc)
+        t_opt, _ = self._optimal_runtime(state, delta_time)
         return t_opt
 
-    def max_success_probability(self, state=None, delta_time=1, hpc=None):
+    def max_success_probability(self, state=None, delta_time=1):
         r"""
         Find the maximum success probability.
         
@@ -871,11 +840,6 @@ class QuantumWalk(ABC):
             Time difference between two consecutive states
             to be saved by the simulation.
             See ``time`` argument in :meth:`simulate` for details.
-
-        hpc : str, default=None
-            Whether or not to use high-performance computing
-            to perform matrix multiplications using CPU or GPU.
-            If ``hpc=None`` uses standalone python.
 
         Returns
         -------
@@ -896,8 +860,7 @@ class QuantumWalk(ABC):
             the max success probability was not obtained in the simulation.
             The simulation must be rerun or interpolated.
         """
-        t_opt, p_succ = self._optimal_runtime(state,
-                                              delta_time, hpc)
+        t_opt, p_succ = self._optimal_runtime(state, delta_time)
         opt_index = int(t_opt / delta_time)
         # TODO: if t_opt / delta_time is not close to an integer,
         # max_sucess_probability is not in p_succ.
