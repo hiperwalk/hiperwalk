@@ -184,10 +184,12 @@ class Graph():
         A = self._adj_matrix
 
         if A.has_sorted_indices:
+        if A.has_sorted_indices:
             i = self._binary_search(A.indices, v, start=A[u],
                                     end=A[u + 1])
             return i != -1
 
+        return v in A.indices[A.indptr[u]:A.indptr[u+1]]
         return v in A.indices[A.indptr[u]:A.indptr[u+1]]
 
     def _entry(self, lin, col):
@@ -428,7 +430,7 @@ class Graph():
         Rearrange `matrix.indices` accoring to the
         Graph's neighbor order.
         """
-        # TODO: Check if `has_sorted_indices` changes
+        # TODO: Check if ´has_sorted_indices' changes
 
         indices = matrix.indices
         adj_indices = self._adj_matrix.indices
