@@ -921,12 +921,12 @@ def _plot_probability_distribution_on_plane(
                            vmin=vmin/4, vmax=vmax/4,
                            **kwargs)
     ax.set_zlim(vmin, vmax)
-    kwargs['cmap'] = cmap # reinserts into kwargs
 
+    kwargs['cmap'] = cmap # reinserts into kwargs
     if cbar is None:
         cbar = plt.colorbar(mappable,
                             shrink=0.4, aspect=20,
-                            pad=0.15)
+                            pad=0.15, ax=ax)
     else:
         cbar.update_normal(mappable)
 
