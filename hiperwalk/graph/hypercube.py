@@ -65,9 +65,9 @@ import numpy as np
 from scipy.sparse import csr_array
 from types import MethodType
 from .graph import Graph
-def Hypercube(dim, weights=None, multiedges=None):
+def Hypercube(dim, multiedges=None, weights=None):
     r"""
-    Hypercube graph.
+    Hypercube graph constructor.
 
     The hypercube graph consists of ``2**dim`` vertices.
     The numerical labels of these vertices  are
@@ -80,21 +80,17 @@ def Hypercube(dim, weights=None, multiedges=None):
     ----------
     dim : int
         The dimension of the hypercube.
-    weights: :class:`scipy.sparse.csr_array`, default=None
-        If ``weights == None`` and ``multiedges == None``,
-        an instance of :class:`hiperwalk.Graph` is created.
-        if ``weights!=None``, an instance of
-        :class:`hiperwalk.WeightedGraph` is created.
-        The weight of each edge is specified by the
-        entries of ``weights``.
+    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+        See :ref:`graph_constructors`.
 
-    multiedges: :class:`scipy.sparse.csr_array`, default=None
-        If ``multiedges == None`` and ``multiedges == None``,
-        an instance of :class:`hiperwalk.Graph` is created.
-        if ``multiedges!=None``, an instance of
-        :class:`hiperwalk.WeightedGraph` is created.
-        The weight of each edge is specified by the
-        entries of ``multiedges``.
+    Returns
+    -------
+    :class:`hiperwalk.Graph`
+        See :ref:`graph_constructors` for details.
+
+    See Also
+    --------
+    :ref:`graph_constructors`.
 
     Notes
     -----
