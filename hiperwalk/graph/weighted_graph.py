@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.sparse import issparse, csr_array, diags
+from . import Graph
 
-class WeigthedGraph(Graph):
+class WeightedGraph(Graph):
     r"""
     Constructs an arbitrary weighted graph.
 
