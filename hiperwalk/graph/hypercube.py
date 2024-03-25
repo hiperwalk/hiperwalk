@@ -38,16 +38,25 @@ def __number_of_edges(self):
 def __degree(self, vertex):
     return self._dim
 
-def __dimension(self):
+def dimension(self):
     r"""
-    Hypercube dimension.
-
-    .. todo::
-        How to add to docs?
+    The dimension of the Hypercube.
 
     Returns
     -------
     int
+
+    Examples
+    --------
+    .. testsetup::
+        import hiperwalk as hpw
+
+    .. doctest::
+
+        >>> n = 10
+        >>> g = hpw.Hypercube(10)
+        >>> g.dimension() == n
+        True
     """
     return self._dim
 
@@ -60,22 +69,32 @@ def Hypercube(dim, weights=None, multiedges=None):
     r"""
     Hypercube graph.
 
-    The hypercube graph consists of ``2**n`` vertices,
-    where ``n`` is the hypercube *dimension*.
+    The hypercube graph consists of ``2**dim`` vertices.
     The numerical labels of these vertices  are
-    ``0``, ``1``, ..., ``2**n - 1``.
+    ``0``, ``1``, ..., ``2**dim - 1``.
     Two vertices are adjacent
     if and only if the corresponding binary tuples
     differ by only one bit, indicating a Hamming distance of 1.
 
-    .. todo::
-        Update docs.
-        Create generic constructor docs.
-
     Parameters
     ----------
-    dimension : int
+    dim : int
         The dimension of the hypercube.
+    weights: :class:`scipy.sparse.csr_array`, default=None
+        If ``weights == None`` and ``multiedges == None``,
+        an instance of :class:`hiperwalk.Graph` is created.
+        if ``weights!=None``, an instance of
+        :class:`hiperwalk.WeightedGraph` is created.
+        The weight of each edge is specified by the
+        entries of ``weights``.
+
+    multiedges: :class:`scipy.sparse.csr_array`, default=None
+        If ``multiedges == None`` and ``multiedges == None``,
+        an instance of :class:`hiperwalk.Graph` is created.
+        if ``multiedges!=None``, an instance of
+        :class:`hiperwalk.WeightedGraph` is created.
+        The weight of each edge is specified by the
+        entries of ``multiedges``.
 
     Notes
     -----
@@ -87,12 +106,27 @@ def Hypercube(dim, weights=None, multiedges=None):
     Here, :math:`\oplus` represents the bitwise XOR operation,
     and :math:`n` signifies the dimension of the hypercube.
 
-    The order of the arcs is determined by the XOR operation.
-    Consider two arcs, :math:`(u, u \oplus 2^i)` and :math:`(v, v \oplus 2^j)`,
-    labeled numerically as :math:`a_1` and :math:`a_2`, respectively.
-    The condition :math:`a_1 < a_2` is true if and only
-    if either :math:`u < v` is true, or
-    both :math:`u = v` and :math:`i < j` are true.
+    The **order of the neighbors** is determined by the XOR operation.
+    The neighbors of vertex :math:`u` are given in the following order:
+    :math:`u \oplus 2^0`, :math:`u \oplus 2^1, \ldots,`
+    :math:`u \oplus 2^{n - 1}`.
+    For example,
+
+    .. testsetup::
+        import hiperwalk as hpw
+
+    .. doctest::
+
+        >>> u = 10
+        >>> bin(u)
+        '0b1010'
+        >>> neigh = neighbors(u)
+        >>> neigh
+        [11, 8, 14, 2]
+        >>> [bin(v) for v in neigh]
+        ['0b1011', '0b1000', '0b1110', '0b0010']
+        >>> [u^v for v in neigh]
+        [1, 2, 4, 8]
     """
     if weights is not None and multiedges is not None:
         raise ValueError(
@@ -136,6 +170,6 @@ def Hypercube(dim, weights=None, multiedges=None):
     g.number_of_vertices = MethodType(__number_of_vertices, g)
     g.number_of_edges = MethodType(__number_of_edges, g)
     g.degree = MethodType(__degree, g)
-    g.dimension = MethodType(__dimension, g)
+    g.dimension = MethodType(dimension, g)
 
     return g
