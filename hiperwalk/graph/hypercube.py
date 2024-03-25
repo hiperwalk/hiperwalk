@@ -118,7 +118,7 @@ def Hypercube(dim, weights=None, multiedges=None):
         g._rearrange_matrix_indices(weights)
         data = weights
         del g
-        g = WeigthedGraph(data, copy=False)
+        g = WeightedGraph(data, copy=False)
     elif multiedges is not None:
         g._rearrange_matrix_indices(multiedges)
         data = multiedges
