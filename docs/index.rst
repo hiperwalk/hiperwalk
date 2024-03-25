@@ -22,6 +22,7 @@ and efficient environment for the simulation of quantum walks and spatial search
 
    install/index
    tutorial/index
+   examples/index
    documentation/index
    development/index
 
