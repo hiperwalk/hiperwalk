@@ -26,6 +26,8 @@ There are three classes of graph.
 :class:`hiperwalk.Graph` is used as input for
 both quantum walk models.
 
+.. _graph_constructors:
+
 Graph Constructors
 ------------------
 
@@ -41,14 +43,27 @@ Every constructor has the following template:
 
 >>> GraphConstructor(args, multiedges=None, weights=None) #doctest: +SKIP
 
-where ``multiedges`` and ``weights`` are optinal arguments
+where ``multiedges`` and ``weights`` are optional arguments
 whose default value is ``None``.
-If neither ``multiedges`` nor ``weights`` are set,
-an instance of :class:`hiperwalk.Graph` is returned.
-If ``multiedges`` is set,
-an instance of :class:`hiperwalk.Multigraph` is returned.
-If ``weights`` is set,
-an instance of :class:`hiperwalk.WeightedGraph` is returned.
+Every graph constructor returns an instance of
+
+* :class:`hiperwalk.Graph` if ``multiedges is None``
+  and ``weights is None``.
+* :class:`hiperwalk.Multigraph` if ``multiedges is not None``
+  and ``weights is None``.
+* :class:`hiperwalk.WeightedGraph` if ``multiedges is None``
+  and ``weights is not None``.
+
+Both ``multiedges`` and ``weights`` are expected to be
+instances of :class:`scipy.sparse.csr_array` such that
+
+* ``multiedges[u, v]`` is the number of edges
+  incident to both vertices ``u`` and ``v``.
+* ``weights[u, v]`` is the weight of the edge
+  incident to both vertices ``u`` and ``v``.
+
+If ``multiedges is not None`` and ``weights is not None``,
+a ValueError exception is raised.
 
 The following is a list of the available graph constructors.
 
