@@ -67,7 +67,7 @@ class Graph():
     Constructs an arbitrary simple graph with loops.
 
     This class defines the graph structure used for implementing a 
-    quantum walk. It encapsulates all necessary properties 
+    quantum walk. It encapsulates all necessary properties
     and functionalities of the graph 
     required for the quantum walk dynamics.
 
@@ -125,6 +125,7 @@ class Graph():
         Add numpy array manipulation
 
     The treatment of the graph depends on the quantum walk model. 
+
     .. todo::
         Reference new part of documentation.
     """
@@ -255,6 +256,13 @@ class Graph():
     def neighbors(self, vertex):
         r"""
         Return all neighbors of the given vertex.
+
+        Returns
+        -------
+        list of int:
+            The neighbors of ``vertex``.
+            The order of the neighbors varies depending on
+            the graph.
         """
         vertex = self.vertex_number(vertex)
         start = self._adj_matrix.indptr[vertex]
