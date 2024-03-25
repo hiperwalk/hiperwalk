@@ -189,6 +189,7 @@ class Graph():
             return i != -1
 
         return v in A.indices[A.indptr[u]:A.indptr[u+1]]
+        return v in A.indices[A.indptr[u]:A.indptr[u+1]]
 
     def _entry(self, lin, col):
         entry = self._adj_matrix.indptr[lin] + 1
@@ -428,7 +429,7 @@ class Graph():
         Rearrange `matrix.indices` accoring to the
         Graph's neighbor order.
         """
-        # TODO: Check if `has_sorted_indices` changes
+        # TODO: Check if ´has_sorted_indices' changes
 
         indices = matrix.indices
         adj_indices = self._adj_matrix.indices
