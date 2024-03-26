@@ -25,7 +25,7 @@ def Cycle(num_vert, multiedges=None, weights=None):
     The cycle can be interpreted as being embedded on the line
     with a cyclic boundary condition.
     In this context,
-    the **order of the neighbors** is
+    the **order of neighbors** is
     the neighbor to the right first,
     followed by the neighbor to the left.
     In other words, for any vertex :math:`v`,

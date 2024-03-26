@@ -23,7 +23,7 @@ def Line(num_vert, multiedges=None, weights=None):
 
     Notes
     -----
-    The **order of the neighbors** is
+    The **order of neighbors** is
     the neighbor to the right first,
     followed by the neighbor to the left.
     In other words, for any vertex :math:`v`,

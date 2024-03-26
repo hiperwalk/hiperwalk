@@ -65,6 +65,7 @@ import numpy as np
 from scipy.sparse import csr_array
 from types import MethodType
 from .graph import Graph
+
 def Hypercube(dim, multiedges=None, weights=None):
     r"""
     Hypercube graph constructor.
@@ -102,13 +103,14 @@ def Hypercube(dim, multiedges=None, weights=None):
     Here, :math:`\oplus` represents the bitwise XOR operation,
     and :math:`n` signifies the dimension of the hypercube.
 
-    The **order of the neighbors** is determined by the XOR operation.
+    The **order of neighbors** is determined by the XOR operation.
     The neighbors of vertex :math:`u` are given in the following order:
     :math:`u \oplus 2^0`, :math:`u \oplus 2^1, \ldots,`
     :math:`u \oplus 2^{n - 1}`.
     For example,
 
     .. testsetup::
+
         import hiperwalk as hpw
 
     .. doctest::
