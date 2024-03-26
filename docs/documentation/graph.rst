@@ -65,7 +65,10 @@ instances of :class:`scipy.sparse.csr_array` such that
 If ``multiedges is not None`` and ``weights is not None``,
 a ValueError exception is raised.
 
-The following is a list of the available graph constructors.
+List of Graph Constructors
+**************************
+
+The following is the list of all available graph constructors.
 
 .. toctree::
    :maxdepth: 1
