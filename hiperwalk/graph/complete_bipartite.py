@@ -93,7 +93,7 @@ def CompleteBipartite(num_vert1, num_vert2, multiedges=None, weights=None):
     num_vert2: int
         Number of vertices of the second part.
 
-    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+    multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
     Returns

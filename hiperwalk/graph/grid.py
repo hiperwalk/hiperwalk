@@ -32,7 +32,7 @@ def Grid(dim, periodic=True, diagonal=False,
         ``True`` if the grid has the diagonal representation,
         ``False`` if it has the natural representation.
 
-    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+    multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
     Returns

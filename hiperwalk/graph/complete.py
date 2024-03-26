@@ -78,7 +78,7 @@ def Complete(num_vert, multiedges=None, weights=None):
     num_vert : int
         Number of vertices in the complete graph.
 
-    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+    multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
     Returns
