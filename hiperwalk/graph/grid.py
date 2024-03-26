@@ -1,5 +1,5 @@
 from numpy import array as np_array
-from .square_lattice import SquareLattice
+from .integer_lattice import IntegerLattice
 from types import MethodType
 
 def Grid(dim, periodic=True, diagonal=False,
@@ -193,7 +193,7 @@ def Grid(dim, periodic=True, diagonal=False,
         basis = np_array([[1, 1], [1, -1],
                           [-1, 1], [-1, -1]])
 
-    g = SquareLattice(dim, basis, periodic, weights, multiedges)
+    g = IntegerLattice(dim, basis, periodic, weights, multiedges)
     # g._neighbor_index = MethodType(_neighbor_index, g)
     g.diagonal = diagonal
 
