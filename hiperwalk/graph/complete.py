@@ -66,7 +66,7 @@ def laplacian_matrix(self):
 
     return lpl_matrix
 
-def Complete(num_vert, weights=None, multiedges=None):
+def Complete(num_vert, multiedges=None, weights=None):
     r"""
     Complete graph.
 
@@ -77,6 +77,18 @@ def Complete(num_vert, weights=None, multiedges=None):
     ----------
     num_vert : int
         Number of vertices in the complete graph.
+
+    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+        See :ref:`graph_constructors`.
+
+    Returns
+    -------
+    :class:`hiperwalk.Graph`
+        See :ref:`graph_constructors` for details.
+
+    See Also
+    --------
+    :ref:`graph_constructors`.
     """
     if weights is not None or multiedges is not None:
         raise NotImplementedError()
