@@ -82,7 +82,7 @@ class Graph():
             * :class:`scipy.sparse.csr_array`,
             * :class:`numpy.ndarray`,
             * list of lists.
-        * :class:`network.Graph`.
+        * :class:`networkx.Graph`.
             * The adjacency matrix is extracted from the graph.
 
     copy : bool, default=False
