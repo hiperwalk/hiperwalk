@@ -81,7 +81,7 @@ def Hypercube(dim, multiedges=None, weights=None):
     ----------
     dim : int
         The dimension of the hypercube.
-    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+    multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
     Returns

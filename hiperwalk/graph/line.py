@@ -9,7 +9,7 @@ def Line(num_vert, multiedges=None, weights=None):
     num_vert : int
         The number of vertices on the line.
 
-    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+    multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
     Returns
