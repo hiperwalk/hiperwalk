@@ -70,7 +70,13 @@ The following is a list of the available graph constructors.
 .. toctree::
    :maxdepth: 1
 
+   graph_constructors/complete
+   graph_constructors/complete_bipartite
+   graph_constructors/cycle
+   graph_constructors/grid
    graph_constructors/hypercube
+   graph_constructors/line
+   graph_constructors/square_lattice
 
 .. [#fn1] NetworkX uses `graph generators
    <https://networkx.org/documentation/stable/reference/generators.html>`_

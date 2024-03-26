@@ -136,6 +136,9 @@ def vertex_number(self, coordinates):
     return number
 
 def vertex_coordinates(self, vertex):
+    r"""
+    TODO docs
+    """
     self._valid_vertex(vertex, exception=True)
 
     dim = self._dim.copy()
@@ -173,6 +176,9 @@ def vertex_coordinates(self, vertex):
     return coordinates
 
 def dimensions(self):
+    r"""
+    TODO docs dimensions
+    """
     return self._dim
 
 def neighbors(self, vertex):
