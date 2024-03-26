@@ -1,5 +1,5 @@
 from .graph import Graph
-from .square_lattice import SquareLattice
+from .integer_lattice import IntegerLattice
 from .cycle import Cycle
 from .line import Line
 from .grid import Grid

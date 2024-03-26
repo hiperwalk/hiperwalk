@@ -1,10 +1,10 @@
-=======================
-hiperwalk.SquareLattice
-=======================
+========================
+hiperwalk.IntegerLattice
+========================
 
 .. currentmodule:: hiperwalk
 
-.. autofunction:: SquareLattice
+.. autofunction:: IntegerLattice
 
 Methods
 -------
@@ -15,7 +15,7 @@ Besides all methods inherited from
 or :class:`hiperwalk.WeightedGraph`,
 a hypercube instance also has the following method.
 
-.. currentmodule:: hiperwalk.graph.square_lattice
+.. currentmodule:: hiperwalk.graph.integer_lattice
 
 .. autosummary::
    :toctree: generated

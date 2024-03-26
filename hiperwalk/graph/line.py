@@ -1,4 +1,4 @@
-from .square_lattice import SquareLattice
+from .integer_lattice import IntegerLattice
 
 def Line(num_vert, multiedges=None, weights=None):
     r"""
@@ -48,5 +48,5 @@ def Line(num_vert, multiedges=None, weights=None):
     """
 
     basis = [1, -1]
-    g = SquareLattice(num_vert, basis, False, weights, multiedges)
+    g = IntegerLattice(num_vert, basis, False, weights, multiedges)
     return g

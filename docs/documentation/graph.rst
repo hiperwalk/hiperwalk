@@ -63,7 +63,20 @@ instances of :class:`scipy.sparse.csr_array` such that
   incident to both vertices ``u`` and ``v``.
 
 If ``multiedges is not None`` and ``weights is not None``,
-a ValueError exception is raised.
+a `ValueError exception
+<https://docs.python.org/3/library/exceptions.html#ValueError>`_
+is raised.
+
+.. [#fn1] NetworkX uses `graph generators
+   <https://networkx.org/documentation/stable/reference/generators.html>`_
+   for the same concept.
+   However, both `constructor
+   <https://docs.python.org/3/reference/datamodel.html#object.__init__>`_
+   and `generator
+   <https://docs.python.org/3/glossary.html#term-generator>`_
+   are words that already have consolidated meanings.
+   Thus, we decided to use the word *constructor* because
+   it conveys the idea that an instance is going to be returned.
 
 List of Graph Constructors
 **************************
@@ -78,16 +91,5 @@ The following is the list of all available graph constructors.
    graph_constructors/cycle
    graph_constructors/grid
    graph_constructors/hypercube
+   graph_constructors/integer_lattice
    graph_constructors/line
-   graph_constructors/square_lattice
-
-.. [#fn1] NetworkX uses `graph generators
-   <https://networkx.org/documentation/stable/reference/generators.html>`_
-   for the same concept.
-   However, both `constructor
-   <https://docs.python.org/3/reference/datamodel.html#object.__init__>`_
-   and `generator
-   <https://docs.python.org/3/glossary.html#term-generator>`_
-   are words that already have consolidated meanings.
-   Thus, we decided to use the word *constructor* because
-   it conveys the idea that an instance is going to be returned.

@@ -1,4 +1,4 @@
-from .square_lattice import SquareLattice
+from .integer_lattice import IntegerLattice
 
 def Cycle(num_vert, multiedges=None, weights=None):
     r"""
@@ -49,5 +49,5 @@ def Cycle(num_vert, multiedges=None, weights=None):
 
     """
     basis = [1, -1]
-    g = SquareLattice(num_vert, basis, True, weights, multiedges)
+    g = IntegerLattice(num_vert, basis, True, weights, multiedges)
     return g

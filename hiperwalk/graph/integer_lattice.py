@@ -5,19 +5,6 @@ from scipy.sparse import eye as sparse_eye
 from .graph import Graph
 from types import MethodType
 
-# class SquareLattice(Graph):
-#     r"""
-#     Class for Square Lattice graphs.
-# 
-#     Lattice graphs are embedabble in a Euclidian Space,
-#     forming a regular tiling.
-# 
-#     Notes
-#     -----
-#     Given an embedding,
-#     directions can be assigned to the arcs.
-#     """
-
 def __generate_valid_basis(euc_dim, basis=None):
     if basis is None:
         basis = np.arange(1, euc_dim + 1)
@@ -193,10 +180,43 @@ def neighbors(self, vertex):
 
     return neighs
 
-def SquareLattice(dim, basis=None, periodic=True,
-                  weights=None, multiedges=None):
+def IntegerLattice(dim, basis=None, periodic=True,
+                  multiedges=None, weights=None):
     r"""
-    TODO docs
+    Integer lattice graph.
+
+    An integer lattice is a lattice in an euclidean space
+    such that every point is a tuple of integers.
+    In the integer lattice graph,
+    every vertex corresponds to a lattice point.
+
+    Parameters
+    ----------
+    dim : tuple of int
+        Lattice dimensions where
+        ``dim[i]`` is the number of vertices in the i-th-axis.
+
+    basis = ?, default=None
+
+    periodic : bool, default=True
+        ``True`` if the grid has cyclic boundary conditions,
+        ``False`` if it has borders.
+
+    multiedges, weights: scipy.sparse.csr_array, default=None
+        See :ref:`graph_constructors`.
+
+    Returns
+    -------
+    :class:`hiperwalk.Graph`
+        See :ref:`graph_constructors` for details.
+
+    See Also
+    --------
+    :ref:`graph_constructors`.
+
+    Notes
+    -----
+    The **order of neighbors** depends on the value of ``basis``.
     """
     if weights is not None or multiedges is not None:
         raise NotImplementedError()
@@ -209,7 +229,7 @@ def SquareLattice(dim, basis=None, periodic=True,
     # create toy graph
     g = Graph(sparse_eye(num_vert).tocsr())
 
-    # modify toy graph to SquareLattice
+    # modify toy graph to IntegerLattice
     g._dim = dim
     g._periodic = periodic
     g._euc_dim = len(g._dim) # euclidian space dimension
