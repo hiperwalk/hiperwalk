@@ -81,22 +81,35 @@ def laplacian_matrix(self):
     return np.block([[A, B],
                      [C, D]])
 
-def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
+def CompleteBipartite(num_vert1, num_vert2, multiedges=None, weights=None):
     r"""
     Complete bipartite graph.
 
     Parameters
     ----------
     num_vert1: int
-        Number of vertices of the first partition.
+        Number of vertices of the first part.
+
     num_vert2: int
-        Number of vertices of the second partition.
+        Number of vertices of the second part.
+
+    multiedges, weights: :class:`scipy.sparse.csr_array`, default=None
+        See :ref:`graph_constructors`.
+
+    Returns
+    -------
+    :class:`hiperwalk.Graph`
+        See :ref:`graph_constructors` for details.
+
+    See Also
+    --------
+    :ref:`graph_constructors`.
 
     Notes
     -----
-    The vertices in the first partition are labeled from
+    The vertices in the first part are labeled from
     0 to ``num_vert1 - 1`` and the vertices of the
-    second partition are labeled from
+    second part are labeled from
     ``num_vert1`` to ``num_vert1 + num_vert2 - 1``.
     """
 
@@ -105,7 +118,7 @@ def CompleteBipartite(num_vert1, num_vert2, weights=None, multiedges=None):
 
     if num_vert1 <= 0 or num_vert2 <= 0:
         raise ValueError("There must be at least one vertex "
-                         + "in each partition.")
+                         + "in each part.")
 
     # toy graph
     g = Graph(eye(num_vert1 + num_vert2).tocsr())
