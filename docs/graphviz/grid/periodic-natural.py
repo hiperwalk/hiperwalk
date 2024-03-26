@@ -1,4 +1,4 @@
-print('digraph {')
+print('graph {')
 
 dim = 3
 
@@ -24,23 +24,26 @@ for y in range(-1, dim + 1):
 
 print()
 
-arc_count = 0
 for y in range(dim):
     for x in range(dim):
         tail = str((x, y))
-        for d in range(4):
+        for d in [0, 2]:
             y_axis = d // 2
             shift = 1 if d % 2 == 0 else -1
             head = (str((x + shift, y)) if not y_axis else
                     str((x, y + shift)))
 
-            arc_str = '\t "' + tail + '" -> "' + head + '"'
-            arc_str += '[headlabel=' + str(arc_count)
-            arc_str += ' labeldistance=4'
-            arc_str += ' labelangle=-20'
-            arc_str += '];'
+            arc_str = '\t "' + tail + '" -- "' + head + '";'
 
             print(arc_str)
-            arc_count += 1
+
+        if x == 0:
+            head = str((-1, y))
+            arc_str = '\t "' + tail + '" -- "' + head + '";'
+            print(arc_str)
+        if y == 0:
+            head = str((x, -1))
+            arc_str = '\t "' + tail + '" -- "' + head + '";'
+            print(arc_str)
 
 print('}')
