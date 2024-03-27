@@ -121,6 +121,50 @@ class Graph():
         the argument ``copy`` must be set to ``True``.
 
     The treatment of the graph depends on the quantum walk model. 
+
+    The default **order of neighbors** is the ascending order.
+    A different order of neighbors can be specified using a
+    sparse matrix where
+    :obj:`scipy.sparse.csr_array.has_sorted_indices` is ``False``.
+    In this case,
+    the neighbors of ``u`` are given by
+    ``adj_matrix.indices[adj_matrix.indptr[u]:adj_matrix.indptr[u+1]]``.
+
+    Examples
+    --------
+
+    .. testsetup::
+
+        import hiperwalk as hpw
+        import scipy.sparse
+
+    Creating a complete graph with loops and
+    the default order of neighbors (ascending order).
+
+    .. doctest::
+
+        >>> num_vert = 4
+        >>> A = scipy.sparse.csr_array([[1]*num_vert]*num_vert)
+        >>> g = hpw.Graph(A)
+        >>> g.neighbors(0)
+        array([0, 1, 2, 3], dtype=int32)
+        >>> g.neighbors(1)
+        array([0, 1, 2, 3], dtype=int32)
+
+    Creating a complete graph with loops and
+    the descending order of neighbors.
+
+    .. doctest::
+
+        >>> data = [1]*(num_vert**2)
+        >>> indices = list(range(num_vert - 1, -1, -1))*num_vert
+        >>> indptr = list(range(0, num_vert*(num_vert + 1), num_vert))
+        >>> A = scipy.sparse.csr_array((data, indices, indptr))
+        >>> g = hpw.Graph(A)
+        >>> g.neighbors(0)
+        array([3, 2, 1, 0])
+        >>> g.neighbors(1)
+        array([3, 2, 1, 0])
     """
 
     def _default_dtype(self):
