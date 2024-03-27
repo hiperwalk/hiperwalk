@@ -204,7 +204,12 @@ def vertex_coordinates(self, vertex):
 
 def dimensions(self):
     r"""
-    TODO docs dimensions
+    Dimensions of integer lattice.
+
+    Returns
+    -------
+    dim : tuple of int
+        ``dim[i]`` is the number of vertices in the ``i``-th axis.
     """
     return self._dim
 
