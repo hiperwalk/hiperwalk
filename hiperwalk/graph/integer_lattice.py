@@ -124,7 +124,47 @@ def vertex_number(self, coordinates):
 
 def vertex_coordinates(self, vertex):
     r"""
-    TODO docs
+    Return the coordinates of the given vertex.
+
+    Given the number of a vertex,
+    return the corresponding coordinates in the integer lattice.
+
+    Returns
+    -------
+    tuple of int
+
+    See Also
+    --------
+    hiperwalk.Graph.vertex_number
+
+    Notes
+    -----
+    The vertex number depends on its coordinates and the
+    dimension of the lattice ``dim``.
+    If the coordinates of a vertex are ``(v[0], ..., v[n-1])``,
+    its number is
+    ``v[n-1] + dim[n-1]*v[n-2] + ... + dim[n-1]*...*dim[1]*v[0]``.
+
+    Examples
+    --------
+    .. testsetup::
+
+        import hiperwalk as hpw
+
+    The methods ``vertex_coordinates`` is the inverse of
+    ``vertex_number``, and vice versa.
+
+    .. doctest::
+
+        >>> g = hpw.IntegerLattice((3, 3, 3))
+        >>> g.vertex_coordinates(0)
+        (0, 0, 0)
+        >>> g.vertex_number((0, 0, 0))
+        0
+        >>> g.vertex_coordinates(13)
+        (1, 1, 1)
+        >>> g.vertex_number((1, 1, 1))
+        13
     """
     self._valid_vertex(vertex, exception=True)
 
