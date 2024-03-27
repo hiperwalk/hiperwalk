@@ -10,4 +10,4 @@ Methods
 -------
 
 All methods are inherited from
-:class:`hiperwalk.SquareLattice`.
+:class:`hiperwalk.IntegerLattice`.
