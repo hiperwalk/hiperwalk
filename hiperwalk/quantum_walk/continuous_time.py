@@ -17,24 +17,11 @@ class ContinuousTime(QuantumWalk):
         Graph on which the quantum walk takes place.
         There are two acceptable inputs:
 
-        :class:`hiperwalk.graph.Graph` :
-            The graph itself.
-
-        :class:`scipy.sparse.csr_array`:
-            An adjacency matrix, Laplacian matrix, or any real Hermitian matrix.
-
-    gamma : float
-        The value of gamma for setting the Hamiltonian.
+        * Simple graph (:class:`hiperwalk.Graph`);
+        * Weighted graph (:class:`hiperwalk.WeightedGraph`);
 
     **kwargs : optional
         Additional arguments to set the Hamiltonian and evolution operator.
-
-    Raises
-    ------
-    TypeError
-        If ``gamma`` is ``None`` or complex.
-    ValueError
-        If ``gamma < 0``.
 
     See Also
     --------
@@ -73,7 +60,8 @@ class ContinuousTime(QuantumWalk):
     .. math::
         L_{i,j} = \begin{cases}
             \text{degree}(v_i), \text{ if } i=j,\\
-            -1, \text{ if } i\neq j \text{ and } v_i \text{ is adjacent to } v_j,\\
+            -1, \text{ if } i\neq j \text{ and }
+                v_i \text{ is adjacent to } v_j,\\
             0, \text{ otherwise.}
         \end{cases}
 
@@ -83,13 +71,11 @@ class ContinuousTime(QuantumWalk):
     or Laplacian matrix, along with the positioning 
     of the marked vertices.
 
-    The ``ContinuousTime`` class enables the simulation of 
-    real Hamiltonians. To specify a particular Hamiltonian :math:`H`, 
-    it can be provided as a real Hermitian matrix :math:`C` 
-    using the ``graph=C`` parameter. This configuration sets 
-    :math:`H = -\gamma C`. In this case, the adjacency matrix 
-    represents a weighted graph, where the edge weights are 
-    the non-zero real entries of :math:`C`. 
+    The :class:`hiperwalk.ContinuousTime` class enables the simulation of
+    real Hamiltonians.
+    A particular Hamiltonian :math:`H`,
+    can be simulated by creating a :class:`hiperwalk.WeightedGraph`
+    with adjacency matrix :math:`C` such that :math:`H = -\gamma C`.
     Additionally, the Laplacian matrix is computed 
     as :math:`D - A`, with :math:`D` being 
     the degree matrix. 
