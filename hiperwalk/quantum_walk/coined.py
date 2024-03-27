@@ -28,8 +28,8 @@ class Coined(QuantumWalk):
         Graph on which the quantum walk takes place.
         Two types of entries are accepted:
 
-        * Simple graph (:class:`hiperwalk.graph.Graph`);
-        * Multigraph (:class:`hiperwalk.graph.Multigraph`);
+        * Simple graph (:class:`hiperwalk.Graph`);
+        * Multigraph (:class:`hiperwalk.Multigraph`);
 
         A symmetric directed multigraph is created based on the input.
 
@@ -71,7 +71,7 @@ class Coined(QuantumWalk):
         \end{align*}
 
     .. note::
-        The arc ordering may change for graphs defined using specific classes.
+        The order of arcs depends on the order of neighbors.
 
     Arcs are represented using either
     the (tail,head) notation or numerical labels.
@@ -100,7 +100,6 @@ class Coined(QuantumWalk):
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
     found in the book  'Quantum Walks and Search Algorithms' [1]_.
 
-
     For example, the graph :math:`G(V, E)` shown in
     Figure 1 has an adjacency matrix ``adj_matrix``.
 
@@ -124,7 +123,10 @@ class Coined(QuantumWalk):
         :layout: neato
         :caption: Figure 1
 
-    The arcs of the associated digraph in the arc notation are
+    Suppose that, for this graph,
+    the neighbors are given in ascending order.
+    Then,
+    the arcs of the associated digraph in the arc notation are
 
     >>> arcs = [(i, j) for i in range(4)
     ...                for j in range(4) if adj_matrix[i,j] == 1]
