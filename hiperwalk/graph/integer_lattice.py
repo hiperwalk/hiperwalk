@@ -194,9 +194,45 @@ def IntegerLattice(dim, basis=None, periodic=True,
     ----------
     dim : tuple of int
         Lattice dimensions where
-        ``dim[i]`` is the number of vertices in the i-th-axis.
+        ``dim[i]`` is the number of vertices in the ``i``-th-axis.
 
-    basis = ?, default=None
+    basis : list of int or matrix, default=None
+        Vectors used to determine the graph adjacency and
+        the corresponding order of neighbors.
+        ``basis`` can be specified in three different ways.
+        Let ``n = len(dim)``.
+
+        * ``None``
+            Equivalent to the argument ``[1, ..., n]``.
+
+        * list of int
+            Adjacency is described by the standard basis where
+            ``i`` corresponds to the array with all entries
+            equal to ``0`` and the ``i-1``-th entry equal to ``1``.
+            Analogously, ``-i`` corresponds to the same array
+            but in the opposite direction (``-1`` instead of ``1``).
+
+            The values of ``basis`` must satisfy
+            ``1 <= abs(basis) <= n``.
+            Note that 0 is not a valid value because
+            ``-0 == 0``.
+
+            It is expected that ``len(basis) == 2*n`` or
+            ``len(basis) == n``.
+            If ``len(basis) == n``,
+            the equivalent argument is
+
+            .. code-block:: python
+
+                [basis[0], ..., basis[n - 1],
+                 -basis[0], ..., -basis[n - 1]]
+
+        * matrix
+            A matrix with ``2*n`` rows and ``n`` columns.
+            The ``i``-th neighbor of the
+            vertex with coordinates ``(v[0], ..., v[n-1])`` is
+            ``(v[0] + basis[i][0], ..., v[n-1] + basis[i][n-1])``.
+
 
     periodic : bool, default=True
         ``True`` if the grid has cyclic boundary conditions,
@@ -217,6 +253,41 @@ def IntegerLattice(dim, basis=None, periodic=True,
     Notes
     -----
     The **order of neighbors** depends on the value of ``basis``.
+
+    The vertex number depends on its coordinates and ``dim``.
+    If the coordinates of a vertex are ``(v[0], ..., v[n-1])``,
+    its number is
+    ``v[n-1] + dim[n-1]*v[n-2] + ... + dim[n-1]*...*dim[1]*v[0]``.
+
+    Examples
+    --------
+
+    .. testsetup::
+
+        import hiperwalk as hpw
+
+    .. doctest::
+
+        >>> g = hpw.IntegerLattice((3, 3), basis=None)
+        >>> neigh = g.neighbors((1, 1))
+        >>> [g.vertex_coordinates(v) for v in neigh]
+        [(2, 1), (1, 2), (0, 1), (1, 0)]
+
+    .. doctest::
+
+        >>> g = hpw.IntegerLattice((3, 3), basis=[-1, -2])
+        >>> neigh = g.neighbors((1, 1))
+        >>> [g.vertex_coordinates(v) for v in neigh]
+        [(0, 1), (1, 0), (2, 1), (1, 2)]
+
+    .. doctest::
+
+        >>> basis = [[0, 1], [-1, 1], [1, -1], [0, -1]]
+        >>> g = hpw.IntegerLattice((3, 3), basis=basis)
+        >>> neigh = g.neighbors((1, 1))
+        >>> [g.vertex_coordinates(v) for v in neigh]
+        [(1, 2), (0, 2), (2, 0), (1, 0)]
+
     """
     if weights is not None or multiedges is not None:
         raise NotImplementedError()
