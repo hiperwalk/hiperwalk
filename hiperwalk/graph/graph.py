@@ -120,14 +120,7 @@ class Graph():
         If the user wishes to keep the original ``adj_matrix``,
         the argument ``copy`` must be set to ``True``.
 
-    .. todo::
-        check if it is more efficient to store adj_matrix as numpy array.
-        Add numpy array manipulation
-
     The treatment of the graph depends on the quantum walk model. 
-
-    .. todo::
-        Reference new part of documentation.
     """
 
     def _default_dtype(self):
@@ -144,6 +137,9 @@ class Graph():
         self._adj_matrix = adj_matrix
 
     def __init__(self, adj_matrix, copy=False):
+        # TODO: check if it is more efficient to store adj_matrix
+        # as numpy array. Add numpy array manipulation
+
         try:
             adj_matrix.adj #throws AttributeError if not networkx graph
             import networkx as nx
