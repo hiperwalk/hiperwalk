@@ -15,12 +15,20 @@ import atexit
 __engine_initiated = False
 __hpc_type = None
 
-def set_hpc(hpc: str):
+def set_hpc(hpc):
     r"""
-    hpc : str, default=None
-        Indicates whether to utilize high-performance computing
+    Indicates which HPC platform is going to be used.
+
+    After executing the ``set_hpc`` command,
+    all subsequent hiperwalk commands will
+    utilize the dsignated HPC platform.
+
+    Parameters
+    ----------
+    hpc : {None, 'cpu', 'gpu'}
+        Indicates whether to utilize HPC
         for matrix multiplication using CPU or GPU.
-        If set to ``hpc=None``, it will use standalone Python.
+        If ``hpc=None``, it will use standalone Python.
     """
     new_hpc = hpc
 
