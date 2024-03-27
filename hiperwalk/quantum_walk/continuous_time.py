@@ -230,8 +230,9 @@ class ContinuousTime(QuantumWalk):
             ``'A'`` is shorthand for ``'adjacency'`` (default).
             ``'L'`` is shorthand for ``'laplacian'``.
 
-        marked: TODO
-            TODO
+        marked : list of vertices
+            List of vertices to be marked.
+            If empty list, no vertex is marked.
 
         Raises
         ------
