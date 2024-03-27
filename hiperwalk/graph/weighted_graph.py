@@ -31,10 +31,6 @@ class WeightedGraph(Graph):
 
     Notes
     -----
-    .. todo::
-        Check if it is more efficient to store the adjacency matrix as
-        sparse or dense.
-    
     The graph :math:`G(V,E)` on which the quantum walk 
     takes place is specified by
     any real Hermitian matrix :math:`C`.
@@ -47,6 +43,8 @@ class WeightedGraph(Graph):
         self._adj_matrix = adj_matrix
 
     def __init__(self, adj_matrix, copy=False):
+        # TODO: Check if it is more efficient to store the
+        # adjacency matrix as sparse or dense.
         super().__init__(adj_matrix, copy)
 
     def adjacent(self, u, v):
