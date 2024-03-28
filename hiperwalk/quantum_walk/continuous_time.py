@@ -394,7 +394,7 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        terms : int, default=21
+        terms : int, default=20
             Number of terms in the truncated Taylor series expansion.
 
         See Also
@@ -497,7 +497,7 @@ class ContinuousTime(QuantumWalk):
         Set the evolution operator.
 
         This method defines the evolution operator for a specified 
-        time t via the argument ``time=t``.
+        ``time``.
         It first determines the 
         Hamiltonian and subsequently derives the evolution operator 
         via a truncated Taylor series. The default number of terms 
@@ -535,9 +535,11 @@ class ContinuousTime(QuantumWalk):
         
         .. math::
             \text{e}^{-\text{i}tH} \approx
-            \sum_{j = 0}^{n} (-\text{i}tH)^j / j!
+            \sum_{j = 0}^{n-1} (-\text{i}tH)^j / j!
 
-        where ``terms``:math:`=n+1`.
+        where ``terms``:math:`=n`.
+        This choice reflects default Python loops over integers,
+        such as ``range`` and ``np.arange``.
 
         .. warning::
             For non-integer time (floating number),
@@ -562,54 +564,3 @@ class ContinuousTime(QuantumWalk):
         update = filter_and_call(self._set_terms, update)
         if (update):
             filter_and_call(self._set_evolution, update)
-
-    def simulate(self, time=None, state=None, initial_state=None):
-        r"""
-        Analogous to :meth:`hiperwalk.QuantumWalk.simulate`,
-        which accepts float entries for the ``time`` parameter.
-
-        Parameters
-        ----------
-        time : float or tuple of floats
-            This parameter is analogous to those in
-            :meth:`hiperwalk.QuantumWalk.simulate`,
-            with the distinction that it accepts float inputs.
-            The ``step`` parameter is used to construct the evolution operator.
-            The states within the interval
-            **[** ``start/step``, ``end/step`` **]** are stored.
-            The values describing this interval are
-            rounded up if the decimal part exceeds ``1 - 1e-5``,
-            and rounded down otherwise.
-
-        Other Parameters
-        ----------------
-        See :meth:`hiperwalk.QuantumWalk.simulate`.
-
-        See Also
-        --------
-        set_evolution
-        get_evolution
-        """
-        if time is None:
-            raise ValueError(
-                "Invalid `time_range`. Expected a float, 2-tuple, "
-                + "or 3-tuple of float."
-            )
-
-        time = np.array(QuantumWalk._time_to_tuple(time))
-
-        self.set_time(time=time[2])
-
-        # cleaning time_range to int
-        tol = 1e-5
-        time = [int(val/time[2])
-                if int(val/time[2])
-                   <= np.ceil(val/time[2]) - tol
-                else int(np.ceil(val/time[2]))
-                for val in time]
-
-        states = super().simulate(time, state, initial_state)
-        return states
-
-    def _number_to_valid_time(self, number):
-        return number
