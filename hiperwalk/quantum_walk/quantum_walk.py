@@ -378,7 +378,9 @@ class QuantumWalk(ABC):
         ----------
         entries : list of entry
             Each entry is a 2-tuple or array with format
-            ``(amplitude, vertex)``.
+            ``(amplitude, label)``.
+            That is, an amplitude and the corresponding label of
+            the computational basis.
 
         Returns
         -------
