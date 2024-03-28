@@ -110,10 +110,11 @@ def vertex_number(self, coordinates):
         return coordinates
 
     # coordinates
+    coordinates = list(coordinates)
     dim = self._dim
     mult = 1
     number = 0
-    for i in range(self._euc_dim):
+    for i in range(self._euc_dim - 1, -1, -1):
         if self._periodic:
             coordinates[i] = coordinates[i] % self._dim[i]
 
@@ -183,22 +184,17 @@ def vertex_coordinates(self, vertex):
         pass
 
     # input is number
-
-    mult = 1
-    for i in range(0, self._euc_dim - 1):
-        mult *= dim[i]
-
+    mult = np.prod(dim, dtype=np.int64)
     coordinates = np.zeros(self._euc_dim, dtype=np.int32)
-    for i in range(self._euc_dim - 1, 0, -1):
+    for i in range(self._euc_dim - 1):
+        mult = mult // dim[i]
         coordinates[i] = vertex // mult
 
         # TODO: check which one is more efficient
         vertex = vertex % mult
         # vertex -= coordinates[i]*mult
 
-        mult = mult % dim[i - 1]
-
-    coordinates[0] = vertex
+    coordinates[-1] = vertex
 
     return coordinates
 
