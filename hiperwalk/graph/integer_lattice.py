@@ -132,7 +132,7 @@ def vertex_coordinates(self, vertex):
 
     Returns
     -------
-    tuple of int
+    :class:`numpy.ndarray`
 
     See Also
     --------
