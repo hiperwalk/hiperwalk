@@ -756,7 +756,7 @@ class QuantumWalk(ABC):
                 "fit function": fitfunc}
 
     def _number_to_valid_time(self, number):
-        raise NotImplementedError()
+        return int(number)
 
     def _optimal_runtime(self, state, delta_time):
         r"""

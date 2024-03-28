@@ -1155,9 +1155,6 @@ class Coined(QuantumWalk):
         else:
             super()._simulate_step(step, hpc)
 
-    def _number_to_valid_time(self, number):
-        return int(number)
-
     def probability(self, states, vertices):
         r"""
         Computes the sum of probabilities for the specified vertices.
