@@ -57,7 +57,7 @@ One way to accomplish this is by using the
 which generates a state of the computational basis.
 
 >>> vertex = N // 2
->>> state = qw.ket(vertex, vertex + 1)
+>>> state = qw.ket((vertex, vertex + 1))
 >>> state
 array([0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 0.,
        0., 0., 0.])

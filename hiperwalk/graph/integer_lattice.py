@@ -158,11 +158,11 @@ def vertex_coordinates(self, vertex):
     .. doctest::
 
         >>> g = hpw.IntegerLattice((3, 3, 3))
-        >>> g.vertex_coordinates(0)
+        >>> tuple(g.vertex_coordinates(0))
         (0, 0, 0)
         >>> g.vertex_number((0, 0, 0))
         0
-        >>> g.vertex_coordinates(13)
+        >>> tuple(g.vertex_coordinates(13))
         (1, 1, 1)
         >>> g.vertex_number((1, 1, 1))
         13
@@ -311,14 +311,14 @@ def IntegerLattice(dim, basis=None, periodic=True,
 
         >>> g = hpw.IntegerLattice((3, 3), basis=None)
         >>> neigh = g.neighbors((1, 1))
-        >>> [g.vertex_coordinates(v) for v in neigh]
+        >>> [tuple(g.vertex_coordinates(v)) for v in neigh]
         [(2, 1), (1, 2), (0, 1), (1, 0)]
 
     .. doctest::
 
         >>> g = hpw.IntegerLattice((3, 3), basis=[-1, -2])
         >>> neigh = g.neighbors((1, 1))
-        >>> [g.vertex_coordinates(v) for v in neigh]
+        >>> [tuple(g.vertex_coordinates(v)) for v in neigh]
         [(0, 1), (1, 0), (2, 1), (1, 2)]
 
     .. doctest::
@@ -326,7 +326,7 @@ def IntegerLattice(dim, basis=None, periodic=True,
         >>> basis = [[0, 1], [-1, 1], [1, -1], [0, -1]]
         >>> g = hpw.IntegerLattice((3, 3), basis=basis)
         >>> neigh = g.neighbors((1, 1))
-        >>> [g.vertex_coordinates(v) for v in neigh]
+        >>> [tuple(g.vertex_coordinates(v)) for v in neigh]
         [(1, 2), (0, 2), (2, 0), (1, 0)]
 
     """

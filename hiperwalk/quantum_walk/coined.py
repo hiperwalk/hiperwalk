@@ -423,6 +423,8 @@ class Coined(QuantumWalk):
 
             import numpy as np
             import scipy.sparse
+            from sys import path
+            path.append('../..')
 
         .. doctest::
 
@@ -431,7 +433,7 @@ class Coined(QuantumWalk):
             ...                             [1, 0, 1, 1],
             ...                             [0, 1, 0, 1],
             ...                             [0, 1, 1, 0]])
-            >>> qw = hpw.Coined(A)
+            >>> qw = hpw.Coined(hpw.Graph(A))
             >>> qw.set_shift(shift='flipflop')
             >>> S = qw.get_shift().todense()
             >>> S
@@ -1081,12 +1083,12 @@ class Coined(QuantumWalk):
             qw = hpw.Coined(graph=g)
 
         >>> psi = qw.state([(1, (0, 1)), [1, 1], (1, 2)])
-        >>> psi1 = qw.state([(1, ([0, 0], [1, 0])),
-        ...                  [1, (0, dim - 1)],
-        ...                  (1, [(0, 0), [0, 1]])])
-        >>> psi2 = qw.state([(1, [0, 0], [1, 0]),
-        ...                  [1, (0, dim - 1)],
-        ...                  (1, [(0, 0), [0, 1]])])
+        >>> psi1 = qw.state([(1, ([0, 0], [0, 1])),
+        ...                  [1, [(0, 0), (dim - 1, 0)]],
+        ...                  (1, (0, 1))])
+        >>> psi2 = qw.state([(1, [[0, 0], [0, 1]]),
+        ...                  [1, ((0, 0), (dim - 1, 0))],
+        ...                  (1, [0, 1])])
         >>> np.all(psi == psi1)
         True
         >>> np.all(psi1 == psi2)

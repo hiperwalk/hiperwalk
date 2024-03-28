@@ -398,15 +398,21 @@ class QuantumWalk(ABC):
 
         The following commands generate the same state.
 
+        .. testsetup::
+
+            import numpy as np
+            import hiperwalk as hpw
+            qw = hpw.Coined(hpw.Cycle(5))
+
         >>> psi = qw.state([[1, 0], [1, 1], [1, 2]])
         >>> psi1 = qw.state([[1, 0], (1, 1), (1, 2)])
         >>> psi2 = qw.state(([1, 0], (1, 1), (1, 2)))
         >>> psi3 = qw.state(((1, 0), (1, 1), (1, 2)))
-        >>> np.all(psi == ps1)
+        >>> np.all(psi == psi1)
         True
-        >>> np.all(psi1 == ps2)
+        >>> np.all(psi1 == psi2)
         True
-        >>> np.all(psi2 == ps3)
+        >>> np.all(psi2 == psi3)
         True
         """
         if len(entries) == 0:
