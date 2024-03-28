@@ -49,6 +49,9 @@ def dimension(self):
     Examples
     --------
     .. testsetup::
+
+        from sys import path
+        path.append('..')
         import hiperwalk as hpw
 
     .. doctest::
@@ -115,14 +118,15 @@ def Hypercube(dim, multiedges=None, weights=None):
 
     .. doctest::
 
+        >>> g = hpw.Hypercube(4)
         >>> u = 10
         >>> bin(u)
         '0b1010'
-        >>> neigh = neighbors(u)
+        >>> neigh = g.neighbors(u)
         >>> neigh
-        [11, 8, 14, 2]
+        array([11,  8, 14,  2])
         >>> [bin(v) for v in neigh]
-        ['0b1011', '0b1000', '0b1110', '0b0010']
+        ['0b1011', '0b1000', '0b1110', '0b10']
         >>> [u^v for v in neigh]
         [1, 2, 4, 8]
     """

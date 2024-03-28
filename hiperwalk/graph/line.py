@@ -31,18 +31,18 @@ def Line(num_vert, multiedges=None, weights=None):
 
     .. testsetup::
 
-        >>> import hiperwalk as hpw
+        import hiperwalk as hpw
 
     .. doctest::
 
         >>> g = hpw.Line(10)
-        >>> g.neighbors(0) # 0 and 9 are not adjacent
+        >>> list(g.neighbors(0)) # 0 and 9 are not adjacent
         [1]
-        >>> g.neighbors(1)
+        >>> list(g.neighbors(1))
         [2, 0]
-        >>> g.neighbors(8)
+        >>> list(g.neighbors(8))
         [9, 7]
-        >>> g.neighbors(9) # 0 and 9 are not adjacent
+        >>> list(g.neighbors(9)) # 0 and 9 are not adjacent
         [8]
 
     """
