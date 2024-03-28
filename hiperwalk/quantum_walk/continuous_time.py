@@ -212,9 +212,8 @@ class ContinuousTime(QuantumWalk):
         r"""
         Set the Hamiltonian.
 
-        The Hamiltonian takes the form of -gamma A, -gamma L, 
-        or -gamma C, where A is the adjacency matrix, L is 
-        the Laplacian matrix, and C is any real Hermitian matrix.
+        The Hamiltonian takes the form of ``-gamma*C`` wheres
+        ``C`` is either the adjacency matrix or the Laplacian matrix.
         If marked vertices are specified, the Hamiltonian 
         is modified as described in the Notes section. 
         Once the Hamiltonian has been established, 
@@ -230,7 +229,7 @@ class ContinuousTime(QuantumWalk):
             ``'A'`` is shorthand for ``'adjacency'`` (default).
             ``'L'`` is shorthand for ``'laplacian'``.
 
-        marked : list of vertices
+        marked : list of vertices, default=[]
             List of vertices to be marked.
             If empty list, no vertex is marked.
 
@@ -255,15 +254,12 @@ class ContinuousTime(QuantumWalk):
         .. math::
             H = -\gamma C  - \sum_{m \in M} \ket m \bra m,
 
-        where :math:`C` is the adjacency matrix, Laplacian
-        matrix, or any real Hermitian matrix. The set
-        :math:`M` specifies the marked vertices via
+        where :math:`C` is either the adjacency matrix or
+        the Laplacian matrix.
+        The set :math:`M` specifies the marked vertices via
         the argument ``marked=M``. For instance, ``marked={0}``
         specifies that :math:`v_0` is the marked vertex.
         The default is :math:`M=\emptyset`.
-
-        If the type of the Hamiltonian is set ``'adjacency'`` 
-        (default), 
         
         References
         ----------
