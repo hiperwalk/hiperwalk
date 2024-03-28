@@ -896,7 +896,7 @@ def _plot_probability_distribution_on_plane(
 
     X = np.arange(0, x_dim, 1)
     Y = np.arange(0, y_dim, 1)
-    X, Y = np.meshgrid(X, Y)
+    Y, X = np.meshgrid(Y, X)
     Z = np.reshape(probabilities, (x_dim, y_dim))
 
     _default_plane_kwargs(kwargs)
@@ -917,6 +917,9 @@ def _plot_probability_distribution_on_plane(
         surf = [0]
     else:
         surf[0].remove()
+    print(X.shape)
+    print(Y.shape)
+    print(Z.shape)
     surf[0] = ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
                            vmin=vmin/4, vmax=vmax/4,
                            **kwargs)
