@@ -13,7 +13,3 @@ Classes
     QuantumWalk
     Coined
     ContinuousTime
-
-Pyneblina Interface
--------------------
-Functions used to call pyneblina.
