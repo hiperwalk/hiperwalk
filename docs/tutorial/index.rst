@@ -127,5 +127,6 @@ The remainder of the tutorial is split into the following sections.
     :maxdepth: 1
 
     graphs.rst
+    graph_constructors.rst
     quantum_walk_models.rst
     plotting.rst
