@@ -277,7 +277,8 @@ def plot_probability_distribution(
             if filename is not None:
                 filename_suffix = str(i).zfill(
                         len(str(len(probabilities) - 1)))
-                plt.savefig(filename + '-' + filename_suffix)
+                plt.savefig(filename if len(probabilities) == 1
+                            else filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
             if show:
@@ -917,9 +918,7 @@ def _plot_probability_distribution_on_plane(
         surf = [0]
     else:
         surf[0].remove()
-    print(X.shape)
-    print(Y.shape)
-    print(Z.shape)
+
     surf[0] = ax.plot_surface(X, Y, Z, cmap=mappable.cmap,
                            vmin=vmin/4, vmax=vmax/4,
                            **kwargs)
