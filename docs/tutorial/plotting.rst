@@ -103,6 +103,10 @@ Histogram Plot
 This is essentially the same as the bar plot
 but the ``width`` kwarg is *overriden* so the bars are not separated.
 
+>>> hpw.plot_probability_distribution(prob,
+...                                   plot='histogram') #doctest: +SKIP
+
+
 .. image:: histogram.png
 
 Line Plot
@@ -119,11 +123,6 @@ A line is drawn between adjacent markers.
 
 It is built on top of :obj:`matplotlib.pyplot.plot`.
 The respective valid matplotlib keywords can be used to customize the plot.
-
->>> hpw.plot_probability_distribution(
-...     prob, plot='bar', color='red', edgecolor='black', linewidth=3,
-...     tick_label=[str((x, y)) for x in range(dim) for y in range(dim)]
-... ) #doctest: +SKIP
 
 >>> hpw.plot_probability_distribution(
 ...     prob, plot='line', linewidth=3, color='black', linestyle='--',
@@ -248,5 +247,8 @@ it may be hard to visualize the probabilities.
 If ``rescale`` is set to ``True``, each plot is rescaled such that
 the maximum probability of the current plot corresponds to
 the maximum value on the axis.
+
+>>> hpw.plot_probability_distribution(
+...     prob, graph=lat, animate=True, rescale=True) #doctest: +SKIP
 
 .. image:: rescale.gif
