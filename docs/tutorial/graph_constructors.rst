@@ -38,6 +38,11 @@ coined quantum walks, as it may result in undesirable behavior.
 As an example, let's consider a Line with 10 vertices.
 First, we create the line using the :class:`hiperwalk.Graph` class.
 
+.. testsetup::
+
+   import networkx as nx
+   import hiperwalk as hpw
+
 >>> path = nx.path_graph(10)
 >>> adj_matrix = nx.adjacency_matrix(path)
 >>> arbitrary_line = hpw.Graph(adj_matrix)
