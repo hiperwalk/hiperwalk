@@ -47,7 +47,9 @@ class Multigraph(Graph):
 
     def _set_adj_matrix(self, adj_matrix):
         if not np.issubdtype(adj_matrix.dtype, self._default_dtype()):
-            adj_matrix = adj_matrix.astype(self._default_dtype())
+            adj_matrix.data = adj_matrix.data.astype(
+                                        self._default_dtype(),
+                                        copy=False)
 
         data = adj_matrix.data
         for i in range(1, len(data)):
