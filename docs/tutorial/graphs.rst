@@ -76,6 +76,31 @@ Order of Neighbors
 Multigraphs
 -----------
 
+You can create a multigraph by passing its adjacency matrix.
+The entries the adjacency matrix entries are the number of edges
+simultaneously incident to pairs of vertices.
+
+.. testsetup::
+
+   import numpy as np
+
+>>> # creating the adjacency matrix of a complete multigraph
+>>> num_vert = 5
+>>> adj_matrix = np.zeros((num_vert, num_vert))
+>>> for i in range(num_vert):
+...     for j in range(num_vert):
+...         adj_matrix[i, j] = i + j
+...
+>>> # creating multigraph
+>>> g = hpw.Multigraph(adj_matrix)
+>>> # checking if multigraph was created properly
+>>> np.all(np.array(
+...         [g.number_of_edges(u, v) == u + v
+...         for u in range(num_vert)
+...         for v in range(num_vert)]
+...       ) == True)
+True
+
 ---------------
 Weighted Graphs
 ---------------
