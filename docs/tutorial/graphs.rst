@@ -197,3 +197,15 @@ represent the edge weights.
 >>> adj_matrix2 = g.adjacency_matrix().todense()
 >>> np.all(np.isclose(adj_matrix, adj_matrix2))
 True
+
+Weighted graphs are used to create continuous-time quantum walks
+(:class:`hiperwalk.ContinuousTime`).
+
+
+Order of Neighbors
+------------------
+The order of neighbors does not play a crucial role in
+the continuous-time quantum walk.
+Even so,
+you can specify the order of neighbors in weighted graphs
+using commands akin to those used for multigraphs.
