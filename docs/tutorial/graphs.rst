@@ -77,7 +77,7 @@ Multigraphs
 -----------
 
 You can create a multigraph by passing its adjacency matrix.
-The entries the adjacency matrix entries are the number of edges
+The adjacency matrix entries are the number of edges
 simultaneously incident to pairs of vertices.
 
 .. testsetup::
@@ -97,10 +97,30 @@ simultaneously incident to pairs of vertices.
 >>> np.all(np.array(
 ...         [g.number_of_edges(u, v) == u + v
 ...         for u in range(num_vert)
-...         for v in range(num_vert)]
-...       ) == True)
+...         for v in range(num_vert)]) == True)
 True
 
 ---------------
 Weighted Graphs
 ---------------
+
+You can create a weighted graph by passing its adjacency matrix.
+The adjacency matrix entries are real values that
+represent the edge weights.
+
+.. testsetup::
+
+   import numpy as np
+
+>>> # creating the adjacency matrix of a complete weighted graph
+>>> num_vert = 5
+>>> adj_matrix = np.zeros((num_vert, num_vert))
+>>> for i in range(num_vert):
+...     for j in range(num_vert):
+...         adj_matrix[i, j] = (i + j)/10
+...
+>>> # creating weighted
+>>> g = hpw.WeightedGraph(adj_matrix)
+>>> adj_matrix2 = g.adjacency_matrix().todense()
+>>> np.all(np.isclose(adj_matrix, adj_matrix2))
+True
