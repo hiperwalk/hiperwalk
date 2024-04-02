@@ -130,16 +130,48 @@ simultaneously incident to pairs of vertices.
 >>> adj_matrix = np.zeros((num_vert, num_vert))
 >>> for i in range(num_vert):
 ...     for j in range(num_vert):
-...         adj_matrix[i, j] = i + j
+...         adj_matrix[i, j] = i + j + 1
 ...
 >>> # creating multigraph
 >>> g = hpw.Multigraph(adj_matrix)
 >>> # checking if multigraph was created properly
 >>> np.all(np.array(
-...         [g.number_of_edges(u, v) == u + v
+...         [g.number_of_edges(u, v) == u + v + 1
 ...         for u in range(num_vert)
 ...         for v in range(num_vert)]) == True)
 True
+
+Multigraphs are used to create coined quantum walks
+(:class:`hiperwalk.Coined`).
+
+Order of Neighbors
+------------------
+
+To specify a non-default order of neighbors,
+you can follow the same steps used for simple graphs.
+But be aware that the values of ``data`` must be rearranged
+with respect to ``indices``.
+
+>>> # creating data with the appropriate values
+>>> data = [u + v + 1 for u in range(num_vert)
+...         for v in indices[indptr[u]:indptr[u+1]]]
+>>> adj_matrix = scipy.sparse.csr_array((data, indices, indptr))
+>>> # create multigraph with desired order of neighbors
+>>> g = hpw.Multigraph(adj_matrix)
+>>> for u in range(num_vert):
+...     print(g.neighbors(u))
+[0 1 2 3 4]
+[1 2 3 4 0]
+[2 3 4 0 1]
+[3 4 0 1 2]
+[4 0 1 2 3]
+>>> # checking if multigraph was created properly
+>>> np.all(np.array(
+...         [g.number_of_edges(u, v) == u + v + 1
+...         for u in range(num_vert)
+...         for v in range(num_vert)]) == True)
+True
+
 
 ---------------
 Weighted Graphs
