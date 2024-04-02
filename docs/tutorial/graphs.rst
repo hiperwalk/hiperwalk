@@ -72,6 +72,47 @@ regardless of the model.
 Order of Neighbors
 ------------------
 
+By default, the neighbors of a vertex are listed in ascending order.
+
+>>> hpw_ladder.neighbors(1)
+array([ 0,  2, 11])
+
+Depending on the graph,
+you may wish to specify a different order of neighbors.
+This is particularly useful for the coined quantum walk model
+(:class:`hiperwalk.Coined`).
+To specify an order of neighbors,
+create the adjacency matrix using :class:`scipy.sparse.csr_array`
+such that :obj:`scipy.sparse.csr_array.has_sorted_indices` is ``False``.
+This can be done by expliciting
+:class:`scipy.sparse.csr_array`'s ``indices``.
+Then, the neighbors of ``u`` are listed in the order
+``indices[indptr[u]:indptr[u+1]]``.
+For example,
+the following commands create a
+complete graph with self-loops where the neighbors of ``u`` are
+listed in the order ``[u, u+1, ..., u-1]``.
+
+>>> import scipy.sparse
+>>> # creating the csr_array
+>>> num_vert = 5
+>>> data = np.ones(num_vert**2)
+>>> indices = [(u + shift) % num_vert
+...            for u in range(num_vert)
+...            for shift in range(num_vert)]
+>>> indptr = np.arange(0, num_vert**2 + 1, num_vert)
+>>> adj_matrix = scipy.sparse.csr_array((data, indices, indptr))
+>>> # creating graph with non-default order of neighbors
+>>> g = hpw.Graph(adj_matrix)
+>>> # testing the order of neighbors
+>>> for u in range(num_vert):
+...     print(g.neighbors(u))
+[0 1 2 3 4]
+[1 2 3 4 0]
+[2 3 4 0 1]
+[3 4 0 1 2]
+[4 0 1 2 3]
+
 -----------
 Multigraphs
 -----------
