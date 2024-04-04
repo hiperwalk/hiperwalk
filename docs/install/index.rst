@@ -2,6 +2,36 @@
 Install
 =======
 
+You can install Hiperwalk locally or its docker distribution.
+We recommend to use Hiperwalk's docker distribution.
+
+-------------------
+Docker Installation
+-------------------
+
+Using Hiperwalk on its Docker distribution offers
+numerous benefits to users.
+Docker provides a lightweight, portable, and scalable environment,
+ensuring seamless deployment across
+different operating systems and environments.
+With Docker, users can easily manage dependencies,
+streamline updates, and replicate configurations,
+leading to improved consistency and reliability.
+Additionally, Docker enables efficient resource utilization,
+facilitating faster development cycles and easier collaboration
+among team members.
+Overall, opting for Hiperwalk on its Docker distribution
+empowers users with enhanced flexibility, efficiency,
+and agility in their development and deployment processes.
+
+.. todo::
+
+   Add installation guidelines
+
+------------------
+Local Installation
+------------------
+
 Hiperwalk relies on a number of Python libraries.
 However, installing these Python libraries alone does not enable
 Hiperwalk to leverage High-Performance Computing (HPC).
