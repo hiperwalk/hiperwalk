@@ -18,7 +18,7 @@ sys.path.append(os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'Hiperwalk'
-copyright = '2023'
+copyright = '2024'
 author = 'Gustavo Bezerra'
 
 # The full version, including alpha/beta/rc tags
