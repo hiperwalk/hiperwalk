@@ -128,13 +128,6 @@ def send_vector(v):
     # TODO: check if complex automatically?
     is_complex = isinstance(v.dtype, complex)
 
-    if not is_complex:
-        warn(
-            "Real multiplication not implemented. "
-            + "Treating entries as complex."
-        )
-    is_complex = True
-
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
     # use next instruction (commented).
@@ -272,12 +265,7 @@ def _send_dense_matrix(M, is_complex):
     return PyNeblinaMatrix(mat, M.shape, is_complex, False)
 
 def send_matrix(M):
-    if not isinstance(M.dtype, complex):
-        warn(
-            "Real multiplication not implemented. "
-            + "Treating entries as complex."
-        )
-    is_complex = True
+    is_complex = isinstance(M.dtype, complex)
 
     if scipy.sparse.issparse(M):
         return _send_sparse_matrix(M, is_complex)
