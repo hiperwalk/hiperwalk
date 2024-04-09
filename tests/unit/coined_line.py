@@ -58,7 +58,7 @@ class TestCoinedLine(unittest.TestCase):
         center = self.num_vert // 2
         entries = [[1, (center, center + 1)],
                    [-1j, (center, center - 1)]]
-        init_state = self.qw.state(*entries)
+        init_state = self.qw.state(entries)
 
         hpw.set_hpc(None)
         states = self.qw.simulate((num_steps, 1), init_state)
