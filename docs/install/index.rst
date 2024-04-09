@@ -42,7 +42,7 @@ with the Hiperwalk installation.
 On this page, we outline the process for installing Hiperwalk on
 a newly installed Ubuntu 20.04 operating system. The steps will
 cover identifying the GPU, installing the GPU drivers,
-neblina-core, neblina-opencl-bridge, pyneblina, and
+hiperblas-core, hiperblas-opencl-bridge, pyhiperblas, and
 all necessary Python libraries.
 
 .. _docs_install_hiperwalk:
@@ -116,15 +116,15 @@ Next, run the following commands to install the prerequisites:
 
 These newly installed programs serve the following purposes:
 
-* git: used to download neblina-core, neblina-opencl-bridge,
-  pyneblina, and hiperwalk;
-* g++: used for compiling neblina-core, and neblina-opencl-bridge;
-* cmake: essential for compiling neblina-core, neblina-opencl-bridge;
+* git: used to download hiperblas-core, hiperblas-opencl-bridge,
+  pyhiperblas, and hiperwalk;
+* g++: used for compiling hiperblas-core, and hiperblas-opencl-bridge;
+* cmake: essential for compiling hiperblas-core, hiperblas-opencl-bridge;
 * libgtest-dev: verifies the successful installation of
-  neblina-core, and neblina-opencl-bridge;
-* python3-distutils: aids in the installation of pyneblina;
+  hiperblas-core, and hiperblas-opencl-bridge;
+* python3-distutils: aids in the installation of pyhiperblas;
 * python3-pip: necessary for installing Python libraries;
-* pytest: helps test pyneblina.
+* pytest: helps test pyhiperblas.
 
 Although it's not essential, we **recommend** installing FFmpeg,
 which is used for generating animations.
@@ -183,7 +183,7 @@ NVIDIA Toolkit
 --------------
 
 Once the GPU drivers have been successfully installed, it's
-necessary to install the NVIDIA Toolkit, allowing neblina-core
+necessary to install the NVIDIA Toolkit, allowing hiperblas-core
 to use CUDA. To do this, execute the following command:
 
 .. code-block:: shell
@@ -199,53 +199,53 @@ This can be simply done by running the following command:
    nvcc --version
 
 
-Installing neblina-core neblina-opencl-bridge and pyneblina
-===========================================================
+Installing hiperblas-core hiperblas-opencl-bridge and pyhiperblas
+=================================================================
 
 For HPC support,
 Hiperwalk uses
-`neblina-core <https://github.com/paulomotta/neblina-core>`_,
-`neblina-opencl-bridge
-<https://github.com/paulomotta/neblina-opencl-bridge>`_,
-and `pyneblina <https://github.com/paulomotta/pyneblina>`_.
+`hiperblas-core <https://github.com/hiperblas/hiperblas-core>`_,
+`hiperblas-opencl-bridge
+<https://github.com/hiperblas/hiperblas-opencl-bridge>`_,
+and `pyhiperblas <https://github.com/hiperblas/pyhiperblas>`_.
 Note that a computer with a **GPU compatible with CUDA** is required
 for this.
 
 The information in this guide is compiled from
 `Paulo Motta's blog
-<https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/>`_,
-`neblina-core github <https://github.com/paulomotta/neblina-core>`_,
-and `pyneblina github <https://github.com/paulomotta/pyneblina>`_.
+<https://paulomotta.pro.br/wp/2021/05/01/pyhiperblas-and-hiperblas-core/>`_,
+`hiperblas-core github <https://github.com/hiperblas/hiperblas-core>`_,
+and `pyhiperblas github <https://github.com/hiperblas/pyhiperblas>`_.
 
-It is **strongly recommended** that neblina-core,
-neblina-opencl-bridge, and pyneblina
+It is **strongly recommended** that hiperblas-core,
+hiperblas-opencl-bridge, and pyhiperblas
 are installed (i.e. cloned) in the same directory.
 In this guide, we will install both projects into the home directory.
 In Linux, the tilde (``~``) serves as an alias for the home directory.
 
-neblina-core
-------------
+hiperblas-core
+--------------
 
 Firstly, clone the repository in the home directory.
 
 .. code-block:: shell
 
    cd ~
-   git clone https://github.com/paulomotta/neblina-core.git
+   git clone https://github.com/hiperblas/hiperblas-core.git
 
-Next, navigate to the neblina-core directory to compile and
+Next, navigate to the hiperblas-core directory to compile and
 install the code.
 
 .. code-block:: shell
 
-   cd neblina-core
+   cd hiperblas-core
    cmake .
    make
    sudo make install
    sudo ldconfig
 
-The ``ldconfig`` command creates a link for the newly installed neblina-core,
-making it accessible for use by pyneblina.
+The ``ldconfig`` command creates a link for the newly installed hiperblas-core,
+making it accessible for use by pyhiperblas.
 Before moving forward, **reboot** your computer to
 ensure that the ``ldconfig`` command takes effect.
 
@@ -257,7 +257,7 @@ a symbolic link to another directory.
 
    sudo ln -s /usr/local/lib /usr/local/lib64
 
-To verify the successful installation of neblina-core,
+To verify the successful installation of hiperblas-core,
 execute the ``vector_test`` and ``matrix_test`` tests.
 
 .. code-block:: shell
@@ -265,32 +265,32 @@ execute the ``vector_test`` and ``matrix_test`` tests.
    ./vector_test
    ./matrix_test
 
-neblina-opencl-bridge
----------------------
+hiperblas-opencl-bridge
+-----------------------
 
-The installation of the neblina-opencl-bridge is very similar to
-the installation of neblina-core.
-To install neblina-opencl-bridge,
+The installation of the hiperblas-opencl-bridge is very similar to
+the installation of hiperblas-core.
+To install hiperblas-opencl-bridge,
 first clone the repository into
-**the same directory neblina-core was cloned**.
-In this guide, we cloned neblina-core into the home directory.
+**the same directory hiperblas-core was cloned**.
+In this guide, we cloned hiperblas-core into the home directory.
 
 .. code-block:: shell
 
    cd ~
-   git clone https://github.com/paulomotta/neblina-opencl-bridge.git
+   git clone https://github.com/hiperblas/hiperblas-opencl-bridge.git
 
-Now, enter the new ``neblina-opencl-bridge`` directory to compile and
+Now, enter the new ``hiperblas-opencl-bridge`` directory to compile and
 install the code.
 
 .. code-block:: shell
 
-   cd neblina-opencl-bridge
+   cd hiperblas-opencl-bridge
    cmake .
    make
    sudo make install
 
-To verify the succesful installation of neblina-opencl-bridge,
+To verify the succesful installation of hiperblas-opencl-bridge,
 execute the tests
 
 .. code-block:: shell
@@ -298,24 +298,24 @@ execute the tests
    ./vector_test
    ./matrix_test
 
-pyneblina
----------
+pyhiperblas
+-----------
 
-To install pyneblina, first clone the repository into
-**the same directory neblina-core was cloned**.
-In this guide, we cloned neblina-core into the home directory.
+To install pyhiperblas, first clone the repository into
+**the same directory hiperblas-core was cloned**.
+In this guide, we cloned hiperblas-core into the home directory.
 Thus, execute:
 
 .. code-block:: shell
 
    cd ~
-   git clone https://github.com/paulomotta/pyneblina.git
+   git clone https://github.com/hiperblas/pyhiperblas.git
 
-Next, navigate to the newly created ``pyneblina`` directory to install it.
+Next, navigate to the newly created ``pyhiperblas`` directory to install it.
 
 .. code-block:: shell
 
-   cd pyneblina
+   cd pyhiperblas
    sudo python3 setup.py install
 
 To verify whether the installation was successful, run the following test:
