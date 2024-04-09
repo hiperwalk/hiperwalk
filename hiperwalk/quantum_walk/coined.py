@@ -849,24 +849,26 @@ class Coined(QuantumWalk):
         C = self.get_coin()
 
         if nbl.get_hpc() is not None:
-            # TODO: implement sparse matrix multiplication with hpc
-            S = S.todense()
-            C = C.todense()
+            from warnings import warn
+            warn('HPC sparse matrix multiplication is not implemented. '
+                 + 'Using standard scipy multiplication instead.')
+            # # TODO: implement sparse matrix multiplication with hpc
+            # S = S.todense()
+            # C = C.todense()
 
-            nbl_S = nbl.send_matrix(S)
-            del S
-            nbl_C = nbl.send_matrix(C)
-            del C
-            nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
+            # nbl_S = nbl.send_matrix(S)
+            # del S
+            # nbl_C = nbl.send_matrix(C)
+            # del C
+            # nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
 
-            del nbl_S
+            # del nbl_S
 
-            U = nbl.retrieve_matrix(nbl_C)
-            del nbl_C
-            U = scipy.sparse.csr_array(U)
+            # U = nbl.retrieve_matrix(nbl_C)
+            # del nbl_C
+            # U = scipy.sparse.csr_array(U)
 
-        else:
-            U = S @ C
+        U = S @ C
 
         self._evolution = U
         return U
@@ -1131,32 +1133,32 @@ class Coined(QuantumWalk):
 
         return ket
 
-    def _prepare_engine(self, state, hpc):
-        if hpc is not None:
-            S = nbl.send_matrix(self.get_shift())
-            C = nbl.send_matrix(self.get_coin())
-            self._simul_mat = (C, S)
-            self._simul_vec = nbl.send_vector(state)
+    # def _prepare_engine(self, state, hpc):
+    #     if hpc is not None:
+    #         S = nbl.send_matrix(self.get_shift())
+    #         C = nbl.send_matrix(self.get_coin())
+    #         self._simul_mat = (C, S)
+    #         self._simul_vec = nbl.send_vector(state)
 
-            dtype = (complex if (S.is_complex or C.is_complex
-                                 or np.iscomplex(state.dtype))
-                     else np.double)
+    #         dtype = (complex if (S.is_complex or C.is_complex
+    #                              or np.iscomplex(state.dtype))
+    #                  else np.double)
 
-            return dtype
+    #         return dtype
 
-        return super()._prepare_engine(state, hpc)
+    #     return super()._prepare_engine(state, hpc)
 
 
-    def _simulate_step(self, step, hpc):
-        if hpc is not None:
-            for i in range(step):
-                self._simul_vec = nbl.multiply_matrix_vector(
-                    self._simul_mat[0], self._simul_vec)
+    # def _simulate_step(self, step, hpc):
+    #     if hpc is not None:
+    #         for i in range(step):
+    #             self._simul_vec = nbl.multiply_matrix_vector(
+    #                 self._simul_mat[0], self._simul_vec)
 
-                self._simul_vec = nbl.multiply_matrix_vector(
-                    self._simul_mat[1], self._simul_vec)
-        else:
-            super()._simulate_step(step, hpc)
+    #             self._simul_vec = nbl.multiply_matrix_vector(
+    #                 self._simul_mat[1], self._simul_vec)
+    #     else:
+    #         super()._simulate_step(step, hpc)
 
     def probability(self, states, vertices):
         r"""
