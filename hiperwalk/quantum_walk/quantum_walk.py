@@ -498,7 +498,7 @@ class QuantumWalk(ABC):
 
 
 
-    def simulate(self, time=None, state=None, initial_state=None):
+    def simulate(self, time=None, state=None):
         r"""
         Simulates the quantum walk.
 
@@ -528,12 +528,6 @@ class QuantumWalk(ABC):
         state : :class:`numpy.array`, default=None
             The starting state onto which the evolution operator
             will be applied.
-
-        initial_state :
-            .. deprecated: 2.0
-                ``initial_state`` will be removed in version 2.1,
-                it is replaced by ``state`` because
-                the latter is more concise.
 
         Returns
         -------
@@ -589,13 +583,6 @@ class QuantumWalk(ABC):
                 "``time` not specified`. "
                 + "Must be an int or tuple of int."
             )
-
-        if initial_state is not None:
-            warn("``initial_state`` will be removed in version 2.1,"
-                 + "it is replaced by ``state`` because"
-                 + "the latter is more concise.")
-            if state is None:
-                state = initial_state
 
         if state is None:
             raise ValueError(
