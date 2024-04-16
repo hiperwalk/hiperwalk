@@ -41,7 +41,9 @@ we can pass ``cycle`` to the quantum walk constructor.
 
 Coined Model
 ''''''''''''
-To create a coined quantum walk, we execute
+A coined quantum walk can be created by passing an instance of
+:class:`hiperwalk.Graph` or :class:`hiperwalk.Multigraph`.
+To create a coined quantum walk on the cycle, we execute
 
 >>> coined = hpw.Coined(graph=cycle)
 >>> coined #doctest: +SKIP
@@ -55,7 +57,9 @@ True
 
 Continuous-time Model
 '''''''''''''''''''''
-To create a continuous-time quantum walk,
+A coined quantum walk can be created by passing an instance of
+:class:`hiperwalk.Graph` or :class:`hiperwalk.WeightedGraph`.
+To create a continuous-time quantum walk on the cycle,
 we execute an analogous command.
 
 >>> continuous = hpw.ContinuousTime(graph=cycle)
