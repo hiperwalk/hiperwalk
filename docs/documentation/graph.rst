@@ -78,6 +78,8 @@ is raised.
    Thus, we decided to use the word *constructor* because
    it conveys the idea that an instance is going to be returned.
 
+.. _docs_documentation_list_of_graph_constructors:
+
 List of Graph Constructors
 **************************
 
