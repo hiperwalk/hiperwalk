@@ -1037,7 +1037,6 @@ class Coined(QuantumWalk):
 
         The state corresponds to the walker being in a superposition
         of the ``entries``.
-        For instance, click on :meth:`qwalk.coined.Graph`.
         The final state is normalized in order to be a unit vector.
 
         Parameters
