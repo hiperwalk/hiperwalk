@@ -79,7 +79,7 @@ class TestCoinedCycle(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([1, (0, 1)])
+        init_state = self.qw.ket((0, 1))
 
         num_steps = self.num_vert
         final_state = self.qw.simulate(num_steps, init_state)[0]
@@ -93,7 +93,7 @@ class TestCoinedCycle(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([1, (0, self.num_vert - 1)])
+        init_state = self.qw.ket((0, self.num_vert - 1))
 
         num_steps = self.num_vert
         final_state = self.qw.simulate(num_steps, init_state)[0]
@@ -102,7 +102,7 @@ class TestCoinedCycle(unittest.TestCase):
 
     @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
     def test_hpc_evolution_operator_matches_nonhpc(self):
-        init_state = self.qw.state([1, (0, 1)])
+        init_state = self.qw.ket((0, 1))
         num_steps = 2*self.num_vert
 
         hpw.set_hpc(None)

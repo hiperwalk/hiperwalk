@@ -418,7 +418,8 @@ class QuantumWalk(ABC):
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
-        state = np.zeros(self.hilb_dim)
+        dtype = np.array([entry[0] for entry in entries]).dtype
+        state = np.zeros(self.hilb_dim, dtype=dtype)
 
         for ampl, vertex in entries:
             state[self._graph.vertex_number(vertex)] = ampl
