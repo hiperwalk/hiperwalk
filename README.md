@@ -1,7 +1,7 @@
 # Hiperwalk
 
-Source code of Hiperwalk project
-http://qubit.lncc.br/qwalk/
+Homepage of Hiperwalk project
+http://hiperwalk.org/
 
 Currently, it is necessary to have
 [neblina-core](https://github.com/paulomotta/neblina-core) and
