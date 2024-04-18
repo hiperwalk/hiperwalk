@@ -1,5 +1,7 @@
 # Hiperwalk
 
+High-performance Quantum Walk Simulator
+
 Homepage of Hiperwalk project
 http://hiperwalk.org/
 
