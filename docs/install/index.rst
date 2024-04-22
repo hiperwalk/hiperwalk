@@ -2,31 +2,7 @@
 Install
 =======
 
-You can install Hiperwalk locally or its docker distribution.
-We recommend to use Hiperwalk's docker distribution.
-
--------------------
-Docker Installation
--------------------
-
-Using Hiperwalk on its Docker distribution offers
-numerous benefits to users.
-Docker provides a lightweight, portable, and scalable environment,
-ensuring seamless deployment across
-different operating systems and environments.
-With Docker, users can easily manage dependencies,
-streamline updates, and replicate configurations,
-leading to improved consistency and reliability.
-Additionally, Docker enables efficient resource utilization,
-facilitating faster development cycles and easier collaboration
-among team members.
-Overall, opting for Hiperwalk on its Docker distribution
-empowers users with enhanced flexibility, efficiency,
-and agility in their development and deployment processes.
-
-.. todo::
-
-   Add installation guidelines
+You can install Hiperwalk locally (no HPC support) or its docker distribution (with HPC support).
 
 ------------------
 Local Installation
@@ -36,14 +12,12 @@ Hiperwalk relies on a number of Python libraries.
 However, installing these Python libraries alone does not enable
 Hiperwalk to leverage High-Performance Computing (HPC).
 If you desire to install Hiperwalk with HPC support, please refer
+to :ref:`docs_docker_instatllation:` or
 to :ref:`docs_install_hpc_prerequisites` before proceeding
-with the Hiperwalk installation.
+with the local installation.
 
 On this page, we outline the process for installing Hiperwalk on
-a newly installed Ubuntu 20.04 operating system. The steps will
-cover identifying the GPU, installing the GPU drivers,
-hiperblas-core, hiperblas-opencl-bridge, pyhiperblas, and
-all necessary Python libraries.
+a newly installed Ubuntu operating system. 
 
 .. _docs_install_hiperwalk:
 
@@ -87,6 +61,33 @@ To update an older version of the hiperwalk package:
 
    pip3 install hiperwalk --upgrade
 
+
+.. _docs_docker_instatllation:
+
+-------------------
+Docker Installation
+-------------------
+
+Using Hiperwalk on its Docker distribution offers
+numerous benefits to users.
+Docker provides a lightweight, portable, and scalable environment,
+ensuring seamless deployment across
+different operating systems and environments.
+With Docker, users can easily manage dependencies,
+streamline updates, and replicate configurations,
+leading to improved consistency and reliability.
+Additionally, Docker enables efficient resource utilization,
+facilitating faster development cycles and easier collaboration
+among team members.
+Overall, opting for Hiperwalk on its Docker distribution
+empowers users with enhanced flexibility, efficiency,
+and agility in their development and deployment processes.
+
+.. todo::
+
+   Add installation guidelines
+
+
 .. _docs_install_hpc_prerequisites:
 
 HPC Prerequisites
@@ -100,7 +101,10 @@ Ubuntu packages. Execute the following commands:
    sudo apt update
    sudo apt upgrade
 
-
+The steps described here will cover identifying the GPU, 
+installing the GPU drivers, hiperblas-core, 
+hiperblas-opencl-bridge, pyhiperblas, and
+all necessary Python libraries.
 Next, run the following commands to install the prerequisites:
 
 .. code-block:: shell
