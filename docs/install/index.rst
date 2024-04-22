@@ -58,6 +58,12 @@ To update an older version of the hiperwalk package:
 
    pip3 install hiperwalk --upgrade
 
+To uninstall the hiperwalk package:
+
+.. code-block:: shell
+
+   pip3 uninstall hiperwalk
+
 
 .. _docs_install_docker_installation:
 
