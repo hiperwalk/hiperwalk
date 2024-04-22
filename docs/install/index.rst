@@ -16,9 +16,6 @@ to :ref:`docs_docker_installation:` or
 :ref:`docs_install_hpc_prerequisites` before proceeding
 with the local installation.
 
-On this page, we outline the process for installing Hiperwalk on
-a newly installed Ubuntu operating system. 
-
 .. _docs_install_hiperwalk:
 
 Hiperwalk
