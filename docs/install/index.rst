@@ -12,7 +12,7 @@ Hiperwalk relies on a number of Python libraries.
 However, installing these Python libraries alone does not enable
 Hiperwalk to leverage High-Performance Computing (HPC).
 If you desire to install Hiperwalk with HPC support, please refer
-to :ref:`docs_docker_installation:` or
+to :ref:`docs_install_docker_installation:` or
 :ref:`docs_install_hpc_prerequisites` before proceeding
 with the local installation.
 
@@ -59,7 +59,7 @@ To update an older version of the hiperwalk package:
    pip3 install hiperwalk --upgrade
 
 
-.. _docs_docker_installation:
+.. _docs_install_docker_installation:
 
 -------------------
 Docker Installation
