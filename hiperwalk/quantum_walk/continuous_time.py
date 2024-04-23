@@ -345,6 +345,16 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
+    def get_time():
+        r"""
+        Return the time used to construct the evolution operator.
+
+        Returns
+        -------
+        float
+        """
+        return self._time
+
     def set_time(self, time=1):
         r"""
         Set a time instant.
