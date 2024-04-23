@@ -14,7 +14,7 @@ if __DEBUG__:
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
-        filename=None, interval=250, figsize=(12, 10), dpi=100, **kwargs):
+        filename=None, interval=250, figsize=(10, 5), dpi=100, **kwargs):
     """
     Plot the probability distributions of quantum walk states.
 
@@ -92,7 +92,7 @@ def plot_probability_distribution(
         If ``True``, each quantum walk step is used as an animation frame.
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
-    figsize : tuple, default=(12, 10)
+    figsize : tuple, default=(10, 5)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
     dpi : float, default=100
         Figure resolution in dots-per-inch.
@@ -950,7 +950,8 @@ def _is_in_notebook():
 
 ##########################################################################
 
-def plot_success_probability(time, probabilities, figsize=(12, 10), dpi=100, **kwargs):
+def plot_success_probability(time, probabilities, figsize=(10, 5),
+                             dpi=100, **kwargs):
     r"""
     Plot the success probability over time.
 
@@ -966,7 +967,7 @@ def plot_success_probability(time, probabilities, figsize=(12, 10), dpi=100, **k
         Success probabilities with respect to ``time``,
         such that ``probabilities[i]`` corresponds to ``i``-th
         timestamp described by ``time``.
-    figsize : tuple, default=(12, 10)
+    figsize : tuple, default=(10, 5)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
     dpi : float, default=100
         Figure resolution in dots-per-inch.
