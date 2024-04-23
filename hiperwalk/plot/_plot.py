@@ -608,8 +608,6 @@ def _plot_probability_distribution_on_line(
     matplotlib.pyplot.plot
     """
 
-    if 'marker' not in kwargs:
-        kwargs['marker'] = 'o'
     line = plt.plot(np.arange(len(probabilities)),
                      probabilities, **kwargs)
 
@@ -1000,9 +998,6 @@ def plot_success_probability(time, probabilities, figsize=(12, 10), dpi=100, **k
     time = np.arange(*time)
 
 
-    if 'marker' not in kwargs:
-        kwargs['marker'] = 'o'
-
     plt.xlabel('Time', fontsize=18)
     plt.ylabel('Success probability', fontsize=18)
     plt.xticks(fontsize=14)
@@ -1051,7 +1046,7 @@ def plot_function(qw_iter, x_label, y_label, x_vals, function,
 
         y.append(function(qw, *args, **function_kwargs))
 
-    plt.plot(x, y, marker='o')
+    plt.plot(x, y)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
     plt.show()
