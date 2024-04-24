@@ -9,7 +9,8 @@ psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
                    [-0.5, (center, center + (1, -1))],
                    [-0.5, (center, center + (-1, 1))],
                    [0.5, (center, center + (-1, -1))]])
-psi_final = dtqw.simulate(time=dim // 2, state=psi0)
+psi_final = dtqw.simulate(range=(dim // 2, dim // 2 + 1),
+                          state=psi0)
 prob = dtqw.probability_distribution(psi_final)
 hpw.plot_probability_distribution(prob, graph=grid)
 
