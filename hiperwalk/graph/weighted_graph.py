@@ -36,8 +36,8 @@ class WeightedGraph(Graph):
     any real Hermitian matrix :math:`C`.
     """
 
-    def _default_dtype(self):
-        return np.float32
+    # def _default_dtype(self):
+    #     return np.float32
 
     def _set_adj_matrix(self, adj_matrix):
         self._adj_matrix = adj_matrix
