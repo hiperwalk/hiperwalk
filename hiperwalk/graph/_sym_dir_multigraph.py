@@ -86,7 +86,9 @@ class SDMultigraph(Graph):
             entry += multiedge - out_degree
             return entry
 
-        except TypeError:
+        except (TypeError, IndexError):
+            # TypeError if python int
+            # IndexError if numpy int
             return arc
 
         raise NotImplementedError("arc_number() for multigraphs.")
