@@ -449,60 +449,69 @@ Once the evolution operator is set,
 the :meth:`hiperwalk.QuantumWalk.simulate` method
 needs to be called in order to carry out the simulation.
 This method requires two arguments:
-``time`` and ``state``.
-The ``time`` parameter specifies the number of times that
+``range`` and ``state``.
+The ``range`` parameter specifies the number of times that
 the evolution operator is going to be applied to the ``state``.
-``time`` also specifies when the simulation should
+``range`` also specifies when the simulation should
 stop and which intermediate states need to be stored.
 The simulation returns a list of states such that
 the ``i``-th entry corresponds to the ``i``-th saved state.
 
 Coined Model
 ````````````
-In the coined quantum walk model,
-the ``time`` is discrete.
-Thus, only integer entries are accepted.
-There are three argument types for ``time``.
+There are three argument types for ``range``.
 
-* integer: ``stop``.
-  The final simulation time.
+* integer: ``end``.
+  The simulation saves the states from the ``0``-th to the
+  ``end - 1``-th application of the evolution operator.
 
-  >>> states = coined.simulate(time=10,
+  >>> states = coined.simulate(range=10,
   ...                          state=coined.ket(0))
   >>> len(states)
-  1
+  10
   >>> len(states[0]) == coined.hilbert_space_dimension()
   True
-  >>> U = coined.get_evolution().todense()
-  >>> state = np.linalg.matrix_power(U, 10) @ coined.ket(0)
-  >>> np.allclose(state, states[0])
+
+* 2-tuple of integer: ``(start, end)``.
+  Save every state from the ``start``-th to time ``end - 1``-th
+  application of the evolution operator.
+  For example,
+  if ``range=(2, 10)``, returns the states corresponding to
+  the application of the evolution operator with exponents
+  ``[2, 3, 4, 5, 6, 7, 8, 9]``.
+
+  >>> states = coined.simulate(range=(2, 10),
+  ...                          state=coined.ket(0))
+  >>> len(states)
+  8
+  >>> len(states[0]) == coined.hilbert_space_dimension()
   True
 
-* 2-tuple of integer: ``(stop, step)``.
-  Save every state from time ``0`` to time ``stop``
+  A 2-tuple of integer is the simplest way to obtain a single state.
+  To obtain the state corresponding to the ``i``-th application of
+  the evolution operator, use ``range(i, i + 1)``.
+
+  >>> psi = coined.simulate(range=(10, 11),
+  ...                       state=coined.ket(0))
+  >>> # extract the desired state from the list of states
+  >>> psi = psi[0]
+  >>>
+  >>> # check result
+  >>> U = coined.get_evolution().todense()
+  >>> phi = np.linalg.matrix_power(U, 10) @ coined.ket(0)
+  >>> np.allclose(psi, phi)
+  True
+
+* 3-tuple of integer: ``(start, end, step)``.
+  Save every state from time ``start`` to time ``end``
   separated by ``step`` applications of the evolution operator.
   For example,
-  if ``time=(10, 2)``, returns the states obtained at times
-  ``[0, 2, 4, 6, 8, 10]``.
-
-  >>> states = coined.simulate(time=(10, 2),
-  ...                          state=coined.ket(0))
-  >>> # single state returned
-  >>> len(states)
-  6
-  >>> len(states[0]) == coined.hilbert_space_dimension()
-  True
-
-* 3-tuple of integer: ``(start, stop, step)``.
-  Save every state from time ``start`` to time ``stop``
-  separated by ``step`` application of the evolution operator.
-  For example,
-  if ``time=(1, 10, 2)``, returns the states at times
+  if ``range=(1, 10, 2)``, returns the states corresponding to
+  the application of the evolution operator with exponents
   ``[1, 3, 5, 7, 9]``.
 
-  >>> states = coined.simulate(time=(1, 10, 2),
+  >>> states = coined.simulate(range=(1, 10, 2),
   ...                          state=coined.ket(0))
-  >>> # single state returned
   >>> len(states)
   5
   >>> len(states[0]) == coined.hilbert_space_dimension()
@@ -523,7 +532,7 @@ by passing a float value ``t`` to the
 For this reason,
 we remove the responsability of dealing with float numbers from
 :meth:`hiperwalk.ContinuousTime.simulate`.
-And its ``time`` parameter describes
+And its ``range`` parameter describes
 the number of times that
 the evolution operator is going to be applied to the ``state``
 (analogous to the coined model).
@@ -531,60 +540,85 @@ In this sense,
 ``t`` is interpreted as a single ``step``.
 
 Analogous to the coined model,
-there are three argument types for ``time``.
+there are three argument types for ``range``.
 
-* integer: ``stop``.
-  The final number of applications of the evolution operator.
+* integer: ``end``.
+  The simulation saves the states from the ``0``-th to the
+  ``end - 1``-th application of the evolution operator.
+  The resulting states correspond to the timestamps
+  ``0``, ``t``, ..., ``(end - 1)*t``.
+  In the following example, the timestamps are
+  ``[0, 0.3, ..., 2.7]``.
 
-  >>> cont_states = continuous.simulate(time=10,
+  >>> cont_states = continuous.simulate(range=10,
   ...                                   state=continuous.ket(0))
   >>> len(cont_states)
-  1
+  10
   >>> len(cont_states[0]) == continuous.hilbert_space_dimension()
   True
-  >>> U = continuous.get_evolution()
-  >>> state = np.linalg.matrix_power(U, 10) @ continuous.ket(0)
-  >>> np.allclose(state, cont_states[0])
-  True
+  >>>
+  >>> # cont_states correspond to timestamps
+  >>> 0.3*np.array(range(10))
+  array([0. , 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7])
 
-  The resulting state corresponds to the timestamp ``t*stop``.
-  In the example, ``t*stop = 3``.
-
-* 2-tuple of integer: ``(stop, step)``.
+* 2-tuple of integer: ``(start, end)``.
   Save every state from the initial state to the
-  state after the ``stop``-th application of the evolution operator.
-  The saved states are separated by ``step``
-  applications of the evolution operator.
+  state after the ``(end - 1)``-th application of the evolution operator.
   That is, the stored states correspond to timestamps
-  ``[0, t*step, ..., t*step*stop]``.
+  ``start*t``, ``(start + 1)*t``, ..., ``(end - 1)*t``.
+  In the following example,
+  the stored states correspond to timestamps
+  ``[0.6, 0.9, ..., 2.7]``.
 
-  >>> cont_states = continuous.simulate(time=(10, 2),
+  >>> cont_states = continuous.simulate(range=(2, 10),
   ...                                   state=continuous.ket(0))
-  >>> # single state returned
   >>> len(cont_states)
-  6
+  8
   >>> len(cont_states[0]) == continuous.hilbert_space_dimension()
   True
+  >>>
+  >>> # cont_states correspond to timestamps
+  >>> 0.3*np.array(range(2, 10))
+  array([0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7])
 
-  In the example, the stored states correspond to timestamps
-  ``[0, 0.6, 1.2, 1.8, 2.4, 3]``, respectively.
+  A 2-tuple of integer can be used to obtain a single state
+  without updating the evolution operator,
+  as long as the timestamp is a multiple of ``t``.
+  More specifically, to obtain the state at timestamp ``i*t``,
+  use ``range=(i, i + 1)``.
+  The following example return the state at timestamp ``3``.
 
-* 3-tuple of integer: ``(start, stop, step)``.
+  >>> psi = continuous.simulate(range=(10, 11),
+  ...                           state=continuous.ket(0))
+  >>> # extract the single state from the list of states
+  >>> psi = psi[0]
+  >>>
+  >>> # verify
+  >>> U = continuous.get_evolution()
+  >>> phi = np.linalg.matrix_power(U, 10) @ continuous.ket(0)
+  >>> np.allclose(psi, phi)
+  True
+
+* 3-tuple of integer: ``(start, end, step)``.
   Save every state from the ``start``-th to
-  the ``stop``-th application of the evolution operator.
+  the ``(end - 1)``-th application of the evolution operator.
   The saved states are separated by ``step``
   applications of the evolution operator.
+  In the following example,
+  the stored states correspond to timestamps
+  ``[0.3, 0.9, 1.5, 2.1, 2.7]``, respectively.
 
-  >>> cont_states = continuous.simulate(time=(1, 10, 2),
+  >>> cont_states = continuous.simulate(range=(1, 10, 2),
   ...                                   state=continuous.ket(0))
   >>> # single state returned
   >>> len(cont_states)
   5
   >>> len(cont_states[0]) == continuous.hilbert_space_dimension()
   True
-
-  In the example, the stored states correspond to timestamps
-  ``[0.3, 0.9, 1.5, 2.1, 2.7]``, respectively.
+  >>>
+  >>> # cont_states correspond to timestamps
+  >>> 0.3*np.array(range(1, 10, 2))
+  array([0.3, 0.9, 1.5, 2.1, 2.7])
 
 Calculating Probability
 -----------------------

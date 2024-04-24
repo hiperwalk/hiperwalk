@@ -318,47 +318,49 @@ class QuantumWalk(ABC):
         return prob[0] if single_state else prob
 
     @staticmethod
-    def _time_to_tuple(time):
+    def _range_to_tuple(range):
         r"""
-        Clean and format ``time`` to ``(start, end, step)`` format.
+        Clean and format ``range`` to ``(start, end, step)`` format.
 
         See :meth:`simulate` for valid input format options.
 
         Raises
         ------
         ValueError
-            If ``time`` is in an invalid input format.
+            If ``range`` is in an invalid input format.
         """
 
-        if not hasattr(time, '__iter__'):
-            time = [time]
+        if not hasattr(range, '__iter__'):
+            range = [range]
 
-        if len(time) == 1:
-            start = end = step = time[0]
-        elif len(time) == 2:
+        if len(range) == 1:
             start = 0
-            end = time[0]
-            step = time[1]
+            end = range[0]
+            step = 1
+        elif len(range) == 2:
+            start = range[0]
+            end = range[1]
+            step = 1
         else:
-            start = time[0]
-            end = time[1]
-            step = time[2]
+            start = range[0]
+            end = range[1]
+            step = range[2]
         
-        time = [start, end, step]
+        range = [start, end, step]
 
         if start < 0 or end < 0 or step <= 0:
             raise ValueError(
-                "Invalid 'time' value."
+                "Invalid 'range' value."
                 + "'start' and 'end' must be non-negative"
                 + " and 'step' must be positive."
             )
         if start > end:
             raise ValueError(
-                "Invalid `time` value."
+                "Invalid `range` value."
                 + "`start` cannot be larger than `end`."
             )
 
-        return time
+        return range
 
     def _normalize(self, state, error=1e-16):
         norm = np.linalg.norm(state)
@@ -499,7 +501,7 @@ class QuantumWalk(ABC):
 
 
 
-    def simulate(self, time=None, state=None):
+    def simulate(self, range=None, state=None):
         r"""
         Simulates the quantum walk.
 
@@ -509,22 +511,37 @@ class QuantumWalk(ABC):
 
         Parameters
         ----------
-        time : int, tuple of int, default=None
-            Specifies the time instances when the state should be saved.
+        range : int, tuple of int, default=None
+            Specifies the number of applitcations of
+            the evolution operator,
+            and the corresponding states to be saved.
             It can be defined in three distinct ways:
             
             * end
-                Saves the state at the ``end`` time.
-                Only the final state is retained.
+                Saves the states from the ``0``-th to the ``(end - 1)``-th
+                application of the evolution operator.
+                The corresponding exponents of the evolution operator are
+                all integers in the open interval ``[0, end)``, i.e.
+                ``[0, 1, ..., end - 1]``.
 
-            * (end, step)
-                Retains every state from time 0 to ``end`` (inclusive)
-                that corresponds to a multiple of ``step``.
+            * (start, end)
+                Saves the states from the ``start``-th to
+                the ``(end - 1)``-th application of the evolution operator.
+                The corresponding exponents of the evolution operator are
+                all integers in the open interval ``[start, end)``, i.e.
+                ``[start, start + 1, ..., end - 1]``.
 
             * (start, end, step)
-                Stores every state from time ``start`` (inclusive)
-                to ``end`` (inclusive)
-                that is a multiple of ``step``.
+                Saves the states from the ``start``-th to
+                the ``(end - 1)``-th application of the evolution operator
+                separated by ``step`` applications.
+                The corresponding exponents of the evolution operator are
+                all integers in the open interval ``[start, end)``
+                such that the difference between two integers is at least
+                ``step``, i.e.
+                ``[start, start + step, ..., start + k*step]``
+                where ``k`` is the smallest integer that satisfies
+                ``start + (k + 1)*step >= end``.
 
         state : :class:`numpy.array`, default=None
             The starting state onto which the evolution operator
@@ -539,10 +556,7 @@ class QuantumWalk(ABC):
         Raises
         ------
         ValueError
-            Triggered if:
-            * ``time=None``.
-            * ``state=None``.
-            * ``evolution_operator=None`` and hasn't been set before.
+            Triggered if ``range is None`` or ``state is None``.
 
         See Also
         --------
@@ -552,15 +566,16 @@ class QuantumWalk(ABC):
         Notes
         -----
         The states computed and saved during the simulation 
-        are determined by the parameter ``time=(start,end,step)``.        
+        are determined by the parameter ``range=(start,end,step)``.        
         
         The simulation of the walk is based on the expression
-        :math:`|\psi(t)\rangle=U^t|\psi(\text{start})\rangle`, where
-        :math:`|\psi(\text{start})\rangle` denotes the initial state.        
+        :math:`|\psi(t)\rangle=U^t|\psi(0)\rangle`, where
+        :math:`|\psi(0)\rangle` denotes the initial state.        
         The values for :math:`t` progress as 
-        :math:`t=0,\,\text{step},\,2\cdot\text{step},...`, 
-        until reaching the highest multiple of step that is less than or equal to 
-        :math:`\text{end}-\text{start}`.
+        :math:`t=\text{start}`, :math:`\text{start} + \text{step}`,
+        :math:`\text{start} + 2\cdot\text{step}, \ldots`,
+        until reaching the highest value of :math:`k` that satisfy
+        :math:`\text{start} + k\cdot \text{step} < \text{end}`.
         
         Specifically, the simulation begins from the state 
         :math:`|\psi(\text{start})\rangle` and 
@@ -572,16 +587,16 @@ class QuantumWalk(ABC):
 
         Examples
         --------
-        Given ``time=(0, 13, 3)``, the saved states would include:
+        Given ``range=(0, 13, 3)``, the saved states would include:
         the initial state (t=0), intermediate states (t=3, 6, and 9),
         and the concluding state (t=12).
         """
         ############################################
         ### Check if simulation was set properly ###
         ############################################
-        if time is None:
+        if range is None:
             raise ValueError(
-                "``time` not specified`. "
+                "``range` not specified`. "
                 + "Must be an int or tuple of int."
             )
 
@@ -601,18 +616,17 @@ class QuantumWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        time = np.array(QuantumWalk._time_to_tuple(time))
+        range = np.array(QuantumWalk._range_to_tuple(range))
 
-        if not np.all([e.is_integer() for e in time]):
-            raise ValueError("`time` has non-int entry.")
+        if not np.all([e.is_integer() for e in range]):
+            raise ValueError("`range` has non-int entry.")
 
-        start, end, step = time
+        start, end, step = range
         hpc = nbl.get_hpc()
         dtype = self._prepare_engine(state, hpc)
 
         # number of states to save
-        num_states = int(end/step) + 1
-        num_states -= (int((start - 1)/step) + 1) if start > 0 else 0
+        num_states = 1 + (end - 1 - start) // step
 
         saved_states = np.zeros(
             (num_states, state.shape[0]), dtype=dtype
@@ -623,13 +637,12 @@ class QuantumWalk(ABC):
         if start == 0:
             saved_states[0] = state.copy()
             state_index += 1
-            num_states -= 1
 
         # simulate walk / apply evolution operator
         if start > 0:
             self._simulate_step(start - step, hpc)
 
-        for i in range(num_states):
+        while state_index < num_states:
             self._simulate_step(step, hpc)
             saved_states[state_index] = self._save_simul_vec(hpc)
             state_index += 1
@@ -749,9 +762,6 @@ class QuantumWalk(ABC):
                 "period": 1/freq,
                 "fit function": fitfunc}
 
-    def _number_to_valid_time(self, number):
-        return int(number)
-
     def _optimal_runtime(self, state, delta_time):
         r"""
         .. todo::
@@ -765,7 +775,7 @@ class QuantumWalk(ABC):
         N = self._graph.number_of_vertices()
         # if search algorithm takes O(N),
         # it is better to use classical computing.
-        final_time = self._number_to_valid_time(N/2)
+        final_time = N//2
         states = self.simulate(time=(final_time, delta_time),
                                state=state)
         p_succ = self.success_probability(states)
@@ -776,7 +786,7 @@ class QuantumWalk(ABC):
                 p_succ
             )
         t_opt = (np.pi/2 - d['phase shift']) / d['angular frequency']
-        return self._number_to_valid_time(t_opt), p_succ
+        return int(t_opt), p_succ
 
 
     def optimal_runtime(self, state=None, delta_time=1):
