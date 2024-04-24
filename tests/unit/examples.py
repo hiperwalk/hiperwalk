@@ -15,8 +15,8 @@ class TestExamples(unittest.TestCase):
         g = hpw.CompleteBipartite(num_vert1, num_vert2)
 
         qw = hpw.Coined(g, coin='G', marked={'-G': [0]})
-        time = (int(2*np.sqrt(num_vert)), 1)
-        states = qw.simulate(time=time,
+        r = int(2*np.sqrt(num_vert)) + 1
+        states = qw.simulate(range=r,
                              state=qw.uniform_state())
 
         marked_prob = qw.success_probability(states)
@@ -33,8 +33,8 @@ class TestExamples(unittest.TestCase):
         num_vert = 100
         g = hpw.Complete(num_vert)
         qw = hpw.Coined(g, coin='G', marked={'-G': [0]})
-        time = (int(2*np.sqrt(num_vert)), 1)
-        states = qw.simulate(time=time,
+        r = int(2*np.sqrt(num_vert)) + 1
+        states = qw.simulate(range=r,
                              state=qw.uniform_state())
         marked_prob = qw.success_probability(states)
         expected_prob = np.array([0.01, 0.01, 0.08759208, 0.0829212,
@@ -54,7 +54,8 @@ class TestExamples(unittest.TestCase):
                            [-0.5, (center, center + (1, -1))],
                            [-0.5, (center, center + (-1, 1))],
                            [0.5, (center, center + (-1, -1))]])
-        psi_final = dtqw.simulate(time=dim // 2, state=psi0)
+        psi_final = dtqw.simulate(range=(dim // 2, dim // 2 + 1),
+                                  state=psi0)
         prob = dtqw.probability_distribution(psi_final)
 
         expected_prob = np.array([[
@@ -3729,7 +3730,7 @@ class TestExamples(unittest.TestCase):
         qw = hpw.Coined(graph=g, coin='G', shift='ff', marked={'-I': [0]})
         psi0 = qw.uniform_state()
         num_steps = int(1.5*np.sqrt(N*np.log(N)))
-        states = qw.simulate(time=(num_steps, 1),
+        states = qw.simulate(range=(num_steps + 1),
                              state=psi0)
         succ_prob = qw.success_probability(states)
 
@@ -3759,7 +3760,7 @@ class TestExamples(unittest.TestCase):
         g = hpw.Hypercube(dim)
         qw = hpw.Coined(g)
         state = qw.state(*[[1, i] for i in range(dim)])
-        states = qw.simulate(time=(dim), state=state)
+        states = qw.simulate(time=(dim, dim + 1), state=state)
         probs = qw.probability_distribution(states)
 
         expected_prob = np.array(
@@ -3788,7 +3789,7 @@ class TestExamples(unittest.TestCase):
         cycle = hpw.Cycle(N)
         ctqw = hpw.ContinuousTime(cycle, gamma=0.35)
         psi0 = ctqw.ket(N // 2)
-        psi_final = ctqw.simulate(time=50, state=psi0)
+        psi_final = ctqw.simulate(range=(N // 2, N // 2 + 1), state=psi0)
         prob = ctqw.probability_distribution(psi_final)
 
         expected_prob = np.array(
@@ -3830,8 +3831,8 @@ class TestExamples(unittest.TestCase):
         A = nx.adjacency_matrix(K_N)+np.eye(N)
         graph = hpw.Graph(A)
         qw = hpw.Coined(graph, shift='flipflop', coin='G', marked={'-G': [0]})
-        t_final = (round(4*np.pi*np.sqrt(N)/4),1)
-        states = qw.simulate(time=t_final,
+        r = (round(4*np.pi*np.sqrt(N)/4) + 1)
+        states = qw.simulate(range=r,
                              state=qw.uniform_state())
         marked_prob = qw.success_probability(states)
 

@@ -994,7 +994,7 @@ def plot_success_probability(time, probabilities, figsize=(10, 5),
 
     _configure_figure(fig_width, fig_height, dpi)
 
-    time = QuantumWalk._time_to_tuple(time)
+    time = QuantumWalk._range_to_tuple(time)
     time[1] += time[2]
     time = np.arange(*time)
 

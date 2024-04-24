@@ -75,7 +75,7 @@ If everything was installed correctly,
 the :meth:`hiperwalk.Coined.simulate` method will automatically use
 high-performance computing to perform the matrix-vector multiplications.
 
->>> final_state = qw.simulate(time=N//2,
+>>> final_state = qw.simulate(range=(N//2, N//2 + 1),
 ...                           state=state)
 
 
