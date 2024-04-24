@@ -107,3 +107,36 @@ class TestContinuousTime(unittest.TestCase):
         self.assertTrue(np.allclose(
             U@U.T.conjugate(), np.eye(U.shape[0])
         ))
+
+    def test_uniform_state(self):
+        # superposition of all vertices
+        state = self.qw.uniform_state()
+
+        self.assertIsInstance(state, np.ndarray)
+        self.assertEqual(state.shape, (self.num_vert, ))
+        self.assertTrue(np.allclose(
+            state,
+            1/np.sqrt(self.num_vert)*np.ones(self.num_vert))
+        )
+
+        # superposition of given vertices
+        even_verts = np.arange(0, self.num_vert, 2)
+        odd_verts = np.arange(1, self.num_vert, 2)
+
+        even_state = self.qw.uniform_state(vertices=even_verts)
+        odd_state = self.qw.uniform_state(vertices=odd_verts)
+
+        self.assertIsInstance(even_state, np.ndarray)
+        self.assertIsInstance(odd_state, np.ndarray)
+        self.assertEqual(even_state.shape, (self.num_vert, ))
+        self.assertEqual(odd_state.shape, (self.num_vert, ))
+        self.assertTrue(np.allclose(
+            even_state,
+            [1/np.sqrt(len(even_verts)) if v % 2 == 0 else 0
+             for v in range(self.num_vert)]
+        ))
+        self.assertTrue(np.allclose(
+            odd_state,
+            [1/np.sqrt(len(odd_verts)) if v % 2 == 1 else 0
+             for v in range(self.num_vert)]
+        ))

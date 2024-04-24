@@ -53,13 +53,20 @@ class QuantumWalk(ABC):
         self.hilb_dim = 0
 
 
-    def uniform_state(self):
+    def uniform_state(self, vertices=None):
         r"""
         Create a uniform state.
 
-        The state is constructed based on the ``hilb_dim`` attribute.
         The uniform state is a unit vector with entries 
         that have the same real amplitudes.
+
+        Parameters
+        ----------
+        vertices: list of vertices, default=None
+            If ``vertices is None``,
+            create the uniform superposition of all vertices.
+            Otherwise,
+            create the uniform superposition of the given vertices.
 
         Returns
         -------
@@ -79,8 +86,15 @@ class QuantumWalk(ABC):
         while in the coined quantum walk model, 
         :math:`i` is the label of an arc.
         """
-        return (np.ones(self.hilb_dim, dtype=float)
-                / np.sqrt(self.hilb_dim))
+        if vertices is None:
+            return (np.ones(self.hilb_dim, dtype=float)
+                    / np.sqrt(self.hilb_dim))
+
+        # uniform superposition of the given vertices
+        state = np.zeros(self.hilb_dim)
+        state[[self._graph.vertex_number(v) for v in vertices]] = 1
+
+        return state / np.sqrt(np.sum(state))
 
     def _set_marked(self, marked=[]):
         if (id(marked) != id(self._marked)):

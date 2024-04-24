@@ -77,3 +77,63 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_coin(coin=C)
         C2 = self.qw.get_coin()
         self.assertTrue((C - C2).nnz == 0)
+
+    def test_uniform_state(self):
+        state = self.qw.uniform_state()
+        num_arcs = self.qw._graph.number_of_arcs()
+        
+        self.assertIsInstance(state, np.ndarray)
+        self.assertEqual(state.shape, (num_arcs, ))
+        self.assertTrue(np.allclose(
+            state,
+            1/np.sqrt(num_arcs)*np.ones(num_arcs)
+        ))
+
+        # superposition of given arcs
+        even_arcs = np.arange(0, num_arcs, 2)
+        state = self.qw.uniform_state(arcs=even_arcs)
+        self.assertIsInstance(state, np.ndarray)
+        self.assertEqual(state.shape, (num_arcs, ))
+        self.assertTrue(np.allclose(
+            state,
+            [1/np.sqrt(len(even_arcs)) if a % 2 == 0 else 0
+             for a in range(num_arcs)]
+        ))
+        odd_arcs = np.arange(1, num_arcs, 2)
+        state = self.qw.uniform_state(arcs=odd_arcs)
+        self.assertIsInstance(state, np.ndarray)
+        self.assertEqual(state.shape, (num_arcs, ))
+        self.assertTrue(np.allclose(
+            state,
+            [1/np.sqrt(len(odd_arcs)) if a % 2 == 1 else 0
+             for a in range(num_arcs)]
+        ))
+
+        # test if all vertices == uniform superposition
+        self.assertTrue(np.allclose(
+            self.qw.uniform_state(),
+            self.qw.uniform_state(vertices=np.arange(self.num_vert))
+        ))
+        # test if all arcs == uniform superposition
+        self.assertTrue(np.allclose(
+            self.qw.uniform_state(),
+            self.qw.uniform_state(arcs=np.arange(num_arcs))
+        ))
+        # test if all vertices and all arcs == uniform_superposition
+        self.assertTrue(np.allclose(
+            self.qw.uniform_state(),
+            self.qw.uniform_state(vertices=np.arange(self.num_vert),
+                                  arcs=np.arange(num_arcs))
+        ))
+
+        # uniform superposition of all arcs
+        # except odd arcs with tail in odd vertices
+        even_verts = np.arange(0, self.num_vert, 2)
+        state = self.qw.uniform_state(vertices=even_verts,
+                                      arcs=even_arcs)
+        state2 = [0 if (a % 2 == 1 and
+                        self.qw._graph.arc(a)[0] % 2 == 1)
+                  else 1
+                  for a in range(num_arcs)]
+        state2 = state2 / np.sqrt(np.sum(state2))
+        self.assertTrue(np.allclose(state, state2))

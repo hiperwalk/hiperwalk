@@ -1132,32 +1132,63 @@ class Coined(QuantumWalk):
 
         return ket
 
-    # def _prepare_engine(self, state, hpc):
-    #     if hpc is not None:
-    #         S = nbl.send_matrix(self.get_shift())
-    #         C = nbl.send_matrix(self.get_coin())
-    #         self._simul_mat = (C, S)
-    #         self._simul_vec = nbl.send_vector(state)
+    def uniform_state(self, vertices=None, arcs=None):
+        r"""
+        Create a uniform state.
 
-    #         dtype = (complex if (S.is_complex or C.is_complex
-    #                              or np.iscomplex(state.dtype))
-    #                  else np.double)
+        The uniform state is a unit vector with entries 
+        that have the same real amplitudes.
+        If both ``vertices is None`` and ``arcs is None``,
+        create the uniform superposition of all arcs.
+        Otherwise,
+        create the uniform superposition of all arcs in
+        ``arcs`` and all the arcs with tail in ``vertices``.
 
-    #         return dtype
+        Parameters
+        ----------
+        vertices: list of vertices, default=None
+            If ``vertices is not None``,
+            every arc with tail in ``vertices`` is added to
+            the uniform superposition.
 
-    #     return super()._prepare_engine(state, hpc)
+        arcs: list of arcs, default=None
+            If ``arcs is not None``,
+            every arc in ``arcs`` is added to
+            the uniform superposition.
 
+        Returns
+        -------
+        :obj:`numpy.ndarray`
 
-    # def _simulate_step(self, step, hpc):
-    #     if hpc is not None:
-    #         for i in range(step):
-    #             self._simul_vec = nbl.multiply_matrix_vector(
-    #                 self._simul_mat[0], self._simul_vec)
+        Notes
+        -----
+        An example of the uniform state is
 
-    #             self._simul_vec = nbl.multiply_matrix_vector(
-    #                 self._simul_mat[1], self._simul_vec)
-    #     else:
-    #         super()._simulate_step(step, hpc)
+        .. math::
+            \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
+
+        where :math:`N` represents the dimension of the Hilbert space, and 
+        :math:`i` is a label within the graph. 
+        In the continuous-time quantum walk model, 
+        :math:`i` corresponds to the label of a vertex, 
+        while in the coined quantum walk model, 
+        :math:`i` is the label of an arc.
+        """
+        if vertices is None and arcs is None:
+            return (np.ones(self.hilb_dim, dtype=float)
+                    / np.sqrt(self.hilb_dim))
+
+        # uniform superposition of the given arcs
+        state = np.zeros(self.hilb_dim)
+        if arcs is not None:
+            state[[self._graph.arc_number(a) for a in arcs]] = 1
+
+        # uniform superposition of the given vertices
+        if vertices is not None:
+            for v in vertices:
+                state[self._graph.arcs_with_tail(v)] = 1
+
+        return state / np.sqrt(np.sum(state))
 
     def probability(self, states, vertices):
         r"""
