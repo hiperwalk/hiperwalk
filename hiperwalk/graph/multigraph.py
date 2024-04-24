@@ -37,8 +37,8 @@ class Multigraph(Graph):
     call :meth:`adjacency_matrix()` after creating the multigraph.
     """
 
-    def _default_dtype(self):
-        return np.int32
+    # def _default_dtype(self):
+    #     return np.int32
 
     def _count_loops(self, adj_matrix):
         loops = [adj_matrix[v, v]
@@ -46,10 +46,10 @@ class Multigraph(Graph):
         self._num_loops = np.sum(loops)
 
     def _set_adj_matrix(self, adj_matrix):
-        if not np.issubdtype(adj_matrix.dtype, self._default_dtype()):
-            adj_matrix.data = adj_matrix.data.astype(
-                                        self._default_dtype(),
-                                        copy=False)
+        # if not np.issubdtype(adj_matrix.dtype, self._default_dtype()):
+        #     adj_matrix.data = adj_matrix.data.astype(
+        #                                 self._default_dtype(),
+        #                                 copy=False)
 
         data = adj_matrix.data
         for i in range(1, len(data)):

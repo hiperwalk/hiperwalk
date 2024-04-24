@@ -167,8 +167,8 @@ class Graph():
         array([3, 2, 1, 0])
     """
 
-    def _default_dtype(self):
-        return np.int8
+    # def _default_dtype(self):
+    #     return np.int8
 
     def _count_loops(self, adj_matrix):
         loops = [adj_matrix[v, v] != 0
@@ -187,15 +187,17 @@ class Graph():
         try:
             adj_matrix.adj #throws AttributeError if not networkx graph
             import networkx as nx
-            adj_matrix = nx.adjacency_matrix(adj_matrix,
-                                             dtype=self._default_dtype())
+            # adj_matrix = nx.adjacency_matrix(adj_matrix,
+            #                                  dtype=self._default_dtype())
+            adj_matrix = nx.adjacency_matrix(adj_matrix)
         except AttributeError:
             pass
 
         # TODO: store numpy matrix
         if not issparse(adj_matrix):
-            adj_matrix = csr_array(adj_matrix,
-                                   dtype=self._default_dtype())
+            # adj_matrix = csr_array(adj_matrix,
+            #                        dtype=self._default_dtype())
+            adj_matrix = csr_array(adj_matrix)
 
         if adj_matrix.shape[0] != adj_matrix.shape[1]:
             raise TypeError("Adjacency matrix is not square.")
