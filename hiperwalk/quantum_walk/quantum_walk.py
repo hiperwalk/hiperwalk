@@ -597,7 +597,7 @@ class QuantumWalk(ABC):
         :math:`|\psi(\text{start}+j\cdot\text{step})\rangle`,
         where :math:`j=0,1,...` and the maximum value of :math:`j`
         ensures that 
-        :math:`\text{start}+j\cdot\text{step}\le \text{end}`.
+        :math:`\text{start}+j\cdot\text{step} < \text{end}`.
 
         Examples
         --------
