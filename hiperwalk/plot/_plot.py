@@ -14,7 +14,8 @@ if __DEBUG__:
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
-        filename=None, interval=250, figsize=(10, 5), dpi=100, **kwargs):
+        filename=None, interval=250, figsize=(10, 6), dpi=100,
+        repeat=True, repeat_delay=2500, **kwargs):
     """
     Plot the probability distributions of quantum walk states.
 
@@ -30,12 +31,14 @@ def plot_probability_distribution(
         found at each vertex during the quantum walk evolution.
         Each column corresponds to a vertex, 
         while each row represents a step in the walk.
+
     plot : str, default=None
         The plot type.
         The valid options are
         ``{'bar', 'line', 'graph', 'histogram', 'plane'}``.
         If ``None``, uses default plotting. Usually ``bar``,
         but default plotting changes according to ``graph``.
+
     show : bool, default=True
         Whether or not to show plots or animation.
         With ``show=True`` we have:
@@ -50,6 +53,7 @@ def plot_probability_distribution(
         all the quantum walk steps are shown at once.
         If ``animate==True``,
         the entire animation is shown as a html video.
+
     filename : str, default=None
         The filename path (with no format) where
         the plot(s) will be saved.
@@ -58,6 +62,7 @@ def plot_probability_distribution(
         the j-step is saved in the ``filename-j.png`` file;
         if ``animate==True``,
         the entire walk is saved in the ``filename.fig`` file.
+
     graph : optional
         The structure of the graph on which the walk takes place.
         The graph labels are used as plotting labels.
@@ -73,6 +78,7 @@ def plot_probability_distribution(
             NetworkX Graph
         * :class:`scipy.sparse.csr_matrix`
             Adjacency matrix.
+
     rescale : bool, optional
         If ``False`` or omitted, the reference maximum probability
         is the global one.
@@ -86,16 +92,28 @@ def plot_probability_distribution(
         (halfway betweeen 300 and 3000),
         while for ``rescale=True``,
         the step maximum node size shown is 3000.
+
     animate : bool, default=False
         Whether or not to animate multiple plots.
         If ``False``, each quantum walk step generates an image.
         If ``True``, each quantum walk step is used as an animation frame.
+
     interval : int, default=250
         Time in milliseconds that each frame is shown if ``animate==True``.
-    figsize : tuple, default=(10, 5)
+
+    figsize : tuple, default=(10, 6)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+
     dpi : float, default=100
         Figure resolution in dots-per-inch.
+
+    repeat : bool, default: True
+        Whether or not to repeat the animation.
+        See :class:`matplotlib.animation.FuncAnimation`
+
+    repeat_delay : int, default=2500
+        Delay in milliseconds between animation repetitions.
+        See :class:`matplotlib.animation.FuncAnimation`
 
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
@@ -150,12 +168,6 @@ def plot_probability_distribution(
         If ``plot`` has an invalid value.
     KeyError
         If ``plot == 'graph' `` and keyword ``graph`` is not set.
-
-    Warnings
-    --------
-    For showing animations,
-    the current version only supports Jupyter and GTK 3.0.
-    It must be updated to support GTK 4.0 for Ubuntu 22.04.
 
     Notes
     -----
@@ -301,7 +313,11 @@ def plot_probability_distribution(
                             surf=surf,
                             cbar=cbar,
                             **kwargs),
-                    frames=probabilities)
+                    frames=probabilities,
+                    interval=interval,
+                    repeat=repeat,
+                    repeat_delay=repeat_delay)
+
         elif plot == 'graph':
             from functools import partial
             ax, cbar = plot_funcs[plot](probabilities[0], ax,
@@ -310,7 +326,10 @@ def plot_probability_distribution(
             anim = FuncAnimation(
                     fig,
                     partial(plot_funcs[plot], ax=ax, cbar=cbar, **kwargs),
-                    frames=probabilities)
+                    frames=probabilities,
+                    interval=interval,
+                    repeat=repeat,
+                    repeat_delay=repeat_delay)
         else:
             artists = plot_funcs[plot](probabilities[0], ax, **kwargs)
             anim = FuncAnimation(
@@ -318,7 +337,10 @@ def plot_probability_distribution(
                     update_animation[plot],
                     frames=probabilities,
                     fargs=(artists,
-                           ax if 'min_prob' not in kwargs else None))
+                           ax if 'min_prob' not in kwargs else None),
+                    interval=interval,
+                    repeat=repeat,
+                    repeat_delay=repeat_delay)
 
         if filename is not None:
             anim.save(filename)
@@ -950,7 +972,7 @@ def _is_in_notebook():
 
 ##########################################################################
 
-def plot_success_probability(time, probabilities, figsize=(10, 5),
+def plot_success_probability(time, probabilities, figsize=(10, 6),
                              dpi=100, **kwargs):
     r"""
     Plot the success probability over time.
@@ -967,7 +989,7 @@ def plot_success_probability(time, probabilities, figsize=(10, 5),
         Success probabilities with respect to ``time``,
         such that ``probabilities[i]`` corresponds to ``i``-th
         timestamp described by ``time``.
-    figsize : tuple, default=(10, 5)
+    figsize : tuple, default=(10, 6)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
     dpi : float, default=100
         Figure resolution in dots-per-inch.
