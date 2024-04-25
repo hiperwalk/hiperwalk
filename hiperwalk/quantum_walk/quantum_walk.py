@@ -776,7 +776,7 @@ class QuantumWalk(ABC):
                 "period": 1/freq,
                 "fit function": fitfunc}
 
-    def _optimal_runtime(self, state, delta_time):
+    def _optimal_runtime(self, state, step):
         r"""
         .. todo::
             Returns all arguments.
@@ -790,20 +790,20 @@ class QuantumWalk(ABC):
         # if search algorithm takes O(N),
         # it is better to use classical computing.
         final_time = N//2
-        states = self.simulate(time=(final_time, delta_time),
+        states = self.simulate(time=(final_time, step),
                                state=state)
         p_succ = self.success_probability(states)
         del states
 
         d = QuantumWalk.fit_sin_squared(
-                np.arange(0, final_time + delta_time, delta_time),
+                np.arange(0, final_time + step, step),
                 p_succ
             )
         t_opt = (np.pi/2 - d['phase shift']) / d['angular frequency']
         return int(t_opt), p_succ
 
 
-    def optimal_runtime(self, state=None, delta_time=1):
+    def optimal_runtime(self, state=None, step=1):
         r"""
         Find the optimal running time of a quantum-walk-based search.
 
@@ -820,10 +820,9 @@ class QuantumWalk(ABC):
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
-        delta_time :
-            Time difference between two consecutive states
-            to be saved by the simulation.
-            See ``time`` argument in :meth:`simulate` for details.
+        step :
+            Step of the simulation range.
+            See ``range`` argument in :meth:`simulate` for details.
 
         Returns
         -------
@@ -832,7 +831,6 @@ class QuantumWalk(ABC):
             fitting the sine-squared function.
             The returned type depends on the quantum walk model.
 
-
         See Also
         --------
         simulate
@@ -840,10 +838,10 @@ class QuantumWalk(ABC):
         success_probability
         fit_sin_squared
         """
-        t_opt, _ = self._optimal_runtime(state, delta_time)
+        t_opt, _ = self._optimal_runtime(state, step)
         return t_opt
 
-    def max_success_probability(self, state=None, delta_time=1):
+    def max_success_probability(self, state=None, step=1):
         r"""
         Find the maximum success probability.
         
@@ -856,10 +854,9 @@ class QuantumWalk(ABC):
             The state initial state for the simulation.
             If ``None``, uses the uniform state.
 
-        delta_time :
-            Time difference between two consecutive states
-            to be saved by the simulation.
-            See ``time`` argument in :meth:`simulate` for details.
+        step :
+            Step of the simulation range.
+            See ``range`` argument in :meth:`simulate` for details.
 
         Returns
         -------
@@ -876,13 +873,13 @@ class QuantumWalk(ABC):
         -----
 
         .. todo::
-            If ``t_opt / delta_time`` is not close to an integer,
+            If ``t_opt / step`` is not close to an integer,
             the max success probability was not obtained in the simulation.
             The simulation must be rerun or interpolated.
         """
-        t_opt, p_succ = self._optimal_runtime(state, delta_time)
-        opt_index = int(t_opt / delta_time)
-        # TODO: if t_opt / delta_time is not close to an integer,
+        t_opt, p_succ = self._optimal_runtime(state, step)
+        opt_index = int(t_opt / step)
+        # TODO: if t_opt / step is not close to an integer,
         # max_sucess_probability is not in p_succ.
         # simulation must be rerun
         return p_succ[opt_index]
