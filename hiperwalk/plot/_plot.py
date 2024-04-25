@@ -972,8 +972,8 @@ def _is_in_notebook():
 
 ##########################################################################
 
-def plot_success_probability(time, probabilities, figsize=(10, 6),
-                             dpi=100, **kwargs):
+def plot_success_probability(range, probabilities, figsize=(10, 6),
+                             dpi=100, time_step=1, **kwargs):
     r"""
     Plot the success probability over time.
 
@@ -981,18 +981,23 @@ def plot_success_probability(time, probabilities, figsize=(10, 6),
     
     Parameters
     ----------
-    time:
-        Time used for the quantum walk simulation.
+    range: tuple of int
+        Range used for the quantum walk simulation.
         See :meth:`QuantumWalk.simulate` for details.
 
     probabilities:
         Success probabilities with respect to ``time``,
         such that ``probabilities[i]`` corresponds to ``i``-th
         timestamp described by ``time``.
+
     figsize : tuple, default=(10, 6)
         Figure size in inches. Must be a tuple in the format (WIDTH, HEIGHT).
+
     dpi : float, default=100
         Figure resolution in dots-per-inch.
+
+    time_step: float, default=1
+        Time interval between simulation steps.
 
     **kwargs:
         Additional arguments to customize plot.
@@ -1016,8 +1021,8 @@ def plot_success_probability(time, probabilities, figsize=(10, 6),
 
     _configure_figure(fig_width, fig_height, dpi)
 
-    time = QuantumWalk._range_to_tuple(time)
-    time = np.arange(*time)
+    range = QuantumWalk._range_to_tuple(range)
+    range = time_step*np.arange(*range)
 
 
     plt.xlabel('Time', fontsize=18)
@@ -1028,5 +1033,5 @@ def plot_success_probability(time, probabilities, figsize=(10, 6),
     ax = plt.gca()
     ax.set_ylim(0, 1.05*max(probabilities))
 
-    plt.plot(time, probabilities, **kwargs)
+    plt.plot(range, probabilities, **kwargs)
     plt.show()
