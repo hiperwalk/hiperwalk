@@ -11,11 +11,14 @@ from scipy.sparse import csr_array
 if __DEBUG__:
     from time import time
 
+python_range = range
+
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
         filename=None, interval=250, figsize=(10, 6), dpi=100,
-        repeat=True, repeat_delay=2500, **kwargs):
+        repeat=True, repeat_delay=2500, range=None,
+        time_step=1, **kwargs):
     """
     Plot the probability distributions of quantum walk states.
 
@@ -35,7 +38,7 @@ def plot_probability_distribution(
     plot : str, default=None
         The plot type.
         The valid options are
-        ``{'bar', 'line', 'graph', 'histogram', 'plane'}``.
+        ``{'line', 'bar', 'graph', 'histogram', 'plane'}``.
         If ``None``, uses default plotting. Usually ``bar``,
         but default plotting changes according to ``graph``.
 
@@ -115,6 +118,17 @@ def plot_probability_distribution(
         Delay in milliseconds between animation repetitions.
         See :class:`matplotlib.animation.FuncAnimation`
 
+    range: tuple of int, default=None
+        Range used for the quantum walk simulation.
+        See :meth:`QuantumWalk.simulate` for details.
+        If ``range is not None``,
+        each figure or frame will have a label with the corresponding time.
+        The values shown are
+        ``time_step * np.arange(*range)``.
+
+    time_step: float, default=1
+        Time interval between simulation steps.
+
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
         Valid arguments depend on ``plot``.
@@ -122,6 +136,9 @@ def plot_probability_distribution(
 
     Other Parameters
     ----------------
+    Line Plots
+        See :obj:`matplotlib.pyplot.plot` for more optional keywords.
+
     Bar Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
 
@@ -153,9 +170,6 @@ def plot_probability_distribution(
     Histogram Plots
         See :obj:`matplotlib.pyplot.bar` for more optional keywords.
         The ``width`` keyword is always overriden.
-
-    Line Plots
-        See :obj:`matplotlib.pyplot.plot` for more optional keywords.
 
     Plane Plots
         dimensions: 2-tuple of int
@@ -261,7 +275,7 @@ def plot_probability_distribution(
     update_animation = {
         valid_plots[0]: _update_animation_bars,
         valid_plots[1]: _update_animation_line,
-        valid_plots[2]: _update_animation_graph,
+        valid_plots[2]: None,
         valid_plots[3]: _update_animation_bars,
         valid_plots[4]: None
     }
@@ -274,14 +288,19 @@ def plot_probability_distribution(
     preconfigs[plot](probabilities, kwargs)
 
     if not animate:
-        for i in range(len(probabilities)):
+        t = [None] * len(probabilities)
+        if range is not None:
+            t = QuantumWalk._range_to_tuple(range)
+            t = time_step*np.arange(*t)
+
+        for i in python_range(len(probabilities)):
             # TODO: set figure size according to graph dimensions
             # TODO: check for kwargs
             fig, ax = configs[plot](fig_width=fig_width,
                                     fig_height=fig_height,
                                     dpi=dpi)
 
-            plot_funcs[plot](probabilities[i], ax, **kwargs)
+            plot_funcs[plot](probabilities[i], ax, time=t[i], **kwargs)
 
             plt.tight_layout()
 
@@ -301,6 +320,14 @@ def plot_probability_distribution(
                                 fig_height=fig_height,
                                 dpi=dpi)
 
+        from itertools import cycle
+        t = None
+        if range is not None:
+            t = QuantumWalk._range_to_tuple(range)
+            t[0] -= t[2]
+            t = time_step*np.arange(*t)
+            t = cycle(t)
+
         if plot == 'plane':
             from functools import partial
             surf, cbar = plot_funcs[plot](probabilities[0], ax,
@@ -312,6 +339,7 @@ def plot_probability_distribution(
                             ax=ax,
                             surf=surf,
                             cbar=cbar,
+                            time=t,
                             **kwargs),
                     frames=probabilities,
                     interval=interval,
@@ -325,7 +353,8 @@ def plot_probability_distribution(
 
             anim = FuncAnimation(
                     fig,
-                    partial(plot_funcs[plot], ax=ax, cbar=cbar, **kwargs),
+                    partial(plot_funcs[plot], ax=ax, cbar=cbar,
+                            time=t, **kwargs),
                     frames=probabilities,
                     interval=interval,
                     repeat=repeat,
@@ -337,7 +366,8 @@ def plot_probability_distribution(
                     update_animation[plot],
                     frames=probabilities,
                     fargs=(artists,
-                           ax if 'min_prob' not in kwargs else None),
+                           ax if 'min_prob' not in kwargs else None,
+                           t),
                     interval=interval,
                     repeat=repeat,
                     repeat_delay=repeat_delay)
@@ -378,6 +408,8 @@ def _default_graph_kwargs(kwargs, plot):
         return plot
 
     # Hiperwalk Hypercube
+    plot = 'graph' if plot is None else plot
+
     is_hypercube = False
     try:
         is_hypercube = graph.degree(0) == graph.dimension()
@@ -403,7 +435,19 @@ def _default_graph_kwargs(kwargs, plot):
         kwargs['max_node_size'] = 1000
         kwargs['edgecolors'] = None
 
-    return 'graph' if plot is None else plot
+        return plot
+
+    # other graphs
+    if hasattr(graph, 'number_of_vertices'):
+        nx_graph = nx.Graph(graph.adjacency_matrix())
+    elif hasattr(graph, 'number_of_nodes'):
+        nx_graph = graph
+    else:
+        nx_graph = nx.Graph(graph)
+
+    kwargs['graph'] = nx_graph
+
+    return plot
 
 
 def _preconfigure_plot(probabilities, kwargs):
@@ -542,7 +586,7 @@ def _configure_plane_figure(fig_width,
 
 def _plot_probability_distribution_on_bars(
         probabilities, ax, labels=None, graph=None,
-        min_prob=None, max_prob=None, **kwargs
+        min_prob=None, max_prob=None, time=None, **kwargs
     ):
     """
     Plot probability distribution using matplotlib bar plot.
@@ -567,16 +611,19 @@ def _plot_probability_distribution_on_bars(
 
     bars = plt.bar(np.arange(len(probabilities)), probabilities, **kwargs)
     _posconfigure_plot_figure(ax, len(probabilities), labels, graph,
-                             min_prob, max_prob)
+                             min_prob, max_prob, time)
     return [bars]
 
-def _update_animation_bars(frame, bars, ax):
+def _update_animation_bars(frame, bars, ax, time):
     bars = bars[0]
     for i, bar in enumerate(bars):
         bar.set_height(frame[i])
 
     if ax is not None:
         _rescale_axis(ax, 0, frame.max())
+
+    t = next(time)
+    title = plt.title('Time: ' + str(t), loc='right')
 
     return [bars]
 
@@ -607,7 +654,7 @@ def _plot_probability_distribution_on_histogram(
 
 def _plot_probability_distribution_on_line(
         probabilities, ax, labels=None, graph=None,
-        min_prob=None, max_prob=None, **kwargs
+        min_prob=None, max_prob=None, time=None, **kwargs
     ):
     """
     Plots probability distribution using matplotlib's line plot.
@@ -634,21 +681,24 @@ def _plot_probability_distribution_on_line(
                      probabilities, **kwargs)
 
     _posconfigure_plot_figure(
-        ax, len(probabilities), labels, graph, min_prob, max_prob
+        ax, len(probabilities), labels, graph, min_prob, max_prob, time
     )
 
     return line
 
-def _update_animation_line(frame, line, ax):
+def _update_animation_line(frame, line, ax, time):
     line = line[0]
     line.set_ydata(frame)
     if ax is not None:
         _rescale_axis(ax, 0, frame.max())
 
+    t = next(time)
+    title = plt.title('Time: ' + str(t), loc='right')
+
     return [line]
 
 def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
-                              min_prob=None, max_prob=None):
+                              min_prob=None, max_prob=None, time=None):
     """
     Add final touches to the plotted figure.
 
@@ -708,11 +758,15 @@ def _posconfigure_plot_figure(ax, num_vert, labels=None, graph=None,
         # plt.ylim((min_prob, max_prob*1.02))
         _rescale_axis(ax, min_prob, max_prob)
 
+    if time is not None:
+        plt.title('Time: ' + str(time), loc='right')
+
 def _rescale_axis(ax, min_prob, max_prob):
     ax.set_ylim((min_prob, max_prob*1.02))
 
 
-def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
+def _plot_probability_distribution_on_graph(probabilities, ax, time=None,
+                                            **kwargs):
     """
     Draw graph and illustrates the probabilities depending on the
     volatile parameters.
@@ -749,6 +803,14 @@ def _plot_probability_distribution_on_graph(probabilities, ax, **kwargs):
         global start
         end = time()
         start = end
+
+    if time is not None:
+        try:
+            time = next(time)
+        except TypeError:
+            pass
+
+        ax.set_title('Time: ' + str(time), loc='right')
 
     return [ax, cbar]
 
@@ -881,11 +943,8 @@ def _configure_colorbar(ax, cbar, kwargs):
         cbar.ax.tick_params(labelsize=14, length=7)
     else:
         cbar.update_normal(sm)
-    return cbar
 
-def _update_animation_graph(frame, ax, cax):
-    ax = ax[0]
-    return _plot_probability_distribution_on_graph(frame, ax)
+    return cbar
 
 def _default_plane_kwargs(kwargs):
     if not 'cmap' in kwargs:
@@ -908,7 +967,7 @@ def _default_plane_kwargs(kwargs):
 
 def _plot_probability_distribution_on_plane(
         probabilities, ax, surf=None, cbar=None, labels=None, graph=None,
-        min_prob=None, max_prob=None, dimensions=None, **kwargs
+        min_prob=None, max_prob=None, dimensions=None, time=None, **kwargs
     ):
     """
     Plots probability distribution on the plane.
@@ -943,6 +1002,14 @@ def _plot_probability_distribution_on_plane(
                            vmin=vmin/4, vmax=vmax/4,
                            **kwargs)
     ax.set_zlim(vmin, vmax)
+
+    if time is not None:
+        try:
+            time = next(time)
+        except TypeError:
+            pass
+
+        ax.set_title('Time: ' + str(time), loc='right')
 
     kwargs['cmap'] = cmap # reinserts into kwargs
     if cbar is None:
