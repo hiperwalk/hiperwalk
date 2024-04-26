@@ -345,7 +345,7 @@ class ContinuousTime(QuantumWalk):
             return True
         return False
 
-    def get_time():
+    def get_time(self):
         r"""
         Return the time used to construct the evolution operator.
 
