@@ -129,6 +129,13 @@ def plot_probability_distribution(
     time_step: float, default=1
         Time interval between simulation steps.
 
+    labels : dict, optional
+        Labels to be shown on graph.
+        If `graph` is `None`, `labels.keys()` must be integers
+        from 0 to `num_vert` - 1.
+        If `graph is not None`, `labels.keys()` must be
+        labels of the corresponding :class:`networkx.Graph`'s nodes.
+
     **kwargs : dict, optional
         Extra arguments to further customize plotting.
         Valid arguments depend on ``plot``.
