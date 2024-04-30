@@ -625,8 +625,9 @@ def _update_animation_bars(frame, bars, ax, time):
     if ax is not None:
         _rescale_axis(ax, 0, frame.max())
 
-    t = next(time)
-    title = plt.title('Time: ' + str(t), loc='right')
+    if time is not None:
+        t = next(time)
+        title = plt.title('Time: ' + str(t), loc='right')
 
     return [bars]
 
@@ -695,8 +696,9 @@ def _update_animation_line(frame, line, ax, time):
     if ax is not None:
         _rescale_axis(ax, 0, frame.max())
 
-    t = next(time)
-    title = plt.title('Time: ' + str(t), loc='right')
+    if time is not None:
+        t = next(time)
+        title = plt.title('Time: ' + str(t), loc='right')
 
     return [line]
 
