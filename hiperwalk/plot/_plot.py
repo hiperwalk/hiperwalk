@@ -2,14 +2,10 @@ import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
-from .._constants import __DEBUG__
 from ..graph import *
 from ..quantum_walk import QuantumWalk
 from matplotlib.animation import FuncAnimation
 from scipy.sparse import csr_array
-
-if __DEBUG__:
-    from time import time
 
 python_range = range
 
@@ -805,11 +801,6 @@ def _plot_probability_distribution_on_graph(probabilities, ax, time=None,
     # setting and drawing colorbar
     if 'cmap' in kwargs:
         cbar = _configure_colorbar(ax, cbar, kwargs)
-
-    if __DEBUG__:
-        global start
-        end = time()
-        start = end
 
     if time is not None:
         try:
