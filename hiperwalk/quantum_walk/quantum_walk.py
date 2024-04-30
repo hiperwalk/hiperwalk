@@ -3,7 +3,6 @@ import numpy as np
 import scipy.sparse
 import inspect
 from sys import modules as sys_modules
-from .._constants import __DEBUG__
 from warnings import warn
 from ..graph import Graph
 import scipy.optimize

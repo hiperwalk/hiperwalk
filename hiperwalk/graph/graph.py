@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.sparse import issparse, csr_array, diags
-from .._constants import __DEBUG__
 
 def _binary_search(v, elem, start=0, end=None):
     r"""
@@ -270,8 +269,6 @@ class Graph():
         """
         # TODO test this function
         # TODO write unitary tests
-        if __DEBUG__:
-            assert self.adjacent(vertex, neigh)
 
         adj_matrix = self._adj_matrix
         start = adj_matrix.indptr[vertex]

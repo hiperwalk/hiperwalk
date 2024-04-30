@@ -6,7 +6,6 @@ import numpy as np
 import scipy.sparse
 from warnings import warn
 from .._constants import *
-from .._constants import __DEBUG__
 
 ############################################
 # used for automatically stopping the engine
@@ -172,10 +171,6 @@ def retrieve_vector(pynbl_vec):
 
     # if a vector is being retrieved.
     # the engine should have been already initiated
-    if __DEBUG__:
-        global __engine_initiated
-        if not __engine_initiated: raise AssertionError
-
     nbl_vec = pynbl_vec.nbl_obj
     neblina.move_vector_host(nbl_vec)
 
@@ -327,10 +322,6 @@ def multiply_matrix_vector(pynbl_mat, pynbl_vec):
     """
     # if a matrix-vector operation is being requested,
     # the engine should have been already initiated
-    if __DEBUG__:
-        global __engine_initiated
-        if not __engine_initiated: raise AssertionError
-
     if pynbl_mat.sparse:
         nbl_vec = neblina.sparse_matvec_mul(pynbl_vec.nbl_obj,
                                             pynbl_mat.nbl_obj)

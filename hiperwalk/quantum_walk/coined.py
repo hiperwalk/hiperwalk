@@ -4,12 +4,8 @@ import scipy.sparse
 import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
-from .._constants import __DEBUG__
 from scipy.linalg import hadamard, dft
 from . import _pyneblina_interface as nbl
-
-if __DEBUG__:
-    from time import time as now
 
 class Coined(QuantumWalk):
     r"""
@@ -215,14 +211,6 @@ class Coined(QuantumWalk):
             }
 
         self.set_evolution(**kwargs)
-
-        if __DEBUG__:
-            methods = list(self._valid_kwargs)
-            params = [p for m in methods
-                        for p in self._valid_kwargs[m]]
-            if len(params) != len(set(params)):
-                raise AssertionError
-
 
     def _set_flipflop_shift(self):
         r"""
@@ -507,9 +495,6 @@ class Coined(QuantumWalk):
             raise ValueError('Coin was not specified for all vertices.')
 
         self._coin = coin_list
-
-        if __DEBUG__:
-            if self._coin is None: raise AssertionError
 
     def set_coin(self, coin='default'):
         """
@@ -1012,9 +997,6 @@ class Coined(QuantumWalk):
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
         """
-        if __DEBUG__:
-            start = now()
-
         try:
             states.shape == 1
         except:
