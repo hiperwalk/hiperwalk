@@ -419,7 +419,7 @@ def _default_graph_kwargs(kwargs, plot):
     except AttributeError:
         pass
 
-    if is_hypercube and plot is None:
+    if is_hypercube and (plot is None or plot == 'graph'):
         plot = 'graph'
 
         nx_graph = nx.from_scipy_sparse_array(graph.adjacency_matrix())
