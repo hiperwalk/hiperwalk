@@ -63,12 +63,13 @@ def _interval_binary_search(v, elem, start = 0, end = None) -> int:
 
 class Graph():
     r"""
-    Constructs an arbitrary simple graph with loops.
+    Constructs an arbitrary graph.
 
     This class defines the graph structure used for implementing a 
     quantum walk. It encapsulates all necessary properties
     and functionalities of the graph 
     required for the quantum walk dynamics.
+    This class also supports the creation of graphs with loops.
 
     Parameters
     ----------
