@@ -4,24 +4,32 @@ from scipy.sparse import issparse, csr_array, diags
 
 class Multigraph(Graph):
     r"""
-    Constructs an arbitrary multigraph.
+    Construct an arbitrary multigraph.
+
+    This class enables the creation of a multigraph, 
+    where multiple edges between the same pair of 
+    vertices are permitted. The structure of the 
+    graph is defined by a Hermitian adjacency matrix. 
+    The entries of this matrix are non-negative integers 
+    that represent the number of multiple edges between vertices.
 
     Parameters
     ----------
-    adj_matrix :
-        The adjacency matrix of the graph
-        (any integer Hermitian matrix).
-        Two input types are accepted:
-
-        * Any matrix -- for instance,
-            * :class:`scipy.sparse.csr_array`,
-            * :class:`numpy.ndarray`,
-            * list of lists.
-        * :class:`networkx.Graph`.
-            * The adjacency matrix is extracted from the graph.
+    adj_matrix : various types accepted
+        The adjacency matrix of the graph, which must be a 
+        Hermitian matrix with non-negative integer entries. 
+        Acceptable input types include:
+            * Direct matrix types such as:
+                * :class:`scipy.sparse.csr_array`,
+                * :class:`numpy.ndarray`,
+                * List of lists.
+            * :class:`networkx.Graph`:
+                The adjacency matrix is automatically extracted from the specified networkx graph.
 
     copy : bool, default=False
-        If ``True``, a hard copy of ``adj_matrix`` is stored.
+        Specifies whether to store a hard copy of ``adj_matrix``:
+            * If ``True``, a deep copy of the adjacency matrix is created and stored.
+            * If ``False``, a reference to the original ``adj_matrix`` is stored.
 
     Raises
     ------
@@ -30,13 +38,14 @@ class Multigraph(Graph):
 
     Notes
     -----
-    The ``adj_matrix.data`` attribute is changed for
-    more efficient manipulation.
-    If the original matrix is needed,
-    invoke the constructor with ``copy=True`` or
-    call :meth:`adjacency_matrix()` after creating the multigraph.
+    The ``adj_matrix.data`` attribute may be modified for 
+    more efficient manipulation. If the original matrix 
+    data is required, it is recommended to initialize the 
+    constructor with ``copy=True``. Alternatively, 
+    the original matrix can be retrieved anytime by 
+    calling :meth:`adjacency_matrix()` after the 
+    multigraph has been created.
     """
-
     # def _default_dtype(self):
     #     return np.int32
 
