@@ -295,14 +295,30 @@ class Graph():
 
     def neighbors(self, vertex):
         r"""
-        Return all neighbors of the given vertex.
+        Returns all neighbors of the given vertex.
+
+        This method retrieves all vertices adjacent to the 
+        specified vertex. If the graph allows loops, 
+        the vertex may also be considered its 
+        own neighbor if such an edge exists.
+
+        Parameters
+        ----------
+        vertex : int
+            The vertex for which neighbors are to be found.
 
         Returns
         -------
         list of int:
-            The neighbors of ``vertex``.
-            The order of the neighbors varies depending on
-            the graph.
+            The neighbors of ``vertex``. 
+            The order of the neighbors may vary based on 
+            the graph's internal representation.
+
+        Notes
+        -----
+        The specific order of the neighbors in the returned 
+        list is not guaranteed and may change if the 
+        underlying graph structure is modified.
         """
         vertex = self.vertex_number(vertex)
         start = self._adj_matrix.indptr[vertex]
@@ -462,12 +478,15 @@ class Graph():
 
     def is_simple(self):
         r"""
-        Return True if instance of simple graph.
+        Return True if the graph has no multiedges or weights.
+
+        A simple graph, in this context, does not include multiple 
+        edges between the same pair of vertices or 
+        any weighted edges, although loops are permitted.
 
         Notes
         -----
-        .. todo::
-            Decide if simple graph implementation accepts loops.
+        The Graph class allows for loops in the graph.
         """
         return True
 
