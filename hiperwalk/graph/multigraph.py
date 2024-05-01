@@ -138,4 +138,7 @@ class Multigraph(Graph):
         raise NotImplementedError()
 
     def is_simple(self):
+        r"""
+        Return False.
+        """
         return False
