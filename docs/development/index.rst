@@ -99,8 +99,6 @@ in your preferred browser -- for instance, by double-clicking on it.
 
 Todo
 ====
-* Releases notes.
-* The current version was tested with Ubuntu 20.04.
-  Hiperwalk failed to be configured in Ubuntu 22.04.
-* The current version only works with GTK 3.0.
-  Implementation using GTK 4.0 is postponed to the next release.
+* More examples 
+* Other quantum walk models
+
