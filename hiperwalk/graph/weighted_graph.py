@@ -4,38 +4,44 @@ from . import Graph
 
 class WeightedGraph(Graph):
     r"""
-    Constructs an arbitrary weighted graph.
+    Construct an arbitrary weighted graph.
+
+    This class allows for the creation of a graph where edges 
+    can have weights, described by an adjacency matrix. 
+    The matrix must be Hermitian, as it represents the weights 
+    and connections between nodes.
 
     Parameters
     ----------
-    adj_matrix :
-        The adjacency matrix of the graph
-        (any integer Hermitian matrix).
-        Two input types are accepted:
-
-        * Any matrix -- for instance,
-            * :class:`scipy.sparse.csr_array`,
-            * :class:`numpy.ndarray`,
-            * list of lists.
-        * :class:`networkx.Graph`.
-            * The adjacency matrix is extracted from the graph.
+    adj_matrix : various types accepted
+        The adjacency matrix of the graph, 
+        which must be a Hermitian matrix. 
+        Two types of input are accepted:
+            * Matrix formats such as:
+                * :class:`scipy.sparse.csr_array`,
+                * :class:`numpy.ndarray`,
+                * List of lists.
+            * :class:`networkx.Graph`:
+                The adjacency matrix is derived from the provided NetworkX graph.
 
     copy : bool, default=False
-        If ``True``, a hard copy of ``adj_matrix`` is stored.
-        If ``False``, the pointer to ``adj_matrix`` is stored.
+        Determines how the adjacency matrix is stored:
+            * If ``True``, a deep copy of ``adj_matrix`` is created and stored.
+            * If ``False``, a reference to the original ``adj_matrix`` is stored.
 
     Raises
     ------
     TypeError
-        If ``adj_matrix`` is not a square matrix.
+        If ``adj_matrix`` is not a square matrix, indicating 
+        it cannot represent a valid adjacency matrix.
 
     Notes
     -----
-    The graph :math:`G(V,E)` on which the quantum walk 
-    takes place is specified by
-    any real Hermitian matrix :math:`C`.
+    The graph :math:`G(V,E)` defined by this class can be 
+    used in instances of the ContinuousTime class.
+    When :math:`G(V,E)` is used to define an instance of the Coined class, 
+    the weights of the graph have no effect on the simulation.
     """
-
     # def _default_dtype(self):
     #     return np.float32
 
