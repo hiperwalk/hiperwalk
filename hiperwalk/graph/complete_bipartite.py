@@ -83,7 +83,7 @@ def laplacian_matrix(self):
 
 def CompleteBipartite(num_vert1, num_vert2, multiedges=None, weights=None):
     r"""
-    Construct a complete bipartite graph.
+    Complete bipartite graph constructor.
 
     A complete bipartite graph is a graph whose vertices can be divided 
     into two disjoint and independent sets such that every vertex of 
