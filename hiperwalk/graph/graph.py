@@ -395,7 +395,7 @@ class Graph():
 
     def vertex_number(self, vertex):
         r"""
-        Returns the numerical label of a vertex based on its representation.
+        Return the numerical label of a vertex based on its representation.
 
         This method is designed to handle graphs where vertices might have 
         multiple representations, such as coordinates in a grid. 
