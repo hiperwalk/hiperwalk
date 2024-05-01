@@ -7,11 +7,11 @@ class Multigraph(Graph):
     Construct an arbitrary multigraph.
 
     This class enables the creation of a multigraph, 
-    where multiple edges between the same pair of 
-    vertices are permitted. The structure of the 
-    graph is defined by a Hermitian adjacency matrix. 
+    where multiple edges between the same pair of vertices are permitted. 
+    The structure of the graph is defined by a Hermitian adjacency matrix. 
     The entries of this matrix are non-negative integers 
-    that represent the number of multiple edges between vertices.
+    that represent the number of multiple edges between vertices. 
+    The multigraph also allows loops, which are treated as arcs.
 
     Parameters
     ----------
