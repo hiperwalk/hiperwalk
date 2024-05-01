@@ -68,27 +68,34 @@ def laplacian_matrix(self):
 
 def Complete(num_vert, multiedges=None, weights=None):
     r"""
-    Complete graph.
+    Constructs a complete graph.
 
-    The graph on which any vertex is connected to
-    every other vertex.
+    A complete graph is one in which every vertex is connected 
+    to every other vertex. Each pair of distinct vertices is 
+    connected by a unique edge 
+    unless multiedges are specified.
 
     Parameters
     ----------
     num_vert : int
-        Number of vertices in the complete graph.
-
-    multiedges, weights: scipy.sparse.csr_array, default=None
-        See :ref:`graph_constructors`.
+        The number of vertices in the complete graph.
+    multiedges : scipy.sparse.csr_array, optional
+        Specifies if multiple edges between the same 
+        pair of vertices are allowed. Defaults to None.
+    weights : scipy.sparse.csr_array, optional
+        Assigns weights to the edges of the graph. 
+        Defaults to None.
 
     Returns
     -------
     :class:`hiperwalk.Graph`
-        See :ref:`graph_constructors` for details.
+        Returns an instance of a complete graph. 
+        See :ref:`graph_constructors` for more details.
 
     See Also
     --------
-    :ref:`graph_constructors`.
+    :ref:`graph_constructors`
+        More information on graph constructors and how they are implemented.
     """
     if weights is not None or multiedges is not None:
         raise NotImplementedError()
