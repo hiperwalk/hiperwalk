@@ -295,7 +295,7 @@ class Graph():
 
     def neighbors(self, vertex):
         r"""
-        Returns all neighbors of the given vertex.
+        Return all neighbors of the given vertex.
 
         This method retrieves all vertices adjacent to the 
         specified vertex. If the graph allows loops, 
@@ -327,13 +327,31 @@ class Graph():
 
     def number_of_vertices(self):
         r"""
-        Determine the cardinality of the vertex set.
+        Return the total number of vertices in the graph.
+
+        This method calculates and returns the cardinality 
+        of the vertex set, effectively providing the 
+        count of all vertices present in the graph.
+
+        Returns
+        -------
+        int
+            The total number of vertices in the graph.
         """
         return self._adj_matrix.shape[0]
 
     def number_of_edges(self):
         r"""
-        Determine the cardinality of the edge set.
+        Return the total number of edges in the graph.
+
+        This method calculates and returns the cardinality 
+        of the edge set, indicating the total count of 
+        all edges present in the graph, including loops.
+
+        Returns
+        -------
+        int
+            The total number of edges in the graph.
         """
         non_loops = len(self._adj_matrix.indices) - self._num_loops
         num_edges = non_loops >> 1
@@ -342,6 +360,15 @@ class Graph():
     def number_of_loops(self):
         r"""
         Return the number of loops in the graph.
+
+        This method counts and returns the number of loops 
+        in the graph. A loop is defined as an edge that 
+        connects a vertex to itself.
+
+        Returns
+        -------
+        int
+            The number of loops in the graph.
         """
         return self._num_loops
 
@@ -368,37 +395,32 @@ class Graph():
 
     def vertex_number(self, vertex):
         r"""
-        Return the vertex number given any vertex representation.
+        Returns the numerical label of a vertex based on its representation.
 
-        This method returns the numerical label of the vertex 
-        regardless of its representation.
-        There are some graphs in which a vertex may have multiple
-        representations.
-        For example, coordinates in a grid.
-        For arbitrary graphs,
-        this function returns the argument itself if valid.
+        This method is designed to handle graphs where vertices might have 
+        multiple representations, such as coordinates in a grid. 
+        In cases of arbitrary graphs, this function will return 
+        the input itself if it is a valid representation.
 
         Parameters
         ----------
-        vertex: int
-            The vertex in any of its representation.
-            For general graphs,
-            only its label is accepted.
+        vertex : int
+            The vertex in any valid representation. For arbitrary graphs, only the vertex's label is accepted.
 
         Returns
         -------
         int
-            Vertex number.
+            The numerical label of the vertex.
 
         Raises
         ------
         ValueError
-            If ``vertex`` is not valid.
+            If the ``vertex`` is not a valid representation.
 
         Notes
         -----
-        It is useful to have this function implemented for general graphs
-        to simplify the implementation of some quantum walk methods.
+        Implementing this function is beneficial for arbitrary graphs 
+        as it simplifies the implementation of some quantum walk methods.
         """
         vertex = int(vertex)
         num_vert = self.number_of_vertices()
