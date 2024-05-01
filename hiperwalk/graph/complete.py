@@ -68,7 +68,7 @@ def laplacian_matrix(self):
 
 def Complete(num_vert, multiedges=None, weights=None):
     r"""
-    Construct a complete graph.
+    Complete graph constructor.
 
     A complete graph is one in which every vertex is connected 
     to every other vertex. Each pair of distinct vertices is 
