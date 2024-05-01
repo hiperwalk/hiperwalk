@@ -344,8 +344,7 @@ class Graph():
 
         Notes
         -----
-        .. todo::
-            Will we accept loops in simple graphs?
+        The Graph class supports graphs with loops.
         """
         vertex = self.vertex_number(vertex)
         indptr = self._adj_matrix.indptr
