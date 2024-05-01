@@ -37,10 +37,11 @@ class WeightedGraph(Graph):
 
     Notes
     -----
-    The graph :math:`G(V,E)` defined by this class can be 
-    used in instances of the ContinuousTime class.
-    When :math:`G(V,E)` is used to define an instance of the Coined class, 
-    the weights of the graph have no effect on the simulation.
+    When defining an instance of the Coined class on a weighted graph, 
+    the edge weights do not affect the simulation.
+    
+    When defining an instance of the ContinuousTime class on a weighted graph, 
+    the edge weights do affect the simulation.
     """
     # def _default_dtype(self):
     #     return np.float32
