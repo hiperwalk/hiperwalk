@@ -2,7 +2,7 @@ from .integer_lattice import IntegerLattice
 
 def Line(num_vert, multiedges=None, weights=None):
     r"""
-    Finite line graph (path graph).
+    Finite line graph (path graph) constructor.
 
     Parameters
     ----------
