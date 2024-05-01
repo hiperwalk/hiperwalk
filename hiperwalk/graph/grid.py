@@ -5,7 +5,7 @@ from types import MethodType
 def Grid(dim, periodic=True, diagonal=False,
          multiedges=None, weights=None):
     r"""
-    Two-dimensionsal grid.
+    Two-dimensionsal grid constructor.
 
     The grid can be designed with either
     cyclic boundary conditions or borders.
