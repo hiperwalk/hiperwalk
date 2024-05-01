@@ -45,6 +45,12 @@ class Multigraph(Graph):
     the original matrix can be retrieved anytime by 
     calling :meth:`adjacency_matrix()` after the 
     multigraph has been created.
+
+    When defining an instance of the Coined class on a multigraph, 
+    the number of multiple edges impacts the dimension of the coin.
+    
+    When defining an instance of the ContinuousTime class on a multigraph, 
+    the number of multiple edges is treated as an edge weight.
     """
     # def _default_dtype(self):
     #     return np.int32
