@@ -83,36 +83,43 @@ def laplacian_matrix(self):
 
 def CompleteBipartite(num_vert1, num_vert2, multiedges=None, weights=None):
     r"""
-    Complete bipartite graph.
+    Constructs a complete bipartite graph.
+
+    A complete bipartite graph is a graph whose vertices can be divided 
+    into two disjoint and independent sets such that every vertex of 
+    the first set is connected to every vertex of the second set, 
+    and no vertex within the same set is connected.
 
     Parameters
     ----------
-    num_vert1: int
-        Number of vertices of the first part.
-
-    num_vert2: int
-        Number of vertices of the second part.
-
-    multiedges, weights: scipy.sparse.csr_array, default=None
-        See :ref:`graph_constructors`.
+    num_vert1 : int
+        The number of vertices in the first part of the graph.
+    num_vert2 : int
+        The number of vertices in the second part of the graph.
+    multiedges : scipy.sparse.csr_array, optional
+        Allows multiple edges between the same pair of vertices. 
+        Defaults to None.
+    weights : scipy.sparse.csr_array, optional
+        Assigns weights to the edges of the graph. 
+        Defaults to None.
 
     Returns
     -------
     :class:`hiperwalk.Graph`
-        See :ref:`graph_constructors` for details.
+        Returns an instance of a complete bipartite graph. 
+        Refer to :ref:`graph_constructors` for more details.
 
     See Also
     --------
-    :ref:`graph_constructors`.
+    :ref:`graph_constructors`
+        More information on various types of graph constructors.
 
     Notes
     -----
-    The vertices in the first part are labeled from
-    0 to ``num_vert1 - 1`` and the vertices of the
-    second part are labeled from
-    ``num_vert1`` to ``num_vert1 + num_vert2 - 1``.
+    The vertices in the first part are labeled from 0 to `num_vert1 - 1`, 
+    and the vertices in the second part are labeled from `num_vert1` 
+    to `num_vert1 + num_vert2 - 1`.
     """
-
     if weights is not None or multiedges is not None:
         raise NotImplementedError()
 
