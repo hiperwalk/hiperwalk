@@ -518,9 +518,9 @@ class QuantumWalk(ABC):
         r"""
         Simulates the quantum walk.
 
-        The simulation progresses by iteratively applying 
-        the evolution operator to the outcome of its prior 
-        application, initiating from the specified initial state.
+        The simulation propagates the quantum walk state by iteratively 
+        applying the evolution operator to the result of its previous 
+        application, starting from the specified initial state.
 
         Parameters
         ----------
