@@ -10,14 +10,11 @@ in enabling HPC features must install several prerequisites.
 
 Choose your installation method:
 
-- For a local installation without HPC support, refer to  
-:ref:`docs_local_installation`.
+- :ref:`docs_local_installation` without HPC support.  
 
-- For installation with HPC support using Docker, refer to 
-:ref:`docs_install_docker_installation`.
+- :ref:`docs_install_docker_installation` with HPC support. 
 
-- For installing prerequisites necessary for HPC support, refer to 
-:ref:`docs_install_hpc_prerequisites`.
+-  :ref:`docs_install_hpc_prerequisites` for developers.
 
 
 .. _docs_local_installation:
