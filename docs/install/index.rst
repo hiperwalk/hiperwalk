@@ -9,10 +9,13 @@ that includes HPC capabilities. Additionally, developers interested
 in enabling HPC features must install several prerequisites.
 
 Choose your installation method:
+
 - For a local installation without HPC support, proceed to the 
 "Local Installation" section below.
+
 - For installation with HPC support using Docker, refer to 
 :ref:`docs_install_docker_installation`.
+
 - For installing prerequisites necessary for HPC support, refer to 
 :ref:`docs_install_hpc_prerequisites`.
 
