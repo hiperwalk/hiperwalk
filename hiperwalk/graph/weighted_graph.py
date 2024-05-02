@@ -6,10 +6,10 @@ class WeightedGraph(Graph):
     r"""
     Construct an arbitrary weighted graph.
 
-    This class allows for the creation of a graph where edges 
-    can have weights, described by an adjacency matrix. 
-    The matrix must be Hermitian, as it represents the weights 
-    and connections between nodes.
+    This class enables the creation of a weighted graph, 
+    defined by a Hermitian adjacency matrix that 
+    represents the connections between nodes and 
+    edge weights.
 
     Parameters
     ----------
