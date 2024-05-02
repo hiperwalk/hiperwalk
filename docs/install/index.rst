@@ -8,13 +8,13 @@ You can install Hiperwalk locally (no HPC support) or its docker distribution (w
 Local Installation
 ------------------
 
-Hiperwalk relies on a number of Python libraries.
+Hiperwalk relies on some Python libraries.
 However, installing these Python libraries alone does not enable
 Hiperwalk to leverage High-Performance Computing (HPC).
 If you desire to install Hiperwalk with HPC support, please refer
-to :ref:`docs_install_docker_installation` or
-:ref:`docs_install_hpc_prerequisites` before proceeding
-with the local installation.
+to :ref:`docs_install_docker_installation` (for users) or
+:ref:`docs_install_hpc_prerequisites` (for developers) 
+before proceeding with the local installation.
 
 .. _docs_install_hiperwalk:
 
@@ -96,8 +96,11 @@ and agility in their development and deployment processes.
 HPC Prerequisites
 =================
 
-Before proceeding, it's advisable to update and upgrade your
-Ubuntu packages. Execute the following commands:
+This section and the ones that follow are intended 
+for developers of the Hiperwalk package. 
+Before proceeding, it is advisable to update and 
+upgrade your Ubuntu packages. 
+Execute the following commands:
 
 .. code-block:: shell
 
