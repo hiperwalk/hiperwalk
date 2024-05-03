@@ -103,8 +103,9 @@ and agility in their development and deployment processes.
 
 .. _docs_install_hpc_prerequisites:
 
+-----------------
 HPC Prerequisites
-=================
+-----------------
 
 This section and the ones that follow are intended 
 for developers of the Hiperwalk package. 
