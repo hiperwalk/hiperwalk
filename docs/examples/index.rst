@@ -2,4 +2,5 @@
 Examples
 ========
 
-List of examples here
+For examples, please refer to the :doc:`hiperwalk/examples/index`.
+
