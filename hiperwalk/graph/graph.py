@@ -378,7 +378,7 @@ class Graph():
 
         The degree of a vertex :math:`u` in a graph 
         is the number of edges  incident to :math:`u`.
-        Loops at :math:`u` are counted once.
+        Each Loop is counted once.
 
         Parameters
         ----------
@@ -432,7 +432,7 @@ class Graph():
 
     def adjacency_matrix(self):
         r"""
-        Return the graph's adjacency matrix.
+        Return the adjacency matrix representation of the graph.
 
         Returns
         -------
@@ -444,8 +444,7 @@ class Graph():
         In a simple graph :math:`G(V, E)` with :math:`n` vertices
         :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix 
         of :math:`G(V, E)` is an 
-        :math:`n`-dimensional matrix :math:`A`, defined as follows:
-        
+        :math:`n`-dimensional matrix :math:`A`, defined as follows:        
         .. math::
             A_{i,j} = \begin{cases}
                 1, & \text{if } v_i \text{ is adjacent to } v_j,\\
@@ -453,9 +452,9 @@ class Graph():
             \end{cases}
     
         If :math:`G(V, E)` has a loop on vertex :math:`v_i`, 
-        then :math:`A_{i,j}=1`.
+        then :math:`A_{i,i}=1`.
         
-        In the case of multigraphs, where multiple edges can exist between
+        In multigraphs, where multiple edges can exist between
         the same pair of vertices, the adjacency matrix reflects this
         by counting the number of such edges.
     
