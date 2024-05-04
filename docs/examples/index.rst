@@ -2,6 +2,9 @@
 Examples
 ========
 
-For examples, please refer to the `examples folder <../../hiperwalk/examples/index>`_.
+For examples of the coined model, please refer to `hiperwalk-examples-coined`.
+
+For examples of the continuous-time model, please refer to `hiperwalk-examples-continuous_time`.
+
 
 
