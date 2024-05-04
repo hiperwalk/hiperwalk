@@ -441,7 +441,7 @@ class Graph():
         Notes
         -----
     
-        In a weightless graph :math:`G(V, E)` with :math:`n` vertices
+        In a simple graph :math:`G(V, E)` with :math:`n` vertices
         :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix 
         of :math:`G(V, E)` is an 
         :math:`n`-dimensional matrix :math:`A`, defined as follows:
@@ -452,9 +452,17 @@ class Graph():
                 0, & \text{otherwise.}
             \end{cases}
     
+        If :math:`G(V, E)` has a loop on vertex :math:`v_i`, 
+        then :math:`A_{i,j}=1`.
+        
+        In the case of multigraphs, where multiple edges can exist between
+        the same pair of vertices, the adjacency matrix reflects this
+        by counting the number of such edges.
+    
         In weighted graphs, the entries of :math:`A` represent 
-        the weights of the edges. The weight is a non-zero
-        real number.
+        the weights of the edges. In general, the weight is a non-zero
+        real number. In Hiperwalk, :math:`A` can be an arbitrary
+        Hermitian matrix.        
 
         .. todo::
             Add other return types depending on the stored matrix type.
