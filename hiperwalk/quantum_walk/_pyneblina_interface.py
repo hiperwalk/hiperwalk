@@ -16,11 +16,11 @@ __hpc_type = None
 
 def set_hpc(hpc):
     r"""
-    Indicates which HPC platform is going to be used.
+    Indicate which HPC platform is going to be used.
 
     After executing the ``set_hpc`` command,
     all subsequent hiperwalk commands will
-    utilize the dsignated HPC platform.
+    use the designated HPC platform.
 
     Parameters
     ----------
