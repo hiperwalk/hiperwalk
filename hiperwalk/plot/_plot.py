@@ -1042,7 +1042,7 @@ def _is_in_notebook():
 def plot_success_probability(range, probabilities, figsize=(10, 6),
                              dpi=100, time_step=1, **kwargs):
     r"""
-    Plot the success probability over time.
+    Plot the success probability as a function of the number of steps.
 
     Assumes that the probabilities have already been calculated.
     
