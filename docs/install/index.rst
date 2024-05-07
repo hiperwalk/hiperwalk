@@ -99,7 +99,7 @@ and agility in their development and deployment processes.
 
 **Single time configuration of docker**
 
-Step 1 Add Docker's official GPG key:
+Step 1. Add Docker's official GPG key:
 
 .. code-block:: shell
 
@@ -109,7 +109,7 @@ Step 1 Add Docker's official GPG key:
 	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 	sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-Step 2 Add the repository to Apt sources:
+Step 2. Add the repository to Apt sources:
 
 .. code-block:: shell
 
@@ -117,26 +117,26 @@ Step 2 Add the repository to Apt sources:
 	sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 	sudo apt-get update
 
-Step 3 Install docker latest
+Step 3. Install docker latest
 
 .. code-block:: shell
 
 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-Step 4 Add the user to docker group
+Step 4. Add the user to docker group
 
 .. code-block:: shell
 
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
 
-Step 5 Logout and log back in
+Step 5. Logout and log back in
 
 .. code-block:: shell
 
 	newgrp docker
 
-Step 6 Test your docker installation
+Step 6. Test your docker installation
 
 .. code-block:: shell
 
@@ -144,7 +144,7 @@ Step 6 Test your docker installation
 
 **Single time configuration of nvidia container toolkit**
 
-Step 1 Configure respository
+Step 1. Configure respository
 
 .. code-block:: shell
 
@@ -153,14 +153,14 @@ Step 1 Configure respository
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
 	sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
-Step 2 Update and install
+Step 2. Update and install
 
 .. code-block:: shell
 
 	sudo apt-get update
 	sudo apt-get install -y nvidia-docker2
 
-Step 3 Configure docker to use nvidia in rootless mode
+Step 3. Configure docker to use nvidia in rootless mode
 
 .. code-block:: shell
 
@@ -203,7 +203,7 @@ In the browser, access the "work" folder that appears in the environment, and th
 
 .. todo::
 
-   Add installation guidelines
+   Improve the installation guidelines
 
 
 .. _docs_install_hpc_prerequisites:
