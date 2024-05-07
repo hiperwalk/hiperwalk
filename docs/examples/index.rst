@@ -2,9 +2,9 @@
 Examples
 ========
 
-For examples of the coined model, please refer to :ref:`examples<examples_coined>`.
+Examples of the coined model: `jupyter notebooks<https://github.com/hiperwalk/hiperwalk/tree/master/examples/coined>`.
 
-For examples of the continuous-time model, please refer to :ref:`examples<examples>`.
+Examples of the continuous-time model: `jupyter notebooks<https://github.com/hiperwalk/hiperwalk/tree/master/examples/continuous_time>`.
 
 
 
