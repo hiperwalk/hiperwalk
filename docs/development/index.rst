@@ -101,4 +101,6 @@ Todo
 ====
 * More examples 
 * Other quantum walk models
+* Releases notes
+* The current version only works with GTK 3.0. Implementation using GTK 4.0 is postponed to the next release.
 
