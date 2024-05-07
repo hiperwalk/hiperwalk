@@ -96,6 +96,110 @@ Overall, opting for Hiperwalk on its Docker distribution
 empowers users with enhanced flexibility, efficiency,
 and agility in their development and deployment processes.
 
+
+**Single time configuration of docker**
+
+Step 1 Add Docker's official GPG key:
+
+.. code-block:: shell
+
+	sudo apt-get update
+	sudo apt-get install ca-certificates curl
+	sudo install -m 0755 -d /etc/apt/keyrings
+	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+	sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+Step 2 Add the repository to Apt sources:
+
+.. code-block:: shell
+
+	echo \ "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+	sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+	sudo apt-get update
+
+Step 3 Install docker latest
+
+.. code-block:: shell
+
+	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+Step 4 Add the user to docker group
+
+.. code-block:: shell
+
+	sudo groupadd docker
+	sudo usermod -aG docker $USER
+
+Step 5 Logout and log back in
+
+.. code-block:: shell
+
+	newgrp docker
+
+Step 6 Test your docker installation
+
+.. code-block:: shell
+
+	docker run hello-world
+
+**Single time configuration of nvidia container toolkit**
+
+Step 1 Configure respository
+
+.. code-block:: shell
+
+	curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+	sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+Step 2 Update and install
+
+.. code-block:: shell
+
+	sudo apt-get update
+	sudo apt-get install -y nvidia-docker2
+
+Step 3 Configure docker to use nvidia in rootless mode
+
+.. code-block:: shell
+
+	nvidia-ctk runtime configure --runtime=docker --config=$HOME/.config/docker/daemon.json 
+	systemctl --user restart docker
+	sudo nvidia-ctk config --set nvidia-container-cli.no-cgroups --in-place
+
+**It may be necessary**
+
+.. code-block:: shell
+
+	sudo vi /etc/nvidia-container-runtime/config.toml 
+
+change the value of no-cgroups to false
+
+.. code-block:: shell
+
+	sudo systemctl restart docker
+
+**Test the gpu access**
+
+.. code-block:: shell
+
+	docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu20.04 nvidia-smi
+
+**Hiperwalk with HPC**
+
+Create a folder where you want to save notebooks. Go to folder.
+
+.. code-block:: shell
+
+	docker run --rm --gpus all -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
+
+Open the page with the url that appears on the screen that starts with 127.0.0.1
+
+Example: http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a16e91d1cc
+
+In the browser, access the "work" folder that appears in the environment, and the data will be saved there (in the folder external to the container)
+
 .. todo::
 
    Add installation guidelines
