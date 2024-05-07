@@ -14,7 +14,7 @@ Choose your installation method:
 
 - :ref:`docs_install_docker_installation` with HPC support. 
 
--  :ref:`docs_install_hpc_prerequisites` for developers.
+- :ref:`docs_install_hpc_prerequisites` for developers.
 
 
 .. _docs_local_installation:
