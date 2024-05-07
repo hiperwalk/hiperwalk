@@ -200,6 +200,7 @@ Example: http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a
 
 In the browser, access the "work" folder that appears in the environment, and the data will be saved there (in the folder external to the container)
 
+
 .. todo::
 
    Add installation guidelines
