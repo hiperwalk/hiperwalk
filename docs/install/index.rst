@@ -62,7 +62,7 @@ you can execute any example code available in the
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
 or any Jupyter notebook found in the
 :ref:`docs_examples` section. Alternatively,
-you can proceed to the :ref:`docs_tutorial`.
+you can proceed to the :ref:`docs_tutorial` section.
 
 To update an older version of the hiperwalk package:
 
