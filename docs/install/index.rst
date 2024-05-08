@@ -57,9 +57,11 @@ Python dependencies, which include
    pip3 install hiperwalk
 
 To verify the success of the installation,
-you can execute any code found in the
-`examples directory of the repository
+you can execute any example of code available at the
+`GitHub repository
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
+or any jupyter notebook found in the
+:ref:`docs_examples`
 or proceed to the :ref:`docs_tutorial`.
 
 To update an older version of the hiperwalk package:
