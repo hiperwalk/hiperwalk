@@ -60,7 +60,7 @@ To verify the success of the installation,
 you can execute any example code available in the
 `GitHub repository
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples>`_
-or any Jupyter notebook found in the
+or any Jupyter notebook in the
 :ref:`docs_examples` section. Alternatively,
 you can proceed to the :ref:`docs_tutorial` section.
 
