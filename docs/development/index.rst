@@ -4,6 +4,23 @@
 Development
 ===========
 
+This page describes how to download Hiperwalk 
+from GitHub, how to test it, and how to generate 
+its documentation. Before that, if you wish to 
+contribute or extend Hiperwalk's capabilities by 
+implementing new quantum walk models, please contact 
+the developers (see the next section).
+
+Bug Report and Contact
+======================
+
+To send a bug report or
+contribute to Hiperwalk or contact the developers, 
+write an email to hiperwalk@gmail.com.
+
+Downloading
+===========
+
 HiperWalk is built upon several Python libraries. 
 Before developing for HiperWalk, these libraries need to be installed. 
 The required libraries include
@@ -28,13 +45,6 @@ To contribute, first clone the repository.
     git clone https://github.com/hiperwalk/hiperwalk.git
 
 Next, make the desired modifications and submit a pull request.
-
-Bug Report and Contact
-======================
-
-To send a bug report or
-contribute to Hiperwalk or contact the developers, 
-write an email to hiperwalk@gmail.com.
 
 Testing
 =======
