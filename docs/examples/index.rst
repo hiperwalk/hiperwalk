@@ -10,7 +10,7 @@ Coined Quantum Walk
 - Examples of 
 `Jupyter notebooks
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples/coined>`_
- on GitHub.
+on GitHub.
 
 Continuous-Time Quantum Walk
 ============================
@@ -18,7 +18,9 @@ Continuous-Time Quantum Walk
 - Examples of 
 `Jupyter notebooks
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples/continuous_time>`_
- on GitHub.
+on GitHub.
+
+
 
 
 
