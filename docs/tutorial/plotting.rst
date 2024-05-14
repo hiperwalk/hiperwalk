@@ -177,7 +177,7 @@ accepts any valid keywords associated with it.
 ...             for i in range(lat.number_of_vertices())},
 ...     cmap='copper', node_shape='s',
 ...     font_color='white', font_weight='bold',
-...     edge_color='red', width=2, style=':',
+...     edge_color='red', width=2, style=':'
 ... ) #doctest: +SKIP
 
 
