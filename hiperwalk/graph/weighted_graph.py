@@ -98,12 +98,10 @@ class WeightedGraph(Graph):
                 \sum_{k = 0}^{|V| - 1}A_{ik}, & \text{if } i = j\\
                 0, & \text{otherwise}.
             \end{cases}
-
-        .. todo::
-            See
-            https://people.eecs.berkeley.edu/~satishr/cs270/sp11/rough-notes/Tree-metrics.pdf
-            as reference
         """
+        # See
+        # https://people.eecs.berkeley.edu/~satishr/cs270/sp11/rough-notes/Tree-metrics.pdf
+        # as reference
         return super().laplacian_matrix()
 
     def is_simple(self):

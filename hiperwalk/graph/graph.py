@@ -463,9 +463,6 @@ class Graph():
         the weights of the edges. In general, the weight is a non-zero
         real number. In Hiperwalk, :math:`A` can be an arbitrary
         Hermitian matrix.        
-
-        .. todo::
-            Add other return types depending on the stored matrix type.
         """
         data = np.ones(len(self._adj_matrix.indices), dtype=np.int8)
         indices = self._adj_matrix.indices

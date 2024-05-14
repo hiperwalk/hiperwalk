@@ -73,10 +73,6 @@ array([[0.       , 0.       , 0.       , 0.015625 , 0.       , 0.       ,
 Bar Plot
 ''''''''
 
-.. todo::
-
-   Fix plots
-
 The vertices are represented on the x-axis.
 The respective probabilities are represented on the y-axis.
 Each vertex is associated with a bar.

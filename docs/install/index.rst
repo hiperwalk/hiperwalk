@@ -256,11 +256,6 @@ Example: http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a
 In the browser, access the "work" folder that appears in the environment, and the data will be saved there (in the folder external to the container)
 
 
-.. todo::
-
-   Improve the installation guidelines
-
-
 .. _docs_install_hpc_prerequisites:
 
 Local Installation
@@ -316,17 +311,17 @@ which is used for generating animations.
 NVIDIA Toolkit
 --------------
 
-.. todo::
-
-   OTHER INSTRUCTIONS
-
 Once the GPU drivers have been successfully installed, it's
 necessary to install the NVIDIA Toolkit, allowing hiperblas-core
-to use CUDA. To do this, execute the following command:
-
-.. code-block:: shell
-
-   sudo apt install nvidia-cuda-toolkit
+to use CUDA.
+To do this, access
+`CUDA toolkit Downloads
+<https://developer.nvidia.com/cuda-downloads>`_
+and select the options of
+*Operating System*, *Architecture*, *Distribution*, and
+*Version*,  according to your machine,
+and the desired *Installer Type*.
+Then, follow the instructions of the **Base Installer** section.
 
 To verify the correct installation of the NVIDIA Toolkit,
 you can check if the ``nvcc`` compiler has been installed.

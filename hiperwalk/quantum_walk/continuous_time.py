@@ -557,13 +557,12 @@ class ContinuousTime(QuantumWalk):
             to select a small time interval and perform 
             multiple matrix multiplications to minimize 
             rounding errors.
-
-        .. todo::
-            Use ``scipy.linalg.expm`` when ``hpc=None`` once the
-            `scipy issue 18086
-            <https://github.com/scipy/scipy/issues/18086>`_
-            is solved.
         """
+        # TODO: Use ``scipy.linalg.expm`` when ``hpc=None`` once the
+        #       `scipy issue 18086
+        #       <https://github.com/scipy/scipy/issues/18086>`_
+        #       is solved.
+
         def filter_and_call(method, update):
             valid = self._get_valid_kwargs(method)
             filtered = self._filter_valid_kwargs(kwargs, valid)

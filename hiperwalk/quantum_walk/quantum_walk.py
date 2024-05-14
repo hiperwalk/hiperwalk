@@ -19,14 +19,6 @@ class QuantumWalk(ABC):
     ----------
     graph: :class:`hiperwalk.graph.Graph`
         Graph on which the quantum walk takes place.
-
-    Notes
-    -----
-
-    .. todo::
-        * List the that methods must be overwritten.
-        * Accept other types as ``graph`` such as numpy array
-
     """
 
     @abstractmethod
@@ -449,11 +441,6 @@ class QuantumWalk(ABC):
         ----------
         label : int
             The ket label.
-
-        Examples
-        --------
-        .. todo::
-            valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
         ket[label] = 1
@@ -867,14 +854,6 @@ class QuantumWalk(ABC):
         optimal_runtime
         simulate
         uniform_state
-
-        Notes
-        -----
-
-        .. todo::
-            If ``t_opt / step`` is not close to an integer,
-            the max success probability was not obtained in the simulation.
-            The simulation must be rerun or interpolated.
         """
         t_opt, p_succ = self._optimal_runtime(state, step)
         opt_index = int(t_opt / step)
