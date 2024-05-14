@@ -10,18 +10,18 @@ in enabling HPC features must install several prerequisites.
 
 Choose your installation method:
 
-- :ref:`docs_local_installation` without HPC support.  
+- :ref:`docs_nonhpc_installation` without HPC support.  
 
 - :ref:`docs_install_docker_installation` with HPC support. 
 
 - :ref:`docs_install_hpc_prerequisites` for developers.
 
 
-.. _docs_local_installation:
+.. _docs_nonhpc_installation:
 
-------------------
-Local Installation
-------------------
+--------------------
+Non-HPC Installation
+--------------------
 
 Hiperwalk can be installed locally for environments where HPC support 
 is not required. This installation relies on certain Python libraries.
@@ -79,9 +79,63 @@ To uninstall the hiperwalk package:
 
 .. _docs_install_docker_installation:
 
--------------------
+----------------
+HPC Installation
+----------------
+
+Hiperwalk is capable of using HPC locally or via a docker installation.
+Regardless of the chosen option,
+it is necessary to install the HPC prerequisites.
+
+HPC Prerequisites
+=================
+
+To install the GPU driver, you can follow this
+`tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
+Below, we have outlined the essential steps.
+
+First, you'll need to identify your GPU by running the following command:
+
+.. code-block:: shell
+
+   lspci | grep -e VGA
+
+You can then verify if the outputted
+`GPU is CUDA compatible <https://developer.nvidia.com/cuda-gpus>`_.
+If it is, execute the following command:
+
+.. code-block:: shell
+
+   ubuntu-drivers devices
+
+This will list the available drivers for your GPU. We recommend
+installing the driver tagged with ``recommended`` at the end.
+The driver's name typically follows the format ``nvidia-driver-XXX``
+where ``XXX`` is a specific number.
+For the subsequent steps in the installation process, substitute ``XXX``
+as required. To install the GPU driver, execute the following command:
+
+.. code-block:: shell
+
+   sudo apt install nvidia-driver-XXX
+
+Finally, **reboot you computer**.
+After rebooting, if the installation was successful,
+running the following command:
+
+.. code-block::
+
+   nvidia-smi
+
+should display GPU information such as the name, driver version,
+CUDA version, and so on. Alternatively, you can verify the
+availability of the **NVIDIA Settings** application by
+pressing the ``Super`` key on your keyboard and
+typing ``nvidia settings``.
+
+
 Docker Installation
--------------------
+===================
 
 Using Hiperwalk on its Docker distribution offers
 numerous benefits to users.
@@ -209,9 +263,8 @@ In the browser, access the "work" folder that appears in the environment, and th
 
 .. _docs_install_hpc_prerequisites:
 
------------------
-HPC Prerequisites
------------------
+Local Installation
+==================
 
 This section and the ones that follow are intended 
 for developers of the Hiperwalk package. 
@@ -260,54 +313,12 @@ which is used for generating animations.
 
    sudo apt install ffmpeg
 
-GPU Driver
-----------
-
-To install the GPU driver, you can follow this
-`tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
-Below, we have outlined the essential steps.
-
-First, you'll need to identify your GPU by running the following command:
-
-.. code-block:: shell
-
-   lspci | grep -e VGA
-
-You can then verify if the outputted
-`GPU is CUDA compatible <https://developer.nvidia.com/cuda-gpus>`_.
-If it is, execute the following command:
-
-.. code-block:: shell
-
-   ubuntu-drivers devices
-
-This will list the available drivers for your GPU. We recommend
-installing the driver tagged with ``recommended`` at the end.
-The driver's name typically follows the format ``nvidia-driver-XXX``
-where ``XXX`` is a specific number.
-For the subsequent steps in the installation process, substitute ``XXX``
-as required. To install the GPU driver, execute the following command:
-
-.. code-block:: shell
-
-   sudo apt install nvidia-driver-XXX
-
-Finally, **reboot you computer**.
-After rebooting, if the installation was successful,
-running the following command:
-
-.. code-block::
-
-   nvidia-smi
-
-should display GPU information such as the name, driver version,
-CUDA version, and so on. Alternatively, you can verify the
-availability of the **NVIDIA Settings** application by
-pressing the ``Super`` key on your keyboard and
-typing ``nvidia settings``.
-
 NVIDIA Toolkit
 --------------
+
+.. todo::
+
+   OTHER INSTRUCTIONS
 
 Once the GPU drivers have been successfully installed, it's
 necessary to install the NVIDIA Toolkit, allowing hiperblas-core
@@ -326,8 +337,8 @@ This can be simply done by running the following command:
    nvcc --version
 
 
-Installing hiperblas-core hiperblas-opencl-bridge and pyhiperblas
-=================================================================
+Hiperblas
+---------
 
 For HPC support,
 Hiperwalk uses
@@ -351,7 +362,7 @@ In this guide, we will install both projects into the home directory.
 In Linux, the tilde (``~``) serves as an alias for the home directory.
 
 hiperblas-core
---------------
+**************
 
 Firstly, clone the repository in the home directory.
 
@@ -393,7 +404,7 @@ execute the ``vector_test`` and ``matrix_test`` tests.
    ./matrix_test
 
 hiperblas-opencl-bridge
------------------------
+***********************
 
 The installation of the hiperblas-opencl-bridge is very similar to
 the installation of hiperblas-core.
@@ -426,7 +437,7 @@ execute the tests
    ./matrix_test
 
 pyhiperblas
------------
+***********
 
 To install pyhiperblas, first clone the repository into
 **the same directory hiperblas-core was cloned**.
@@ -450,3 +461,10 @@ To verify whether the installation was successful, run the following test:
 .. code-block:: shell
 
    python3 test.py
+
+Hiperwalk
+---------
+
+To finish the local hiperwalk installation,
+issue the same commands of the
+:ref:`docs_nonhpc_installation` section.
