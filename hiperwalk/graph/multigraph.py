@@ -21,17 +21,22 @@ class Multigraph(Graph):
         The adjacency matrix of the graph, which must be a 
         Hermitian matrix with non-negative integer entries. 
         Acceptable input types include:
+
             * Direct matrix types such as:
                 * :class:`scipy.sparse.csr_array`,
                 * :class:`numpy.ndarray`,
                 * List of lists.
             * :class:`networkx.Graph`:
-                The adjacency matrix is automatically extracted from the specified networkx graph.
+                The adjacency matrix is automatically extracted
+                from the specified networkx graph.
 
     copy : bool, default=False
         Specifies whether to store a hard copy of ``adj_matrix``:
-            * If ``True``, a deep copy of the adjacency matrix is created and stored.
-            * If ``False``, a reference to the original ``adj_matrix`` is stored.
+
+            * If ``True``, a deep copy of the adjacency matrix is
+              created and stored.
+            * If ``False``, a reference to the original
+              ``adj_matrix`` is stored.
 
     Raises
     ------
