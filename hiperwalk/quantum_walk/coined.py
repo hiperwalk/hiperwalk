@@ -450,10 +450,6 @@ class Coined(QuantumWalk):
             array([0, 0, 0, 0, 1, 0, 0, 0])
             >>> S @ np.array([0, 0, 0, 0, 1, 0, 0, 0]) # S|4> = |2>
             array([0, 0, 1, 0, 0, 0, 0, 0])
-
-        .. todo::
-            
-            Add persistent example.
         """
         self.set_evolution(shift=shift,
                            coin=self._coin,
@@ -559,12 +555,6 @@ class Coined(QuantumWalk):
         Note that a loop at a vertex :math:`u` is treated
         as the arc :math:`(u,u)`, contributing an additional 
         one to the degree of :math:`u`.
-        
-
-        .. todo::
-
-            Check if explicit coin is valid.
-
         """
         self.set_evolution(shift=self._shift,
                            coin=coin,
@@ -921,12 +911,6 @@ class Coined(QuantumWalk):
         ----------
         .. [1] R. Portugal. "Quantum walks and search algorithms",
             2nd edition, Springer, 2018.
-
-        Examples
-        --------
-
-        .. todo::
-            Valid examples to clear behavior.
         """
 
         S_kwargs = Coined._filter_valid_kwargs(
@@ -1103,11 +1087,6 @@ class Coined(QuantumWalk):
             arc_number
                 The label of the arc.
                 The number according to the computational basis order.
-
-        Examples
-        --------
-        .. todo::
-            valid examples
         """
         ket = np.zeros(self.hilb_dim, dtype=float)
         ket[self._graph.arc_number(arc)] = 1

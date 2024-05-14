@@ -202,30 +202,14 @@ def plot_probability_distribution(
     ``plot()`` calls the appropriated plotting method with
     customization parameters,
     i.e. bar, line or graph plot with the respective valid kwargs.
-
-    .. todo::
-        - Accept the ``probabilities`` parameter as a list.
-        - Use Graphviz instead of NetworkX to draw graphs.
-            As noted by networkx's documentation:
-            Proper graph visualization is hard, and we highly recommend
-            that people visualize their graphs with tools dedicated to
-            that task. 
-            https://networkx.org/documentation/stable/reference/drawing.html
-        - Implement ``repeat_delay`` parameter:
-            An extra time to wait before the animation is repeated.
-            Pull requests to the
-            `Matplotlib animation writers
-            <https://matplotlib.org/stable/api/animation_api.html#writer-classes>`_
-            are needed.
-        - Implement ``transparency`` parameter:
-            change nodes transparency depending on probability.
-        - Implement GTK 4.0 support.
-
-    Examples
-    --------
-    .. todo::
-        probabilities expects numpy array or matrix
     """
+    # TODO: option to use Graphviz instead of NetworkX to draw graphs.
+    #      As noted by networkx's documentation:
+    #      Proper graph visualization is hard, and we highly recommend
+    #      that people visualize their graphs with tools dedicated to
+    #      that task. 
+    #      https://networkx.org/documentation/stable/reference/drawing.html
+
     # Figure size
 
     if len(figsize) == 2:
@@ -533,7 +517,7 @@ def _configure_figure(fig_width, fig_height, dpi):
     ----------
     num_vert: int
         number of vertices in the graph
-        .. todo:: set the figure size according to num_vert
+
     fig_width, fig_height : float, optional
         Custom figure width and height, respectively.
         If not set, the default value is used.
