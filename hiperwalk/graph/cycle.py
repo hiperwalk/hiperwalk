@@ -46,13 +46,13 @@ def Cycle(num_vert, multiedges=None, weights=None):
 
         >>> g = hpw.Cycle(10)
         >>> g.neighbors(0)
-        [1, 9]
+        array([1, 9])
         >>> g.neighbors(1)
-        [2, 0]
+        array([2, 0])
         >>> g.neighbors(8)
-        [9, 7]
+        array([9, 7])
         >>> g.neighbors(9)
-        [0, 8]
+        array([0, 8])
     """
     basis = [1, -1]
     g = IntegerLattice(num_vert, basis, True, weights, multiedges)
