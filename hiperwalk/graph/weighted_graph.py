@@ -17,17 +17,22 @@ class WeightedGraph(Graph):
         The adjacency matrix of the graph, 
         which must be a Hermitian matrix. 
         Two types of input are accepted:
+
             * Matrix formats such as:
                 * :class:`scipy.sparse.csr_array`,
                 * :class:`numpy.ndarray`,
                 * List of lists.
             * :class:`networkx.Graph`:
-                The adjacency matrix is derived from the provided NetworkX graph.
+                The adjacency matrix is derived from
+                the provided NetworkX graph.
 
     copy : bool, default=False
         Determines how the adjacency matrix is stored:
-            * If ``True``, a deep copy of ``adj_matrix`` is created and stored.
-            * If ``False``, a reference to the original ``adj_matrix`` is stored.
+
+            * If ``True``, a deep copy of ``adj_matrix`` is
+              created and stored.
+            * If ``False``, a reference to the original
+              ``adj_matrix`` is stored.
 
     Raises
     ------
