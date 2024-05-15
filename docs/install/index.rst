@@ -54,7 +54,7 @@ Python dependencies, which include
 
 .. code-block:: shell
 
-   pip3 install hiperwalk
+   pip install hiperwalk
 
 To verify the success of the installation, 
 you can execute any example code available in the
@@ -68,13 +68,13 @@ To update an older version of the hiperwalk package:
 
 .. code-block:: shell
 
-   pip3 install hiperwalk --upgrade
+   pip install hiperwalk --upgrade
 
 To uninstall the hiperwalk package:
 
 .. code-block:: shell
 
-   pip3 uninstall hiperwalk
+   pip uninstall hiperwalk
 
 
 .. _docs_install_docker_installation:
@@ -84,12 +84,15 @@ HPC Installation
 ----------------
 
 Hiperwalk is capable of using HPC locally or via a docker installation.
-Regardless of the chosen option,
-it is necessary to install the HPC prerequisites.
+The following instructions guide you through CPU-based HPC
+with *optional* GPU support.
 
-HPC Prerequisites
+.. _docs_gpu_prerequisites:
+
+GPU Prerequisites
 =================
 
+Skip this section if GPU support is not desired.
 To install the GPU driver, you can follow this
 `tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
 Below, we have outlined the essential steps.
@@ -153,7 +156,10 @@ empowers users with enhanced flexibility, efficiency,
 and agility in their development and deployment processes.
 
 
-**Single time configuration of docker**
+Docker Configuration
+--------------------
+
+Single time configuration of docker.
 
 Step 1. Add Docker's official GPG key:
 
@@ -197,14 +203,20 @@ Step 6. Test your docker installation
 
 	docker run hello-world
 
-**Single time configuration of nvidia container toolkit**
+NVIDIA Container
+----------------
+
+Skip this section if the :ref:`docs_gpu_prerequisites` are not installed.
+
+Single time configuration of nvidia container toolkit.
 
 Step 1. Configure respository
 
 .. code-block:: shell
 
-	curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
-  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | \
+    sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg && \
+    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
@@ -241,19 +253,35 @@ change the value of no-cgroups to false
 
 	docker run --rm --gpus all nvidia/cuda:12.0.0-base-ubuntu20.04 nvidia-smi
 
-**Hiperwalk with HPC**
+Run Docker
+----------
 
 Create a folder where you want to save notebooks. Go to folder.
+
+To run hiperwalk in docker with GPU and CPU support,
+run the following command.
 
 .. code-block:: shell
 
 	docker run --rm --gpus all -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
 
-Open the page with the url that appears on the screen that starts with 127.0.0.1
+To run hiperwalk in docker with CPU-only support,
+run the following command.
 
-Example: http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a16e91d1cc
+.. code-block:: shell
 
-In the browser, access the "work" folder that appears in the environment, and the data will be saved there (in the folder external to the container)
+	docker run --rm -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
+
+Open the page with the url that appears on
+the screen that starts with 127.0.0.1
+
+Example:
+http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a16e91d1cc
+
+In the browser,
+access the "work" folder that appears in the environment,
+and the data will be saved there
+(in the folder external to the container).
 
 
 .. _docs_install_hpc_prerequisites:
@@ -286,7 +314,7 @@ Next, run the following commands to install the prerequisites:
    sudo apt install libgtest-dev
    sudo apt install python3-distutils
    sudo apt install python3-pip
-   pip3 install pytest
+   pip install pytest
 
 
 These newly installed programs serve the following purposes:
@@ -310,6 +338,8 @@ which is used for generating animations.
 
 NVIDIA Toolkit
 --------------
+
+Skip this section if the :ref:`docs_gpu_prerequisites` are not installed.
 
 Once the GPU drivers have been successfully installed, it's
 necessary to install the NVIDIA Toolkit, allowing hiperblas-core
@@ -341,8 +371,6 @@ Hiperwalk uses
 `hiperblas-opencl-bridge
 <https://github.com/hiperblas/hiperblas-opencl-bridge>`_,
 and `pyhiperblas <https://github.com/hiperblas/pyhiperblas>`_.
-Note that a computer with a **GPU compatible with CUDA** is required
-for this.
 
 The information in this guide is compiled from
 `Paulo Motta's blog
@@ -371,7 +399,7 @@ install the code.
 
 .. code-block:: shell
 
-   cd hiperblas-core
+   cd ~/hiperblas-core
    cmake .
    make
    sudo make install
@@ -395,11 +423,14 @@ execute the ``vector_test`` and ``matrix_test`` tests.
 
 .. code-block:: shell
 
+   cd ~/hiperblas-core
    ./vector_test
    ./matrix_test
 
 hiperblas-opencl-bridge
 ***********************
+
+Skip this section if the :ref:`docs_gpu_prerequisites` are not installed.
 
 The installation of the hiperblas-opencl-bridge is very similar to
 the installation of hiperblas-core.
@@ -443,6 +474,13 @@ Thus, execute:
 
    cd ~
    git clone https://github.com/hiperblas/pyhiperblas.git
+
+Before installing ``pyhiperblas``,
+install ``numpy`` using the ``sudo`` command.
+
+.. code-block:: shell
+
+    sudo pip install numpy
 
 Next, navigate to the newly created ``pyhiperblas`` directory to install it.
 
