@@ -55,3 +55,25 @@ for HPC on CPU, with optional GPU support provided by
 [hiperblas-opencl-bridge](https://github.com/hiperblas/hiperblas-opencl-bridge).
 For more details, access
 [https://hiperwalk.org/docs/stable/install/](https://hiperwalk.org/docs/stable/install/).
+
+# Call for Contributions
+
+Small improvements or fixes are always appreciated.
+If you are considering larger contributions to the source code, or
+if you are unsure where to start or how your skills fit in,
+please contact us through
+[hiperwalk@gmail.com](mailto:hiperwalk@gmail.com).
+
+There are multiple ways to contribute to Hiperwalk.
+For instance, you can:
+- contribute to [HiperBLAS](https://github.com/hiperblas)
+- help us stay on top of new and old [issues](https://github.com/hiperwalk/hiperwalk/issues)
+- develop tutorials, presentations, and other educational materials
+- maintain and improve [our website](https://github.com/hiperwalk/hiperwalk.github.io)
+- develop graphic design for our brand assets and promotional materials
+- translate website content
+- help with outreach and onboard new contributors
+
+If you are new to contributing to open source, [this
+guide](https://opensource.guide/how-to-contribute/) helps explain why, what,
+and how to successfully get involved.
