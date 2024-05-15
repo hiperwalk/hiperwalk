@@ -20,59 +20,38 @@ https://doi.org/10.1109/QCE57702.2023.00055)
 [![Contribute](https://img.shields.io/badge/Contribute-Good%20First%20Issue-green.svg)](
 https://github.com/hiperwalk/hiperwalk/issues?q=is%3Aopen+is%3Aissue+label%3A%22Good+First+Issue%22)
 
-High-performance Quantum Walk Simulator
 
-Homepage of Hiperwalk project
-http://hiperwalk.org/
+Hiperwalk, an acronym for High-Performance Quantum Walk Simulator, is a powerful,
+open-source software designed to simulate quantum walks on various graph structures.
+Leveraging heterogeneous High-Performance Computing (HPC),
 
-Currently, it is necessary to have
-[neblina-core](https://github.com/paulomotta/neblina-core) and
-[pyneblina](https://github.com/paulomotta/pyneblina) installed.
-Paulo Motta described on his blog the
-[installation steps for both neblina-core and pyneblina](https://paulomotta.pro.br/wp/2021/05/01/pyneblina-and-neblina-core/).
+* **Website:** [http://hiperwalk.org/](http://hiperwalk.org/)
+* **Documentation:** [https://hiperwalk.org/docs/stable/documentation/](https://hiperwalk.org/docs/stable/documentation/)
+* **Source code:** [https://github.com/hiperwalk/hiperwalk](https://github.com/hiperwalk/hiperwalk)
+* **Contributing:** [https://hiperwalk.org/docs/stable/development/index.html](https://hiperwalk.org/docs/stable/development/index.html)
+* **Bug reports:** [https://github.com/hiperwalk/hiperwalk/issues](https://github.com/hiperwalk/hiperwalk/issues)
+* **Tutorial:** [https://hiperwalk.org/docs/stable/tutorial](https://hiperwalk.org/docs/stable/tutorial)
+* **Examples:** [https://github.com/hiperwalk/hiperwalk/tree/master/examples](https://github.com/hiperwalk/hiperwalk/tree/master/examples)
 
-# Style Guide for Python Code
-The code must be written accordingly [PEP 8](https://peps.python.org/pep-0008/).
-Some code may need to be updated to match PEP 8's requirements.
 
-# Python Libraries Dependencies
-- Matplotlib;
-- NetworkX >= 2.7;
-	- PIL;
-- NumPy;
-- Scipy >= 1.8;
-- Sphinx;
-- numpydoc;
+# Install
 
-## Optional Libraries For Animations
-- PyGObject: backend for showing animations;
-- ImageMagick: for saving animated gifs;
-- ffmpeg: for saving movies.
+Hiperwalk is available with HPC support or not.
 
-# TODO List
-- [ ] Update installation instructions
-- [X] Refactor Coined\_QW\_Adjacency\_Matrix-v2.ipynb
-- [ ] Create separated file for plotting
-	- [ ] General plotting based on networkx
-- [ ] Specific functions for widely used walks?
-- [ ] Support for different coins
-	- [ ] Hadamard Coin general dimensions
-	- [ ] Generating shift operator: checking whether argument type is sparse or not
-	- [ ] Optimization: use lil\_matrix instead of csr\_matrix while generating S operator
-- [ ] Construct shift operators based on sympy expressions?
-- [ ] Implement and refactor tests
-	- [ ] Complete Graph
-	- [ ] Line walk
-	- [ ] Mesh walk
-	- [ ] Tests for plotting graphs?
-- [ ] Clean examples
-- [ ] Add commentaries to qwalk/coined
-- [ ] Create documentation
-	- [ ] pdf (with LaTeX)
-	- [ ] webpage
-- [ ] pyneblina\_interface.py
-	- [ ] Rename functions
-	- [ ] Remove definition from examples
-	- [ ] Move PyneblinaInterface.py functions to Pyneblina project?
-- [ ] Give support for more backends to show animations
-- [ ] Matplotlib animation (show and save may be slow)
+## No HPC Support
+Install the lastest version of Hiperwalk from PyPi
+
+```shell
+pip install hiperwalk
+```
+
+## HPC Support
+
+HPC support is available via Docker or local installation.
+The latter requires
+[hiperblas-core](https://github.com/hiperblas/hiperblas-core) and
+[pyhiperblas](https://github.com/hiperblas/pyhiperblas)
+for HPC on CPU, with optional GPU support provided by
+[hiperblas-opencl-bridge](https://github.com/hiperblas/hiperblas-opencl-bridge).
+For more details, access
+[https://hiperwalk.org/docs/stable/install/](https://hiperwalk.org/docs/stable/install/).
