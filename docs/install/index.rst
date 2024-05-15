@@ -161,11 +161,16 @@ Docker Configuration
 
 Single time configuration of docker.
 
-Step 1. Add Docker's official GPG key:
+Start by updating the package lists:
 
 .. code-block:: shell
 
 	sudo apt-get update
+
+Step 1. Add Docker's official GPG key:
+
+.. code-block:: shell
+
 	sudo apt-get install ca-certificates curl
 	sudo install -m 0755 -d /etc/apt/keyrings
 	sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
