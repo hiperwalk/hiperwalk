@@ -268,31 +268,34 @@ Test the gpu access
 Run Docker
 ----------
 
-Create a folder where you want to save your notebooks and switch to that folder.
+Create a folder where you want to save your notebooks. 
+This folder will store all the examples you create.
 
-To run hiperwalk in docker with CPU-only support,
-run the following command.
+Open a terminal and navigate to the folder you just created.
+
+To run Hiperwalk in Docker with CPU-only support, 
+execute the following command:
 
 .. code-block:: shell
 
 	docker run --rm -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
 
-To run Hiperwalk in Docker with GPU and CPU support, use the following command:
+To run Hiperwalk in Docker with GPU and CPU support, 
+execute the following command:
 
 .. code-block:: shell
 
 	docker run --rm --gpus all -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
 
-Open the page with the url that appears on
-the screen that starts with 127.0.0.1
+Open your web browser and go to the URL that appears on the screen, 
+starting with ``127.0.0.1``. Alternatively, you can directly click 
+on the hyperlink.
 
-Example:
-http://127.0.0.1:8888/lab?token=05cf67f22ffcab83fce3410368ddc5efe459f3a16e91d1cc
+In the Jupyter environment, access the "work" folder. 
+All your data and notebooks will be saved in this folder 
+(external to the Docker container).
 
-In the browser,
-access the "work" folder that appears in the environment,
-and the data will be saved there
-(in the folder external to the container).
+
 
 
 Local Installation
