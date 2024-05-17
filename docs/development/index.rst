@@ -76,7 +76,7 @@ Install Requirements
 To generate the current, under-development documentation locally, 
 all HiperWalk requirements must be installed
 (see :ref:`HiperWalk section in the installation guide
-<docs_install_hiperwalk>`).
+<docs_hpc_enabled>`).
 
 Assuming that all HiperWalk requirements are installed (see *TODO*), 
 the following commands install the remaining documentation-specific requirements.
