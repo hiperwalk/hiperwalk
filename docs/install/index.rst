@@ -100,6 +100,12 @@ To install the GPU driver, you can follow this
 `tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
 Below, we have outlined the essential steps.
 
+.. warning::
+
+	If you have any concerns about the following commands, 
+	especially for installing the NVIDIA driver, 
+	please contact your local support team for assistance.
+
 First, you'll need to identify your GPU by running the following command:
 
 .. code-block:: shell
