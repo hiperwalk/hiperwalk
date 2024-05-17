@@ -15,7 +15,7 @@ Choose your installation method:
 
   - Docker Installation
 
-  - Local Installation (for developers)
+  - Local Installation (for advanced users)
 
 
 .. _docs_basic_installation:
