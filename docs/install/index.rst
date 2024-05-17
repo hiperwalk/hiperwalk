@@ -133,7 +133,7 @@ as required. To install the GPU driver, execute the following command:
 
 Finally, **reboot you computer**.
 After rebooting, if the installation was successful,
-running the following command:
+running the command
 
 .. code-block::
 
