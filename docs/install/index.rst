@@ -152,8 +152,8 @@ Docker simplifies dependency management, updates, and configuration replication,
 enhancing consistency and reliability. 
 
 
-Docker Configuration
---------------------
+Installation Steps
+------------------
 
 Single time configuration of docker.
 
@@ -192,7 +192,8 @@ Step 4. Add the user to docker group
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
 
-Step 5. Logout and log back in
+Step 5. The following command is used to log out and 
+then log back into Docker:
 
 .. code-block:: shell
 
@@ -207,9 +208,11 @@ Step 6. Test your docker installation
 NVIDIA Container
 ----------------
 
-Skip this section if the :ref:`docs_gpu_prerequisites` are not installed.
+Skip this section if GPU support is not needed.
+If the prerequisites are not installed, refer to
+:ref:`docs_gpu_prerequisites`.
 
-Single time configuration of nvidia container toolkit.
+Single time configuration of NVDIA container toolkit.
 
 Step 1. Configure respository
 
