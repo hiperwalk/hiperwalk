@@ -206,12 +206,7 @@ Step 4. Add the user to Docker group
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
 
-Step 5. The following command is used to log out and 
-then log back into Docker:
-
-.. code-block:: shell
-
-	newgrp docker
+Step 5.Log out of your session and then log back in.
 
 Step 6. Test your Docker installation
 
