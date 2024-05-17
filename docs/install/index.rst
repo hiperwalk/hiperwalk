@@ -5,8 +5,7 @@ Install
 Hiperwalk offers multiple installation paths depending on your requirements. 
 You can install Hiperwalk without High-Performance 
 Computing (HPC) support, or opt for a Docker-based installation 
-that includes HPC capabilities. Additionally, developers interested 
-in enabling HPC features must install several prerequisites.
+that includes HPC capabilities. 
 
 Choose your installation method:
 
