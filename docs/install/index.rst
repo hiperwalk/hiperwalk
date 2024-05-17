@@ -293,7 +293,7 @@ Open your web browser and go to the URL that appears on the screen,
 starting with ``127.0.0.1``. Alternatively, you can directly click 
 on the hyperlink.
 
-In the Jupyter environment, access the "work" folder. 
+In the Jupyter environment, access the ``work/`` folder. 
 All your data and notebooks will be saved in the folder
 you have created above
 (external to the Docker container).
