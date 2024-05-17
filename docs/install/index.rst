@@ -83,16 +83,19 @@ To uninstall the hiperwalk package:
 HPC-Enabled Installation
 ------------------------
 
-Hiperwalk is capable of using HPC locally or via a docker installation.
-The following instructions guide you through CPU-based HPC
-with *optional* GPU support.
+Hiperwalk supports HPC through either a Docker installation 
+or a local installation. HPC capabilities can be leveraged 
+using parallelism on multicore CPUs and, optionally, NVIDIA GPUs.
+
+The following instructions will guide you through setting 
+up CPU-based HPC, with optional GPU support.
 
 .. _docs_gpu_prerequisites:
 
 GPU Prerequisites
 =================
 
-Skip this section if GPU support is not desired.
+Skip this section if GPU support is not needed.
 To install the GPU driver, you can follow this
 `tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
 Below, we have outlined the essential steps.
@@ -140,20 +143,13 @@ typing ``nvidia settings``.
 Docker Installation
 ===================
 
-Using Hiperwalk on its Docker distribution offers
-numerous benefits to users.
-Docker provides a lightweight, portable, and scalable environment,
-ensuring seamless deployment across
-different operating systems and environments.
-With Docker, users can easily manage dependencies,
-streamline updates, and replicate configurations,
-leading to improved consistency and reliability.
-Additionally, Docker enables efficient resource utilization,
-facilitating faster development cycles and easier collaboration
-among team members.
-Overall, opting for Hiperwalk on its Docker distribution
-empowers users with enhanced flexibility, efficiency,
-and agility in their development and deployment processes.
+Using Hiperwalk on Docker offers numerous benefits. 
+Docker, a form of containerization, automatically includes Hiperwalk, 
+its prerequisites, and all HPC-enabling software. 
+It provides a lightweight, portable, and scalable environment, 
+ensuring seamless deployment across different systems. 
+Docker simplifies dependency management, updates, and configuration replication, 
+enhancing consistency and reliability. 
 
 
 Docker Configuration
