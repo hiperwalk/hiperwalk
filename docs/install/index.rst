@@ -248,19 +248,20 @@ Step 3. Configure Docker to use NVIDIA in rootless mode
 	systemctl --user restart docker
 	sudo nvidia-ctk config --set nvidia-container-cli.no-cgroups --in-place
 
-It may be necessary
+It may be necessary to edit the following file and 
+change the value of ``no-cgroups`` to ``false``:
 
 .. code-block:: shell
 
 	sudo vi /etc/nvidia-container-runtime/config.toml 
 
-Change the value of no-cgroups to false
+Then, execute:
 
 .. code-block:: shell
 
 	sudo systemctl restart docker
 
-Step 4. Test the GPU access
+Step 4. Test the GPU access:
 
 .. code-block:: shell
 
