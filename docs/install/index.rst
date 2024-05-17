@@ -97,8 +97,9 @@ GPU Prerequisites
 
 Skip this section if GPU support is not needed.
 To install the GPU driver, you can follow this
-`tutorial for installing NVIDIA drivers <https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
-Below, we have outlined the essential steps.
+`tutorial for installing NVIDIA drivers 
+<https://www.linuxcapable.com/install-nvidia-drivers-on-ubuntu-linux/>`_
+. Below, we have outlined the essential steps.
 
 .. warning::
 
