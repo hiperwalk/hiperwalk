@@ -268,14 +268,7 @@ Test the gpu access
 Run Docker
 ----------
 
-Create a folder where you want to save notebooks. Go to folder.
-
-To run hiperwalk in docker with GPU and CPU support,
-run the following command.
-
-.. code-block:: shell
-
-	docker run --rm --gpus all -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
+Create a folder where you want to save your notebooks and switch to that folder.
 
 To run hiperwalk in docker with CPU-only support,
 run the following command.
@@ -283,6 +276,12 @@ run the following command.
 .. code-block:: shell
 
 	docker run --rm -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
+
+To run Hiperwalk in Docker with GPU and CPU support, use the following command:
+
+.. code-block:: shell
+
+	docker run --rm --gpus all -v $(pwd):/home/jovyan/work -p 8888:8888 hiperwalk/hiperwalk:2.0.b0 
 
 Open the page with the url that appears on
 the screen that starts with 127.0.0.1
