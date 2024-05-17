@@ -161,7 +161,7 @@ enhancing consistency and reliability.
 Installation Steps
 ------------------
 
-Single time configuration of docker.
+Single time configuration of Docker.
 
 Start by updating the package lists:
 
@@ -193,13 +193,13 @@ Update the package lists again:
 
     sudo apt-get update
 
-Step 3. Install docker latest
+Step 3. Install Docker latest
 
 .. code-block:: shell
 
 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-Step 4. Add the user to docker group
+Step 4. Add the user to Docker group
 
 .. code-block:: shell
 
@@ -213,7 +213,7 @@ then log back into Docker:
 
 	newgrp docker
 
-Step 6. Test your docker installation
+Step 6. Test your Docker installation
 
 .. code-block:: shell
 
@@ -228,7 +228,7 @@ If the prerequisites are not installed, refer to
 
 Single time configuration of NVDIA container toolkit.
 
-Step 1. Configure respository
+Step 1. Configure repository
 
 .. code-block:: shell
 
@@ -245,7 +245,7 @@ Step 2. Update and install
 	sudo apt-get update
 	sudo apt-get install -y nvidia-docker2
 
-Step 3. Configure docker to use nvidia in rootless mode
+Step 3. Configure Docker to use NVIDIA in rootless mode
 
 .. code-block:: shell
 
@@ -259,13 +259,13 @@ It may be necessary
 
 	sudo vi /etc/nvidia-container-runtime/config.toml 
 
-change the value of no-cgroups to false
+Change the value of no-cgroups to false
 
 .. code-block:: shell
 
 	sudo systemctl restart docker
 
-Test the gpu access
+Test the GPU access
 
 .. code-block:: shell
 
@@ -298,7 +298,8 @@ starting with ``127.0.0.1``. Alternatively, you can directly click
 on the hyperlink.
 
 In the Jupyter environment, access the "work" folder. 
-All your data and notebooks will be saved in this folder 
+All your data and notebooks will be saved in the folder
+you have created above
 (external to the Docker container).
 
 
