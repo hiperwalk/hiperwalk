@@ -7,15 +7,14 @@ Examples
 Coined Quantum Walk
 ===================
 
-Examples of
-`coined quantum waslk on Jupyter notebooks
-<https://github.com/hiperwalk/hiperwalk/tree/master/examples/coined>`_
-on GitHub.
+Examples of Jupyter notebooks on GitHub:
+`hiperwalk/examples/coined/notebooks
+<https://github.com/hiperwalk/hiperwalk/tree/master/examples/coined/notebooks>`_
+
 
 Continuous-Time Quantum Walk
 ============================
 
-Examples of
-`continuous-time quantum walks on Jupyter notebooks
-<https://github.com/hiperwalk/hiperwalk/tree/master/examples/continuous_time>`_
-on GitHub.
+Examples of Jupyter notebooks on GitHub:
+`hiperwalk/examples/continuous_time/notebooks
+<https://github.com/hiperwalk/hiperwalk/tree/master/examples/continuous_time/notebooks>`_
