@@ -24,8 +24,8 @@ Choose your installation method:
 Basic Installation
 ------------------
 
-Hiperwalk can be installed locally for environments where HPC support 
-is not required. This installation relies on certain Python libraries.
+Hiperwalk can be installed without HPC support. 
+This installation relies on certain Python libraries.
 
 Installation Steps
 ==================
