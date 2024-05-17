@@ -463,7 +463,7 @@ class Coined(QuantumWalk):
 
         Returns
         -------
-        scipy.sparse.csr_array
+        :class:`scipy.sparse.csr_array`
 
         See Also
         --------
