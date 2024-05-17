@@ -10,23 +10,23 @@ in enabling HPC features must install several prerequisites.
 
 Choose your installation method:
 
-- :ref:`docs_nonhpc_installation` without HPC support.  
+- :ref:`docs_basic_installation` without HPC support  
 
-- :ref:`docs_install_docker_installation` with HPC support. 
+- :ref:`docs_hpc_enabled`
 
-- :ref:`docs_install_hpc_prerequisites` for developers.
+	- Docker Installation
+
+	- Local Installation (for developers)
 
 
-.. _docs_nonhpc_installation:
+.. _docs_basic_installation:
 
---------------------
-Non-HPC Installation
---------------------
+------------------
+Basic Installation
+------------------
 
 Hiperwalk can be installed locally for environments where HPC support 
 is not required. This installation relies on certain Python libraries.
-
-.. _docs_install_hiperwalk:
 
 Installation Steps
 ==================
@@ -77,11 +77,11 @@ To uninstall the hiperwalk package:
    pip uninstall hiperwalk
 
 
-.. _docs_install_docker_installation:
+.. _docs_hpc_enabled:
 
-----------------
-HPC Installation
-----------------
+------------------------
+HPC-Enabled Installation
+------------------------
 
 Hiperwalk is capable of using HPC locally or via a docker installation.
 The following instructions guide you through CPU-based HPC
@@ -288,8 +288,6 @@ access the "work" folder that appears in the environment,
 and the data will be saved there
 (in the folder external to the container).
 
-
-.. _docs_install_hpc_prerequisites:
 
 Local Installation
 ==================
@@ -505,4 +503,4 @@ Hiperwalk
 
 To finish the local hiperwalk installation,
 issue the same commands of the
-:ref:`docs_nonhpc_installation` section.
+:ref:`docs_basic_installation` section.
