@@ -193,7 +193,7 @@ Update the package lists again:
 
     sudo apt-get update
 
-Step 3. Install Docker latest
+Step 3. Install Docker
 
 .. code-block:: shell
 
