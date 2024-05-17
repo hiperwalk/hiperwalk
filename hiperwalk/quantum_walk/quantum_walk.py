@@ -391,7 +391,7 @@ class QuantumWalk(ABC):
 
         Returns
         -------
-        :class:`numpy.array`
+        :class:`numpy.ndarray`
 
         Notes
         -----
@@ -696,28 +696,28 @@ class QuantumWalk(ABC):
             It contains information about the best fit found.
             The dictionary keys are
 
-            ``"fit function"`` :
-                a pointer to the obtained sine squared
+            fit function
+                A pointer to the obtained sine squared
                 function. Issuing ``d["fit function"](theta)`` evaluates
                 the function at point ``theta``.
 
-            ``"amplitude"``:
-                amplitude of the obtained fit function.
+            amplitude:
+                Amplitude of the obtained fit function.
 
-            ``"angular frequency"`` :
-                angular frequency of the obtained fit function.
+            angular frequency
+                Angular frequency of the obtained fit function.
 
-            ``"phase shift"`` :
-                phase shift of the obtained fit function.
+            phase shift
+                Phase shift of the obtained fit function.
 
-            ``"vertical offset"`` :
-                vertical offset of the obtained fit function.
+            vertical offset
+                Vertical offset of the obtained fit function.
 
-            ``"frequency"`` :
-                frequency of the obtained fit function.
+            frequency
+                Frequency of the obtained fit function.
 
-            ``"period"`` :
-                period of the obtained fit function.
+            period
+                Period of the obtained fit function.
 
         Notes
         -----
