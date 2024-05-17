@@ -14,9 +14,9 @@ Choose your installation method:
 
 - :ref:`docs_hpc_enabled`
 
-	- Docker Installation
+  - Docker Installation
 
-	- Local Installation (for developers)
+  - Local Installation (for developers)
 
 
 .. _docs_basic_installation:
