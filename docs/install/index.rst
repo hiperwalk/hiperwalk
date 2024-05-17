@@ -266,7 +266,7 @@ Change the value of no-cgroups to false
 
 	sudo systemctl restart docker
 
-Test the GPU access
+Step 4. Test the GPU access
 
 .. code-block:: shell
 
