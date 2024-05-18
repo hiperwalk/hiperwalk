@@ -4,10 +4,11 @@
 Examples
 ========
 
+Links to examples of Jupyter notebooks on GitHub for the following quantum walk models:
+
 Coined Quantum Walk
 ===================
 
-Examples of Jupyter notebooks on GitHub:
 `hiperwalk/examples/coined/notebooks
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples/coined/notebooks>`_
 
@@ -15,6 +16,5 @@ Examples of Jupyter notebooks on GitHub:
 Continuous-Time Quantum Walk
 ============================
 
-Examples of Jupyter notebooks on GitHub:
 `hiperwalk/examples/continuous_time/notebooks
 <https://github.com/hiperwalk/hiperwalk/tree/master/examples/continuous_time/notebooks>`_
