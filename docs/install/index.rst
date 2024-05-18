@@ -37,8 +37,7 @@ To begin, ensure that pip is installed on your system.
 
    sudo apt install python3-pip
 
-The following command will install Hiperwalk as well as all its
-Python dependencies, which include
+Hiperwalk has several Python dependencies, including
 `numpy <https://numpy.org/>`_,
 `scipy <https://scipy.org/>`_,
 `networkx <https://networkx.org/>`_, and
@@ -50,6 +49,9 @@ Python dependencies, which include
     updated. If you prefer not to have them updated, we recommend
     `creating a virtual environment
     <https://docs.python.org/3/library/venv.html>`_.
+
+The following command will install Hiperwalk and its
+dependencies:
 
 .. code-block:: shell
 
