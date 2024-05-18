@@ -273,7 +273,8 @@ Run Docker
 ----------
 
 Create a folder where you want to save your notebooks. 
-This folder will store all the examples you create.
+This folder will store all the examples you create in
+the browser.
 
 Open a terminal and navigate to the folder you just created.
 
