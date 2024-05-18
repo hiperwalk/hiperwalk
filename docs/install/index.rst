@@ -193,22 +193,22 @@ Update the package lists again:
 
     sudo apt-get update
 
-Step 3. Install Docker
+Step 3. Install Docker:
 
 .. code-block:: shell
 
 	sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-Step 4. Add the user to Docker group
+Step 4. Add the user to Docker group:
 
 .. code-block:: shell
 
 	sudo groupadd docker
 	sudo usermod -aG docker $USER
 
-Step 5.Log out of your session and then log back in.
+Step 5. Log out of your session and then log back in.
 
-Step 6. Test your Docker installation
+Step 6. Test your Docker installation:
 
 .. code-block:: shell
 
@@ -223,7 +223,7 @@ If the prerequisites are not installed, refer to
 
 Single time configuration of NVDIA container toolkit.
 
-Step 1. Configure repository
+Step 1. Configure the repository:
 
 .. code-block:: shell
 
@@ -233,14 +233,14 @@ Step 1. Configure repository
     sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
     sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
-Step 2. Update and install
+Step 2. Update and install:
 
 .. code-block:: shell
 
 	sudo apt-get update
 	sudo apt-get install -y nvidia-docker2
 
-Step 3. Configure Docker to use NVIDIA in rootless mode
+Step 3. Configure Docker to use NVIDIA in rootless mode:
 
 .. code-block:: shell
 
