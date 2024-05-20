@@ -4,17 +4,16 @@ sys_path.append('../')
 sys_path.append('../../')
 import hiperwalk as hpw
 import unittest
-from test_constants import *
+from test_constants import HPC
 
 class TestCoinedLine(unittest.TestCase):
 
     def setUp(self):
-        hpw.set_hpc(None)
+        hpw.set_hpc(HPC)
         self.num_vert = 41
         self.line = hpw.Line(self.num_vert)
         self.qw = hpw.Coined(self.line)
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
@@ -33,7 +32,6 @@ class TestCoinedLine(unittest.TestCase):
             final_state[-1] == 1 and np.all(final_state[:-1] == 0)
         )
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_persistent_shift_left_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
@@ -53,7 +51,8 @@ class TestCoinedLine(unittest.TestCase):
             final_state[0] == 1 and np.all(final_state[1:] == 0)
         )
 
-    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
+    @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
+                                  'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
 
         num_steps = self.num_vert // 2
@@ -71,7 +70,6 @@ class TestCoinedLine(unittest.TestCase):
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
         )
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_set_explicit_coin(self):
         C = self.qw.get_coin()
         self.qw.set_coin(coin=C)

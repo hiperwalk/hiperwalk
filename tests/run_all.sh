@@ -1,3 +1,3 @@
-echo "TEST_HPC = True" > test_constants.py
-echo "TEST_NONHPC = True" >> test_constants.py
-python3 -m unittest unit/*.py
+./run_hpc_none.sh
+./run_hpc_cpu.sh
+./run_hpc_gpu.sh
