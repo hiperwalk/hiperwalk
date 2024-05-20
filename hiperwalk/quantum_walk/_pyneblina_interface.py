@@ -138,15 +138,15 @@ def send_vector(v):
     # 
     # vec = (neblina.vector_new(n, neblina.COMPLEX)
     #        if is_complex else neblina.vector_new(n, neblina.FLOAT))
-    vec = neblina.vector_new(n, neblina.COMPLEX)
+    # TODO: check if line below and the previou comment are still needed
+    # vec = neblina.vector_new(n, neblina.COMPLEX)
 
     try:
         # TODO: Pyneblina needs to accept 3 only arguments
         # instead of 4?
         # TODO: check if neblina.vector_set is idetifying
         # the vector type right (i.e. real and not complex)
-        for i in range(n):
-            neblina.vector_set(vec, i, v[i].real, v[i].imag)
+        vec = neblina.load_numpy_array(v)
     except AttributeError:
         print("Error: vector entries must have real and imaginary parts.")
     except TypeError:
