@@ -1,3 +1,6 @@
+from .multigraph import Multigraph
+from .weighted_graph import WeightedGraph
+
 def __adjacent(self, u, v):
     x = u ^ v #bitwise xor
     return x != 0 and x & (x - 1) == 0
@@ -69,7 +72,7 @@ from scipy.sparse import csr_array
 from types import MethodType
 from .graph import Graph
 
-def Hypercube(dim, multiedges=None, weights=None):
+def Hypercube(dim, multiedges=None, weights=None, copy=False):
     r"""
     Hypercube graph constructor.
 
@@ -84,8 +87,27 @@ def Hypercube(dim, multiedges=None, weights=None):
     ----------
     dim : int
         The dimension of the hypercube.
-    multiedges, weights: scipy.sparse.csr_array, default=None
-        See :ref:`graph_constructors`.
+
+    multiedges, weights: matrix or dict, default=None
+        If ``multiedges is not None``, returns a multigraph.
+        If ``weights is not None``, returns a weighted graph.
+        Two types of entries are accepted:
+        an instance of :class:`scipy.sparse.csr_array` or a ``dict``.
+
+        * :class:`scipy.sparse.csr_array`: the adjacency matrix.
+        * `dict`: a dictionary with entries ``{(u, v): value}`` where
+            ``(u, v)`` is a valid edge and ``value != 0`` represents
+            the number of multiedges or the weight.
+            All unlisted edges are assigned the default value of 1.
+
+    copy : bool, default=False
+        The ``copy`` parameter is relevant only when
+        ``multiedges`` (``weights``) is an adjacency matrix.
+        If ``True``,
+        a hard copy of ``multiedges`` (``weights``) is stored.
+        If ``False``,
+        the pointer to ``multiedges`` (``weights``) is stored and
+        the ``multiedges``'s (``weights``') data is changed.
 
     Returns
     -------
@@ -147,22 +169,24 @@ def Hypercube(dim, multiedges=None, weights=None):
                                        for shift in range(dim)])
     adj_matrix = csr_array((data, indices, indptr),
                            shape=(num_vert, num_vert))
-
-    data = None
     g = Graph(adj_matrix, copy=False)
+
+    data = weights if weights is not None else multiedges
+    if data is not None:
+        if hasattr(data, 'keys'):
+            data = g._dict_to_adj_matrix(data)
+            copy = False
+        else:
+            g._rearrange_matrix_indices(data)
+
+        del g
+
     if weights is not None:
-        g._rearrange_matrix_indices(weights)
-        data = weights
-        del g
-        g = WeightedGraph(data, copy=False)
+        g = WeightedGraph(data, copy=copy)
     elif multiedges is not None:
-        g._rearrange_matrix_indices(multiedges)
-        data = multiedges
-        del g
-        g = Multigraph(data, copy=False)
+        g = Multigraph(data, copy=copy)
 
     # Binding particular attributes and methods
-    # TODO: add to docs
     g._dim = int(dim)
     g._num_loops = 0
 
