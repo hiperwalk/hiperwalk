@@ -69,8 +69,9 @@ class WeightedGraph(Graph):
         # this should not be invoked
         raise AttributeError("WeightedGraph has no `_find_entry` method.")
 
-    def adjacency_matrix(self):
-        # TODO: return a copy?
+    def adjacency_matrix(self, copy=True):
+        if copy:
+            return csr_array(self._adj_matrix, copy=True)
         return self._adj_matrix
 
     def laplacian_matrix(self):
