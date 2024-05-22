@@ -430,9 +430,15 @@ class Graph():
                              str(num_vert - 1))
         return vertex
 
-    def adjacency_matrix(self):
+    def adjacency_matrix(self, copy=True):
         r"""
         Return the adjacency matrix representation of the graph.
+
+        Parameters
+        ----------
+        copy : bool, default=True
+            If ``True``, return a hard copy of the adjacency matrix.
+            If ``False``, return a pointer to the adjacency matrix.
 
         Returns
         -------
@@ -467,8 +473,8 @@ class Graph():
         data = np.ones(len(self._adj_matrix.indices), dtype=np.int8)
         indices = self._adj_matrix.indices
         indptr = self._adj_matrix.indptr
-        # TODO: copy or not?
-        return csr_array((data, indices, indptr))
+
+        return csr_array((data, indices, indptr), copy=copy)
 
     def laplacian_matrix(self):
         r"""
