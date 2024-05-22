@@ -552,3 +552,50 @@ class Graph():
                     temp = matrix.data[i]
                     matrix.data[i] = matrix.data[j]
                     matrix.data[j] = temp
+
+    def _dict_to_adj_matrix(self, dictionary):
+        r"""
+        Receives a dictionary and returns the
+        adjacency matrix with values overwritten by the dictionary.
+
+        Parameters
+        ----------
+        dictionary: dict
+            A dictionary with entries {`(u, v): value`}
+
+        Raises
+        ------
+        ValueError
+            If trying to remove an edge from the graph --
+            assign a value of 0 to an existing edge --, or
+            if trying to insert an edge into the graph --
+            assign a value to a non-existing edge.
+        """
+        # expects a dictionary with non-zero values
+        # the key corresponds to an edge
+        #   edge must be a tuple
+        #   raises an error if the edge does not exist
+        # the value that corresponds to the given edge
+
+        d = dictionary
+        data = np.ones(self._adj_matrix.shape[0],
+                       dtype=np.array(list(d.values())).dtype)
+        indices = self._adj_matrix.indices
+        indptr = self._adj_matrix.indptr
+
+        adj_matrix = csr_array((data, indices, indptr))
+
+        for key in d:
+            u, v = key[0], key[1]
+
+            if adj_matrix[u, v] == 0 and d[key] != 0:
+                raise ValueError('Inexistent edge ' + str((u, v)))
+
+            if adj_matrix[u, v] != 0 and d[key] == 0:
+                raise ValueError('Edge ' + str(key)
+                                 + 'cannot be assigned a value of 0.')
+
+            adj_matrix[u, v] = d[key]
+            adj_matrix[v, u] = d[key]
+
+        return adj_matrix
