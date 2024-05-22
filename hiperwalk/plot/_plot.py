@@ -1,6 +1,7 @@
 import networkx as nx #TODO: import only needed functions?
 import matplotlib.pyplot as plt
 import numpy as np
+import re
 from PIL import Image
 from ..graph import *
 from ..quantum_walk import QuantumWalk
@@ -274,6 +275,9 @@ def plot_probability_distribution(
     # passes kwargs by reference to be updated accordingly
     preconfigs[plot](probabilities, kwargs)
 
+    # matches a valid filename
+    filename_with_ext_pattern = re.compile(r'(.+)\.(.{3,4})$')
+
     if not animate:
         t = [None] * len(probabilities)
         if range is not None:
@@ -295,8 +299,15 @@ def plot_probability_distribution(
             if filename is not None:
                 filename_suffix = str(i).zfill(
                         len(str(len(probabilities) - 1)))
-                plt.savefig(filename if len(probabilities) == 1
-                            else filename + '-' + filename_suffix)
+                # Use the base name, suffix, and extension to assemble the
+                # name if filename was provided with an extension.
+                if m := filename_with_ext_pattern.match(filename):
+                    name = m.group(1)
+                    ext = m.group(2)
+                    plt.savefig(f'{name}-{filename_suffix}.{ext}')
+                else:
+                    plt.savefig(filename if len(probabilities) == 1
+                                else filename + '-' + filename_suffix)
                 if not show:
                     plt.close()
             if show:
@@ -360,6 +371,10 @@ def plot_probability_distribution(
                     repeat_delay=repeat_delay)
 
         if filename is not None:
+            # Use .gif extension if the user didn't provide an
+            # extension for the animation file.
+            if not filename_with_ext_pattern.match(filename):
+                filename = filename + '.gif'
             anim.save(filename)
         if show:
             if _is_in_notebook():
