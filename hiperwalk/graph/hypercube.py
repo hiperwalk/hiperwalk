@@ -89,25 +89,10 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
         The dimension of the hypercube.
 
     multiedges, weights: matrix or dict, default=None
-        If ``multiedges is not None``, returns a multigraph.
-        If ``weights is not None``, returns a weighted graph.
-        Two types of entries are accepted:
-        an instance of :class:`scipy.sparse.csr_array` or a ``dict``.
-
-        * :class:`scipy.sparse.csr_array`: the adjacency matrix.
-        * `dict`: a dictionary with entries ``{(u, v): value}`` where
-            ``(u, v)`` is a valid edge and ``value != 0`` represents
-            the number of multiedges or the weight.
-            All unlisted edges are assigned the default value of 1.
+        See :ref:`graph_constructors`.
 
     copy : bool, default=False
-        The ``copy`` parameter is relevant only when
-        ``multiedges`` (``weights``) is an adjacency matrix.
-        If ``True``,
-        a hard copy of ``multiedges`` (``weights``) is stored.
-        If ``False``,
-        the pointer to ``multiedges`` (``weights``) is stored and
-        the ``multiedges``'s (``weights``') data is changed.
+        See :ref:`graph_constructors`.
 
     Returns
     -------
