@@ -586,10 +586,11 @@ class Graph():
         adj_matrix = csr_array((data, indices, indptr))
 
         for key in d:
-            u, v = key[0], key[1]
+            u = self.vertex_number(key[0])
+            v = self.vertex_number(key[1])
 
             if adj_matrix[u, v] == 0 and d[key] != 0:
-                raise ValueError('Inexistent edge ' + str((u, v)))
+                raise ValueError('Inexistent edge ' + str(key))
 
             if adj_matrix[u, v] != 0 and d[key] == 0:
                 raise ValueError('Edge ' + str(key)
