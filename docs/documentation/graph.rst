@@ -55,12 +55,45 @@ Every graph constructor returns an instance of
   and ``weights is not None``.
 
 Both ``multiedges`` and ``weights`` are expected to be
-instances of :class:`scipy.sparse.csr_array` such that
+instances of :class:`dict` or :class:`scipy.sparse.csr_array`.
 
-* ``multiedges[u, v]`` is the number of edges
-  incident to both vertices ``u`` and ``v``.
-* ``weights[u, v]`` is the weight of the edge
-  incident to both vertices ``u`` and ``v``.
+* If they are an instance of :class:`dict`
+  in the ``{(u, v): value}`` format.
+
+  * ``multiedges[(u, v)]`` is the number of edges
+    incident to both vertices ``u`` and ``v``.
+
+  * ``weights[(u, v)]`` is the weight of the edge
+    incident to both vertices ``u`` and ``v``.
+
+  If an edge exists in the graph but it is not listed in
+  the :class:`dict` keys,
+  its value defaults to 1.
+  Attempting to remove an edge by assigning its value to 0
+  (e.g. ``weights[(u, v)] = 0``) or
+  attempting to add an edge by assigning a value to it
+  (e.g. ``weights[(-1, -1) = 10])`` raises a
+  a `ValueError exception
+  <https://docs.python.org/3/library/exceptions.html#ValueError>`_.
+
+* If they are an instance of :class:`scipy.sparse.csr_array`,
+
+  * ``multiedges[u, v]`` is the number of edges
+    incident to both vertices ``u`` and ``v``.
+
+  * ``weights[u, v]`` is the weight of the edge
+    incident to both vertices ``u`` and ``v``.
+
+  In this case, all valid edges must have been assigned a
+  value different from 0.
+  When explicitly specifying the adjacency matrix,
+  the ``copy`` changes the method's behavior.
+
+  * If ``copy = False`` (default), a pointer to the
+    adjacency matrix is stored.
+
+  * If ``copy = True``, a hard copy of the
+    adjacency matrix is stored.
 
 If ``multiedges is not None`` and ``weights is not None``,
 a `ValueError exception
