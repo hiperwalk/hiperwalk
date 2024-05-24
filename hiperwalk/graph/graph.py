@@ -430,15 +430,11 @@ class Graph():
                              str(num_vert - 1))
         return vertex
 
-    def adjacency_matrix(self, copy=True):
+    def adjacency_matrix(self):
         r"""
         Return the adjacency matrix representation of the graph.
 
-        Parameters
-        ----------
-        copy : bool, default=True
-            If ``True``, return a hard copy of the adjacency matrix.
-            If ``False``, return a pointer to the adjacency matrix.
+        Return a **hard copy** of the adjacency matrix.
 
         Returns
         -------
@@ -446,7 +442,6 @@ class Graph():
 
         Notes
         -----
-    
         In a simple graph :math:`G(V, E)` with :math:`n` vertices
         :math:`v_0, \ldots, v_{n-1}`, the adjacency matrix 
         of :math:`G(V, E)` is an 
@@ -464,17 +459,12 @@ class Graph():
         In multigraphs, where multiple edges can exist between
         the same pair of vertices, the adjacency matrix reflects this
         by counting the number of such edges.
-    
-        In weighted graphs, the entries of :math:`A` represent 
-        the weights of the edges. In general, the weight is a non-zero
-        real number. In Hiperwalk, :math:`A` can be an arbitrary
-        Hermitian matrix.        
         """
-        data = np.ones(len(self._adj_matrix.indices), dtype=np.int8)
+        data = np.ones(len(self._adj_matrix.indices), dtype=np.int64)
         indices = self._adj_matrix.indices
         indptr = self._adj_matrix.indptr
 
-        return csr_array((data, indices, indptr), copy=copy)
+        return csr_array((data, indices, indptr), copy=True)
 
     def laplacian_matrix(self):
         r"""
