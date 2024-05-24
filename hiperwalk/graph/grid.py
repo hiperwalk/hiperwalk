@@ -3,7 +3,7 @@ from .integer_lattice import IntegerLattice
 from types import MethodType
 
 def Grid(dim, periodic=True, diagonal=False,
-         multiedges=None, weights=None):
+         multiedges=None, weights=None, copy=False):
     r"""
     Two-dimensionsal grid constructor.
 
@@ -32,7 +32,10 @@ def Grid(dim, periodic=True, diagonal=False,
         ``True`` if the grid has the diagonal representation,
         ``False`` if it has the natural representation.
 
-    multiedges, weights: scipy.sparse.csr_array, default=None
+    multiedges, weights: matrix or dict, default=None
+        See :ref:`graph_constructors`.
+
+    copy : bool, default=False
         See :ref:`graph_constructors`.
 
     Returns
@@ -193,8 +196,9 @@ def Grid(dim, periodic=True, diagonal=False,
         basis = np_array([[1, 1], [1, -1],
                           [-1, 1], [-1, -1]])
 
-    g = IntegerLattice(dim, basis, periodic, weights, multiedges)
-    # g._neighbor_index = MethodType(_neighbor_index, g)
+    g = IntegerLattice(dim, basis=basis, periodic=periodic,
+                       multiedges=multiedges, weights=weights,
+                       copy=copy)
     g.diagonal = diagonal
 
     return g
