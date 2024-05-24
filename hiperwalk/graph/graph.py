@@ -530,7 +530,7 @@ class Graph():
                 if indices[i] != adj_indices[i]:
                     # find right position
                     j = np.where(indices[start:end] == adj_indices[i])
-                    j = j[0][0]
+                    j = start + j[0][0]
 
                     # swap indices
                     temp = indices[i]
