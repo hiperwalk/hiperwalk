@@ -4,6 +4,8 @@ from scipy.sparse import csr_array
 from scipy.sparse import eye as sparse_eye
 from .graph import Graph
 from types import MethodType
+from .multigraph import Multigraph
+from .weighted_graph import WeightedGraph
 
 def __generate_valid_basis(euc_dim, basis=None):
     if basis is None:
@@ -222,7 +224,7 @@ def neighbors(self, vertex):
     return neighs
 
 def IntegerLattice(dim, basis=None, periodic=True,
-                  multiedges=None, weights=None):
+                  multiedges=None, weights=None, copy=False):
     r"""
     Integer lattice graph.
 
@@ -282,6 +284,9 @@ def IntegerLattice(dim, basis=None, periodic=True,
     multiedges, weights: scipy.sparse.csr_array, default=None
         See :ref:`graph_constructors`.
 
+    copy : bool, default=False
+        See :ref:`graph_constructors`.
+
     Returns
     -------
     :class:`hiperwalk.Graph`
@@ -330,8 +335,12 @@ def IntegerLattice(dim, basis=None, periodic=True,
         [(1, 2), (0, 2), (2, 0), (1, 0)]
 
     """
-    if weights is not None or multiedges is not None:
-        raise NotImplementedError()
+    if weights is not None and multiedges is not None:
+        raise ValueError(
+            "Both `weights` and `multiedges` arguments were set. "
+            + "Cannot decide whether to create a weighted graph or "
+            + "a multigraph."
+        )
 
     if not hasattr(dim, '__iter__'):
         dim = [dim]
@@ -358,5 +367,33 @@ def IntegerLattice(dim, basis=None, periodic=True,
 
     #create adjacency matrix
     g._set_adj_matrix(__create_adj_matrix(g))
+
+    # create multigraph or weighted graph
+    data = weights if weights is not None else multiedges
+    if data is not None:
+        if hasattr(data, 'keys'):
+            data = g._dict_to_adj_matrix(data)
+            copy = False
+        else:
+            g._rearrange_matrix_indices(data)
+
+        if weights is not None:
+            g2 = WeightedGraph(data, copy=copy)
+
+        else:
+            g2 = Multigraph(data, copy=copy)
+
+        g2._dim = g._dim
+        g2._periodic = g._periodic
+        g2._euc_dim = g._euc_dim
+        g2._num_loops = g._num_loops
+        g2._basis = g._basis
+
+        g2._valid_vertex = MethodType(_valid_vertex, g2)
+        g2.vertex_number = MethodType(vertex_number, g2)
+        g2.vertex_coordinates = MethodType(vertex_coordinates, g2)
+        g2.dimensions = MethodType(dimensions, g2)
+
+        g = g2
 
     return g
