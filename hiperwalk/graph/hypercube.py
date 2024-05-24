@@ -148,7 +148,7 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
     num_vert = 1 << dim
     num_arcs = dim*num_vert
 
-    data = np.ones(num_arcs, dtype=np.int8)
+    data = np.ones(num_arcs, dtype=np.int64)
     indptr = np.arange(0, num_arcs + 1, dim)
     indices = np.array([v ^ 1 << shift for v in range(num_vert)
                                        for shift in range(dim)])
@@ -168,19 +168,22 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
 
     if weights is not None:
         g = WeightedGraph(data, copy=copy)
+
     elif multiedges is not None:
         g = Multigraph(data, copy=copy)
 
-    # Binding particular attributes and methods
+    if multiedges is None:
+        # bind specific simple/weighted graph methods
+        g.degree = MethodType(__degree, g)
+        g.number_of_edges = MethodType(__number_of_edges, g)
+
+    # Binding common attributes and methods
     g._dim = int(dim)
     g._num_loops = 0
 
     g.adjacent = MethodType(__adjacent, g)
     g._neighbor_index = MethodType(__neighbor_index, g)
-    g.degree = MethodType(__degree, g)
     g.number_of_vertices = MethodType(__number_of_vertices, g)
-    g.number_of_edges = MethodType(__number_of_edges, g)
-    g.degree = MethodType(__degree, g)
     g.dimension = MethodType(dimension, g)
 
     return g
