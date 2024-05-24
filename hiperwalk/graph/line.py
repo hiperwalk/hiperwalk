@@ -1,6 +1,6 @@
 from .integer_lattice import IntegerLattice
 
-def Line(num_vert, multiedges=None, weights=None):
+def Line(num_vert, multiedges=None, weights=None, copy=False):
     r"""
     Finite line graph (path graph) constructor.
 
@@ -10,6 +10,9 @@ def Line(num_vert, multiedges=None, weights=None):
         The number of vertices on the line.
 
     multiedges, weights: scipy.sparse.csr_array, default=None
+        See :ref:`graph_constructors`.
+
+    copy : bool, default=False
         See :ref:`graph_constructors`.
 
     Returns
@@ -48,5 +51,7 @@ def Line(num_vert, multiedges=None, weights=None):
     """
 
     basis = [1, -1]
-    g = IntegerLattice(num_vert, basis, False, weights, multiedges)
+    g = IntegerLattice(num_vert, basis=basis, periodic=False,
+                       multiedges=multiedges, weights=weights,
+                       copy=copy)
     return g
