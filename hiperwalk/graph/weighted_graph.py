@@ -62,16 +62,37 @@ class WeightedGraph(Graph):
     def adjacent(self, u, v):
         return self._adj_matrix[u, v] != 0
 
-    def _entry(self, entry):
-        return self._adj_matrix[u, v]
+    def _entry(self, row, col):
+        return self._adj_matrix[row, col]
 
     def _find_entry(self, entry):
         # this should not be invoked
         raise AttributeError("WeightedGraph has no `_find_entry` method.")
 
     def adjacency_matrix(self, copy=True):
+        r"""
+        Return the adjacency matrix representation of the graph.
+
+        Parameters
+        ----------
+        copy : bool, default=True
+            If ``True``, return a hard copy of the adjacency matrix.
+            If ``False``, return a pointer to the adjacency matrix.
+
+        Returns
+        -------
+        :class:`scipy.sparse.csr_array`.
+
+        Notes
+        -----
+        In weighted graphs,
+        the entries of the adjacency matrix :math:`A` represent
+        the weights of the edges. In general, the weight is a non-zero
+        real number. In Hiperwalk, :math:`A` can be an arbitrary
+        Hermitian matrix.
+        """
         if copy:
-            return csr_array(self._adj_matrix, copy=True)
+            return self._adj_matrix.copy()
         return self._adj_matrix
 
     def laplacian_matrix(self):

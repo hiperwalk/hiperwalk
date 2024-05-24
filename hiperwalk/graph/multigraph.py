@@ -146,14 +146,14 @@ class Multigraph(Graph):
     
     # TODO: add functions to manage multiedges
 
-    def adjacency_matrix(self, copy=True):
+    def adjacency_matrix(self):
         data = np.copy(self._adj_matrix.data)
         for i in range(len(data) - 1, 0, -1):
             data[i] -= data[i - 1]
 
         indices = self._adj_matrix.indices
         indptr = self._adj_matrix.indptr
-        adj_matrix = csr_array((data, indices, indptr), copy=copy)
+        adj_matrix = csr_array((data, indices, indptr), copy=True)
         return adj_matrix
 
     def laplacian_matrix(self):
