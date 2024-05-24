@@ -191,7 +191,7 @@ class ContinuousTime(QuantumWalk):
 
         if update:
             if self._hamil_type == 'adjacency':
-                H = -self._gamma * self._graph.adjacency_matrix(copy=False)
+                H = -self._gamma * self._graph.adjacency_matrix()
             else:
                 H = -self._gamma * self._graph.laplacian_matrix()
 
