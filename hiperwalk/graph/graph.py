@@ -567,7 +567,7 @@ class Graph():
         # the value that corresponds to the given edge
 
         d = dictionary
-        data = np.ones(self._adj_matrix.shape[0],
+        data = np.ones(self._adj_matrix.indices.shape[0],
                        dtype=np.array(list(d.values())).dtype)
         indices = self._adj_matrix.indices
         indptr = self._adj_matrix.indptr
