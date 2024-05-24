@@ -776,7 +776,7 @@ class QuantumWalk(ABC):
         # if search algorithm takes O(N),
         # it is better to use classical computing.
         final_time = N//2
-        states = self.simulate(time=(final_time, step),
+        states = self.simulate(range=(0,final_time, step),
                                state=state)
         p_succ = self.success_probability(states)
         del states
