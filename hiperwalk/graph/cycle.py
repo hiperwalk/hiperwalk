@@ -1,6 +1,6 @@
 from .integer_lattice import IntegerLattice
 
-def Cycle(num_vert, multiedges=None, weights=None):
+def Cycle(num_vert, multiedges=None, weights=None, copy=False):
     r"""
     Cycle graph constructor.
 
@@ -12,13 +12,12 @@ def Cycle(num_vert, multiedges=None, weights=None):
     ----------
     num_vert : int
         The number of vertices in the cycle. 
-    multiedges : scipy.sparse.csr_array, optional
-        Specifies the number of multiple edges between the same 
-        pair of vertices. 
-        Defaults to None.
-    weights : scipy.sparse.csr_array, optional
-        Assigns weights to the edges of the graph. 
-        Defaults to None.
+
+    multiedges, weights: matrix or dict, default=None
+        See :ref:`graph_constructors`.
+
+    copy : bool, default=False
+        See :ref:`graph_constructors`.
 
     Returns
     -------
@@ -55,5 +54,7 @@ def Cycle(num_vert, multiedges=None, weights=None):
         array([0, 8])
     """
     basis = [1, -1]
-    g = IntegerLattice(num_vert, basis, True, weights, multiedges)
+    g = IntegerLattice(num_vert, basis=basis, periodic=True,
+                       multiedges=multiedges, weights=weights,
+                       copy=copy)
     return g
