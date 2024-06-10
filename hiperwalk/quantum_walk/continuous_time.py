@@ -404,7 +404,7 @@ class ContinuousTime(QuantumWalk):
 
         Parameters
         ----------
-        terms : int, default=20
+        terms : int, default=21
             Number of terms in the truncated Taylor series expansion.
 
         See Also
@@ -463,42 +463,11 @@ class ContinuousTime(QuantumWalk):
 
             return U
 
-        # determining the number of terms in power series
-        max_val = np.max(np.abs(H))
-        if max_val*time <= 1:
-            if hpc is not None:
-                nbl_U = nbl.matrix_power_series(-1j*time*H, n)
-            else:
-                U = numpy_matrix_power_series(-1j*time*H.todense(), n)
-
-        else:
-            # if the order of magnitude is very large,
-            # float point errors may occur
-            if ((isinstance(time, int) or time.is_integer())
-                and max_val <= 1
-            ):
-                new_time = 1
-                num_mult = time - 1
-            else:
-                # TODO: assert precision
-                new_time = max_val*time
-                order = np.ceil(np.math.log(new_time, n))
-                new_time /= 10**order
-                num_mult = int(np.round(time/new_time)) - 1
-
-            if hpc is not None:
-                new_nbl_U = nbl.matrix_power_series(
-                        -1j*new_time*H, n)
-                nbl_U = nbl.multiply_matrices(new_nbl_U, new_nbl_U)
-                for i in range(num_mult - 1):
-                    nbl_U = nbl.multiply_matrices(nbl_U, new_nbl_U)
-            else:
-                U = numpy_matrix_power_series(
-                        -1j*new_time*H.todense(), n)
-                U = np.linalg.matrix_power(U, num_mult + 1)
-
         if hpc is not None:
+            nbl_U = nbl.matrix_power_series(-1j*time*H, n)
             U = nbl.retrieve_matrix(nbl_U)
+        else:
+            U = numpy_matrix_power_series(-1j*time*H.todense(), n)
 
         self._evolution = U
 
