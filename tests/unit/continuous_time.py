@@ -7,11 +7,12 @@ sys_path.append('../../')
 from test_constants import *
 import hiperwalk as hpw
 import unittest
+from test_constants import HPC
 
 class TestContinuousTime(unittest.TestCase):
 
     def setUp(self):
-        hpw.set_hpc(None)
+        hpw.set_hpc(HPC)
         self.num_vert = 40
         nx_graph = nx.ladder_graph(self.num_vert // 2)
         self.adj = nx.adjacency_matrix(nx_graph)
@@ -19,14 +20,12 @@ class TestContinuousTime(unittest.TestCase):
         self.gamma = 1/2
         self.qw = hpw.ContinuousTime(self.g, gamma=self.gamma)
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hamiltonian_default(self):
         H = self.qw.get_hamiltonian()
         self.assertTrue((H - (-self.gamma*self.adj) != 0).nnz == 0)
         self.assertTrue(self.qw._hamiltonian is not None)
         self.assertTrue(self.qw._marked.size == 0)
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_hamiltonian_multiple_marked(self):
         prev_H = self.qw._hamiltonian
         prev_marked = self.qw._marked
@@ -46,7 +45,6 @@ class TestContinuousTime(unittest.TestCase):
         self.assertTrue(self.qw._marked is not None)
         self.assertTrue(id(self.qw._marked) != id(prev_marked))
         
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_operator_invalid_time(self):
         marked = self.qw._marked
         H = self.qw._hamiltonian
@@ -59,7 +57,6 @@ class TestContinuousTime(unittest.TestCase):
         self.assertTrue(id(H) == id(self.qw._hamiltonian))
         self.assertTrue(id(U) == id(self.qw._evolution))
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_operator_set_hamiltonian_no_marked(self):
         prev_marked = self.qw._marked
         prev_H = self.qw._hamiltonian
@@ -74,7 +71,6 @@ class TestContinuousTime(unittest.TestCase):
         self.assertTrue(id(prev_H) != id(self.qw._hamiltonian))
         self.assertTrue(id(prev_U) != id(self.qw._evolution))
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_operator_set_hamiltonian_and_marked(self):
         prev_marked = self.qw._marked
         prev_H = self.qw._hamiltonian
@@ -89,19 +85,8 @@ class TestContinuousTime(unittest.TestCase):
         self.assertTrue(id(prev_H) != id(self.qw._hamiltonian))
         self.assertTrue(id(prev_U) != id(self.qw._evolution))
 
-    @unittest.skipIf(not TEST_NONHPC, 'Skipping nonhpc tests.')
     def test_evolution_unitary(self):
         U = self.qw.set_evolution(gamma=self.qw.get_gamma(), time=1)
-        U = self.qw.get_evolution()
-
-        self.assertTrue(np.allclose(
-            U@U.T.conjugate(), np.eye(U.shape[0])
-        ))
-
-    @unittest.skipIf(not TEST_HPC, 'Skipping hpc tests.')
-    def test_hpc_evolution_unitary(self):
-        hpw.set_hpc('cpu')
-        self.qw.set_time(time=1)
         U = self.qw.get_evolution()
 
         self.assertTrue(np.allclose(
