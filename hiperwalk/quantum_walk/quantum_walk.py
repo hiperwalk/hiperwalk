@@ -82,8 +82,8 @@ class QuantumWalk(ABC):
                     / np.sqrt(self.hilb_dim))
 
         # uniform superposition of the given vertices
-        state = np.zeros(self.hilb_dim)
-        state[[self._graph.vertex_number(v) for v in vertices]] = 1.
+        state = np.zeros(self.hilb_dim, dtype=float)
+        state[[self._graph.vertex_number(v) for v in vertices]] = 1
 
         return state / np.sqrt(np.sum(state))
 
@@ -426,6 +426,8 @@ class QuantumWalk(ABC):
             raise TypeError("Entries were not specified.")
 
         dtype = np.array([entry[0] for entry in entries]).dtype
+        dtype = (complex if np.issubdtype(dtype, np.complexfloating)
+                 else float)
         state = np.zeros(self.hilb_dim, dtype=dtype)
 
         for ampl, vertex in entries:
