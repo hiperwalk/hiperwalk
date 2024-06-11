@@ -1065,6 +1065,8 @@ class Coined(QuantumWalk):
             raise TypeError("Entries were not specified.")
 
         dtype = np.array([entry[0] for entry in entries]).dtype
+        dtype = (complex if np.issubdtype(dtype, np.complexfloating)
+                 else float)
         state = np.zeros(self.hilb_dim, dtype=dtype)
 
         for ampl, arc in entries:
