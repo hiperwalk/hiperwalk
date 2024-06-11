@@ -500,13 +500,16 @@ class QuantumWalk(ABC):
 
             # TODO: compare with numpy.linalg.matrix_power
 
-    def _save_simul_vec(self, hpc):
+    def _save_simul_vec(self, hpc, continue_simulation):
         ret = None
 
         if hpc is not None:
             # TODO: check if vector must be deleted or
             #       if it can be reused via neblina-core commands.
             ret = nbl.retrieve_vector(self._simul_vec)
+            if continue_simulation:
+                # does it need to be a copy?
+                self._simul_vec = nbl.send_vector(ret.copy())
         else:
             ret = self._simul_vec
 
@@ -657,7 +660,8 @@ class QuantumWalk(ABC):
 
         while state_index < num_states:
             self._simulate_step(step, hpc)
-            saved_states[state_index] = self._save_simul_vec(hpc)
+            saved_states[state_index] = self._save_simul_vec(
+                    hpc, state_index + 1 < num_states)
             state_index += 1
 
         # TODO: free vector from neblina core
