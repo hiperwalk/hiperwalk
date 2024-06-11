@@ -22,7 +22,7 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([[1., (0, 1)]])
+        init_state = self.qw.state([[1, (0, 1)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate((num_steps, num_steps + 1),
@@ -42,7 +42,7 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_marked([])
 
         init_state = self.qw.state(
-            [[1., (self.num_vert - 1, self.num_vert - 2)]])
+            [[1, (self.num_vert - 1, self.num_vert - 2)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate((num_steps, num_steps + 1),
@@ -60,13 +60,13 @@ class TestCoinedLine(unittest.TestCase):
 
         num_steps = self.num_vert // 2
         center = self.num_vert // 2
-        # changed from complex vector to float
-        entries = [[1., (0, 1)]]
+        entries = [[1, (center, center + 1)],
+                   [-1j, (center, center - 1)]]
         init_state = self.qw.state(entries)
 
         hpw.set_hpc(None)
         states = self.qw.simulate((num_steps + 1), init_state)
-        hpw.set_hpc('cpu')
+        hpw.set_hpc(HPC)
         hpc_states = self.qw.simulate((num_steps + 1), init_state)
 
         self.assertTrue(
@@ -134,9 +134,9 @@ class TestCoinedLine(unittest.TestCase):
         even_verts = np.arange(0, self.num_vert, 2)
         state = self.qw.uniform_state(vertices=even_verts,
                                       arcs=even_arcs)
-        state2 = [0. if (a % 2 == 1 and
+        state2 = [0 if (a % 2 == 1 and
                         self.qw._graph.arc(a)[0] % 2 == 1)
-                  else 1.
+                  else 1
                   for a in range(num_arcs)]
         state2 = state2 / np.sqrt(np.sum(state2))
         self.assertTrue(np.allclose(state, state2))
