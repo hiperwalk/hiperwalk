@@ -83,7 +83,7 @@ class QuantumWalk(ABC):
 
         # uniform superposition of the given vertices
         state = np.zeros(self.hilb_dim)
-        state[[self._graph.vertex_number(v) for v in vertices]] = 1
+        state[[self._graph.vertex_number(v) for v in vertices]] = 1.
 
         return state / np.sqrt(np.sum(state))
 

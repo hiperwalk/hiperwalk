@@ -125,7 +125,8 @@ def send_vector(v):
     """
 
     # TODO: check if complex automatically?
-    is_complex = isinstance(v.dtype, complex)
+    # the complex type from Python is not the same as numpy complex128
+    is_complex = str(v.dtype) == "complex128"
 
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
@@ -173,14 +174,15 @@ def retrieve_vector(pynbl_vec):
     # the engine should have been already initiated
     nbl_vec = pynbl_vec.nbl_obj
     neblina.move_vector_host(nbl_vec)
+    py_vec = neblina.retrieve_numpy_array(nbl_vec)
 
-    if not pynbl_vec.is_complex:
-        raise NotImplementedError("Cannot retrieve real-only vectors.")
-    py_vec = np.array(
-                [neblina.vector_get(nbl_vec, 2*i)
-                 + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
-                 for i in range(pynbl_vec.shape)]
-            )
+    # if not pynbl_vec.is_complex:
+    #     raise NotImplementedError("Cannot retrieve real-only vectors.")
+    # py_vec = np.array(
+    #             [neblina.vector_get(nbl_vec, 2*i)
+    #              + 1j*neblina.vector_get(nbl_vec, 2*i + 1)
+    #              for i in range(pynbl_vec.shape)]
+    #         )
 
     # TODO: check if vector is being deleted (or not)
 
@@ -212,9 +214,8 @@ def _send_sparse_matrix(M, is_complex):
     #   In addition, there should be a way to
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
+    smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX) if is_complex else neblina.sparse_matrix_new(n, n, neblina.FLOAT)
     # smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
-    #     if is_complex else neblina.sparse_matrix_new(n, n, neblina.FLOAT)
-    smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
     
     # inserts elements into neblina sparse matrix
     row = 0
@@ -242,18 +243,19 @@ def _send_sparse_matrix(M, is_complex):
     return PyNeblinaMatrix(smat, M.shape, is_complex, True)
 
 def _send_dense_matrix(M, is_complex):
-    num_rows, num_cols = M.shape
-    mat = (neblina.matrix_new(num_rows, num_cols, neblina.COMPLEX)
-           if is_complex
-           else neblina.matrix_new(num_rows, num_cols, neblina.FLOAT))
+    # num_rows, num_cols = M.shape
+    # mat = (neblina.matrix_new(num_rows, num_cols, neblina.COMPLEX)
+    #        if is_complex
+    #        else neblina.matrix_new(num_rows, num_cols, neblina.FLOAT))
     
     # inserts elements into neblina matrix
     # TODO: Check if there really is a difference between real and complex
     # TODO: Check if default value is zero so we can jump setting element. 
 
-    for i in range(num_rows):
-        for j in range(num_cols):
-            neblina.matrix_set(mat, i, j, M[i, j].real, M[i, j].imag)
+    # for i in range(num_rows):
+    #     for j in range(num_cols):
+    #         neblina.matrix_set(mat, i, j, M[i, j].real, M[i, j].imag)
+    mat = neblina.load_numpy_matrix(M)
 
     neblina.move_matrix_device(mat)
 
@@ -276,25 +278,26 @@ def retrieve_matrix(pynbl_mat):
 
     nbl_mat = pynbl_mat.nbl_obj
     neblina.move_matrix_host(nbl_mat)
+    py_mat = neblina.retrieve_numpy_matrix(nbl_mat)
 
-    # TODO: Check if using default numpy datatype.
-    py_mat = np.zeros(pynbl_mat.shape, dtype=(
-        complex if pynbl_mat.is_complex else float
-    ))
+    # # TODO: Check if using default numpy datatype.
+    # py_mat = np.zeros(pynbl_mat.shape, dtype=(
+    #     complex if pynbl_mat.is_complex else float
+    # ))
 
     num_rows, num_cols = pynbl_mat.shape
     # TODO: Not vectorized. Implement with list comprehension. 
     #       This may require the double memory usage. 
     #       Check memory usage before choosing which method to use.
-    for i in range(num_rows):
-        for j in range(num_cols):
-            if pynbl_mat.is_complex:
-                py_mat[i,j] = (
-                      neblina.matrix_get(nbl_mat, 2*i, 2*j)
-                    + neblina.matrix_get(nbl_mat, 2*i, 2*j + 1)*1j
-                )
-            else:
-                py_mat[i,j] = neblina.matrix_get(nbl_mat, i, j)
+    # for i in range(num_rows):
+    #     for j in range(num_cols):
+    #         if pynbl_mat.is_complex:
+    #             py_mat[i,j] = (
+    #                   neblina.matrix_get(nbl_mat, 2*i, 2*j)
+    #                 + neblina.matrix_get(nbl_mat, 2*i, 2*j + 1)*1j
+    #             )
+    #         else:
+    #             py_mat[i,j] = neblina.matrix_get(nbl_mat, i, j)
 
     return py_mat
 
