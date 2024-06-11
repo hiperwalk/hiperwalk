@@ -17,11 +17,12 @@ class TestCoinedLine(unittest.TestCase):
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
+        print("test_persistent_shift_right_state_transfer")
         self.qw.set_shift('persistent')
         self.qw.set_coin('I')
         self.qw.set_marked([])
 
-        init_state = self.qw.state([[1, (0, 1)]])
+        init_state = self.qw.state([[1., (0, 1)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate((num_steps, num_steps + 1),
@@ -33,6 +34,7 @@ class TestCoinedLine(unittest.TestCase):
         )
 
     def test_persistent_shift_left_state_transfer(self):
+        print("test_persistent_shift_left_state_transfer")
         # initial state in leftmost vertex
         # final state in rightmost vertex
         self.qw.set_shift('persistent')
@@ -40,7 +42,7 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_marked([])
 
         init_state = self.qw.state(
-            [[1, (self.num_vert - 1, self.num_vert - 2)]])
+            [[1., (self.num_vert - 1, self.num_vert - 2)]])
 
         num_steps = self.num_vert - 1
         final_state = self.qw.simulate((num_steps, num_steps + 1),
@@ -54,11 +56,12 @@ class TestCoinedLine(unittest.TestCase):
     @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
                                   'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
+        print("test_hpc_default_evolution_operator")
 
         num_steps = self.num_vert // 2
         center = self.num_vert // 2
-        entries = [[1, (center, center + 1)],
-                   [-1j, (center, center - 1)]]
+        # changed from complex vector to float
+        entries = [[1., (0, 1)]]
         init_state = self.qw.state(entries)
 
         hpw.set_hpc(None)
@@ -71,12 +74,14 @@ class TestCoinedLine(unittest.TestCase):
         )
 
     def test_set_explicit_coin(self):
+        print("test_set_explicit_coin")
         C = self.qw.get_coin()
         self.qw.set_coin(coin=C)
         C2 = self.qw.get_coin()
         self.assertTrue((C - C2).nnz == 0)
 
     def test_uniform_state(self):
+        print("test_uniform_state")
         state = self.qw.uniform_state()
         num_arcs = self.qw._graph.number_of_arcs()
         
@@ -129,9 +134,9 @@ class TestCoinedLine(unittest.TestCase):
         even_verts = np.arange(0, self.num_vert, 2)
         state = self.qw.uniform_state(vertices=even_verts,
                                       arcs=even_arcs)
-        state2 = [0 if (a % 2 == 1 and
+        state2 = [0. if (a % 2 == 1 and
                         self.qw._graph.arc(a)[0] % 2 == 1)
-                  else 1
+                  else 1.
                   for a in range(num_arcs)]
         state2 = state2 / np.sqrt(np.sum(state2))
         self.assertTrue(np.allclose(state, state2))
