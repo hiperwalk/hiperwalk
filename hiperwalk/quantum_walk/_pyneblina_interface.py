@@ -125,8 +125,11 @@ def send_vector(v):
     """
 
     # TODO: check if complex automatically?
-    # the complex type from Python is not the same as numpy complex128
-    is_complex = str(v.dtype) == "complex128"
+    # # the complex type from Python is not the same as numpy complex128
+    # is_complex = str(v.dtype) == "complex128"
+    # more pythonic way of checking if type is complex
+    is_complex = np.issubdtype(v.dtype, np.complexfloating)
+
 
     n = v.shape[0]
     # TODO: needs better support from pyneblina to
@@ -214,7 +217,8 @@ def _send_sparse_matrix(M, is_complex):
     #   In addition, there should be a way to
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
-    smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX) if is_complex else neblina.sparse_matrix_new(n, n, neblina.FLOAT)
+    smat = (neblina.sparse_matrix_new(n, n, neblina.COMPLEX) if is_complex
+            else neblina.sparse_matrix_new(n, n, neblina.FLOAT))
     # smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
     
     # inserts elements into neblina sparse matrix
@@ -262,7 +266,7 @@ def _send_dense_matrix(M, is_complex):
     return PyNeblinaMatrix(mat, M.shape, is_complex, False)
 
 def send_matrix(M):
-    is_complex = isinstance(M.dtype, complex)
+    is_complex = np.issubdtype(M.dtype, np.complexfloating)
 
     if scipy.sparse.issparse(M):
         return _send_sparse_matrix(M, is_complex)
