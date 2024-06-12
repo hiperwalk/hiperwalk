@@ -379,20 +379,20 @@ def matrix_power_series(A, n):
             + "Converting to dense."
         )
 
-    pynbl_A = send_matrix(A).nbl_obj
-    I = np.eye(A.shape[0], dtype=A.dtype)
-    pynbl_Term = send_matrix(I).nbl_obj
-    pynbl_M = send_matrix(I.copy()).nbl_obj
-    print(id(pynbl_A ))
-    print(type(pynbl_A ))
-    print(id(pynbl_Term ))
-    print(type(pynbl_Term ))
-    print(id(pynbl_M ))
-    print(type(pynbl_M ))
+    pA = phb.load_numpy_matrix(A)
+    phb.move_matrix_device(pA)
 
-    for i in range(1, n+1):
-        pynbl_Term = neblina.mat_mul(pynbl_Term, pynbl_A)
-        pynbl_Term = neblina.scalar_mat_mul(1/i, pynbl_Term)
-        pynbl_M = neblina.mat_add(pynbl_M, pynbl_Term)
+    T = np.eye(A.shape[0], dtype=A.dtype)
+    pT = phb.load_numpy_matrix(T)
+    phb.move_matrix_device(pT)
 
-    return neblina.retrieve_numpy_matrix(pynbl_M)
+    M = np.eye(A.shape[0], dtype=A.dtype)
+    pM = phb.load_numpy_matrix(M)
+    phb.move_matrix_device(pM)
+
+    for i in range(1, n + 1):
+        pT = phb.mat_mul(pT, pA)
+        pT = phb.scalar_mat_mul(1/i, pT)
+        pM = phb.mat_add(pM, pT)
+
+    return phb.retrieve_numpy_matrix(pM)
