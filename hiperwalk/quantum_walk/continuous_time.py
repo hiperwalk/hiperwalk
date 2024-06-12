@@ -464,8 +464,7 @@ class ContinuousTime(QuantumWalk):
             return U
 
         if hpc is not None:
-            nbl_U = nbl.matrix_power_series(-1j*time*H, n)
-            U = nbl.retrieve_matrix(nbl_U)
+            U = nbl.matrix_power_series(-1j*time*H.todense(), n)
         else:
             U = numpy_matrix_power_series(-1j*time*H.todense(), n)
 
