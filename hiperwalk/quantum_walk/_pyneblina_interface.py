@@ -379,20 +379,20 @@ def matrix_power_series(A, n):
             + "Converting to dense."
         )
 
-    pA = phb.load_numpy_matrix(A)
-    phb.move_matrix_device(pA)
+    pA = neblina.load_numpy_matrix(A)
+    neblina.move_matrix_device(pA)
 
     T = np.eye(A.shape[0], dtype=A.dtype)
-    pT = phb.load_numpy_matrix(T)
-    phb.move_matrix_device(pT)
+    pT = neblina.load_numpy_matrix(T)
+    neblina.move_matrix_device(pT)
 
     M = np.eye(A.shape[0], dtype=A.dtype)
-    pM = phb.load_numpy_matrix(M)
-    phb.move_matrix_device(pM)
+    pM = neblina.load_numpy_matrix(M)
+    neblina.move_matrix_device(pM)
 
     for i in range(1, n + 1):
-        pT = phb.mat_mul(pT, pA)
-        pT = phb.scalar_mat_mul(1/i, pT)
-        pM = phb.mat_add(pM, pT)
+        pT = neblina.mat_mul(pT, pA)
+        pT = neblina.scalar_mat_mul(1/i, pT)
+        pM = neblina.mat_add(pM, pT)
 
-    return phb.retrieve_numpy_matrix(pM)
+    return neblina.retrieve_numpy_matrix(pM)
