@@ -863,7 +863,8 @@ class Coined(QuantumWalk):
         its definition remains unaltered 
         even in the presence of marked vertices. However, if the coin 
         operator is defined using coin names, any marked vertices will 
-        prompt an update to the coin operator. Specifically, the coin names 
+        prompt an update to the coin operator.
+        Specifically, the coin names
         for each marked vertex will default to a replacement with -I, 
         unless an alternative substitution is provided.
 

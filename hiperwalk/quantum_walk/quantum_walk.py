@@ -468,6 +468,10 @@ class QuantumWalk(ABC):
                 else:
                     state = state.astype(complex)
 
+            print('_prepare_engine')
+            print(self._evolution.dtype)
+            print(state.dtype)
+            print()
             self._simul_mat = nbl.send_matrix(self._evolution)
             self._simul_vec = nbl.send_vector(state)
 
