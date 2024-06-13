@@ -772,7 +772,7 @@ class Coined(QuantumWalk):
         set_coin
         """
         if scipy.sparse.issparse(self._coin):
-            if not bool(self._marked):
+            if len(self._marked) == 0:
                 return self._coin
 
             # if coin was explicitly set,
@@ -805,7 +805,7 @@ class Coined(QuantumWalk):
             return scipy.sparse.csr_array(C)
 
         oracle_coin = self._oracle_coin
-        if bool(oracle_coin):
+        if len(oracle_coin) > 0:
             coin = self._coin
             coin_list = [oracle_coin[i] if oracle_coin[i] != ''
                          else coin[i]
