@@ -58,17 +58,46 @@ class TestCoinedLine(unittest.TestCase):
     def test_hpc_default_evolution_operator(self):
         print("test_hpc_default_evolution_operator")
 
+        # checking if evolution operator is unitary
+        U = self.qw.get_evolution()
+        I = U @ U.T.conjugate()
+        self.assertTrue(np.allclose(I, np.eye(I.shape[0]))
+
+        # simulation parameters
         num_steps = self.num_vert // 2
         center = self.num_vert // 2
         entries = [[1, (center, center + 1)],
                    [-1j, (center, center - 1)]]
         init_state = self.qw.state(entries)
 
+        print('\n-------------------------------')
+        print(self.qw._evolution.dtype)
+        print(init_state.dtype)
+        # HPC simulation
+        hpc_states = self.qw.simulate((num_steps + 1), init_state)
+        # checking if all states are unitary
+        probs = qw.probability_distribution(states)
+        self.assertTrue(
+            np.allclose(probs.sum(axis=1), np.ones(probs.shape[0]),
+                        rtol=1e-15, atol=1e-15)
+        )
+
+        # Non-HPC simulation
         hpw.set_hpc(None)
         states = self.qw.simulate((num_steps + 1), init_state)
-        hpw.set_hpc(HPC)
-        hpc_states = self.qw.simulate((num_steps + 1), init_state)
+        # checking if all states are unitary
+        probs = qw.probability_distribution(states)
+        self.assertTrue(
+            np.allclose(probs.sum(axis=1), np.ones(probs.shape[0]),
+                        rtol=1e-15, atol=1e-15)
+        )
 
+        diff = states - hpc_states
+        print(diff)
+        print(diff.min())
+        print(diff.max())
+        print('-------------------------------')
+        # checking if the obtained states are equivalent
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
         )

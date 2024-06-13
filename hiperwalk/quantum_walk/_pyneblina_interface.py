@@ -224,17 +224,15 @@ def _send_sparse_matrix(M, is_complex):
     # inserts elements into neblina sparse matrix
     row = 0
     next_row_ind = M.indptr[1]
-    j = 2
     for i in range(len(M.data)):
         while i == next_row_ind:
             row += 1
-            next_row_ind = M.indptr[j]
-            j += 1
+            next_row_ind = M.indptr[row + 1]
             
         col = M.indices[i]
         if is_complex:
-            neblina.sparse_matrix_set(smat, row, col, M[row, col].real,
-                              M[row, col].imag)
+            neblina.sparse_matrix_set(smat, row, col,
+                                      M[row, col].real, M[row, col].imag)
         else:
             # TODO: Pynebliena needs to accept 4 arguments instead of 5?
             # TODO: check if smatrix_set_real_value is beign called
@@ -269,8 +267,10 @@ def send_matrix(M):
     is_complex = np.issubdtype(M.dtype, np.complexfloating)
 
     if scipy.sparse.issparse(M):
+        print('sending sparse matrix')
         return _send_sparse_matrix(M, is_complex)
 
+    print('sending dense matrix')
     return _send_dense_matrix(M, is_complex)
 
 def retrieve_matrix(pynbl_mat):
