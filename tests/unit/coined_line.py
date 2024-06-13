@@ -14,6 +14,12 @@ class TestCoinedLine(unittest.TestCase):
         self.line = hpw.Line(self.num_vert)
         self.qw = hpw.Coined(self.line)
 
+    def tearDown(self):
+        del self.line
+        self.line = None
+        del self.qw
+        self.qw = None
+
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
@@ -57,12 +63,6 @@ class TestCoinedLine(unittest.TestCase):
                                   'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
         print("test_hpc_default_evolution_operator")
-
-        # checking if evolution operator is unitary
-        U = self.qw.get_evolution()
-        I = U @ U.T.conjugate()
-        print('\n-------------------------------')
-        print(I)
 
         # simulation parameters
         num_steps = self.num_vert // 2
