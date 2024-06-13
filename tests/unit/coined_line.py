@@ -61,7 +61,8 @@ class TestCoinedLine(unittest.TestCase):
         # checking if evolution operator is unitary
         U = self.qw.get_evolution()
         I = U @ U.T.conjugate()
-        self.assertTrue(np.allclose(I, np.eye(I.shape[0]))
+        from scipy.sparse import eye
+        self.assertTrue(np.allclose(I, eye(I.shape[0])))
 
         # simulation parameters
         num_steps = self.num_vert // 2
