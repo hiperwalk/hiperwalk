@@ -76,7 +76,7 @@ class TestCoinedLine(unittest.TestCase):
         # HPC simulation
         hpc_states = self.qw.simulate((num_steps + 1), init_state)
         # checking if all states are unitary
-        probs = qw.probability_distribution(states)
+        probs = self.qw.probability_distribution(hpc_states)
         self.assertTrue(
             np.allclose(probs.sum(axis=1), np.ones(probs.shape[0]),
                         rtol=1e-15, atol=1e-15)
@@ -86,7 +86,7 @@ class TestCoinedLine(unittest.TestCase):
         hpw.set_hpc(None)
         states = self.qw.simulate((num_steps + 1), init_state)
         # checking if all states are unitary
-        probs = qw.probability_distribution(states)
+        probs = self.qw.probability_distribution(states)
         self.assertTrue(
             np.allclose(probs.sum(axis=1), np.ones(probs.shape[0]),
                         rtol=1e-15, atol=1e-15)
