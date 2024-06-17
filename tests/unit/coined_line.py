@@ -23,7 +23,6 @@ class TestCoinedLine(unittest.TestCase):
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
-        print("test_persistent_shift_right_state_transfer")
         self.qw.set_shift('persistent')
         self.qw.set_coin('I')
         self.qw.set_marked([])
@@ -40,7 +39,6 @@ class TestCoinedLine(unittest.TestCase):
         )
 
     def test_persistent_shift_left_state_transfer(self):
-        print("test_persistent_shift_left_state_transfer")
         # initial state in leftmost vertex
         # final state in rightmost vertex
         self.qw.set_shift('persistent')
@@ -62,7 +60,6 @@ class TestCoinedLine(unittest.TestCase):
     @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
                                   'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
-        print("test_hpc_default_evolution_operator")
 
         # simulation parameters
         num_steps = self.num_vert // 2
@@ -71,15 +68,11 @@ class TestCoinedLine(unittest.TestCase):
                    [-1j, (center, center - 1)]]
         init_state = self.qw.state(entries)
 
-        print('-------------------------------')
-        print(self.qw._evolution.dtype)
-        print(init_state.dtype)
         # HPC simulation
         hpc_states = self.qw.simulate((num_steps + 1), init_state)
         # checking if all states are unitary
         probs = self.qw.probability_distribution(hpc_states)
         probs = probs.sum(axis=1)
-        print(probs)
         # self.assertTrue(
         #     np.allclose(probs, np.ones(probs.shape),
         #                 rtol=1e-15, atol=1e-15)
@@ -91,31 +84,24 @@ class TestCoinedLine(unittest.TestCase):
         # checking if all states are unitary
         probs = self.qw.probability_distribution(states)
         probs = probs.sum(axis=1)
-        print(probs)
         # self.assertTrue(
         #     np.allclose(probs, np.ones(probs.shape),
         #                 rtol=1e-15, atol=1e-15)
         # )
 
         diff = states - hpc_states
-        print(diff)
-        print(diff.min())
-        print(diff.max())
-        print('-------------------------------')
         # checking if the obtained states are equivalent
         self.assertTrue(
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
         )
 
     def test_set_explicit_coin(self):
-        print("test_set_explicit_coin")
         C = self.qw.get_coin()
         self.qw.set_coin(coin=C)
         C2 = self.qw.get_coin()
         self.assertTrue((C - C2).nnz == 0)
 
     def test_uniform_state(self):
-        print("test_uniform_state")
         state = self.qw.uniform_state()
         num_arcs = self.qw._graph.number_of_arcs()
         

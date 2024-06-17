@@ -132,31 +132,8 @@ def send_vector(v):
 
 
     n = v.shape[0]
-    # TODO: needs better support from pyneblina to
-    # use next instruction (commented).
-    # For example: neblina.vector_set works, but in the real case,
-    # it should not be needed to pass the imaginary part as argument.
-    # In addition,
-    # there should be a way to return a vector and automatically
-    # convert to an array of float or of complex numbers accordingly.
-    # 
-    # vec = (neblina.vector_new(n, neblina.COMPLEX)
-    #        if is_complex else neblina.vector_new(n, neblina.FLOAT))
-    # TODO: check if line below and the previou comment are still needed
-    # vec = neblina.vector_new(n, neblina.COMPLEX)
 
-    try:
-        # TODO: Pyneblina needs to accept 3 only arguments
-        # instead of 4?
-        # TODO: check if neblina.vector_set is idetifying
-        # the vector type right (i.e. real and not complex)
-        vec = neblina.load_numpy_array(v)
-    except AttributeError:
-        print("Error: vector entries must have real and imaginary parts.")
-    except TypeError:
-        print("Error: vector entries must be numbers.")
-    except Exception as e:
-        print("Error: ", e)
+    vec = neblina.load_numpy_array(v)
 
     # suppose that the vector is going to be used
     # immediately after being transferred
@@ -267,10 +244,8 @@ def send_matrix(M):
     is_complex = np.issubdtype(M.dtype, np.complexfloating)
 
     if scipy.sparse.issparse(M):
-        print('sending sparse matrix')
         return _send_sparse_matrix(M, is_complex)
 
-    print('sending dense matrix')
     return _send_dense_matrix(M, is_complex)
 
 def retrieve_matrix(pynbl_mat):
