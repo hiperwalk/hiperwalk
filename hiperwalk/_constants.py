@@ -1,4 +1,4 @@
-__version__ = '2.0b13'
+__version__ = '2.0b'
 
 from sys import modules as sys_modules
 from enum import Enum
