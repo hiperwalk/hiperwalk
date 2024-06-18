@@ -198,23 +198,39 @@ def _send_sparse_matrix(M, is_complex):
             else neblina.sparse_matrix_new(n, n, neblina.FLOAT))
     # smat = neblina.sparse_matrix_new(n, n, neblina.COMPLEX)
     
-    # inserts elements into neblina sparse matrix
-    row = 0
-    next_row_ind = M.indptr[1]
-    for i in range(len(M.data)):
-        while i == next_row_ind:
-            row += 1
-            next_row_ind = M.indptr[row + 1]
-            
-        col = M.indices[i]
-        if is_complex:
-            neblina.sparse_matrix_set(smat, row, col,
-                                      M[row, col].real, M[row, col].imag)
-        else:
-            # TODO: Pynebliena needs to accept 4 arguments instead of 5?
-            # TODO: check if smatrix_set_real_value is beign called
-            # instead of smatrix_set_complex_value
-            neblina.sparse_matrix_set(smat, row, col, M[row, col], 0) 
+    # # inserts elements into neblina sparse matrix
+    # row = 0
+    # next_row_ind = M.indptr[1]
+    # for i in range(len(M.data)):
+    #     while i == next_row_ind:
+    #         row += 1
+    #         next_row_ind = M.indptr[row + 1]
+    # 
+    #     col = M.indices[i]
+    #     if is_complex:
+    #         neblina.sparse_matrix_set(smat, row, col,
+    #                                   M[row, col].real, M[row, col].imag)
+    #     else:
+    #         # TODO: Pynebliena needs to accept 4 arguments instead of 5?
+    #         # TODO: check if smatrix_set_real_value is beign called
+    #         # instead of smatrix_set_complex_value
+    #         neblina.sparse_matrix_set(smat, row, col, M[row, col], 0)
+
+    for row in range(n):
+        start = M.indptr[row]
+        end = M.indptr[row + 1]
+
+        # columns must be added in reverse order
+        for index in range(end - 1, start - 1, -1):
+            col = M.indices[index]
+
+            if is_complex:
+                neblina.sparse_matrix_set(smat, row, col,
+                                          M[row, col].real,
+                                          M[row, col].imag)
+            else:
+                neblina.sparse_matrix_set(smat, row, col,
+                                          M[row, col].real, 0)
 
     neblina.sparse_matrix_pack(smat) # TODO: is this needed?
     neblina.move_sparse_matrix_device(smat)
