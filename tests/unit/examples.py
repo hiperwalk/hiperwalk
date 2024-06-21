@@ -12,6 +12,8 @@ class TestExamples(unittest.TestCase):
         hpw.set_hpc(HPC)
     
     def coined_bipartite_search(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         num_vert1 = 73
         num_vert2 = 42
         num_vert = num_vert1 + num_vert2
@@ -33,6 +35,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
     def coined_complete_search(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         num_vert = 100
         g = hpw.Complete(num_vert)
         qw = hpw.Coined(g, coin='G', marked={'-G': [0]})
@@ -49,6 +53,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
     def coined_diagonal_grid(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         dim = 121
         grid = hpw.Grid(dim, diagonal=True, periodic=False)
         dtqw = hpw.Coined(grid, shift='persistent', coin='grover')
@@ -3727,6 +3733,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(prob, expected_prob))
 
     def coined_grid_search(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         dim = 25
         g = hpw.Grid((dim, dim))
         N = g.number_of_vertices()
@@ -3759,6 +3767,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(succ_prob, expected_prob))
 
     def coined_hypercube(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         dim = 6
         g = hpw.Hypercube(dim)
         qw = hpw.Coined(g)
@@ -3788,6 +3798,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(probs, expected_prob))
 
     def continuous_cycle(self):  
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         N = 101
         cycle = hpw.Cycle(N)
         ctqw = hpw.ContinuousTime(cycle, gamma=0.35)
@@ -3827,6 +3839,8 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(prob, expected_prob))
 
     def grovers_algorithm(self):
+        print(HPC)
+        self.assertTrue(HPC == hpw.get_hpc())
         import networkx as nx
 
         N = 128
