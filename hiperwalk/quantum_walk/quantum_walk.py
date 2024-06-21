@@ -458,7 +458,7 @@ class QuantumWalk(ABC):
 
         if hpc is not None:
             # autocast. hiperblas-core only allows same-time multipl
-            mat_complex = np.issubdtype(self._evolution,
+            mat_complex = np.issubdtype(self._evolution.dtype,
                                         np.complexfloating)
             vec_complex = np.issubdtype(state.dtype,
                                         np.complexfloating)
