@@ -11,7 +11,7 @@ class TestExamples(unittest.TestCase):
     def setUp(self):
         hpw.set_hpc(HPC)
     
-    def coined_bipartite_search(self):
+    def test_coined_bipartite_search(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         num_vert1 = 73
@@ -34,7 +34,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
-    def coined_complete_search(self):
+    def test_coined_complete_search(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         num_vert = 100
@@ -52,7 +52,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
-    def coined_diagonal_grid(self):
+    def test_coined_diagonal_grid(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 121
@@ -3732,7 +3732,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(prob, expected_prob))
 
-    def coined_grid_search(self):
+    def test_coined_grid_search(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 25
@@ -3766,7 +3766,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(succ_prob, expected_prob))
 
-    def coined_hypercube(self):
+    def test_coined_hypercube(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 6
@@ -3797,7 +3797,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(probs, expected_prob))
 
-    def continuous_cycle(self):  
+    def test_continuous_cycle(self):  
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         N = 101
@@ -3838,7 +3838,7 @@ class TestExamples(unittest.TestCase):
 
         self.assertTrue(np.allclose(prob, expected_prob))
 
-    def grovers_algorithm(self):
+    def test_grovers_algorithm(self):
         print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         import networkx as nx
