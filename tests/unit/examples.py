@@ -7,6 +7,9 @@ import numpy as np
 import hiperwalk as hpw
 
 class TestExamples(unittest.TestCase):
+
+    def setUp(self):
+        hpw.set_hpc(HPC)
     
     def coined_bipartite_search(self):
         num_vert1 = 73
