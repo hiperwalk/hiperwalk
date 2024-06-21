@@ -12,7 +12,6 @@ class TestExamples(unittest.TestCase):
         hpw.set_hpc(HPC)
     
     def test_coined_bipartite_search(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         num_vert1 = 73
         num_vert2 = 42
@@ -35,7 +34,6 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
     def test_coined_complete_search(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         num_vert = 100
         g = hpw.Complete(num_vert)
@@ -53,7 +51,6 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(marked_prob, expected_prob))
 
     def test_coined_diagonal_grid(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 121
         grid = hpw.Grid(dim, diagonal=True, periodic=False)
@@ -3733,7 +3730,6 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(prob, expected_prob))
 
     def test_coined_grid_search(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 25
         g = hpw.Grid((dim, dim))
@@ -3767,13 +3763,12 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(succ_prob, expected_prob))
 
     def test_coined_hypercube(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         dim = 6
         g = hpw.Hypercube(dim)
         qw = hpw.Coined(g)
-        state = qw.state(*[[1, i] for i in range(dim)])
-        states = qw.simulate(time=(dim, dim + 1), state=state)
+        state = qw.state([[1, i] for i in range(dim)])
+        states = qw.simulate(range=(dim, dim + 1), state=state)
         probs = qw.probability_distribution(states)
 
         expected_prob = np.array(
@@ -3798,7 +3793,6 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(probs, expected_prob))
 
     def test_continuous_cycle(self):  
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         N = 101
         cycle = hpw.Cycle(N)
@@ -3839,7 +3833,6 @@ class TestExamples(unittest.TestCase):
         self.assertTrue(np.allclose(prob, expected_prob))
 
     def test_grovers_algorithm(self):
-        print(HPC)
         self.assertTrue(HPC == hpw.get_hpc())
         import networkx as nx
 
