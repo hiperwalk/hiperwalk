@@ -123,7 +123,7 @@ def send_vector(v):
     neblina.move_vector_device(vec)
     return vec
 
-def retrieve_vector(pynbl_vec):
+def retrieve_vector(nbl_vec):
     r"""
     Retrieves vector from the device and converts it to python array.
     By default, it is supposed that the vector is not going to be used in
@@ -134,7 +134,6 @@ def retrieve_vector(pynbl_vec):
 
     # if a vector is being retrieved.
     # the engine should have been already initiated
-    nbl_vec = pynbl_vec.nbl_obj
     neblina.move_vector_host(nbl_vec)
     py_vec = neblina.retrieve_numpy_array(nbl_vec)
 
