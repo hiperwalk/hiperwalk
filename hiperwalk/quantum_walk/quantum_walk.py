@@ -491,9 +491,10 @@ class QuantumWalk(ABC):
             # TODO: request multiple multiplications at once
             #       to neblina-core
             # TODO: check if intermediate states are being freed
+            is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
                 self._simul_vec = nbl.multiply_matrix_vector(
-                    self._simul_mat, self._simul_vec)
+                    self._simul_mat, self._simul_vec, is_sparse)
         else:
             for i in range(step):
                 self._simul_vec = self._simul_mat @ self._simul_vec
