@@ -121,7 +121,7 @@ def send_vector(v):
     # immediately after being transferred
     # TODO: check if this is the case
     neblina.move_vector_device(vec)
-    return PyNeblinaVector(vec, is_complex, n)
+    return vec
 
 def retrieve_vector(pynbl_vec):
     r"""
