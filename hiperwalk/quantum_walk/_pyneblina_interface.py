@@ -150,7 +150,7 @@ def retrieve_vector(pynbl_vec):
 
     return py_vec
         
-def _send_sparse_matrix(M, is_complex):
+def _send_sparse_matrix(M):
     r"""
     Transfers a sparse Matrix (M) stored in csr format to Neblina-core and
     moves it to the device (ready to be used).
