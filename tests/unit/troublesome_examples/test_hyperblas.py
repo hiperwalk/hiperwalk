@@ -14,8 +14,8 @@ g = hpw.Complete(num_vert)
 qw = hpw.Coined(g, coin='G', marked={'-G': [0]})
 r = int(2*np.sqrt(num_vert)) + 1
 expected_states = qw.simulate(range=r, state=qw.uniform_state())
-expected_prob_dist = qw.probability_distribution(states)
-expected_succ_prob = qw.success_probability(states)
+expected_prob_dist = qw.probability_distribution(expected_states)
+expected_succ_prob = qw.success_probability(expected_states)
 
 # implementing simulation using pyhiperblas
 
