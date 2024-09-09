@@ -505,14 +505,9 @@ class QuantumWalk(ABC):
         ret = None
 
         if hpc is not None:
-            # TODO: check if vector must be deleted or
-            #       if it can be reused via neblina-core commands.
-            ret = nbl.retrieve_vector(self._simul_vec)
-            if continue_simulation:
-                # does it need to be a copy?
-                self._simul_vec = nbl.send_vector(ret.copy())
+            ret = nbl.copy_vector(self._simul_vec)
         else:
-            ret = self._simul_vec
+            ret = self._simul_vec.copy()
 
         return ret
 
