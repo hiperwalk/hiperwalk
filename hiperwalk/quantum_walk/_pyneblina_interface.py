@@ -105,21 +105,7 @@ def send_vector(v):
     I think an auxiliary vector is beign created,
     thus twice the memory needed is being used
     """
-
-    # TODO: check if complex automatically?
-    # # the complex type from Python is not the same as numpy complex128
-    # is_complex = str(v.dtype) == "complex128"
-    # more pythonic way of checking if type is complex
-    is_complex = np.issubdtype(v.dtype, np.complexfloating)
-
-
-    n = v.shape[0]
-
     vec = neblina.load_numpy_array(v)
-
-    # suppose that the vector is going to be used
-    # immediately after being transferred
-    # TODO: check if this is the case
     neblina.move_vector_device(vec)
     return vec
 
@@ -286,3 +272,8 @@ def matrix_power_series(A, n):
 
     #return neblina.retrieve_numpy_matrix(pM)
     return retrieve_matrix(pM)
+
+def copy_vector(v):
+    res = neblina.copy_vector_from_device(v)
+    vec = neblina.retrieve_numpy_array(res)
+    return vec
