@@ -453,33 +453,14 @@ class QuantumWalk(ABC):
     ######################################
 
     def _prepare_engine(self, state, hpc):
-        if self._evolution is None:
-            self._evolution = self.get_evolution()
 
         if hpc is not None:
-            # autocast. hiperblas-core only allows same-time multipl
-            mat_complex = np.issubdtype(self._evolution.dtype,
-                                        np.complexfloating)
-            vec_complex = np.issubdtype(state.dtype,
-                                        np.complexfloating)
-            if mat_complex != vec_complex:
-                if not mat_complex:
-                    self._evolution = self._evolution.astype(complex)
-                else:
-                    state = state.astype(complex)
-
             self._simul_mat = nbl.send_matrix(self._evolution)
             self._simul_vec = nbl.send_vector(state)
 
         else:
             self._simul_mat = self._evolution
             self._simul_vec = state
-
-        dtype = (np.complex128 if (np.iscomplexobj(self._evolution)
-                             or np.iscomplexobj(state))
-                 else np.double)
-
-        return dtype
 
     def _simulate_step(self, step, hpc):
         """
@@ -635,7 +616,27 @@ class QuantumWalk(ABC):
 
         start, end, step = range
         hpc = nbl.get_hpc()
-        dtype = self._prepare_engine(state, hpc)
+
+        #########################################################
+        # autoconversion of matrix and vector types
+        # hiperblas-core only allows same-time multipl
+        if self._evolution is None:
+            self._evolution = self.get_evolution()
+
+        is_mat_complex = np.issubdtype(self._evolution.dtype,
+                                       np.complexfloating)
+        is_vec_complex = np.issubdtype(state.dtype,
+                                       np.complexfloating)
+        if is_mat_complex != is_vec_complex:
+            if not is_mat_complex:
+                self._evolution = self._evolution.astype(complex)
+            else:
+                state = state.astype(complex)
+
+        dtype = state.dtype
+        #########################################################
+
+        self._prepare_engine(state, hpc)
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
