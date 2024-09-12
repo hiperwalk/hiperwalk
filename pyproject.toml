@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hiperwalk"
-version = "2.0b17"
+version = "2.0b18"
 description = "High-Performance Quantum Walk Simulator"
 license = {file="LICENSE"}
 readme = "README.md"
