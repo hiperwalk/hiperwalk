@@ -70,6 +70,8 @@ To install the required libraries, use the following commands:
    pip3 install matplotlib
 
 Next, make the desired modifications and submit a pull request.
+We strongly recommend reading `best practices for pull requests
+<https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/getting-started/best-practices-for-pull-request>`_.
 
 Testing
 =======
