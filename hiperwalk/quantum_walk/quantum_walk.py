@@ -416,11 +416,11 @@ class QuantumWalk(ABC):
         >>> psi2 = qw.state(([1, 0], (1, 1), (1, 2)))
         >>> psi3 = qw.state(((1, 0), (1, 1), (1, 2)))
         >>> np.all(psi == psi1)
-        True
+        np.True_
         >>> np.all(psi1 == psi2)
-        True
+        np.True_
         >>> np.all(psi2 == psi3)
-        True
+        np.True_
         """
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")

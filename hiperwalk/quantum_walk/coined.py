@@ -441,7 +441,7 @@ class Coined(QuantumWalk):
         .. doctest::
 
             >>> (S @ S == np.eye(8)).all() # True by definition
-            True
+            np.True_
             >>> S @ np.array([1, 0, 0, 0, 0, 0, 0, 0]) # S|0> = |1>
             array([0, 1, 0, 0, 0, 0, 0, 0])
             >>> S @ np.array([0, 1, 0, 0, 0, 0, 0, 0]) # S|1> = |0>
@@ -637,7 +637,7 @@ class Coined(QuantumWalk):
             for key in coin:
                 coin_name = self._coin_to_valid_name(key)
                 value = coin[key]
-                if value != []:
+                if len(value) > 0:
                     if not hasattr(value, '__iter__'):
                         raise TypeError("Expected a list of vertices. "
                                 + "Received " + str(type(value)) + " "
@@ -1058,9 +1058,9 @@ class Coined(QuantumWalk):
         ...                  [1, ((0, 0), (dim - 1, 0))],
         ...                  (1, [0, 1])])
         >>> np.all(psi == psi1)
-        True
+        np.True_
         >>> np.all(psi1 == psi2)
-        True
+        np.True_
         """
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")

@@ -134,7 +134,7 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
         array([11,  8, 14,  2])
         >>> [bin(v) for v in neigh]
         ['0b1011', '0b1000', '0b1110', '0b10']
-        >>> [u^v for v in neigh]
+        >>> [int(u^v) for v in neigh]
         [1, 2, 4, 8]
     """
     if weights is not None and multiedges is not None:

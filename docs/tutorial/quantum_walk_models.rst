@@ -53,7 +53,7 @@ The Hilbert space of the coined quantum walk has dimension
 :math:`2|E|`, i.e. the number of arcs.
 
 >>> coined.hilbert_space_dimension() == 2*cycle.number_of_edges()
-True
+np.True_
 
 Continuous-time Model
 '''''''''''''''''''''
@@ -104,7 +104,7 @@ array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0.,
        0., 0., 0., 0., 0.])
 >>> state2 = coined.ket(10)
 >>> np.all(state == state2)
-True
+np.True_
 
 Continuous-time Model
 `````````````````````
@@ -324,7 +324,7 @@ operator to even vertices and the Hadamard operator to odd vertices:
 >>> (C1 != C2).nnz == 0
 True
 >>> np.all(M1 == M2)
-True
+np.True_
 
 All these keys can be integrated into a single call to the
 :meth:`hiperwalk.Coined.set_evolution` method when creating
@@ -470,7 +470,7 @@ There are three argument types for ``range``.
   >>> len(states)
   10
   >>> len(states[0]) == coined.hilbert_space_dimension()
-  True
+  np.True_
 
 * 2-tuple of integer: ``(start, end)``.
   Save every state from the ``start``-th to time ``end - 1``-th
@@ -485,7 +485,7 @@ There are three argument types for ``range``.
   >>> len(states)
   8
   >>> len(states[0]) == coined.hilbert_space_dimension()
-  True
+  np.True_
 
   A 2-tuple of integer is the simplest way to obtain a single state.
   To obtain the state corresponding to the ``i``-th application of
@@ -515,7 +515,7 @@ There are three argument types for ``range``.
   >>> len(states)
   5
   >>> len(states[0]) == coined.hilbert_space_dimension()
-  True
+  np.True_
 
 Continuous-time Model
 `````````````````````
@@ -636,7 +636,7 @@ subset of the vertices for each state.
 >>> len(probs) == len(states)
 True
 >>> np.all([0 <= p and p <= 1  for p in probs])
-True
+np.True_
 
 The
 :meth:`hiperwalk.QuantumWalk.probability_distribution` method
