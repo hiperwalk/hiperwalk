@@ -139,7 +139,7 @@ simultaneously incident to pairs of vertices.
 ...         [g.number_of_edges(u, v) == u + v + 1
 ...         for u in range(num_vert)
 ...         for v in range(num_vert)]) == True)
-True
+np.True_
 
 Multigraphs are used to create coined quantum walks
 (:class:`hiperwalk.Coined`).
@@ -170,7 +170,7 @@ with respect to ``indices``.
 ...         [g.number_of_edges(u, v) == u + v + 1
 ...         for u in range(num_vert)
 ...         for v in range(num_vert)]) == True)
-True
+np.True_
 
 
 ---------------
@@ -196,7 +196,7 @@ represent the edge weights.
 >>> g = hpw.WeightedGraph(adj_matrix)
 >>> adj_matrix2 = g.adjacency_matrix().todense()
 >>> np.all(np.isclose(adj_matrix, adj_matrix2))
-True
+np.True_
 
 Weighted graphs are used to create continuous-time quantum walks
 (:class:`hiperwalk.ContinuousTime`).

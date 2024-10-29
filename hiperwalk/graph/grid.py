@@ -99,11 +99,11 @@ def Grid(dim, periodic=True, diagonal=False,
 
             >>> nat = hpw.Grid(3, diagonal=False, periodic=True)
             >>> neigh = nat.neighbors((0, 0))
-            >>> [tuple(nat.vertex_coordinates(v)) for v in neigh]
+            >>> [tuple(int(i) for i in nat.vertex_coordinates(v)) for v in neigh]
             [(1, 0), (2, 0), (0, 1), (0, 2)]
             >>> 
             >>> neigh = nat.neighbors((1, 1))
-            >>> [tuple(nat.vertex_coordinates(v)) for v in neigh]
+            >>> [tuple(int(i) for i in nat.vertex_coordinates(v)) for v in neigh]
             [(2, 1), (0, 1), (1, 2), (1, 0)]
 
     Diagonal Grid:
@@ -151,11 +151,11 @@ def Grid(dim, periodic=True, diagonal=False,
 
             >>> diag = hpw.Grid(3, diagonal=True, periodic=True)
             >>> neigh = diag.neighbors((0, 0))
-            >>> [tuple(diag.vertex_coordinates(v)) for v in neigh]
+            >>> [tuple(int(i) for i in diag.vertex_coordinates(v)) for v in neigh]
             [(1, 1), (1, 2), (2, 1), (2, 2)]
             >>> 
             >>> neigh = diag.neighbors((1, 1))
-            >>> [tuple(diag.vertex_coordinates(v)) for v in neigh]
+            >>> [tuple(int(i) for i in diag.vertex_coordinates(v)) for v in neigh]
             [(2, 2), (2, 0), (0, 2), (0, 0)]
 
         In the case of a diagonal grid with borders,

@@ -39,13 +39,13 @@ def Line(num_vert, multiedges=None, weights=None, copy=False):
     .. doctest::
 
         >>> g = hpw.Line(10)
-        >>> list(g.neighbors(0)) # 0 and 9 are not adjacent
+        >>> list(int(i) for i in g.neighbors(0)) # 0 and 9 are not adjacent
         [1]
-        >>> list(g.neighbors(1))
+        >>> list(int(i) for i in g.neighbors(1))
         [2, 0]
-        >>> list(g.neighbors(8))
+        >>> list(int(i) for i in g.neighbors(8))
         [9, 7]
-        >>> list(g.neighbors(9)) # 0 and 9 are not adjacent
+        >>> list(int(i) for i in g.neighbors(9)) # 0 and 9 are not adjacent
         [8]
 
     """
