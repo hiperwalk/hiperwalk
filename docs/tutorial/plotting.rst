@@ -201,7 +201,7 @@ The following is a list of specific Hiperwalk keywords.
 
 * ``plot``
 * ``show``
-* ``filename``
+* ``fname``
 * ``graph``
 * ``rescale``
 * ``animate``

@@ -13,7 +13,7 @@ python_range = range
 # histogram is alias for bar width=1
 def plot_probability_distribution(
         probabilities, plot=None, animate=False, show=True,
-        filename=None, interval=250, figsize=(10, 6), dpi=100,
+        fname=None, interval=250, figsize=(10, 6), dpi=100,
         repeat=True, repeat_delay=2500, range=None,
         time_step=1, **kwargs):
     """
@@ -54,7 +54,7 @@ def plot_probability_distribution(
         If ``animate==True``,
         the entire animation is shown as a html video.
 
-    filename : str, default=None
+    fname : str, default=None
         The filename path (with no format) where
         the plot(s) will be saved.
         If ``None`` no file is saved.
@@ -296,18 +296,18 @@ def plot_probability_distribution(
             plt.tight_layout()
 
             # saves or shows image (or both)
-            if filename is not None:
+            if fname is not None:
                 filename_suffix = str(i).zfill(
                         len(str(len(probabilities) - 1)))
                 # Use the base name, suffix, and extension to assemble the
                 # name if filename was provided with an extension.
-                if m := filename_with_ext_pattern.match(filename):
+                if m := filename_with_ext_pattern.match(fname):
                     name = m.group(1)
                     ext = m.group(2)
                     plt.savefig(f'{name}-{filename_suffix}.{ext}')
                 else:
-                    plt.savefig(filename if len(probabilities) == 1
-                                else filename + '-' + filename_suffix)
+                    plt.savefig(fname if len(probabilities) == 1
+                                else fname + '-' + filename_suffix)
                 if not show:
                     plt.close()
             if show:
@@ -370,12 +370,12 @@ def plot_probability_distribution(
                     repeat=repeat,
                     repeat_delay=repeat_delay)
 
-        if filename is not None:
+        if fname is not None:
             # Use .gif extension if the user didn't provide an
             # extension for the animation file.
-            if not filename_with_ext_pattern.match(filename):
-                filename = filename + '.gif'
-            anim.save(filename)
+            if not filename_with_ext_pattern.match(fname):
+                fname = fname + '.gif'
+            anim.save(fname)
         if show:
             if _is_in_notebook():
                 from IPython import display
