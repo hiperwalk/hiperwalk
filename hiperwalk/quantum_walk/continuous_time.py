@@ -412,7 +412,7 @@ class ContinuousTime(QuantumWalk):
         set_evolution
         """
         self.set_evolution(time=self._time,
-                          number_of_terms=number_of_terms,
+                           number_of_terms=number_of_terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
                            marked=self._marked)
@@ -476,12 +476,11 @@ class ContinuousTime(QuantumWalk):
 
         This method defines the evolution operator for a specified 
         ``time``.
-        It first determines the 
-        Hamiltonian and subsequently derives the evolution operator 
-        via a truncated Taylor series. The default number of terms 
-        in this series is set to ``number_of_terms=21``, which is adequate 
-        when the Hamiltonian is derived from the adjacency matrix 
-        and gamma is less than 1.
+        It first determines the Hamiltonian and subsequently derives 
+        the evolution operator via a truncated Taylor series. 
+        The default number of terms in this series is set to 
+        ``number_of_terms=21``, which is adequate when the Hamiltonian
+        is derived from the adjacency matrix and gamma is less than 1.
 
         Parameters
         ----------
