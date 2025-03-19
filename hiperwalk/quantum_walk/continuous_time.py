@@ -108,7 +108,7 @@ class ContinuousTime(QuantumWalk):
 
         self._gamma = None
         self._hamil_type = None
-        self._terms = None
+        self._number_of_terms = None
         self._hamiltonian = None
 
         self._time = None
@@ -273,7 +273,7 @@ class ContinuousTime(QuantumWalk):
             Phys. Rev. A 70, 022314, 2004.
         """
         self.set_evolution(time=self._time,
-                           terms=self._terms,
+                           number_of_terms=self._number_of_terms,
                            gamma=gamma,
                            type=type,
                            marked=marked)
@@ -386,25 +386,25 @@ class ContinuousTime(QuantumWalk):
         :math:`t` is the time.
         """
         self.set_evolution(time=time,
-                           terms=self._terms,
+                           number_of_terms=self._number_of_terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
                            marked=self._marked)
 
-    def _set_terms(self, terms=21):
-        if self._terms != terms:
-            self._terms = terms
+    def _set_number_of_terms(self, number_of_terms=21):
+        if self._number_of_terms != number_of_terms:
+            self._number_of_terms = number_of_terms
             return True
         return False
 
-    def set_terms(self, terms=21):
+    def set_number_of_terms(self, number_of_terms=21):
         r"""
         Set the number of terms used to calculate the
         evolution operator as a power series.
 
         Parameters
         ----------
-        terms : int, default=21
+        numer_of_terms : int, default=21
             Number of terms in the truncated Taylor series expansion.
 
         See Also
@@ -412,12 +412,12 @@ class ContinuousTime(QuantumWalk):
         set_evolution
         """
         self.set_evolution(time=self._time,
-                           terms=terms,
+                           number_of_terms=number_of_terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
                            marked=self._marked)
 
-    def get_terms(self):
+    def get_number_of_terms(self):
         r"""
         Retrieve the number of terms in the power series used to
         calculate the evolution operator.
@@ -428,12 +428,12 @@ class ContinuousTime(QuantumWalk):
 
         See Also
         --------
-        set_terms
+        set_number_of_terms
         set_evolution
         """
-        return self._terms
+        return self._number_of_terms
 
-    def _set_evolution(self, terms=21):
+    def _set_evolution(self, number_of_terms=21):
         r"""
         If this method is invoked,
         the evolution is recalculated
@@ -444,7 +444,7 @@ class ContinuousTime(QuantumWalk):
             self._evolution = np.eye(self.hilb_dim)
             return
 
-        n = terms - 1
+        n = number_of_terms - 1
         H = self.get_hamiltonian()
 
         hpc = nbl.get_hpc()
@@ -476,12 +476,11 @@ class ContinuousTime(QuantumWalk):
 
         This method defines the evolution operator for a specified 
         ``time``.
-        It first determines the 
-        Hamiltonian and subsequently derives the evolution operator 
-        via a truncated Taylor series. The default number of terms 
-        in this series is set to ``terms=21``, which is adequate 
-        when the Hamiltonian is derived from the adjacency matrix 
-        and gamma is less than 1.
+        It first determines the Hamiltonian and subsequently derives 
+        the evolution operator via a truncated Taylor series. 
+        The default number of terms in this series is set to 
+        ``number_of_terms=21``, which is adequate when the Hamiltonian
+        is derived from the adjacency matrix and gamma is less than 1.
 
         Parameters
         ----------
@@ -490,13 +489,13 @@ class ContinuousTime(QuantumWalk):
             If omitted, the default arguments are used.
             See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`,
             :meth:`hiperwalk.ContinuousTime.set_time`, and
-            :meth:`hiperwalk.ContinuousTime.set_terms`.
+            :meth:`hiperwalk.ContinuousTime.set_number_of_terms`.
 
         See Also
         --------
         set_hamiltonian
         set_time
-        set_terms
+        set_number_of_terms
 
         Notes
         -----
@@ -515,7 +514,7 @@ class ContinuousTime(QuantumWalk):
             \text{e}^{-\text{i}tH} \approx
             \sum_{j = 0}^{n-1} (-\text{i}tH)^j / j!
 
-        where ``terms``:math:`=n`.
+        where ``number_of_terms``:math:`=n`.
         This choice reflects default Python loops over integers,
         such as ``range`` and ``np.arange``.
 
@@ -538,6 +537,6 @@ class ContinuousTime(QuantumWalk):
 
         update = filter_and_call(self._set_time, False)
         update = filter_and_call(self._set_hamiltonian, update)
-        update = filter_and_call(self._set_terms, update)
+        update = filter_and_call(self._set_number_of_terms, update)
         if (update):
             filter_and_call(self._set_evolution, update)
