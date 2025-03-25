@@ -14,7 +14,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         repository: hiperwalk/hiperwalk.github.io
         submodules: true
@@ -29,9 +29,9 @@ jobs:
       run: hugo
 
     - name: Install Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
-        python-version: 3.9
+        python-version: 3.12
 
     - name: Install graphviz
       run: |
@@ -45,7 +45,7 @@ jobs:
           pip3 install PyGObject
 
     - name: Checkout hiperwalk source code (stable)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: hiperwalk/hiperwalk
         path: hiperwalk
@@ -65,7 +65,7 @@ jobs:
           rm -rf hiperwalk
 
     - name: Checkout hiperwalk source code (latest)
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: hiperwalk/hiperwalk
         path: hiperwalk
