@@ -5,7 +5,7 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
 from scipy.linalg import hadamard, dft
-from . import _pyneblina_interface as nbl
+from . import _pyhiperblas_interface as nbl
 
 class Coined(QuantumWalk):
     r"""
@@ -174,6 +174,7 @@ class Coined(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
+        print("em coined.py, __init__")
         # create symmetric directed multigraph from input
         sdmg = SDMultigraph(graph)
 
@@ -211,6 +212,8 @@ class Coined(QuantumWalk):
             }
 
         self.set_evolution(**kwargs)
+        print("BD, em hiperwalk/quantum_walk/coined.py, FINAL  def __init__(self, graph=None, **kwargs):")
+        #exit()
 
     def _set_flipflop_shift(self):
         r"""
@@ -237,7 +240,8 @@ class Coined(QuantumWalk):
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
         S = scipy.sparse.csr_array(
-            ( np.ones(num_arcs, dtype=np.int8),
+            ( np.ones(num_arcs, dtype=np.float64),  # BDmodif
+            #( np.ones(num_arcs, dtype=np.int8),    # BDmodif 
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
@@ -281,7 +285,8 @@ class Coined(QuantumWalk):
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
         S = scipy.sparse.csr_array(
-            ( np.ones(num_arcs, dtype=np.int8),
+            ( np.ones(num_arcs, dtype=np.float64),  # BDmodif
+            #( np.ones(num_arcs, dtype=np.int8), # BDmodif
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
@@ -493,7 +498,7 @@ class Coined(QuantumWalk):
         self._coin = coin_list
 
     def set_coin(self, coin='default'):
-        """
+        r"""
         Set the coin operator based on the graph's structure.
 
         Builds a coin operator considering the degree of each vertex.
@@ -751,6 +756,51 @@ class Coined(QuantumWalk):
                            coin=self._coin,
                            marked=marked)
 
+    # def _coin_list_to_explicit_coin00(self, coin_list):
+    #     num_vert = self._graph.number_of_vertices()
+    #     degree = self._graph.degree
+    #     blocks = [self._coin_funcs[coin_list[v]](degree(v))
+    #               for v in range(num_vert)]
+    #     C = scipy.sparse.block_diag(blocks, format='csr')
+    #     print("BDD, em _coin_list_to_explicit_coin, C = ", C.toarray())
+    #     print("BDD, em _coin_list_to_explicit_coin,  scipy.sparse.csr_array(C)) = ", scipy.sparse.csr_array(C))
+    #     return scipy.sparse.csr_array(C)
+
+    import scipy.sparse
+
+    def _coin_list_to_explicit_coinBD(self, coin_list):
+        num_vert = self._graph.number_of_vertices()
+        degree = self._graph.degree
+
+    # Cria blocos CSR garantindo que indices e indptr sejam int64
+        blocks = []
+        for v in range(num_vert):
+            block = self._coin_funcs[coin_list[v]](degree(v))
+
+        # Garante tipo float64 para os dados e int64 para indices/indptr
+         # Garante que seja CSR
+            if not scipy.sparse.isspmatrix_csr(block):
+              block = scipy.sparse.csr_matrix(block, dtype=np.float64)
+            else:
+              # Garante que o tipo dos dados seja float64
+              block = block.astype(np.float64, copy=False)
+
+       #     block = block.asfptype()  # força float64 nos dados (sem cópias se já for)
+            block.indices = np.ascontiguousarray(block.indices, dtype=np.int64)
+            block.indptr  = np.ascontiguousarray(block.indptr,  dtype=np.int64)
+
+            blocks.append(block)
+
+    # Cria a matriz blocada já consistente
+        C = scipy.sparse.block_diag(blocks, format='csr')
+
+    # Garante consistência total e contiguidade (sem conversão extra)
+        C.indices = np.ascontiguousarray(C.indices, dtype=np.int64)
+        C.indptr  = np.ascontiguousarray(C.indptr,  dtype=np.int64)
+        C.data    = np.ascontiguousarray(C.data,    dtype=np.float64)
+
+        return scipy.sparse.csr_array(C)
+
     def _coin_list_to_explicit_coin(self, coin_list):
         num_vert = self._graph.number_of_vertices()
         degree = self._graph.degree
@@ -771,14 +821,17 @@ class Coined(QuantumWalk):
         --------
         set_coin
         """
+        print("++++++  em hiperwalk/quantum_walk/coined.py: get_coin(self)")
+        print("em get_coin: self._coin=", self._coin[:5])
+        print("em get_coin: scipy.sparse.issparse(self._coin) =", scipy.sparse.issparse(self._coin))
         if scipy.sparse.issparse(self._coin):
-            if len(self._marked) == 0:
-                return self._coin
+            if len(self._marked) == 0: return self._coin
 
             # if coin was explicitly set,
             # and there are different coins for the marked vertices,
             # change them.
             def get_block(vertex):
+                print (" def get_block(vertex): ", vertex)
                 g = self._graph
                 neighbors = g.neighbors(vertex)
                 # TODO: this technique wont work after the behavior of
@@ -786,11 +839,8 @@ class Coined(QuantumWalk):
                 a1 = g.arc_number((vertex, neighbors[0]))
                 a2 = g.arc_number((vertex, neighbors[-1]))
                 # arc order may change
-                start = min(a1, a2)
-                end = max(a1, a2) + 1
-
-                return scipy.sparse.csr_array(self._coin[start:end,
-                                                         start:end])
+                start = min(a1, a2); end = max(a1, a2) + 1
+                return scipy.sparse.csr_array(self._coin[start:end, start:end])
 
             num_vert = self._graph.number_of_vertices()
             degree = self._graph.degree
@@ -800,9 +850,16 @@ class Coined(QuantumWalk):
                       if oracle_coin[v] != ''
                       else get_block(v)
                       for v in range(num_vert)]
+
+            #print("++++ em get_coin: blocks=", blocks); exit()
+
             C = scipy.sparse.block_diag(blocks, format='csr')
 
             return scipy.sparse.csr_array(C)
+
+        print("em get_coin(self), semi-final ")
+
+        #print("C=",C)
 
         oracle_coin = self._oracle_coin
         if len(oracle_coin) > 0:
@@ -813,16 +870,32 @@ class Coined(QuantumWalk):
         else:
             coin_list = self._coin
 
+        print("coin_list[:5]=",coin_list[:5])
+#        print("_coin_list_to_explicit_coin(coin_list)=",self._coin_list_to_explicit_coin(coin_list))
+        print("em get_coin(self), final ")
+
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
         # TODO: Check if matrix is sparse in pynelibna interface
         # TODO: Check if matrices are deleted from memory and GPU.
+
+        #from . import _pyhiperblas_interface as nbl  #BD
+        print("BD, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
         U = None
 
         S = self.get_shift()
-        C = self.get_coin()
 
+        #print("type(S) = ", type(S)); print("S = self.get_shift(), S =  ")
+        #formatted = "\n".join( " ".join(f"{v:2d}" for v in row) for row in S.toarray())
+        #print(formatted); print(); 
+
+        print("BD, em _set_evolution, CALL  C = self.get_coin(), monta a matriz CSR ")
+        C = self.get_coin()
+        #print("type(C) = ", type(C)); print("C = self.get_coin(), C =  ")
+        #formatted = "\n".join( " ".join(f"{v:8.1e}" for v in row) for row in C.toarray())
+        #formatted = "\n".join( " ".join(f"{v:5.1f}" for v in row) for row in C.toarray())
+        #if C.shape[0] <=16 : print(formatted); print()
         if nbl.get_hpc() is not None:
             from warnings import warn
             warn('HPC sparse matrix multiplication is not implemented. '
@@ -831,19 +904,95 @@ class Coined(QuantumWalk):
             # S = S.todense()
             # C = C.todense()
 
-            # nbl_S = nbl.send_matrix(S)
-            # del S
-            # nbl_C = nbl.send_matrix(C)
-            # del C
-            # nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
+#        print("em _set_evolution, nbl.get_hpc() = ",nbl.get_hpc()); exit();
+        #    print("scipy.sparse.issparse(S)=", scipy.sparse.issparse(S)) ;
+        #    print("em _set_evolution, before nbl_S = nbl.send_matrix(S) ");
+        #    nbl_S = nbl.send_matrix(S)
+        #    print("em _set_evolution, after  nbl_S = nbl.send_matrix(S) ");
+        #    del S
+        #    print("scipy.sparse.issparse(S)=", scipy.sparse.issparse(C)) ;
+        #    print("em _set_evolution, before nbl_C = nbl.send_matrix(C) ");
+        #    nbl_C = nbl.send_matrix(C)
+        #    print("em _set_evolution, after  nbl_C = nbl.send_matrix(C) ");
+        #    exit()
+        #    del C
+        #    nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
 
-            # del nbl_S
+        #    del nbl_S
 
-            # U = nbl.retrieve_matrix(nbl_C)
-            # del nbl_C
-            # U = scipy.sparse.csr_array(U)
+        #    U = nbl.retrieve_matrix(nbl_C)
+        #    del nbl_C
+        #    U = scipy.sparse.csr_array(U)
+        
+        np.set_printoptions(linewidth=240) 
+        print("type(S.indices)   = ", type(S.indices))
+        print("S.indices.dtype   = ", S.indices.dtype)
+        print("indices contiguous: ", S.indices.flags['C_CONTIGUOUS'])
+        print("S.indptr.dtype    = ", S.indptr.dtype)
+        print("indptr contiguous : ", S.indptr.flags['C_CONTIGUOUS'])
+        print("type(S)           = ", type(S))
+        print("S.dtype           = ", S.dtype)
+        print("S.data.dtype      = ", S.data.dtype)
+        print("data contiguous   : ", S.data.flags['C_CONTIGUOUS'])
+        print("BD, em coined.py: S.indices    = ", S.indices) 
+        perm = S.indices 
 
-        U = S @ C
+        print("type(C.indices)   = ", type(C.indices))
+        print("C.indices.dtype   = ", C.indices.dtype)
+        print("indices contiguous: ", C.indices.flags['C_CONTIGUOUS'])
+        print("C.indptr.dtype    = ", C.indptr.dtype)
+        print("indptr contiguous : ", C.indptr.flags['C_CONTIGUOUS'])
+        print("type(C)           = ", type(C))
+        print("C.dtype           = ", C.dtype)
+        print("C.data.dtype      = ", C.data.dtype)
+        print("data contiguous   : ", C.data.flags['C_CONTIGUOUS'])
+
+        #U = C.copy()
+
+        if nbl.get_hpc() is  None:
+            print("BD, em _set_evolution, computeU,  U = S @ C ");
+            # U = S @ C
+            U = C[S.indices,:]
+            #print("BD, em _set_evolution, AFTER  U = S @ C ");
+        else: 
+
+            #S.indices = S.indices.astype(np.int32)
+            #S.indptr  = S.indptr.astype(np.int32)
+            #S.data    = S.data.astype(np.float64)
+            #print("BD, em _set_evolution, S.toarray()  = ", S.toarray()); 
+            hbS = nbl.send_matrix(S)
+            ##print("BD, em _set_evolution, hbS  = "); nbl.sparse_matrix_print(hbS); 
+            ##print("BD, em coined.py: S.indptr    = ", S.indptr) 
+            ##print("BD, em coined.py: S.indices   = ", S.indices) 
+            ##print("BD, em coined.py: S.data      = ", S.data) 
+
+            #C.indices = C.indices.astype(np.int32)
+            #C.indptr  = C.indptr.astype(np.int32)
+            #C.data  = C.data.astype(np.float64)
+            #print("BD, em _set_evolution, C.toarray()  = ", C.toarray()); 
+            hbC = nbl.send_matrix(C)
+            ##print("BD, em _set_evolution, hbC  = "); nbl.sparse_matrix_print(hbC); 
+            ##print("BD, em coined.py: C.indptr    = ", C.indptr) 
+            ##print("BD, em coined.py: C.indices   = ", C.indices) 
+            ##print("BD, em coined.py: C.data      = ", C.data) 
+
+            ##U = S @ C
+            ##print("BD, em _set_evolution, (S @ C).toarray()  = ", U.toarray()); 
+            ##print("BD, em coined.py: (S @ C).indptr    = ", U.indptr) 
+            ##print("BD, em coined.py: (S @ C).indices   = ", U.indices) 
+            ##print("BD, em coined.py: (S @ C).data      = ", U.data) 
+
+            U = C.copy()
+            hbU = nbl.send_matrix(U)
+            print("BD, em _set_evolution, computeU, nbl.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); nbl.sparse_matrix_print(hbU); 
+            nbl.permute_sparse_matrix(hbS, hbC, hbU); 
+            #print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix(hbS, hbC, hbU);  ");
+            #print("BD, em coined.py: U.toarray() = \n", U.toarray()) 
+            ##print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix,  hbU  = "); nbl.sparse_matrix_print(hbU); 
+            ##print("BD, em coined.py: U.indptr    = ", U.indptr) 
+            ##print("BD, em coined.py: U.indices   = ", U.indices) 
+            ##print("BD, em coined.py: U.data      = ", U.data) 
+            #print("BD, em _set_evolution, exit() ");  exit()
 
         self._evolution = U
         return U
@@ -913,6 +1062,7 @@ class Coined(QuantumWalk):
         .. [1] R. Portugal. "Quantum walks and search algorithms",
             2nd edition, Springer, 2018.
         """
+        import time
 
         S_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
@@ -924,10 +1074,24 @@ class Coined(QuantumWalk):
                               kwargs,
                               Coined._valid_kwargs['marked'])
 
+
+        inicioS = time.perf_counter()
         self._set_shift(**S_kwargs)
+        fimS    = time.perf_counter()
+        inicioC = time.perf_counter()
         self._set_coin(**C_kwargs)
+        fimC    = time.perf_counter()
+        inicioM = time.perf_counter()
         self._set_marked(**R_kwargs)
+        fimM    = time.perf_counter()
+        inicioE = time.perf_counter()
         self._set_evolution()
+        fimE    = time.perf_counter()
+
+        print(f"_set_shift     : Tempo decorrido: {fimS - inicioS:.6f} segundos")
+        print(f"_set_coin      : Tempo decorrido: {fimC - inicioC:.6f} segundos")
+        print(f"_set_marked    : Tempo decorrido: {fimM - inicioM:.6f} segundos")
+        print(f"_set_evolution : Tempo decorrido: {fimE - inicioE:.6f} segundos")
 
     def probability_distribution(self, states):
         r"""
@@ -1062,6 +1226,7 @@ class Coined(QuantumWalk):
         >>> np.all(psi1 == psi2)
         np.True_
         """
+        print("em coined.py: def state") 
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
@@ -1073,6 +1238,7 @@ class Coined(QuantumWalk):
         for ampl, arc in entries:
             state[self._graph.arc_number(arc)] = ampl
 
+        print("em coined.py: def state, return") 
         return self._normalize(state)
 
     def ket(self, arc):

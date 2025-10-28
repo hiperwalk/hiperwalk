@@ -7,14 +7,15 @@ import time
 import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 
-myOption="cpu"
 myOption=None
+myOption="cpu"
 hpw.set_hpc(myOption)
 print("A, get_hpc()=", hpw.get_hpc() )
 
 
-dim = 3 + 1 -1 -0; start=1; end=start+1; step=1 #10*300//1-1
-dim = 16 + 6 - 4; start=1; end=start+20*10; step=1 #10*300//1-1
+dim = 16 + 6 - 4; start=1; end=start+1; step=1 #10*300//1-1
+dim = 16 + 6 - 4 -3 ; start=1; end=start+5*20*10; step=1 #10*300//1-1
+dim = 3 + 1 -1 -0; start=1; end=start+1+4; step=1 #10*300//1-1
 aRange=(start,end,step)
 
 print(f"graph=hpw.Hypercube({dim}),  aRange = {aRange}, get_hpc() = { hpw.get_hpc()}" )
@@ -24,7 +25,7 @@ g = hpw.Hypercube(dim)
 fimG = time.perf_counter()
 print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos")
 inicioC = time.perf_counter()
-qw = hpw.Coined(g)
+qw = hpw.Coined(g, coin="G")
 fimC = time.perf_counter()
 print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos")
 print("B, get_hpc()=", hpw.get_hpc() ); 

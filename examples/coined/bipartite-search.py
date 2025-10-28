@@ -2,7 +2,9 @@ import hiperwalk as hpw
 import numpy as np
 
 num_vert1 = 73
+num_vert1 = 1
 num_vert2 = 42
+num_vert2 = 2
 num_vert = num_vert1 + num_vert2
 g = hpw.CompleteBipartite(num_vert1, num_vert2)
 

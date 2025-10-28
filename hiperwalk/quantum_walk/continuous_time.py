@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
-from . import _pyneblina_interface as nbl
+from . import _pyhiperblas_interface as nbl
 
 class ContinuousTime(QuantumWalk):
     r"""
@@ -438,6 +438,7 @@ class ContinuousTime(QuantumWalk):
         If this method is invoked,
         the evolution is recalculated
         """
+        #from . import _pyhiperblas_interface as nbl #BD
         time = self._time
 
         if time == 0:
