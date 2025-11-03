@@ -3,9 +3,10 @@ export PYTHONUNBUFFERED=1
 export LD_LIBRARY_PATH=/home/bidu/hiperblas/lib:$LD_LIBRARY_PATH
 export LD_LIBRARY_PATH=$HOME/hiperblas/lib:$LD_LIBRARY_PATH
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-comandoA="(cd $relativeDir/hiperblas-core/;. ./instalarHB.sh)"; echo $comando;
+comandoA="(cd $relativeDir/hiperblas-core;. ./instalarHB.sh)"; echo $comando;
 eval $comandoA
-comandoB="(cd $relativeDir/pyhiperblas/; ./instalarPyHB.sh $PWD)"; echo $comando;
+comandoB="(cd $relativeDir/pyhiperblas; ./instalarPyHB.sh $PWD)"; echo $comando;
+comandoB="(cd $relativeDir/pyhiperblas; python3 -m pip install --user -e --break-system-packages --no-deps --no-cache )"
 eval $comandoB
 comandoC="(cd $relativeDir; pip install -e .  --break-system-packages)"; echo $comando;
 eval $comandoC
