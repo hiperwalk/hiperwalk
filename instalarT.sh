@@ -12,4 +12,4 @@ comandoC="(cd $relativeDir; pip install -e .  --break-system-packages)"; echo $c
 eval $comandoC
 comandoD="(cd $relativeDir; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/diagonal-grid.py 2>&1) " ; echo $comando
 comandoD="(cd $relativeDir; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/hyperblasCPLX.py 2>&1) " ; echo $comando
-eval $comandoD
+#eval $comandoD
