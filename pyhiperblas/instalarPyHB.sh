@@ -17,7 +17,7 @@ hwD=${HOME}/OneDrive/aLncc/passeiosQuantOut25/pyhiperblas
 hwD=/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25/pyhiperblas
 hwD=${HOME}/OneDrive/aLncc/passeiosQuantOut25A/pyhiperblas
 hwD=/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/pyhiperblas
-hwD=${1:"."}
+hwD=${1:-"."}
 #cd $HOME/OneDrive/aLncc/passeiosQuantSet25/pyhiperblas
 (
 cd $hwD
