@@ -16,8 +16,8 @@ dim = 16 + 6 - 4 - 4 - 4 - 4 ; start=1; end=start+5; step=1 #10*300//1-1
 dim = 16 + 6 - 00; start=1; end=start+5; step=1 #10*300//1-1
 dim = 3 + 9 +6 +1; start=1; end=start+1+1-0; step=1 #10*300//1-1
 dim = 16 + 6 - 4 - 4 ; start=1; end=start+5*20*10; step=1 #10*300//1-1
-dim = 5 ; start=1; end=start+1+1-0; step=1 #10*300//1-1
 dim = 16 + 6 - 4 - 2  ; start=1; end=start+2000; step=1 #10*300//1-1
+dim = 5 ; start=1; end=start+1+1-0; step=1 #10*300//1-1
 aRange=(start,end,step)
 
 grafo="G" # Grover  para Real

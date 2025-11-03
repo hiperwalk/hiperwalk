@@ -10,12 +10,9 @@ myOption="cpu"
 hpw.set_hpc(myOption) 
 print("\nA, get_hpc()=", hpw.get_hpc() )
 
-dim = 32*5*2*2*2
-dim = 3*1
-
 step=1
-start=1; end=start+5+10000; #step=1 #10*300//1-1
-start=1; end=start+1+1; #step=1 #10*300//1-1
+dim = 32*5*2*2*2; start=1; end=start+5+10000; #step=1 #10*300//1-1
+dim = 3*1; start=1; end=start+1+1; #step=1 #10*300//1-1
 aRange=(start,end,step)
 
 grid = hpw.Grid(dim, diagonal=True, periodic=True)
@@ -69,7 +66,6 @@ itemsize = indices.itemsize
 print(f"Endereço base de U.indices (U.indices[0]): {hex(addr_base)}")
 for i in range(min(2, indices.size)):  # mostra os dois primeiros
     print(f"&U.indices[{i}] = {hex(addr_base + i * itemsize)}")
-
 
 print('--------- TIPOS VETORES INTERNOS CSR ---------------------')
 print(type(U.indptr[0]))
