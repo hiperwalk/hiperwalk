@@ -1,0 +1,24 @@
+https://hiperwalk.org/docs/stable/install/
+
+em pyhiperblas:
+
+o codigo setup.py informacoes sobre a biblioteca neblina
+ contem o diretorio onde esta o arquivo: 
+        library_dirs = ['/home/bidu/libs/lib'],
+ contem o diretorio onde estao os arquivos de cabeçalho: 
+        include_dirs = ['/home/bidu/libs/include',numpy.get_include()],
+ contem o arquivo de ligacao do python com a libneblina-cpu-bridge.so
+        sources = ['neblina_wrapper.c'])      
+
+sudo python3 setup.py install
+
+python3 test.py
+
+(cd ../hiperblas-core/; vi src/neblina_std.c;\
+           . ../meuScripts/instalarHB_Core_Resumido.sh )
+# instala da biblioteca em: /home/bidu/libs/lib/libneblina-cpu-bridge.so,
+
+
+python3-config --cflags
+-I/usr/include/python3.12 -I/usr/include/python3.12  -fno-strict-overflow -Wsign-compare  -DNDEBUG -g -O2 -Wall
+

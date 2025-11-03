@@ -1,0 +1,11 @@
+/home/bidu/hiperblas/lib/libhiperblas-core.so
+/home/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so
+/home/bidu/hiperblas/include/hiperblas.h
+/home/bidu/hiperblas/include/hiperblas_list.h
+/home/bidu/hiperblas/include/hiperblas_std.h
+/home/bidu/hiperblas/include/hiperblas_vector.h
+/home/bidu/hiperblas/include/hiperblas_matrix.h
+/home/bidu/hiperblas/include/hiperblas_smatrix.h
+/home/bidu/hiperblas/include/hiperblas_complex.h
+/home/bidu/hiperblas/include/libhiperblas.h
+/home/bidu/hiperblas/include/bridge_api.h

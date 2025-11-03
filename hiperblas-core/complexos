@@ -1,0 +1,62 @@
+# Created by Octave 6.2.0, Sun Apr 04 18:38:38 2021 -03 <paulo@localhost.localdomain>
+# name: A
+# type: complex matrix
+# rows: 1
+# columns: 10
+ (3,3) (3,3) (3,3) (3,3) (3,3) (3,3) (3,3) (3,3) (3,3) (3,3)
+
+
+# name: AA
+# type: complex matrix
+# rows: 1
+# columns: 4
+ (1,1) (1,-1) (-1,1) (-1,-1)
+
+
+# name: B
+# type: complex matrix
+# rows: 1
+# columns: 10
+ (3,3) (3,3) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (0,0) (3,3)
+
+
+# name: BB
+# type: complex matrix
+# rows: 1
+# columns: 4
+ (3,-4) (6,-2) (1,2) (4,3)
+
+
+# name: C
+# type: complex matrix
+# rows: 1
+# columns: 10
+ (0,0) (3,3) (0,0) (0,0) (0,0) (3,3) (0,0) (0,0) (3,3) (0,0)
+
+
+# name: D
+# type: complex matrix
+# rows: 1
+# columns: 10
+ (0,0) (0,0) (3,3) (0,0) (3,3) (0,0) (0,0) (3,3) (0,0) (0,0)
+
+
+# name: E
+# type: complex matrix
+# rows: 1
+# columns: 10
+ (0,0) (3,3) (0,0) (3,3) (0,0) (0,0) (3,3) (0,0) (0,0) (0,0)
+
+
+# name: F
+# type: matrix
+# rows: 1
+# columns: 10
+ 0 0 0 0 0 0 0 0 0 0
+
+
+# name: ans
+# type: complex scalar
+(1,-5)
+
+

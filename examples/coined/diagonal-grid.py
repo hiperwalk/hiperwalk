@@ -5,13 +5,13 @@ import sys
 import time
 
 import hiperwalk as hpw
-myOption="cpu"
 myOption=None
+myOption="cpu"
 hpw.set_hpc(myOption) 
 print("\nA, get_hpc()=", hpw.get_hpc() )
 
-dim = 3*1
 dim = 32*5*2*2*2
+dim = 3*1
 
 step=1
 start=1; end=start+5+10000; #step=1 #10*300//1-1

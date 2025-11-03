@@ -154,6 +154,7 @@ def _send_sparse_matrix(M):
     
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)");
     # TODO: check if complex automatically?
+    print("M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
     is_complex = np.issubdtype(M.dtype, np.complexfloating)
     n = M.shape[0]
 
@@ -165,6 +166,9 @@ def _send_sparse_matrix(M):
     #   In addition, there should be a way to
     #   return the matrix and automatically
     #   convert to a matrix of float or of complex numbers accordingly.
+    print(f"BD, is_complex={is_complex}")
+    print(f"BD, hiperblas.COMPLEX={hiperblas.COMPLEX}")
+    print(f"BD, hiperblas.FLOAT={hiperblas.FLOAT}"); #exit()
     smat = (hiperblas.sparse_matrix_new(n, n, hiperblas.COMPLEX) if is_complex
             else hiperblas.sparse_matrix_new(n, n, hiperblas.FLOAT))
 
@@ -204,6 +208,7 @@ def _send_dense_matrix(M):
 
 def send_matrix(M):
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)")
+    print("BD, M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
     if scipy.sparse.issparse(M):
         s_matrix = _send_sparse_matrix(M)
         #hiperblas.print_smatrix(s_matrix); exit()
@@ -234,8 +239,9 @@ def sparse_matrix_print(nbl_mat):
 
 def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):
         print("BD1, em _pyHiperblas_interface.py: def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):")
+        #print("BD2, def permute_sparse_matrix, CALL hiperblas.permute_sparse_matrix(")
         hiperblas.permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU)
-        #print("BD3, em _pyHiperblas_interface.py: exit() = "); exit()
+        #print("BD3, :def permute_sparse_matrix, exit() = "); exit()
         
         #hiperblas.sparse_matrix_print(nbl_smatU);
         return

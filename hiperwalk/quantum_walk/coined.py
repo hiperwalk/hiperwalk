@@ -239,8 +239,10 @@ class Coined(QuantumWalk):
 
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
+         
         S = scipy.sparse.csr_array(
-            ( np.ones(num_arcs, dtype=np.float64),  # BDmodif
+            ( np.ones(num_arcs, dtype=np.complex128),  # BDmodif
+            #( np.ones(num_arcs, dtype=np.float64),  # BDmodif
             #( np.ones(num_arcs, dtype=np.int8),    # BDmodif 
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
@@ -806,7 +808,12 @@ class Coined(QuantumWalk):
         degree = self._graph.degree
         blocks = [self._coin_funcs[coin_list[v]](degree(v))
                   for v in range(num_vert)]
+        print("em def _coin_list_to_explicit_coin, blocks[0].dtype=",blocks[0].dtype)
         C = scipy.sparse.block_diag(blocks, format='csr')
+
+        C.indices = np.ascontiguousarray(C.indices, dtype=np.int64)
+        C.indptr  = np.ascontiguousarray(C.indptr,  dtype=np.int64)
+
         return scipy.sparse.csr_array(C)
 
     def get_coin(self):
@@ -872,8 +879,9 @@ class Coined(QuantumWalk):
 
         print("coin_list[:5]=",coin_list[:5])
 #        print("_coin_list_to_explicit_coin(coin_list)=",self._coin_list_to_explicit_coin(coin_list))
-        print("em get_coin(self), final ")
+        #print("em get_coin(self), final, coin_list[0].dtype = ", coin_list[0].dtype ); exit()
 
+        
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
@@ -898,32 +906,16 @@ class Coined(QuantumWalk):
         #if C.shape[0] <=16 : print(formatted); print()
         if nbl.get_hpc() is not None:
             from warnings import warn
-            warn('HPC sparse matrix multiplication is not implemented. '
-                 + 'Using standard scipy multiplication instead.')
+            warn('HPC sparse matrix multiplication implemented by HiperBlas. ')
+            #warn('HPC sparse matrix multiplication is not implemented. '
+            #     + 'Using standard scipy multiplication instead.')
             # # TODO: implement sparse matrix multiplication with hpc
             # S = S.todense()
             # C = C.todense()
 
-#        print("em _set_evolution, nbl.get_hpc() = ",nbl.get_hpc()); exit();
-        #    print("scipy.sparse.issparse(S)=", scipy.sparse.issparse(S)) ;
-        #    print("em _set_evolution, before nbl_S = nbl.send_matrix(S) ");
-        #    nbl_S = nbl.send_matrix(S)
-        #    print("em _set_evolution, after  nbl_S = nbl.send_matrix(S) ");
-        #    del S
-        #    print("scipy.sparse.issparse(S)=", scipy.sparse.issparse(C)) ;
-        #    print("em _set_evolution, before nbl_C = nbl.send_matrix(C) ");
-        #    nbl_C = nbl.send_matrix(C)
-        #    print("em _set_evolution, after  nbl_C = nbl.send_matrix(C) ");
-        #    exit()
-        #    del C
-        #    nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
-
-        #    del nbl_S
-
-        #    U = nbl.retrieve_matrix(nbl_C)
-        #    del nbl_C
-        #    U = scipy.sparse.csr_array(U)
-        
+        #S.indices = np.array([2, 5, 0, 7, 6, 1, 4, 3])
+        #S.indices = np.arange(len(S.indices))
+ 
         np.set_printoptions(linewidth=240) 
         print("type(S.indices)   = ", type(S.indices))
         print("S.indices.dtype   = ", S.indices.dtype)
@@ -934,7 +926,8 @@ class Coined(QuantumWalk):
         print("S.dtype           = ", S.dtype)
         print("S.data.dtype      = ", S.data.dtype)
         print("data contiguous   : ", S.data.flags['C_CONTIGUOUS'])
-        print("BD, em coined.py: S.indices    = ", S.indices) 
+        #print("BD, em _set_evolution, S.toarray()  =\n", S.toarray()); 
+        #print("BD, em coined.py: S.indices    = ", S.indices) 
         perm = S.indices 
 
         print("type(C.indices)   = ", type(C.indices))
@@ -946,6 +939,8 @@ class Coined(QuantumWalk):
         print("C.dtype           = ", C.dtype)
         print("C.data.dtype      = ", C.data.dtype)
         print("data contiguous   : ", C.data.flags['C_CONTIGUOUS'])
+        np.set_printoptions(precision=3, suppress=True)
+        #print("BD, em _set_evolution, C.toarray()  =\n", C.toarray()); 
 
         #U = C.copy()
 
@@ -960,7 +955,10 @@ class Coined(QuantumWalk):
             #S.indptr  = S.indptr.astype(np.int32)
             #S.data    = S.data.astype(np.float64)
             #print("BD, em _set_evolution, S.toarray()  = ", S.toarray()); 
+            ##print("S.dtype=",S.dtype, ", np.complexfloating=", np.complexfloating)
+            #exit()
             hbS = nbl.send_matrix(S)
+            ##print("BD, +++++ em _set_evolution, exit() =\n", exit()); 
             ##print("BD, em _set_evolution, hbS  = "); nbl.sparse_matrix_print(hbS); 
             ##print("BD, em coined.py: S.indptr    = ", S.indptr) 
             ##print("BD, em coined.py: S.indices   = ", S.indices) 
@@ -969,7 +967,6 @@ class Coined(QuantumWalk):
             #C.indices = C.indices.astype(np.int32)
             #C.indptr  = C.indptr.astype(np.int32)
             #C.data  = C.data.astype(np.float64)
-            #print("BD, em _set_evolution, C.toarray()  = ", C.toarray()); 
             hbC = nbl.send_matrix(C)
             ##print("BD, em _set_evolution, hbC  = "); nbl.sparse_matrix_print(hbC); 
             ##print("BD, em coined.py: C.indptr    = ", C.indptr) 
@@ -984,18 +981,21 @@ class Coined(QuantumWalk):
 
             U = C.copy()
             hbU = nbl.send_matrix(U)
-            print("BD, em _set_evolution, computeU, nbl.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); nbl.sparse_matrix_print(hbU); 
+            ##print("BD, em _set_evolution, computeU, nbl.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); nbl.sparse_matrix_print(hbU); 
             nbl.permute_sparse_matrix(hbS, hbC, hbU); 
-            #print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix(hbS, hbC, hbU);  ");
-            #print("BD, em coined.py: U.toarray() = \n", U.toarray()) 
-            ##print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix,  hbU  = "); nbl.sparse_matrix_print(hbU); 
+        #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix(hbS, hbC, hbU);  ");
+        #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix,  hbU  = "); nbl.sparse_matrix_print(hbU); 
             ##print("BD, em coined.py: U.indptr    = ", U.indptr) 
             ##print("BD, em coined.py: U.indices   = ", U.indices) 
             ##print("BD, em coined.py: U.data      = ", U.data) 
             #print("BD, em _set_evolution, exit() ");  exit()
 
+        #np.set_printoptions(precision=3, suppress=True)
+        #print("BD, em _set_evolution, U.toarray()  =\n", U.toarray()); 
+        #print("BD, em _set_evolution, exit() =\n", exit()); 
         self._evolution = U
-        return U
+        print("BD, em _set_evolution, RETURN "); return
+        return # U
 
     def set_evolution(self, **kwargs):
         """
@@ -1078,20 +1078,20 @@ class Coined(QuantumWalk):
         inicioS = time.perf_counter()
         self._set_shift(**S_kwargs)
         fimS    = time.perf_counter()
+        print(f"_set_shift     : Tempo decorrido: {fimS - inicioS:.6f} segundos")
         inicioC = time.perf_counter()
         self._set_coin(**C_kwargs)
         fimC    = time.perf_counter()
+        print(f"_set_coin      : Tempo decorrido: {fimC - inicioC:.6f} segundos")
         inicioM = time.perf_counter()
         self._set_marked(**R_kwargs)
         fimM    = time.perf_counter()
+        print(f"_set_marked    : Tempo decorrido: {fimM - inicioM:.6f} segundos")
         inicioE = time.perf_counter()
         self._set_evolution()
         fimE    = time.perf_counter()
-
-        print(f"_set_shift     : Tempo decorrido: {fimS - inicioS:.6f} segundos")
-        print(f"_set_coin      : Tempo decorrido: {fimC - inicioC:.6f} segundos")
-        print(f"_set_marked    : Tempo decorrido: {fimM - inicioM:.6f} segundos")
         print(f"_set_evolution : Tempo decorrido: {fimE - inicioE:.6f} segundos")
+        return
 
     def probability_distribution(self, states):
         r"""

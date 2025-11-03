@@ -459,13 +459,14 @@ class QuantumWalk(ABC):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
         np.set_printoptions(linewidth=120) 
 
-        self._simul_mat = self._evolution
-        self._simul_vec = state
 
         if hpc is not None:
             self._simul_vec = nbl.send_vector(state)
             self._simul_mat = nbl.send_matrix(self._evolution)
-            #print("em def _prepare_engine, return, exit()"); exit()
+        else:
+            self._simul_mat = self._evolution
+            self._simul_vec = state
+        #print("em def _prepare_engine, return, exit()"); exit()
         return
 
 
@@ -612,6 +613,8 @@ class QuantumWalk(ABC):
         the initial state (t=0), intermediate states (t=3, 6, and 9),
         and the concluding state (t=12).
         """
+        import time
+        import sys
         # from . import _pyhiperblas_interface as nbl #BD
         print("BD, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate")
         ############################################
@@ -667,6 +670,7 @@ class QuantumWalk(ABC):
         #########################################################
 
         self._prepare_engine(state, hpc);
+        np.set_printoptions(precision=3, suppress=True)
         print(f"BD, em simulate, initial state, state=", state, end=";  ");
         print("state.l2Norm=", np.linalg.norm(state)); 
 
@@ -686,6 +690,7 @@ class QuantumWalk(ABC):
         if start > 0:
             self._simulate_step(start - step, hpc)
 
+        inicioS = time.perf_counter()
         while state_index < num_states+0:
             print("BD, em def simulate,                     state_index = ", state_index) 
             self._simulate_step(step, hpc)
@@ -693,13 +698,12 @@ class QuantumWalk(ABC):
             state_index += 1
             if  nbl.get_hpc() == 'cpu' :
                 nbl.print_vectorT_py_inter(self._simul_vec)
-                #print("BD, em def simulate, exit()"); exit()
-
             else:
+                np.set_printoptions(precision=3, suppress=True)
                 print("self._simul_vec=", self._simul_vec, end=";  "); print("self._simul_vec.l2Norm=", np.linalg.norm(self._simul_vec)); 
-            #print("em quantum_walk.py: simulate,  exit()"); exit()
-#
         # TODO: free vector from hiperblas core
+        fimS    = time.perf_counter()
+        print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
         self._simul_mat = None
         self._simul_vec = None
 
