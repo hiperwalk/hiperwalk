@@ -16,8 +16,10 @@ dim = 16 + 6 - 4 - 4 - 4 - 4 ; start=1; end=start+5; step=1 #10*300//1-1
 dim = 16 + 6 - 00; start=1; end=start+5; step=1 #10*300//1-1
 dim = 3 + 9 +6 +1; start=1; end=start+1+1-0; step=1 #10*300//1-1
 dim = 16 + 6 - 4 - 4 ; start=1; end=start+5*20*10; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 2  ; start=1; end=start+2000; step=1 #10*300//1-1
-dim = 5 ; start=1; end=start+1+1-0; step=1 #10*300//1-1
+dim = 16 + 6 - 4 - 2  ; start=1; end=start+5; step=1 #10*300//1-1
+dim = 16 + 6 - 4 - 2  ; start=1; end=start+1000; step=1 #10*300//1-1
+dim = 16 + 6 - 4 - 2 - 9  ; start=1; end=start+5; step=1 #10*300//1-1
+dim = 3 ; start=1; end=start+1+3-0; step=1 #10*300//1-1
 aRange=(start,end,step)
 
 grafo="G" # Grover  para Real
@@ -26,8 +28,11 @@ grafo="F" # Fourier para Complex
 from warnings import warn
 def main():
 
+    algebra="SciPy"
+    if  hpw.get_hpc() == 'hpc' :
+        algebra="HiperBlas"
     hpw.set_hpc(myOption)
-    print(f"graph=hpw.Hypercube({dim}),  aRange = {aRange}, get_hpc() = { hpw.get_hpc()}" )
+    print(f"graph=hpw.Hypercube({dim}),  aRange = {aRange}, {algebra}" )
 
     inicioG = time.perf_counter()
     g = hpw.Hypercube(dim)
@@ -55,11 +60,12 @@ def main():
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
 
     print('\n\n\n')
-    print(len(states))
+    #print(len(states))
+    return
     probs = qw.probability_distribution(states)
 
     #hpw.plot_probability_distribution(probs, graph=g)
-    print(probs)
+    #print(probs)
     #plt.savefig("grafico.png")
 
 main()

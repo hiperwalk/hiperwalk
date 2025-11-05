@@ -298,16 +298,17 @@ static PyObject* py_vec_add(PyObject* self, PyObject* args) {
     return po;
 }
 
-static PyObject* py_matvec_mul(PyObject* self, PyObject* args) {
+static void* py_matvec_mul(PyObject* self, PyObject* args) {
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_matvec_mul(PyObject* self, ... \n");
-    PyObject* a = NULL; PyObject* b = NULL;
-    if(!PyArg_ParseTuple(args, "OO:py_matvec_mul", &a, &b)) return NULL;
-    vector_t * vec_a = (vector_t *)PyCapsule_GetPointer(a, "py_vector_new");
-    matrix_t * mat_b = (matrix_t *)PyCapsule_GetPointer(b, "py_matrix_new");
-    object_t ** in = convertToObject3(vec_a, mat_b);
-    vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
-    PyObject* po = PyCapsule_New((void*)r, "py_vector_new", py_vector_delete);
-    return po;
+    PyObject* M = NULL; PyObject* vI = NULL; PyObject* vO = NULL;
+    if(!PyArg_ParseTuple(args, "OOO:py_matvec_mul", &M, &vI, &vO)) return NULL;
+    matrix_t * mat_M = (matrix_t *)PyCapsule_GetPointer(M,  "py_matrix_new");
+    vector_t * vec_I = (vector_t *)PyCapsule_GetPointer(vI, "py_vector_new");
+    vector_t * vec_O = (vector_t *)PyCapsule_GetPointer(vO, "py_vector_new");
+    object_t ** in = convertToObject3BD(mat_M, vec_I, vec_O);
+    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
+//vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
+    Py_RETURN_NONE;
 }
 
 // Destrutor do PyCapsule
@@ -337,22 +338,35 @@ static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
     //printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: py_permute_sparse_matrix, AFTER permuteSparseMatrix; CALL print_smatrix(hb_smatU); \n"); print_smatrix(hb_smatU);// exit(128+22);
     //printf("BD, em py_permute_sparse_matrix: exit()"); exit(128+14);
     Py_RETURN_NONE;
-    //PyObject* po_smat_U = PyCapsule_New((void*) hb_smatU, "py_permute_sparse_matrix", py_sparse_matrix_delete);
-    //printf("BD, em py_permute_sparse_matrix, return po\n");
-    //return po_smat_U;
 }
 
-static PyObject* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
+static void* py_sparse_matvec_mulBD(PyObject* self, PyObject* args) {
+    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mulBD(PyObject* self, ... \n");
+    PyObject* m = NULL; PyObject* vIn = NULL;  PyObject* vOut = NULL;
+    if(!PyArg_ParseTuple(args, "OOO:py_sparse_matvec_mul", &m, &vIn, &vOut)) return NULL;
+    smatrix_t * aSmat = (smatrix_t *)PyCapsule_GetPointer(m, "py_sparse_matrix_new");
+    vector_t  * vec_In  = (vector_t  *)PyCapsule_GetPointer(vIn, "py_vector_new");
+    vector_t  * vec_Out  = (vector_t  *)PyCapsule_GetPointer(vOut, "py_vector_new");
+    object_t ** in = convertToObject4BD(aSmat, vec_In, vec_Out );
+    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
+    Py_RETURN_NONE;
+}
+
+/*
+static void* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... \n");
     PyObject* a = NULL; PyObject* b = NULL;
     if(!PyArg_ParseTuple(args, "OO:py_sparse_matvec_mul", &a, &b)) return NULL;
     vector_t  * vec_a  = (vector_t  *)PyCapsule_GetPointer(a, "py_vector_new");
     smatrix_t * smat_b = (smatrix_t *)PyCapsule_GetPointer(b, "py_sparse_matrix_new");
     object_t ** in = convertToObject4(vec_a, smat_b);
-    vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
-    PyObject* po = PyCapsule_New((void*)r, "py_vector_new", py_vector_delete);
-    return po;
+    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
+   // vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
+   // PyObject* po = PyCapsule_New((void*)r, "py_vector_new", py_vector_delete);
+  //  return po;
+    Py_RETURN_NONE;
 }
+*/
 
 
 static PyObject* py_vec_prod(PyObject* self, PyObject* args) {
@@ -988,7 +1002,8 @@ static PyObject* get_complex_constant(PyObject* self, PyObject* args)
 static PyMethodDef mainMethods[] = {
     {"init_engine", py_init_engine, METH_VARARGS, "init_engine"},
     {"stop_engine", py_stop_engine, METH_VARARGS, "stop_engine"},
-    {"vector_new", py_vector_new, METH_VARARGS, "vector_new"},
+    {"vector_new",  py_vector_new, METH_VARARGS, "vector_new"},
+    {"vector_delete", py_vector_delete, METH_VARARGS, " desallocate memory alocatted by calloc"},
     {"load_numpy_array", py_load_numpy_array, METH_VARARGS, "load_numpy_array"},
     {"retrieve_numpy_array", py_retrieve_numpy_array, METH_VARARGS, "retrieve_numpy_array"},
     {"vector_set", py_vector_set, METH_VARARGS, "vector_set"},
@@ -1008,12 +1023,12 @@ static PyMethodDef mainMethods[] = {
     {"sparse_matrix_new", py_sparse_matrix_new, METH_VARARGS, "sparse_matrix_new"},
     {"sparse_new", py_matrix_new, METH_VARARGS, "sparse_new"},
     {"smatrixConnect", py_smatrixConnect, METH_VARARGS, "smatrixConnect"},
-    // BD {"load_numpy_smatrix", py_load_numpy_smatrix, METH_VARARGS, "load_numpy_smatrix"},
     {"sparse_matrix_set", py_sparse_matrix_set, METH_VARARGS, "sparse_matrix_set"},
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},
     {"move_sparse_matrix_device", py_move_sparse_matrix_device, METH_VARARGS, "move_sparse_matrix_device"},
     {"move_sparse_matrix_host", py_move_sparse_matrix_host, METH_VARARGS, "move_sparse_matrix_host"},
-    {"sparse_matvec_mul", py_sparse_matvec_mul, METH_VARARGS, "sparse_matvec_mul"},
+    //{"sparse_matvec_mul", py_sparse_matvec_mul, METH_VARARGS, "sparse_matvec_mul"},
+    {"sparse_matvec_mulBD", py_sparse_matvec_mulBD, METH_VARARGS, "sparse_matvec_mul por bidu"},
     {"sparse_matrix_print", py_sparse_matrix_print, METH_VARARGS, "sparse_matrix_print"}, //BD
     {"print_vectorT",       py_print_vectorT,       METH_VARARGS, "print_vectorT"},
     {"vec_add", py_vec_add, METH_VARARGS, "vec_add"},
@@ -1055,8 +1070,6 @@ PyMODINIT_FUNC PyInit_hiperblas(void) {
     PyModule_AddObject(module, "GPU",     gpu_constant);
     PyModule_AddObject(module, "FLOAT",   float_constant);
     PyModule_AddObject(module, "COMPLEX", complex_constant);
-
-
     import_array();
     return module;
 }

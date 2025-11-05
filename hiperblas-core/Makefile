@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/hiperblas-core
+CMAKE_SOURCE_DIR = /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/hiperblas-core
+CMAKE_BINARY_DIR = /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -142,9 +142,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/hiperblas-core/CMakeFiles /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/hiperblas-core//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/CMakeFiles /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/hiperblas-core/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

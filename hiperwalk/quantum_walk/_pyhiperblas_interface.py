@@ -246,7 +246,7 @@ def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):
         #hiperblas.sparse_matrix_print(nbl_smatU);
         return
 
-def multiply_matrix_vector(nbl_mat, nbl_vec, is_sparse):
+def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
     """
     Request matrix multiplication to hiperblas.
 
@@ -273,12 +273,12 @@ def multiply_matrix_vector(nbl_mat, nbl_vec, is_sparse):
     print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector( .., is_sparse=",is_sparse)
     if is_sparse:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto ")
-        nbl_vec = hiperblas.sparse_matvec_mul(nbl_vec, nbl_mat)
+        hiperblas.sparse_matvec_mulBD(nbl_mat, nbl_vecIn, nbl_vecOut)
     else:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.matvec_mul, DENSA, para continuo ")
-        nbl_vec = hiperblas.matvec_mul(nbl_vec, nbl_mat)
+        nbl_vecOut = hiperblas.matvec_mul(nbl_vecIn, nbl_mat)
 
-    return nbl_vec
+    return 
 
 def multiply_matrices(nbl_A, nbl_B):
     return hiperblas.mat_mul(nbl_A, nbl_B)

@@ -17,7 +17,9 @@ extern "C" {
  void delete_object(object_t * in);
  object_t ** convertToObject(vector_t * a, vector_t * b);
  object_t ** convertToObject3(vector_t * a, matrix_t * b);
+ object_t ** convertToObject3BD(matrix_t * m, vector_t * vI, vector_t * vO);
  object_t ** convertToObject4(vector_t * a, smatrix_t * b);
+ object_t ** convertToObject4BD(smatrix_t * m, vector_t * vI, vector_t * vO);
  object_t ** convertToObject2(int n, vector_t * a);
  object_t ** convertMatMatToObject(matrix_t * a, matrix_t * b);
  object_t ** convertScaVecToObject(double s, vector_t * a);
@@ -53,6 +55,7 @@ extern "C" {
  void ** matvec_mul1    ( void ** i, int * status );
  void ** matvec_mul2    ( void ** i, int * status );
  void ** matvec_mul3    ( bridge_manager_t *m, int index, void ** i, int * status );
+ void  matvec_mul3BD    ( bridge_manager_t *m, int index, void ** i, int * status );
 
  void ** vec_sub_cpu    ( void ** i, int * status );
  void ** vec_add_cpu    ( void ** i, int * status );

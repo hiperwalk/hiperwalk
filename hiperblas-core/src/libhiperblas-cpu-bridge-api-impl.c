@@ -343,10 +343,7 @@ void matSquare( void* * outLin, void* * idxOutLin,
     // return (void *)NULL;
 }
 
-void* matVecMul3(  double* mat, double* vec, int ncols, int nrows ) {
-    
-    double * out = (double *) malloc( nrows * sizeof(double) );
-    
+void matVecMul3BD(  double* mat, double* vecIn, double* vecOut, int ncols, int nrows ) {
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
         double sum = 0;
@@ -356,7 +353,27 @@ void* matVecMul3(  double* mat, double* vec, int ncols, int nrows ) {
             double v2;
             int idx1 = matrix_get_real_index(ncols, i, j);
             v1 = mat[idx1];
-            v2 = vec[j];
+            v2 = vecIn[j];
+            sum += v1 * v2;
+        }
+            int idx_out = i; //matrix_get_real_index(ncols, i, j);
+            vecOut[idx_out] = sum;
+    }
+    return ;    
+}
+
+void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
+    double * out = (double *) malloc( nrows * sizeof(double) );
+    #pragma omp parallel for
+    for (int i=0; i<nrows; i++) {
+        double sum = 0;
+        #pragma omp unroll
+        for(int j=0; j < ncols; j++) {
+            double v1;
+            double v2;
+            int idx1 = matrix_get_real_index(ncols, i, j);
+            v1 = mat[idx1];
+            v2 = vecIn[j];
             sum += v1 * v2;
         }
             int idx_out = i; //matrix_get_real_index(ncols, i, j);
@@ -447,47 +464,20 @@ void* 00sparseComplexVecMul(void* mDev, void* idxCol, void* vDev, int nrows, int
 
 
 //[Hiago] 
-void* sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
+void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
     printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseVecMul(void* v, ...  {\n");
-    if (!v) {
-        fprintf(stderr, "Error: Input vector (v) is NULL in sparseVecMul.\n");
-        return NULL;
-    }
-    if (!m_values) {
-        fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n");
-        return NULL;
-    }
-    if (!m_row_ptr) {
-        fprintf(stderr, "Error: Row pointer array (m_row_ptr) is NULL in sparseVecMul.\n");
-        return NULL;
-    }
-    if (!m_col_idx) {
-        fprintf(stderr, "Error: Column index array (m_col_idx) is NULL in sparseVecMul.\n");
-        return NULL;
-    }
+    if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
+    if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
+    if (!m_values) { fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n"); return ; }
+    if (!m_row_ptr) { fprintf(stderr, "Error: Row pointer array (m_row_ptr) is NULL in sparseVecMul.\n"); return ; }
+    if (!m_col_idx) { fprintf(stderr, "Error: Column index array (m_col_idx) is NULL in sparseVecMul.\n"); return ; }
     
-    double* vec_out = (double*)malloc(m_nrows * sizeof(double));
-    if (!vec_out) {
-        fprintf(stderr, "Error: Memory allocation failed for vec_out.\n");
-        return NULL;
-    }
+    double* vec_in  = (double*)vecIn_;
+    double* vec_out = (double*)vecOut_;
 
-    double* vec_in = (double*)v;
     long long int* row_ptr   = (long long int*)m_row_ptr;
     long long int* col_idx   = (long long int*)m_col_idx;
-    //int* row_ptr   = (int*)m_row_ptr;  (long long int*)m_row_ptr;
-    //int* col_idx   = (int*)m_col_idx;  (long long int*)m_col_idx;
     double* values = (double*)m_values;
-    //printf(" linhas :" ); for (int row = 0; row < m_nrows+1; row++) { printf(" %lld, ", row_ptr[row] ); } printf("\n");
-    
-/*
-        if (row_ptr[row] < 0 || row_ptr[row + 1] > nnz) {
-            fprintf(stderr, "Error: row_ptr out of bounds at row %d.\n", row);
-            free(vec_out) ; exit(2222); //BD
-            //return NULL; // it is invalid with openmp
-        }
-	*/
-
     #pragma omp parallel for
     for (int row = 0; row < m_nrows; row++) {
         double sum = 0.0;
@@ -503,38 +493,35 @@ void* sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, in
     }
     //printf("BD, em final de sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {\n");
     //  printf("\n%s, linha %d \n", __FILE__, __LINE__ ); exit(128+13);
-    
-    /* 
-    if(m_nrows<10) { printf("[ "); for (int row = 0; row < m_nrows; row++) { printf("%8.4f ", vec_out[row]); }  printf(" ]\n"); }
-	    */
-    return (void*) vec_out;
+    return ;
 }
 
-void* sparseComplexVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
+void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
     printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseComplexVecMul(void* v, ...  {\n");
-    if (!v) {
-        fprintf(stderr, "Error: Input vector (v) is NULL in sparseVecMul.\n");
-        return NULL;
-    }
+    if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
+    if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
+
     if (!m_values) {
         fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n");
-        return NULL;
+        return ;
     }
     if (!m_row_ptr) {
         fprintf(stderr, "Error: Row pointer array (m_row_ptr) is NULL in sparseVecMul.\n");
-        return NULL;
+        return ;
     }
     if (!m_col_idx) {
         fprintf(stderr, "Error: Column index array (m_col_idx) is NULL in sparseVecMul.\n");
-        return NULL;
+        return ;
     }
-    
+   /* 
     double* vec_out = (double*)malloc(2 * m_nrows * sizeof(double));
     if (!vec_out) {
         fprintf(stderr, "Error: Memory allocation failed for vec_out.\n");
         return NULL;
     }
-    double* vec_in = (double*)v; // Real and imaginary parts are stored separately
+    */
+    double* vec_in = (double*)vecIn_; // Real and imaginary parts are stored separately
+    double* vec_Out = (double*)vecOut_; // Real and imaginary parts are stored separately
     long long int* row_ptr = (long long int*)m_row_ptr;
     long long int* col_idx = (long long int*)m_col_idx;
     double* values = (double*)m_values; // Store real and imaginary parts separately
@@ -562,8 +549,8 @@ void* sparseComplexVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_
                 aSum += aP; bSum += bP;
                 k++;
             }
-            vec_out[2 * row]     = aSum;
-            vec_out[2 * row + 1] = bSum;
+            vec_Out[2 * row]     = aSum;
+            vec_Out[2 * row + 1] = bSum;
   //      printf("BD,                vec_outR[%2d]          =  %8.4f\n", row, aSum);
    //     printf("BD,                vec_outI[%2d]          =  %8.4f\n", row, bSum);
         }
@@ -573,7 +560,7 @@ void* sparseComplexVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_
     //exit(128+33);
     //free(vec_in);
     //vec_in=vec_out;
-    return (void*) vec_out;
+    return; 
 }
 
 void* matVecMul3Complex(  double* mat, double* vec, int ncols, int nrows ) {

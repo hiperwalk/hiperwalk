@@ -99,7 +99,9 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     object_t ** in = convertToObject4(a, b);
 
     //printf("BD, em TEST_F, before call matvec_mul3\n");
-    r = (vector_t *) matvec_mul3(&m, idx, (void **) in, NULL);
+    //r = (vector_t *) matvec_mul3BD(&m, idx, (void **) in, NULL);
+    matvec_mul3BD(&m, idx, (void **) in, NULL);
+    r = (vector_t *) in[2];
     m.bridges[idx].vecreqhost(r);
     printf("BD, em TEST_F, after  call matvec_mul3\n");
     m.bridges[idx].print_vectorT_f(r);

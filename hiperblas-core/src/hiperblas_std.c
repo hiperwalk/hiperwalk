@@ -125,6 +125,21 @@ object_t ** convertToObject(vector_t * a, vector_t * b) {
     return in;
  }
 
+object_t ** convertToObject3BD(matrix_t * m, vector_t * a, vector_t * b) {
+    object_t ** in;
+    in = (object_t **) malloc(3 * sizeof(object_t *));
+
+    in[0] = (object_t *) malloc(sizeof(object_t));
+    vvalue( *in[0] ) = m; in[0]->type = T_MATRIX;
+
+    in[1] = (object_t *) malloc(sizeof(object_t));
+    vvalue( *in[1] ) = a; in[1]->type = T_VECTOR;
+
+    in[2] = (object_t *) malloc(sizeof(object_t));
+    vvalue( *in[2] ) = b; in[2]->type = T_VECTOR;
+    return in;
+ }
+
 object_t ** convertToObject3(vector_t * a, matrix_t * b) {
     object_t ** in;
      if (b != NULL) {
@@ -203,18 +218,29 @@ object_t ** BD00convertToObject4(vector_t * a, smatrix_t * b) {
     return in;
  }
 
+object_t ** convertToObject4BD(smatrix_t * m, vector_t * vI, vector_t * vO){
+	//by bidu@lncc.br in nov.2025
+    object_t ** in = (object_t **) malloc(3 * sizeof(object_t *));
+    in[0] = (object_t *) malloc(sizeof(object_t));
+    in[0]->type = T_SMATRIX;
+    vvalue( *in[0] ) = m; 
+    in[1] = (object_t *) malloc(sizeof(object_t));
+    in[1]->type = T_VECTOR;
+    vvalue( *in[1] ) = vI; 
+    in[2] = (object_t *) malloc(sizeof(object_t));
+    in[2]->type = T_VECTOR;
+    vvalue( *in[2] ) = vO; 
+    return in;
+ }
 object_t ** convertToObject4(vector_t * a, smatrix_t * b) {
 	//by bidu@lncc.br in set.2025
     object_t ** in = (object_t **) malloc(2 * sizeof(object_t *));
-
     in[0] = (object_t *) malloc(sizeof(object_t));
     in[0]->type = T_VECTOR;
     vvalue( *in[0] ) = a; 
-
     in[1] = (object_t *) malloc(sizeof(object_t));
     in[1]->type = T_SMATRIX;
     vvalue( *in[1] ) = b; 
-
     return in;
  }
 
@@ -1254,7 +1280,8 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
     printf(" em computeU, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
-    if (S->type == T_COMPLEX && C->type == T_COMPLEX && U->type == T_COMPLEX) {
+    //if (S->type == T_COMPLEX && C->type == T_COMPLEX && U->type == T_COMPLEX) {
+    if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
             int permuted_row = S->col_idx[row]; // Since S is a permutation matrix
@@ -1268,7 +1295,8 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
                 U->values[2 * (startU + i) + 1] = C->values[2 * (startC + i) + 1];
             }
         }
-    } else if (S->type == T_FLOAT && C->type == T_FLOAT && U->type == T_FLOAT) {
+    //} else if (S->type == T_FLOAT && C->type == T_FLOAT && U->type == T_FLOAT) {
+    } else if (C->type == T_FLOAT ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
             int permuted_row = S->col_idx[row]; // Since A is a permutation matrix
@@ -1309,70 +1337,62 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
  
 }
 
- void ** matvec_mul3( bridge_manager_t *mg, int index, void ** i, int * status ) {
-   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3( bridge_manager_t *mg, int index, void ** i, int * status ) {\n");
+ void  matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
+   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {\n");
     
         object_t ** in = (object_t **) i;
-        vector_t * v = (vector_t *) vvalue( *in[0] );
-        printf("BD, em matvec_mul3: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
-        //printf("BD, em matvec_mul3: vetor de entrada, v, \n"); mg->bridges[index].print_vectorT_f(v);
-        //printf("BD, em matvec_mul3: vetor de entrada, v, \n"); print_vectorT_hiperblas_std(v);
-
-        vector_t * r;
+        vector_t * v = (vector_t *) vvalue( *in[1] );
+        printf("BD, em matvec_mul3BD: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
+        vector_t * r = (vector_t *) vvalue( *in[2] );
        
         //do I have to assume that it needs to be copied everytime?
 	//BD if (v->location != LOCDEV){mg->bridges[index].vecreqdev( v );}
         
-        if( type( *in[1] ) == T_MATRIX ) {        
-            matrix_t * m = (matrix_t *) vvalue( *in[1] );
+        if( type( *in[0] ) == T_MATRIX ) {        
+            matrix_t * m = (matrix_t *) vvalue( *in[0] );
             r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
             mg->bridges[index].vecreqdev( r );
             if (m->location != LOCDEV) {mg->bridges[index].matreqdev( m );}
 
             if(        m->type == T_FLOAT && v->type == T_FLOAT ) {
-                r->extra = (void*)mg->bridges[index].matVecMul3_f( m->extra, v->extra, m->ncol, m->nrow );
+                mg->bridges[index].matVecMul3_f( m->extra, v->extra, r->extra, m->ncol, m->nrow );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_FLOAT;
             } else if( m->type == T_COMPLEX && v->type == T_COMPLEX ) {
-                r->extra = (void*)mg->bridges[index].matVecMul3Complex_f( m->extra, v->extra, m->ncol, m->nrow );
+                //BD mg->bridges[index].matVecMul3Complex_f( m->extra, v->extra, r->extra, m->ncol, m->nrow );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_COMPLEX;
             }
             if (status != NULL) { *status = 0; }
-            return (void *) r;
+            return; // (void *) r;
 
-        } else  if( type( *in[1] ) == T_SMATRIX ) {
+        } else  if( type( *in[0] ) == T_SMATRIX ) {
             //printf(">\n");
-            smatrix_t * m = (smatrix_t *) vvalue( *in[1] );
-            r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
+            smatrix_t * m = (smatrix_t *) vvalue( *in[0] );
+           // r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
             mg->bridges[index].vecreqdev( r );
-//            printf("BD, em matvec_mul3, Before call smatreqdev( m ), m->location: %d\n", m->location);
+//            printf("BD, em matvec_mul3BD, Before call smatreqdev( m ), m->location: %d\n", m->location);
             if (m->location != LOCDEV) { mg->bridges[index].smatreqdev( m ); }
                     // m->values  volta em m->extra 
                     // m->col_idx volta em m->idxColMem, 
                     // m->crow_ptr não altera 
- //           printf("BD, em matvec_mul3, After  call smatreqdev( m ), m->location: %d\n", m->location);
+ //           printf("BD, em matvec_mul3BD, After  call smatreqdev( m ), m->location: %d\n", m->location);
 
             if(m->type == T_FLOAT && v->type == T_FLOAT ) {
-                //printf("BD, em matvec_mul3, Before call sparseVecMul_f \n");
                 // idxColMem é nome de variavel de do neblinaa, implementacao em abandono
-                r->extra = (void*)mg->bridges[index].sparseVecMul_f(v->extra, m->extra, m->row_ptr, m->idxColMem, m->nrow, m->nnz );
+                mg->bridges[index].sparseVecMul_f( v->extra, r->extra, m->extra, m->row_ptr, m->idxColMem, m->nrow, m->nnz );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_FLOAT;
-                //printf("BD, em hiperblas_std.c, matvec_mul3, After  CALL sparseVecMul_f \n");
-	            //printf("BD, em hiperblas_std.c, matvec_mul3: escrevendo vector_t de saida\n"); print_vectorT_hiperblas_std(r); 
-                //printf("BD, em hiperblas_std.c, matvec_mul3, exit(128+13)"); exit(128+13);
             } else if( m->type == T_COMPLEX && v->type == T_COMPLEX ) {
                 //printIdxColMem(m->idxColMem, m->nnz);
-                r->extra = (void*)mg->bridges[index].sparseComplexVecMul_f(v->extra, m->extra, m->row_ptr, m->idxColMem, m->nrow, m->nnz );
+                mg->bridges[index].sparseComplexVecMul_f( v->extra, r->extra, m->extra, m->row_ptr, m->idxColMem, m->nrow, m->nnz );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_COMPLEX;
             } else {
 		    // bloco vazio
             }
-	    //printf(" ainda em matvec_mul3, exit(2222) \n"); exit(2222);
 
             if (status != NULL) { *status = 0; }
-            printf("BD,   em matvec_mul3, RETURN (void *) r  \n");
-            return (void *) r;
+            printf("BD,   em matvec_mul3BD, RETURN (void *) r  \n");
+            return;
             
-        } else if(  type( *in[1] ) == T_RMATRIX ) {
+        } else if(  type( *in[0] ) == T_RMATRIX ) {
 //                rmatrix_t * m = (rmatrix_t *) vvalue( *in[1] );
 //                r->extra = (void*)rmatVecMul3Complex( m, v->extra, m->ncol, m->nrow );
 //                r->location = LOCDEV;
@@ -1386,10 +1406,10 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
 //                ret[0] = (void *) &out;
 //                return ret;
                   if (status != NULL) { *status = -1; }
-                  return (void **)NULL;   
+                  return;// (void **)NULL;   
         } else {
             if (status != NULL) { *status = -1; }
-            return (void **)NULL;   
+            return; // (void **)NULL;   
         }             
 }
 

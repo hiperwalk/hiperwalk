@@ -241,9 +241,9 @@ class Coined(QuantumWalk):
         # Note that there is only one entry per row and column
          
         S = scipy.sparse.csr_array(
-            ( np.ones(num_arcs, dtype=np.complex128),  # BDmodif
+            #( np.ones(num_arcs, dtype=np.complex128),  # BDmodif
             #( np.ones(num_arcs, dtype=np.float64),  # BDmodif
-            #( np.ones(num_arcs, dtype=np.int8),    # BDmodif 
+            ( np.ones(num_arcs, dtype=np.int8),    # BDmodif 
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )

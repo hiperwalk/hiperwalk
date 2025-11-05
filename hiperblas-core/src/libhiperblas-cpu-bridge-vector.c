@@ -28,7 +28,7 @@ vector_t * vector_new( int len, data_type type, int initialize, void * data ) {
 }
 
 void vector_delete( vector_t * v ) {
-    printf("BD, em %s: void vector_delete( vector_t * v ) {\n", __FILE_NAME__);
+    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE_NAME__);
     return;
     if (v != NULL) {
         if (v->value.f != NULL && v->externalData == 0) {

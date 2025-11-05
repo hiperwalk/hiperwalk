@@ -1,0 +1,1 @@
+/usr/bin/c++  -fopenmp CMakeFiles/sparse_matrix_test.dir/test/sparse_matrix_test.cpp.o -o sparse_matrix_test  -Wl,-rpath,/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core libhiperblas-core.so /usr/lib/x86_64-linux-gnu/libgtest.a /usr/lib/x86_64-linux-gnu/libgtest_main.a /usr/lib/x86_64-linux-gnu/libgtest.a 

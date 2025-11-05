@@ -15,6 +15,7 @@ hiperblas_module = Extension(
     libraries=['hiperblas-core', 'hiperblas-cpu-bridge'],  # inclui ambas
     include_dirs=[os.path.join(home, 'hiperblas/include'), numpy.get_include()],
     library_dirs=[os.path.join(home, 'hiperblas/lib')],
+    #extra_compile_args=["-g", "-O1", "-fsanitize=address", "-fno-omit-frame-pointer"], extra_link_args=["-fsanitize=address"],
     sources=['hiperblas_wrapper.c']
 )
 setup(

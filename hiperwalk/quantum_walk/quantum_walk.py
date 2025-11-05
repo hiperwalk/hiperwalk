@@ -7,6 +7,7 @@ from warnings import warn
 #from ..graph import Graph
 import scipy.optimize
 from . import _pyhiperblas_interface as nbl
+import hiperblas
 
 class QuantumWalk(ABC):
     """
@@ -457,16 +458,20 @@ class QuantumWalk(ABC):
 
     def _prepare_engine(self, state, hpc):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
-        np.set_printoptions(linewidth=120) 
-
-
+        np.set_printoptions(linewidth=220) 
         if hpc is not None:
-            self._simul_vec = nbl.send_vector(state)
-            self._simul_mat = nbl.send_matrix(self._evolution)
+            self._simul_vec_in  = nbl.send_vector(state)
+            self.v_out=state.copy();
+            self._simul_vec_out = nbl.send_vector(self.v_out)
+            self._simul_mat     = nbl.send_matrix(self._evolution)
         else:
-            self._simul_mat = self._evolution
-            self._simul_vec = state
-        #print("em def _prepare_engine, return, exit()"); exit()
+            #self._simul_vec_in  = np.asarray(state,        dtype=np.complex128)
+            #self._simul_vec_out = np.asarray(state.copy(), dtype=np.complex128)
+            #self._simul_vec_in  = np.asarray(state,        dtype=np.float64)
+            #self._simul_vec_out = np.asarray(state.copy(), dtype=np.float64)
+            self._simul_vec_in  = state
+            self._simul_vec_out = state.copy()
+            self._simul_mat     = self._evolution
         return
 
 
@@ -476,14 +481,7 @@ class QuantumWalk(ABC):
         to the simulation vector.
         Simulation vector is then updated.
         """
-        import ctypes
-        from ctypes import pythonapi, py_object, c_void_p, c_char_p
-
-        pythonapi.PyCapsule_GetPointer.restype = c_void_p
-        pythonapi.PyCapsule_GetPointer.argtypes = [py_object, c_char_p]
-
         print("BD, em def _simulate_step, step =", step)
-
         if hpc is not None:
             # TODO: request multiple multiplications at once
             #       to hiperblas-core
@@ -491,23 +489,13 @@ class QuantumWalk(ABC):
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
                 print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
-                #nbl.print_vectorT_py_inter(self._simul_vec)
-                #nbl.sparse_matrix_print(self._simul_mat)
-                self._simul_vec = nbl.multiply_matrix_vector(self._simul_mat, self._simul_vec, is_sparse)
-                print("BD, em def _simulate_step, HiperBlas, AFTER  CALL multiply_matrix_vector")
-                #nbl.print_vectorT_py_inter(self._simul_vec)
-
+                nbl.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         else:
             for i in range(step):
-                print("BD, em def _simulate_step, SciPy    , before CALL self._simul_mat @ self._simul_vec")
-                #print(f"BD, self._simul_vec =", self._simul_vec, end=";  "); print("state.l2Norm=", np.linalg.norm(self._simul_vec));
-                #print(" U.indptr =", self._simul_mat.indptr) #.toarray())
-                #print(" U.indices =", self._simul_mat.indices) #.toarray())
-                #print(" U.data =", self._simul_mat.data) #.toarray())
-                self._simul_vec = self._simul_mat @ self._simul_vec
-                #print("BD, em def _simulate_step, SciPy    , after  CALL self._simul_mat @ self._simul_vec")
-                #print(f"BD, self._simul_vec =", self._simul_vec, end=";  "); print("state.l2Norm=", np.linalg.norm(self._simul_vec));
-
+                print("BD, em def _simulate_step, SciPy, BEFORE CALL self._simul_mat @ self._simul_vec")
+                self._simul_vec_out[:] = self._simul_mat @ self._simul_vec_in
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         return
 
     def _save_simul_vec(self, hpc, continue_simulation):
@@ -678,8 +666,8 @@ class QuantumWalk(ABC):
         num_states = 1 + (end - 1 - start) // step
 
         #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
-        saved_states = np.zeros( (num_states//num_states, state.shape[0]), dtype=dtype)
-        state_index = 0 # index of the state to be saved
+        saved_states = np.zeros( (2, state.shape[0]), dtype=dtype)
+        state_index  = 0 # index of the state to be saved
 
         # if save_state:
         if start == 0:
@@ -697,18 +685,19 @@ class QuantumWalk(ABC):
             #saved_states[state_index] = self._save_simul_vec(hpc, state_index + 1 < num_states)
             state_index += 1
             if  nbl.get_hpc() == 'cpu' :
-                nbl.print_vectorT_py_inter(self._simul_vec)
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+                if state_index < 3 or state_index > num_states - 3: nbl.print_vectorT_py_inter(self._simul_vec_out)
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             else:
                 np.set_printoptions(precision=3, suppress=True)
-                print("self._simul_vec=", self._simul_vec, end=";  "); print("self._simul_vec.l2Norm=", np.linalg.norm(self._simul_vec)); 
-        # TODO: free vector from hiperblas core
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+                if state_index < 3 or state_index > num_states - 3: print("self._simul_vec_out=", self._simul_vec_out, end=";  "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out)); 
+                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         fimS    = time.perf_counter()
+        self._simul_mat = None; #  self._simul_vec = None
+        #hiperblas.vector_delete( self._simul_vec)
         print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
-        self._simul_mat = None
-        self._simul_vec = None
-
-
-        return saved_states
+        return #saved_states
 
     @staticmethod
     def _get_valid_kwargs(method):

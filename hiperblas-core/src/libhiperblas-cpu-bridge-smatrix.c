@@ -212,7 +212,7 @@ void smatreqdev(smatrix_t *m) {
 }
 
 void smatrix_delete(smatrix_t *smatrix) {
-    printf("BD, WARNING, em void smatrix_delete(smatrix_t *smatrix) \n");
+    printf("BD, WARNING, em void smatrix_delete(smatrix_t *smatrix), NO FREE!!! \n");
     return;
     if (!smatrix) { return; }
     // Free linked lists in smat if allocated
@@ -268,7 +268,7 @@ void print_vectorT(vector_t *v_) {
 
     if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
 
-    printf("BD, em %s: print_vectorT, ", __FILE__); setvbuf(stdout, NULL, _IONBF, 0);
+    printf("BD, em %s: print_vectorT, ", __FILE_NAME__); setvbuf(stdout, NULL, _IONBF, 0);
 
     char formatoF[] = " %.2f";
     double *data = (double *) v_->extra;
@@ -280,7 +280,7 @@ void print_vectorT(vector_t *v_) {
 
     if (!is_complex) {
         // ---------- Vetor Real ----------
-        printf("[%d:%d]:", 0, n - 1);
+        printf("from v_->extra [%d:%d]:", 0, n - 1);
         if (n <= 20) {
             for (i = 0; i < n; i++) {
                 sum += data[i] * data[i];
@@ -298,7 +298,7 @@ void print_vectorT(vector_t *v_) {
     } else {
         // ---------- Vetor Complexo ----------
         int n_complex = n / 1; // cada número tem parte real e imaginária
-        printf("[0:%d]:", n_complex - 1);
+        printf("from v_->extra [0:%d]:", n_complex - 1);
         if (n_complex <= 10) {
             for (i = 0; i < n_complex; i++) {
                 double re = data[2 * i], im = data[2 * i + 1];
