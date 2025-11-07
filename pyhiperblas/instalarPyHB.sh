@@ -18,7 +18,6 @@ hwD=/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25/pyhiperblas
 hwD=${HOME}/OneDrive/aLncc/passeiosQuantOut25A/pyhiperblas
 hwD=/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantOut25A/pyhiperblas
 hwD=${1:-"."}
-#cd $HOME/OneDrive/aLncc/passeiosQuantSet25/pyhiperblas
 (
 cd $hwD
 #python3 -m pip install -e . --prefix $PYHBdir  --no-deps

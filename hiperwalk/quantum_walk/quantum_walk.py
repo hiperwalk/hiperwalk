@@ -689,13 +689,13 @@ class QuantumWalk(ABC):
             state_index += 1
             if  nbl.get_hpc() == 'cpu' :
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
-                if state_index < 3 or state_index > num_states - 3: nbl.print_vectorT_py_inter(self._simul_vec_out)
+                if state_index < 4 or state_index > num_states - 3: nbl.print_vectorT_py_inter(self._simul_vec_out)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             else:
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
                 #np.set_printoptions(precision=4, suppress=True)
 
-                if state_index < 3 or state_index > num_states - 3: print("self._simul_vec_out=", self._simul_vec_out, end=";  "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out)); 
+                if state_index < 4 or state_index > num_states - 3: print("self._simul_vec_out=", self._simul_vec_out, end=";  "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out)); 
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         fimS    = time.perf_counter()
         self._simul_mat = None; #  self._simul_vec = None

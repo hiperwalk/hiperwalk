@@ -62,20 +62,6 @@ def main():
 
     import os
 
-
-
-   # print( 
-   # f"Hypercube, dim = {dim:4d}, "
-   # f"numStep = {endStep-startStep:4d}, "
-   # f"{coinT}, "
-   # f"numArcs = {num_arcs:10d}, "
-   # f"nnz = {U.nnz:12d}, "
-   # f"densidade = {densidade:.5e}, "
-   # f"algebra = {algebra:>10}, "
-   # f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS'):>3s}, "
-   # f"tempo computeU = {fimC - inicioC:.5e}, "
-   # f"tempo Iteracoes = {fimS - inicioS)/(endStep-startStep):.5e}")
-
     print(
     f"Hypercube, dim = {dim:4d}, "
     f"numStep = {endStep - startStep:4d}, "

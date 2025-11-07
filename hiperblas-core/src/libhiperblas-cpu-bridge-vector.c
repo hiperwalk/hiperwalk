@@ -3,7 +3,9 @@
 #include <stdlib.h>
 
 vector_t * vector_new( int len, data_type type, int initialize, void * data ) {
+
     vector_t * ret = (vector_t *) malloc( sizeof( vector_t ) );
+
     if (initialize && data == NULL) {
         if( type == T_INT ) {
             ret->value.i = (int *) malloc( len * sizeof( int ) );
@@ -28,6 +30,7 @@ vector_t * vector_new( int len, data_type type, int initialize, void * data ) {
 }
 
 void vector_delete( vector_t * v ) {
+
     printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE__); // _NAME__);
     return;
     if (v != NULL) {

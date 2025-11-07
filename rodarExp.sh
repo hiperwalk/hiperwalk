@@ -31,21 +31,11 @@ function simulations () {
 } # function simulations () {
 
 function filtros() {
-#grep "algebra" telAaHypercubeExp_*_coinG_SP_01T.txt |sort|uniq
-#grep computeU  telAaHypercubeExp_*_coinG_SP_01T.txt
 	grep "algebra" telAaHypercubeExp_*_coinG_SP_*T.txt
 	grep "algebra" telAaHypercubeExp_*_coinG_HB_*T.txt
-#grep Iter telAaHypercubeExp_*_coinG_HB*01T.txt
-#grep Iter telAaHypercubeExp_*_coinG_HB*04T.txt
-#grep Iter telAaHypercubeExp_*_coinG_HB*08T.txt
 
-#grep "algebra" telAaHypercubeExp_*_coinF_SP_01T.txt |sort|uniq
-#grep computeU  telAaHypercubeExp_*_coinF_HB_01T.txt
 	grep "algebra" telAaHypercubeExp_*_coinF_SP_*T.txt
 	grep "algebra" telAaHypercubeExp_*_coinF_HB_*T.txt
-#grep Iter telAaHypercubeExp_*_coinF_HB*01T.txt
-#grep Iter telAaHypercubeExp_*_coinF_HB*04T.txt
-#grep Iter telAaHypercubeExp_*_coinF_HB*08T.txt
 } # function filtros() {
 
 simulations 
