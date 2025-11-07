@@ -22,8 +22,8 @@ hwD=${1:-"."}
 (
 cd $hwD
 #python3 -m pip install -e . --prefix $PYHBdir  --no-deps
-comando="python3 -m pip install --user -e $hwD --break-system-packages --no-build-isolation --config-settings editable_mode=compat"  # linux puro
 comando="python3 -m pip install --user -e $hwD --break-system-packages --no-deps --no-cache"  # wsl
+comando="python3 -m pip install --user -e $hwD --break-system-packages --no-build-isolation --config-settings editable_mode=compat"  # linux puro
 echo $comando; eval $comando
 )
 

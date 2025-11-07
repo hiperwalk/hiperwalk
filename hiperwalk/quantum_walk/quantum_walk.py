@@ -461,7 +461,7 @@ class QuantumWalk(ABC):
         np.set_printoptions(linewidth=220) 
         if hpc is not None:
             self._simul_vec_in  = nbl.send_vector(state)
-            self.v_out=state.copy();
+            self.v_out          = state.copy();
             self._simul_vec_out = nbl.send_vector(self.v_out)
             self._simul_mat     = nbl.send_matrix(self._evolution)
         else:
@@ -470,7 +470,8 @@ class QuantumWalk(ABC):
             #self._simul_vec_in  = np.asarray(state,        dtype=np.float64)
             #self._simul_vec_out = np.asarray(state.copy(), dtype=np.float64)
             self._simul_vec_in  = state
-            self._simul_vec_out = state.copy()
+            stateC              = state.copy()
+            self._simul_vec_out = stateC
             self._simul_mat     = self._evolution
         return
 
@@ -658,7 +659,9 @@ class QuantumWalk(ABC):
         #########################################################
 
         self._prepare_engine(state, hpc);
-        np.set_printoptions(precision=3, suppress=True)
+        #np.set_printoptions(precision=3, suppress=True)
+        np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })
+
         print(f"BD, em simulate, initial state, state=", state, end=";  ");
         print("state.l2Norm=", np.linalg.norm(state)); 
 
@@ -689,8 +692,9 @@ class QuantumWalk(ABC):
                 if state_index < 3 or state_index > num_states - 3: nbl.print_vectorT_py_inter(self._simul_vec_out)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             else:
-                np.set_printoptions(precision=3, suppress=True)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+                #np.set_printoptions(precision=4, suppress=True)
+
                 if state_index < 3 or state_index > num_states - 3: print("self._simul_vec_out=", self._simul_vec_out, end=";  "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out)); 
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         fimS    = time.perf_counter()
