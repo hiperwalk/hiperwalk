@@ -1,11 +1,11 @@
-
+#!/bin/bash
 expDir="./examples/coined"
 expFileModel="$expDir/aHypercubeExp"
 expFileModel="aHypercubeExp"
 
-DIMs=( 12 14 16 18 )
 DIMs=(8 10)
-numThreads=(16 1)
+DIMs=( 18 16 14 12 )
+numThreads=(16 8 4 1)
 
 function simulations () {
    for C in \"G\" \"F\"; do
@@ -38,5 +38,5 @@ function filtros() {
 	grep "algebra" telAaHypercubeExp_*_coinF_HB_*T.txt
 } # function filtros() {
 
-simulations 
+#simulations 
 filtros

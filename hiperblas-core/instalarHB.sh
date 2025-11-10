@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e  # para parar se algo falhar
+#set -e  # para parar se algo falhar
 
 # ==============================
 # Configuração
@@ -53,7 +53,7 @@ echo ">> Instalando Hiperwalk em: $prefix"
 
 # Recria diretórios
 echo ">> Criando diretórios $prefix"
-rm -rf "$hwLIB" "$hwINC" "$hwBIN"
+#rm -rf "$hwLIB" "$hwINC" "$hwBIN"
 mkdir -p "$hwLIB" "$hwINC" "$hwBIN"
 
 # Compilação e instalação

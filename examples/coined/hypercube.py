@@ -9,23 +9,23 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
+dim = 16 + 6 - 3   ; startStep=1; endStep=startStep+500; step=1 #10*300//1-1
 
-dim = 16 + 6 - 4 - 4 - 4 - 4 ; start=1; end=start+5; step=1 #10*300//1-1
-dim = 16 + 6 - 00; start=1; end=start+5; step=1 #10*300//1-1
-dim = 3 + 9 +6 +1; start=1; end=start+1+1-0; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 4 ; start=1; end=start+5*20*10; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 2  ; start=1; end=start+5; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 2 - 9  ; start=1; end=start+5; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 2  ; start=1; end=start+1000; step=1 #10*300//1-1
-dim = 3 - 1 + 1 ; start=1; end=start+1+3-0; step=1 #10*300//1-1
-dim = 16 + 6 - 4 - 2    ; start=1; end=start+500; step=1 #10*300//1-1
-aRange=(start,end,step)
+aRange=(startStep,endStep,step)
 
-grafo="F" # Fourier para Complex
-grafo="G" # Grover  para Real
+coin="G" # Grover  para Real
+coin="F" # Fourier para Complex  para Real
 
 myOption=None
 myOption="cpu"
+
+dim      =8        # 10  
+coin     ="G"       # "G" Grover para Real e  "F"  Fourier para Complex
+myOption =None  # None   "cpu"    "gpu"
+
+coinT= "Grover  coin,    real" if coin=="G" else "Fourier coin, complex"
+
+num_vert = 1 << dim; num_arcs = dim*num_vert
 
 from warnings import warn
 def main():
@@ -34,18 +34,17 @@ def main():
     algebra="SciPy"
     if  hpw.get_hpc() == "cpu" :
         algebra="HiperBlas"
-    print(f"graph=hpw.Hypercube({dim}), aRange = {aRange}, algebra: {algebra}" )
-
+    
     inicioG = time.perf_counter()
     g = hpw.Hypercube(dim)
     fimG    = time.perf_counter()
-    print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
+#    print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
 
     inicioC = time.perf_counter()
-    qw = hpw.Coined(g, coin=grafo) 
+    qw = hpw.Coined(g, coin=coin) 
     fimC    = time.perf_counter()
-    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
-    #return
+#    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
+    U = qw.get_evolution(); densidade=num_arcs/U.nnz
 
     initialState = qw.state([[1, i] for i in range(dim)])
     np.set_printoptions(threshold=10)
@@ -57,13 +56,26 @@ def main():
        states = qw.simulate(range=aRange, state=initialState)
     fimS    = time.perf_counter()
 
-    print(f"graph=hpw.Hypercube({dim}), aRange = {aRange}, algebra: {algebra}" )
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
 
-    print('\n\n\n')
-    #print(len(states))
+    import os
+
+    print(
+    f"Hypercube, dim = {dim:4d}, "
+    f"numStep = {endStep - startStep:4d}, "
+    f"{coinT}, "
+    f"numArcs = {num_arcs:10d}, "
+    f"nnz = {U.nnz:12d}, "
+    f"densidade = {densidade:.5e}, "
+    f"algebra = {algebra:>10s}, "
+    f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
+    f"tempo computeU = {fimC - inicioC:.5e}, "
+    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}")
+
+
+    print('\n')
     return
     probs = qw.probability_distribution(states)
 
