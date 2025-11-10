@@ -3,8 +3,10 @@ function setingsSD(){
   module load gcc/14.2.0_sequana
   module load  autodock-gpu/4.2.6_opencl_sequana
   module load cmake/3.30.3_sequana
+  module load python/3.10.16_sequana
 }
-comando="export LD_LIBRARY_PATH=$HOME/hiperblas/lib:$LD_LIBRARY_PATH"
+comando="export LD_LIBRARY_PATH=$SCRATCH/hiperblas/lib:$LD_LIBRARY_PATH"
+comando="export LD_LIBRARY_PATH=$HOME/hiperblas/lib:$SCRATCH/hiperblas/lib:$LD_LIBRARY_PATH"
 echo $comando; eval $comando
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 setingsSD

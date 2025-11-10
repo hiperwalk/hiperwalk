@@ -1,7 +1,7 @@
 relativeDir=./
 export PYTHONUNBUFFERED=1
 #export LD_LIBRARY_PATH=/home/bidu/hiperblas/lib:$LD_LIBRARY_PATH
-comando="export LD_LIBRARY_PATH=$SCRACTH:$HOME/hiperblas/lib:$LD_LIBRARY_PATH"
+comando="export LD_LIBRARY_PATH=$HOME/hiperblas/lib:=$SCRACTH/hiperblas/lib:$LD_LIBRARY_PATH"
  echo $comando; eval $comando
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 read -p "aguardando ...."
