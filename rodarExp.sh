@@ -1,27 +1,25 @@
 #!/bin/bash
 expDir="./examples/coined"
 expFileModel="$expDir/aHypercubeExp"
-expFileModel="aHypercubeExp"
-
-DIMs=(8 10)
-DIMs=( 18 16 14 12 )
-numThreads=(16 8 4 1)
+expFileModel="hypercube"
+expFileModel="hypercube"; DIMs=( 18 16 14 12 ); numThreads=(16 8 4 1)
+expFileModel="diagonal-grid"; DIMs=(100 200 400 800); numThreads=(16 8 4 1); 
 
 function simulations () {
    for C in \"G\" \"F\"; do
      for D in "${DIMs[@]}"; do
 	T=1
 	d=$D; if [[ $D -lt 10 ]]; then d=0${D}; fi
-        nome="${expFileModel}_${d}_coin${C}_SP_0${T}T"
-	comando="sed 's/aDIM/$D/; s/aCoin/$C/; s/aHPCoPTION/None/' ./examples/coined/hypercubeStencil.py > $expDir/${nome}.py"
+        nome="a${expFileModel}_${d}_coin${C}_SP_0${T}T"
+	comando="sed 's/=aDim/=$D/; s/=aCoin/=$C/; s/=aHPCoPTION/=None/' $expDir/${expFileModel}Stencil.py > $expDir/${nome}.py"
 	echo $comando; eval $comando
 	comando="(cd ../hiperwalk; OMP_NUM_THREADS=$T stdbuf -oL time python3 -u $expDir/${nome}.py 2>&1) |grep \": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed\" --color=always |tee telA${nome}.txt " 
 	echo $comando; eval $comando
 
 	for T in "${numThreads[@]}" ; do 
             if [[ $T -lt 10 ]]; then T=0${T}; fi 
-            nome="${expFileModel}_${d}_coin${C}_HB_${T}T";
-	    comando="sed 's/aDIM/$D/; s/aCoin/$C/; s/aHPCoPTION/\"cpu\"/' ./examples/coined/hypercubeStencil.py > $expDir/${nome}.py"
+            nome="a${expFileModel}_${d}_coin${C}_HB_${T}T";
+	    comando="sed 's/=aDim/=$D/; s/=aCoin/=$C/; s/=aHPCoPTION/=\"cpu\"/' $expDir/${expFileModel}Stencil.py > $expDir/${nome}.py"
 	    echo $comando; eval $comando
 	    comando="(cd ../hiperwalk; OMP_NUM_THREADS=$T stdbuf -oL time python3 -u $expDir/${nome}.py 2>&1) |grep \": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed\" --color=always |tee telA${nome}.txt " 
 	    echo $comando; eval $comando
@@ -31,12 +29,14 @@ function simulations () {
 } # function simulations () {
 
 function filtros() {
-	grep "algebra" telAaHypercubeExp_*_coinG_SP_*T.txt
+	comando="grep "algebra" telA$nome*"
+	echo $comando; eval $comando
+	return
 	grep "algebra" telAaHypercubeExp_*_coinG_HB_*T.txt
 
 	grep "algebra" telAaHypercubeExp_*_coinF_SP_*T.txt
 	grep "algebra" telAaHypercubeExp_*_coinF_HB_*T.txt
 } # function filtros() {
 
-#simulations 
+simulations 
 filtros

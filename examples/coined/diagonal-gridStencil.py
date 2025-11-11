@@ -9,7 +9,7 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-numSteps=1000
+numSteps=2000
 dim = 16 + 6 - 3   ; startStep=1; endStep=startStep+numSteps; step=1 #10*300//1-1
 
 aRange=(startStep,endStep,step)
@@ -19,6 +19,10 @@ coin="F" # Fourier para Complex  para Real
 
 myOption=None
 myOption="cpu"
+
+aDim = 10
+aCoin = "G"
+aHPCoPTION = None
 
 dim      =aDim        # 10  
 coin     =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -37,35 +41,35 @@ def main():
         algebra="HiperBlas"
     
     inicioG = time.perf_counter()
-    g = hpw.Hypercube(dim)
+    grid = hpw.Grid(dim, diagonal=True, periodic=False)
     fimG    = time.perf_counter()
-#    print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
 
     inicioC = time.perf_counter()
-    qw = hpw.Coined(g, coin=coin) 
-    fimC    = time.perf_counter()
-#    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
-    U = qw.get_evolution(); densidade=U.nnz/(num_arcs*num_arcs)
+    dtqw = hpw.Coined(grid, shift='persistent', coin='grover')
+    fimC = time.perf_counter()
 
-    initialState = qw.state([[1, i] for i in range(dim)])
-    np.set_printoptions(threshold=10)
-    print("initialState = ", np.array(initialState),  end="; ")
-    print("state.l2Norm=", np.linalg.norm(initialState));
-
+    center = np.array([dim // 2, dim // 2])
+    psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
+                   [-0.5, (center, center + (1, -1))],
+                   [-0.5, (center, center + (-1, 1))],
+                   [0.5, (center, center + (-1, -1))]])
     inicioS = time.perf_counter()
     for r in range(1): #50*1000*1000):
-       states = qw.simulate(range=aRange, state=initialState)
-    fimS    = time.perf_counter()
-
+        psi_final = dtqw.simulate(range=aRange, state=psi0)
+    #KOR psi_final = dtqw.simulate(range=aRange, state=psi0)
+    fimS = time.perf_counter()
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
+    U = dtqw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
 
     import os
-
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
+    nome = os.path.basename(__file__)  # Apenas o nome do arquivo
     print(
-    f"Hypercube, dim = {dim:4d}, "
+    f"{nome:14s}, "
+    f"dim = {dim:4d}, "
     f"numStep = {endStep - startStep:4d}, "
     f"{coinT}, "
     f"numArcs = {num_arcs:10d}, "
@@ -77,12 +81,11 @@ def main():
     f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}, ",
     f"tempo total = {(fimS - inicioG) :.5e}")
 
-
-    print('\n')
     return
-    probs = qw.probability_distribution(states)
 
-    #hpw.plot_probability_distribution(probs, graph=g)
+    psi_final = dtqw.simulate(range=(1, 29 + 1), state=psi0)
+    prob = dtqw.probability_distribution(psi_final)
+    #hpw.plot_probability_distribution(probs, graph=grid)
     #print(probs)
     #plt.savefig("grafico.png")
 
@@ -93,3 +96,6 @@ if __name__ == "__main__":
         import traceback
         print("Erro:", e, file=sys.stderr)
         traceback.print_exc()
+
+
+#main()
