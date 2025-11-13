@@ -1,0 +1,7 @@
+grafo=hypercube;    dim=18;  grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" telas/telAa${grafo}_${dim}_coinF_H*
+
+
+(cd ../hiperwalk; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/agrovers-algorithm_600_coin"G"_HB_01T.py 2>&1) |grep ": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed"
+

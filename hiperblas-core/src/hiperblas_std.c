@@ -1271,6 +1271,7 @@ void allocate_result(smatrix_t *p, smatrix_t *d, smatrix_t *r){
 void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
     U->row_ptr[0] = 0; // First row starts at index 0
     //for (int i = 0; i < U->nrow; i++) { U->row_ptr[i] = 0;}
+    #pragma omp parallel for schedule(static)
     for (int i = 0; i < S->nrow; i++) {
         int permuted_row = S->col_idx[i];  // Get the row index in C
         int nnz_in_C_row = C->row_ptr[permuted_row + 1] - C->row_ptr[permuted_row];
@@ -1280,7 +1281,6 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
     printf(" em computeU, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
-    //if (S->type == T_COMPLEX && C->type == T_COMPLEX && U->type == T_COMPLEX) {
     if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
@@ -1290,12 +1290,11 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
             int startU = U->row_ptr[row];
             int j = C->col_idx[startC];
             for (int i = 0; i < (endC - startC); i++) {
-                U->col_idx[startU + i]          = j++;
+                U->col_idx[startU + i]          = C->col_idx[startC + i];//  j++;
                 U->values[2 * (startU + i)    ] = C->values[2 * (startC + i)];
                 U->values[2 * (startU + i) + 1] = C->values[2 * (startC + i) + 1];
             }
         }
-    //} else if (S->type == T_FLOAT && C->type == T_FLOAT && U->type == T_FLOAT) {
     } else if (C->type == T_FLOAT ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
@@ -1306,7 +1305,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
             //Only for block diagonal matrices
             int j = C->col_idx[startC];
             for (int i = 0; i < (endC - startC); i++) {
-                U->col_idx[startU + i] = j++; //C->col_idx[startC + i];
+                U->col_idx[startU + i] = C->col_idx[startC + i]; //  j++;
                 U->values[startU + i]  = C->values[startC + i];
             }
         }
