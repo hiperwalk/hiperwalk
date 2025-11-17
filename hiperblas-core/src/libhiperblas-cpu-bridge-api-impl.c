@@ -382,85 +382,64 @@ void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
     return out;    
 }
 
-/* [Hiago] Old functions
-void* 00sparseVecMul(void* mDev, void* idxCol, void* vDev, int nrows, int maxCols ) {
-//    const int idx = get_global_id(0);
-//    if( idx >= nrows )
-//        return;
-//        
-//    real sum = 0;
-//    int row = idx;
-//    int midx = idx * maxcols;
-//    int i;
-//    for (i = 0; i < maxcols; i++) {
-//        int col = col_idx[midx + i];
-//        sum += ( col != -1 ) ? m[midx + i] * vec_in[col] : 0;             
-//    }
-//    vec_out[row] = sum;
-    
-    double * vec_out = (double *) malloc( nrows * maxCols * sizeof(double) );
-    double sum_re = 0, re_m, re_v;
-    double * m = (double *) mDev;
-    double * vec_in = (double *) vDev;
-    int * col_idx = (int *) idxCol;
-
-    #pragma omp parallel for
-    for (int idx = 0; idx < nrows; idx++)
-    {
-        // printf("idx=%d ", idx);
-           double sum = 0;
-           int row = idx;
-           int midx = idx * maxCols;
-        //    printf("midx=%d \n", idx);
-           int i;
-           for (i = 0; i < maxCols; i++) {
-                // printf("i=%d midx + i=%d ", i, (midx + i));
-               int col = col_idx[midx + i];
-                // printf("row=%d col=%d value=%.15f vec=%.15f\n", row, col, m[midx + i], vec_in[col]);
-               sum += ( col != -1 ) ? m[midx + i] * vec_in[col] : 0;             
-           }
-           vec_out[row] = sum;
+void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
+    U->row_ptr[0] = 0; // First row starts at index 0
+    for (int i = 0; i < S->nrow; i++) {
+        int permuted_row = S->col_idx[i];  // Get the row index in C
+        int nnz_in_C_row = C->row_ptr[permuted_row + 1] - C->row_ptr[permuted_row];
+        U->row_ptr[i + 1] = U->row_ptr[i] + nnz_in_C_row;
     }
-
-    return (void *)vec_out;
 }
-void* 00sparseComplexVecMul(void* mDev, void* idxCol, void* vDev, int nrows, int maxCols ) {
-
-    double * vec_out = (double *) malloc( 2 * nrows * maxCols * sizeof(double) );
-
-    #pragma omp parallel for
-    for (size_t idx = 0; idx < nrows; idx++)
-    {
-        double sum_re = 0,sum_im = 0, re_m, im_m, re_v, im_v;
-        double * m = (double *) mDev;
-        double * vec_in = (double *) vDev;
-        int * col_idx = (int *) idxCol;
-        int row = idx,i, col, idxt;
-        for (i = 0; i < maxCols; i++) {
-            idxt = (row * maxCols) + i;         
-            col = col_idx[idxt];
-            if( col == -1 )
-                continue;
-            re_m = m[2*idxt];
-            im_m = m[2*idxt+1]; 
-            re_v = vec_in[2*col];
-            im_v = vec_in[2*col+1];    
-            sum_re += re_m*re_v - im_m*im_v;
-            sum_im += re_m*im_v + im_m*re_v; 
+#include <omp.h>
+void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
+   printf(" em computeU + Hiagogo, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
+    #pragma omp parallel 
+{
+        int k=0;
+    printf("BD em %s: void * void computeU, Thread %d of %d created!\n", __FILE__, omp_get_thread_num(), omp_get_num_threads()); 
+    if (C->type == T_COMPLEX ) {
+        #pragma omp parallel for schedule(static)
+        for (int row = 0; row < S->nrow; ++row) {
+            if (row == 0) { printf("Thread %d of %d created!\n", omp_get_thread_num(), omp_get_num_threads()); }
+            int permuted_row = S->col_idx[row]; // Since S is a permutation matrix
+            int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
+            int startU = U->row_ptr[row];
+            int j = C->col_idx[startC];
+            for (int i = 0; i < (endC - startC); i++) {
+                U->col_idx[startU + i]          = j++;
+                U->values[2 * (startU + i)    ] = C->values[2 * (startC + i)];
+                U->values[2 * (startU + i) + 1] = C->values[2 * (startC + i) + 1];
+            }
         }
-        vec_out[2*row] = sum_re;
-        vec_out[2*row+1] = sum_im;
+    } else if (C->type == T_FLOAT ) {
+        #pragma omp parallel for schedule(static)
+        for (int row = 0; row < S->nrow; ++row) {
+            if (k++ < 3 ) {printf("Thread %d of %d created!, row=%d \n",  omp_get_thread_num(), omp_get_num_threads(), row); }
+            int permuted_row = S->col_idx[row]; // Since A is a permutation matrix
+            int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
+            int startU = U->row_ptr[row];
+            //Only for block diagonal matrices
+            int j = C->col_idx[startC];
+            for (int i = 0; i < (endC - startC); i++) {
+                U->col_idx[startU + i] = j++; //C->col_idx[startC + i];
+                U->values[startU + i]  = C->values[startC + i];
+            }
+        }
+    } else {
+        fprintf(stderr, "Incompatible types in computeU\n"); exit(EXIT_FAILURE);
     }
-    return (void *)vec_out;
+ } // end pragma omp parallel 
 }
-*/
-/*
- smatrix_t * permuteSparseMatrix( smatrix_t * S, smatrix_t *C){
-      smatrix_t *U = smatrix_new(S->nrow, S->nrow, C->type);
-        compute_U_row_ptr(S, C, U);
-        computeU(S, C, U);
+
+ void * permuteSparseMatrix( void * S_, void *C_, void *U_){
+      smatrix_t* S = (smatrix_t*) S_;
+      smatrix_t* C = (smatrix_t*) C_;
+      smatrix_t* U = (smatrix_t*) U_;
+      computeRowptrU(S, C, U);
+      #pragma omp parallel 
+      printf("BD em %s: void * permuteSparseMatrix\n", __FILE__); 
+      computeU(S, C, U);
    }
-*/
 
 
 //[Hiago] 

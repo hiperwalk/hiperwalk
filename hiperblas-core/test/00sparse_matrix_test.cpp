@@ -56,32 +56,18 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
 
     printf("\nBD, inicio de TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {\n");
 
-//U.indptr    =  [ 0  4  6  8 12 14 16 17 18 19 20 22 24 28 30 32 36]
-//U.indices   =  [ 6  7  8  9 10 11  4  5  6  7  8  9 13 14  1  2  0  3 12 15 13 14  1  2  6  7  8  9 10 11  4  5  6  7  8  9]
-//U.data      =  [ 0.5  0.5  0.5 -0.5  1.   0.   1.   0.   0.5  0.5 -0.5  0.5  1.   0.   1.   0.   1.   1.   1.   1.   0.   1.   0.   1.   0.5 -0.5  0.5  0.5  0.   1.   0.   1.  -0.5  0.5  0.5  0.5]
-//initial state, state= [ 0.000  0.000  0.000  0.000  0.000  0.000  0.500 -0.500 -0.500  0.500  0.000  0.000  0.000  0.000  0.000  0.000];  state.l2Norm= 1.0
-//v_->extra [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
-    int n = 16;
+    int n = 4;
 
-    vector_t  * a = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
+    vector_t  * a = m.bridges[idx].vector_new(n, T_FLOAT, 1, NULL );
     smatrix_t * b = m.bridges[idx].smatrix_new(n, n, T_FLOAT);
     vector_t * r;
- 
-    int i;
-    for (i = 0; i < a->len; i++) { a->value.f[i] = 0.; }
-    i=6; a->value.f[i] = 0.500;
-    i=7; a->value.f[i] = -0.500;
-    i=8; a->value.f[i] = -0.500;
-    i=9; a->value.f[i] = 0.500;
-    m.bridges[idx].print_vectorT(a);
+
+    for (int i = 0; i < a->len; i++) { a->value.f[i] = 1.; }
+    m.bridges[idx].print_vectorT_f(a);
 
     printf("BD, em TEST_F, vetor  entrada \n");
     for (int i = 0; i < a->len; i++) { printf("r[%2d]=%f\n", i,  a->value.f[i]); }
-    i=0;
-    b->row-ptr[i++]=0;  b->row-ptr[i++]=4;  b->row-ptr[i++]=6;  b->row-ptr[i++]=8;
-    b->row-ptr[i++]=12;  b->row-ptr[i++]=14;  b->row-ptr[i++]=i16;  b->row-ptr[i++]=17;
-    m.bridges[idx].print_smatrix(b);
-    return;
+
     m.bridges[idx].smatrix_set_real_value(b, 0, 0, 1.);
     m.bridges[idx].smatrix_set_real_value(b, 0, 1, 1.);
 //    m.bridges[idx].smatrix_set_real_value(b, 0, 2, 3.);

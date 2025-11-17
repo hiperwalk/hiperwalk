@@ -8,8 +8,9 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-aDim=5; aNumSteps=3; aCoin="F"; aHPCoPTION=None
-aDim=5; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aNumSteps=1
 
 dim          =aDim        # 10
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -63,7 +64,7 @@ def main():
     f"algebra = {algebra:>10s}, "
     f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
     f"tempo computeU = {fimC - inicioC:.5e}, "
-    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}, "
+    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep + 1):.5e}, "
     f"tempo total = {(fimS - inicioG) :.5e}")
 
     return

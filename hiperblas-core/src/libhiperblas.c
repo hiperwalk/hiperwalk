@@ -275,6 +275,8 @@ void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
     
     load_function(manager, &(manager->bridges[index].sparseVecMul_f), "sparseVecMul", index);
     
+    load_function(manager, &(manager->bridges[index].permuteSparseMatrix_f), "permuteSparseMatrix", index);
+
     load_function(manager, &(manager->bridges[index].sparseComplexVecMul_f), "sparseComplexVecMul", index);
     
     load_function(manager, &(manager->bridges[index].print_smatrix_f), "print_smatrix", index);

@@ -5,3 +5,6 @@ grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" te
 
 (cd ../hiperwalk; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/agrovers-algorithm_600_coin"G"_HB_01T.py 2>&1) |grep ": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed"
 
+export g=diagonal-grid;(cd ./; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/${g}Stencil.py 2>&1) >telaG${g}Sctencil.txt
+git clone https://github.com/hiperwalk/hiperwalk.git; cd hiperwalk; git fetch --all; git checkout bidu
+

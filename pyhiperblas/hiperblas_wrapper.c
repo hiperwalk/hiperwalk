@@ -334,9 +334,7 @@ static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
     smatrix_t * hb_smatS = (smatrix_t *) PyCapsule_GetPointer(objS, "py_sparse_matrix_new");
     smatrix_t * hb_smatC = (smatrix_t *) PyCapsule_GetPointer(objC, "py_sparse_matrix_new");
     smatrix_t * hb_smatU = (smatrix_t *) PyCapsule_GetPointer(objU, "py_sparse_matrix_new");
-    permuteSparseMatrix(hb_smatS, hb_smatC, hb_smatU );
-    //printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: py_permute_sparse_matrix, AFTER permuteSparseMatrix; CALL print_smatrix(hb_smatU); \n"); print_smatrix(hb_smatU);// exit(128+22);
-    //printf("BD, em py_permute_sparse_matrix: exit()"); exit(128+14);
+    permuteSparseMatrix(&bridge_manager, bridge_index, hb_smatS, hb_smatC, hb_smatU );
     Py_RETURN_NONE;
 }
 

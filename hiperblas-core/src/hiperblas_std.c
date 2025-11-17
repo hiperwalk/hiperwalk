@@ -6,10 +6,13 @@
 #include <math.h>
 #include <sys/time.h>
 
+#include <omp.h>
+
 #include "libhiperblas.h"
 #include "hiperblas.h"
 #include "hiperblas_list.h"
 #include "bridge_api.h"
+
 
 void runerror( char * strerr ) {
     fprintf(stderr, " runtime error: %s\n", strerr);
@@ -1268,29 +1271,26 @@ void allocate_result(smatrix_t *p, smatrix_t *d, smatrix_t *r){
     }
 }
 
+/*
 void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
     U->row_ptr[0] = 0; // First row starts at index 0
-    //for (int i = 0; i < U->nrow; i++) { U->row_ptr[i] = 0;}
-    #pragma omp parallel for schedule(static)
     for (int i = 0; i < S->nrow; i++) {
         int permuted_row = S->col_idx[i];  // Get the row index in C
         int nnz_in_C_row = C->row_ptr[permuted_row + 1] - C->row_ptr[permuted_row];
         U->row_ptr[i + 1] = U->row_ptr[i] + nnz_in_C_row;
     }
 }
-
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-    printf(" em computeU, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
+   printf(" em computeU + Hiago, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
     if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
             int permuted_row = S->col_idx[row]; // Since S is a permutation matrix
-            int startC = C->row_ptr[permuted_row];
-            int endC   = C->row_ptr[permuted_row + 1];
+            int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
             int startU = U->row_ptr[row];
             int j = C->col_idx[startC];
             for (int i = 0; i < (endC - startC); i++) {
-                U->col_idx[startU + i]          = C->col_idx[startC + i];//  j++;
+                U->col_idx[startU + i]          = j++;
                 U->values[2 * (startU + i)    ] = C->values[2 * (startC + i)];
                 U->values[2 * (startU + i) + 1] = C->values[2 * (startC + i) + 1];
             }
@@ -1299,19 +1299,17 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
             int permuted_row = S->col_idx[row]; // Since A is a permutation matrix
-            int startC = C->row_ptr[permuted_row];
-            int endC   = C->row_ptr[permuted_row + 1];
+            int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
             int startU = U->row_ptr[row];
             //Only for block diagonal matrices
             int j = C->col_idx[startC];
             for (int i = 0; i < (endC - startC); i++) {
-                U->col_idx[startU + i] = C->col_idx[startC + i]; //  j++;
+                U->col_idx[startU + i] = j++; //C->col_idx[startC + i];
                 U->values[startU + i]  = C->values[startC + i];
             }
         }
     } else {
-        fprintf(stderr, "Incompatible types in computeU\n");
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "Incompatible types in computeU\n"); exit(EXIT_FAILURE);
     }
 }
  
@@ -1335,6 +1333,12 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
         return; // (void *) U_;
  
 }
+*/
+
+ void  permuteSparseMatrix( bridge_manager_t *mg, int index, smatrix_t * S_, smatrix_t * C_, smatrix_t * U_ ) {
+         mg->bridges[index].permuteSparseMatrix_f(S_, C_, U_);
+            
+  }
 
  void  matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
    printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {\n");

@@ -7,10 +7,11 @@ expFileModel="diagonal-grid"; DIMs=(100 200 400 800); numThreads=(16 8 4 1);
 expFileModel="grovers-algorithm"; DIMs=(047); numThreads=(1)
 expFileModel="grovers-algorithm"; DIMs=(600 800); numThreads=(16 8 4 1)
 expFileModel="grovers-algorithm"; DIMs=(047); numThreads=(16 8 4 1)
-expFileModel=${1:-"grovers-algorithm"}; DIMs=(047 084 148 256 440 600); numThreads=(16 8 4 1)
 expFileModel=${1:-"grovers-algorithm"}; DIMs=(07); numThreads=(1)
-COINs=(\"F\")
+expFileModel=${1:-"grovers-algorithm"}; DIMs=(047 084 148 256 440 600); numThreads=(16 8 4 1)
+expFileModel=${1:-"grovers-algorithm"}; DIMs=(440); numThreads=(4 1)
 COINs=(\"G\" \"F\")
+COINs=(\"G\")
 
 function simulations () {
    for C in "${COINs[@]}"; do
@@ -47,4 +48,4 @@ function filtros() {
 } # function filtros() {
 
 simulations 
-filtros
+#filtros
