@@ -8,27 +8,29 @@ import sys
 sys.stdout.reconfigure(line_buffering=True)
 
 N = 47
-numSteps=1000
-coin="F" # Fourier para Complex  para Real
-coin="G" # Grover  para Real
-myOption=None
-myOption="cpu"
 
-aDim=N; aNumSteps=numSteps; aCoin=coin; aHPCoPTION=myOption
+
+aDim=5; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=5; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
 
 myDim    =aDim        # 10
 myCoin   =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
-myOption =aHPCoPTION  # None   "cpu"    "gpu"
-myNumSteps=aNumSteps
-step=1; startStep=1; endStep=startStep+myNumSteps; 
-coinT  = "Grover  coin,    real" if myCoin=="G"      else "Fourier coin, complex"
-algebra= "SciPy"                 if myOption == None else "HiperBlas"
+myHPC_option =aHPCoPTION  # None   "cpu"    "gpu"
+myNumSteps =aNumSteps
+
+coinT  = "Grover  coin,    real" if myCoin=="G"          else "Fourier coin, complex"
+algebra="SciPy"                  if myHPC_option == None else "HiperBlas"
+
+startStep=1;endStep=startStep+myNumSteps;step=1
+aRange=(startStep,endStep,step)
+
+N = myDim;  
+
 
 from warnings import warn
 def main():
 
-    hpw.set_hpc(myOption)
-    N = myDim
+    hpw.set_hpc(myHPC_option)
     inicioG = time.perf_counter()
     K_N = nx.complete_graph(N)
     A = nx.adjacency_matrix(K_N)+np.eye(N)
@@ -49,15 +51,15 @@ def main():
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
-    U = qw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
 
+    U = qw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
     import os
     nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     nome = os.path.basename(__file__)  # Apenas o nome do arquivo
     print(
     f"{nome:14s}, "
     f"dim = {myDim:4d}, "
-    f"numStep = {myNumSteps:4d}, "
+    f"numStep = {endStep-startStep:4d}, "
     f"{coinT}, "
     f"numArcs = {num_arcs:10d}, "
     f"nnz = {U.nnz:12d}, "

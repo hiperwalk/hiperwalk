@@ -9,33 +9,23 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-numSteps=1000
-dim = 16 + 6 - 3   ; startStep=1; endStep=startStep+numSteps; step=1 #10*300//1-1
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
 
+dim          =aDim        # 10  
+coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
+myHPC_option =aHPCoPTION  # None   "cpu"    "gpu"
+myNumSteps   =aNumSteps
+
+coinT  = "Grover  coin,    real" if coin=="G"            else "Fourier coin, complex"
+algebra="SciPy"                  if myHPC_option == None else "HiperBlas"
+startStep=1;endStep=startStep+myNumSteps;step=1
 aRange=(startStep,endStep,step)
-
-coin="G" # Grover  para Real
-coin="F" # Fourier para Complex  para Real
-
-myOption=None
-myOption="cpu"
-
-dim      =aDim        # 10  
-coin     =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
-myOption =aHPCoPTION  # None   "cpu"    "gpu"
-
-coinT= "Grover  coin,    real" if coin=="G" else "Fourier coin, complex"
-
-num_vert = 1 << dim; num_arcs = dim*num_vert
 
 from warnings import warn
 def main():
-    hpw.set_hpc(myOption)
-    print(" hpw.get_hpc() = ",  hpw.get_hpc())
-    algebra="SciPy"
-    if  hpw.get_hpc() == "cpu" :
-        algebra="HiperBlas"
     
+    hpw.set_hpc(myHPC_option)
     inicioG = time.perf_counter()
     g = hpw.Hypercube(dim)
     fimG    = time.perf_counter()
@@ -45,7 +35,6 @@ def main():
     qw = hpw.Coined(g, coin=coin) 
     fimC    = time.perf_counter()
 #    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
-    U = qw.get_evolution(); densidade=U.nnz/(num_arcs*num_arcs)
 
     initialState = qw.state([[1, i] for i in range(dim)])
     np.set_printoptions(threshold=10)
@@ -62,10 +51,12 @@ def main():
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
-    import os
 
+    U = qw.get_evolution(); num_arcs=U.shape[0];  densidade=U.nnz/(num_arcs*num_arcs)
+    import os
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     print(
-    f"Hypercube, dim = {dim:4d}, "
+    f"{nome:14s}, "
     f"numStep = {endStep - startStep:4d}, "
     f"{coinT}, "
     f"numArcs = {num_arcs:10d}, "
@@ -74,7 +65,7 @@ def main():
     f"algebra = {algebra:>10s}, "
     f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
     f"tempo computeU = {fimC - inicioC:.5e}, "
-    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}, ",
+    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}, "
     f"tempo total = {(fimS - inicioG) :.5e}")
 
 

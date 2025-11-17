@@ -9,7 +9,8 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-dim = 16 + 6 - 3   ; startStep=1; endStep=startStep+500; step=1 #10*300//1-1
+numSteps=1000
+dim = 16 + 6 - 3   ; startStep=1; endStep=startStep+numSteps; step=1 #10*300//1-1
 
 aRange=(startStep,endStep,step)
 
@@ -19,9 +20,11 @@ coin="F" # Fourier para Complex  para Real
 myOption=None
 myOption="cpu"
 
-dim      =8        # 10  
-coin     ="G"       # "G" Grover para Real e  "F"  Fourier para Complex
-myOption =None  # None   "cpu"    "gpu"
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+
+dim      =aDim        # 10  
+coin     =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
+myOption =aHPCoPTION  # None   "cpu"    "gpu"
 
 coinT= "Grover  coin,    real" if coin=="G" else "Fourier coin, complex"
 
@@ -44,7 +47,6 @@ def main():
     qw = hpw.Coined(g, coin=coin) 
     fimC    = time.perf_counter()
 #    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
-    U = qw.get_evolution(); densidade=num_arcs/U.nnz
 
     initialState = qw.state([[1, i] for i in range(dim)])
     np.set_printoptions(threshold=10)
@@ -59,11 +61,14 @@ def main():
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
+    print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
+
+    U = qw.get_evolution(); num_arcs=U.shape[0];  densidade=U.nnz/(num_arcs*num_arcs)
     import os
-
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     print(
-    f"Hypercube, dim = {dim:4d}, "
+    f"{nome:14s}, "
     f"numStep = {endStep - startStep:4d}, "
     f"{coinT}, "
     f"numArcs = {num_arcs:10d}, "
@@ -72,7 +77,8 @@ def main():
     f"algebra = {algebra:>10s}, "
     f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
     f"tempo computeU = {fimC - inicioC:.5e}, "
-    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}")
+    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep):.5e}, "
+    f"tempo total = {(fimS - inicioG) :.5e}")
 
 
     print('\n')
@@ -83,4 +89,10 @@ def main():
     #print(probs)
     #plt.savefig("grafico.png")
 
-main()
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        print("Erro:", e, file=sys.stderr)
+        traceback.print_exc()
