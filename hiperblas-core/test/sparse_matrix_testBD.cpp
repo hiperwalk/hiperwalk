@@ -2,7 +2,6 @@
 #include "libhiperblas.h"
 #include "bridge_api.h"
 #include "hiperblas_std.h"
-//#include "hiperblas_vector.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -19,12 +18,21 @@ public:
     
     SparseMatrixFixture() {
         idx = 0;
+	/*
         string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
         plugin_name = "/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantHiago/Bhiperblas-core-old/libhiperblas-cpu-bridge.so";
         plugin_name = "/home/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
         plugin_name = "/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
         plugin_name = "/prj/cenapadrjsd/eduardo.garcia2/hiperblas/lib/libhiperblas-cpu-bridge.so";
-        load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
+	*/
+
+        const char *home = getenv("HOME");
+        char  *plugin_name  = (char*) malloc ( 1024 *sizeof(char));
+        snprintf(plugin_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+        printf("plugin_name = %s\n", plugin_name);
+
+        //load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
+        load_plugin(&m, plugin_name, idx);
         m.bridges[idx].InitEngine_f(0);
     }
 
@@ -147,19 +155,20 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     object_t ** in = convertToObject4BD(b, a, rOut ); // rOut->extra contem o vetor de saida
 
     printf("BD, em TEST_F, before call matvec_mul3\n");
-    //r = (vector_t *) matvec_mul3BD(&m, idx, (void **) in, NULL);
+    //r = (vector_t *) matvec_mul3BD(&m, idx, (matvec_mul3BDvoid **) in, NULL);
     matvec_mul3BD(&m, idx, (void **) in, NULL);
     m.bridges[idx].print_vectorT_f(rOut);
     printf("BD, em TEST_F, after  call matvec_mul3\n");
     m.bridges[idx].vecreqhost(rOut); // r->value.f = (double*) r->extra;
     m.bridges[idx].print_vectorT_f(rOut);
+    printf("verificação do resultado da função matvec_mul3BD:");
     for (int i = 0; i < r->len; i++) { EXPECT_EQ( rOut->value.f[i], r->value.f[i]); printf("%d:ok, ", i); }
     printf("\n");
     
     delete_object_array(in, 2);
     m.bridges[idx].vector_delete(a);
     m.bridges[idx].vector_delete(r);
-    return;
+    //return;
     m.bridges[idx].vector_delete(rOut);
     m.bridges[idx].smatrix_delete(b);
     return;
