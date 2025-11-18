@@ -66,11 +66,13 @@ void vector_delete(vector_t *v)
     printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE__); // _NAME__);
     if (!v) return;
 
+    /*
     printf("vector_delete: INICIO\n");
     printf("  type=%d, externalData=%d\n", v->type, v->externalData);
     printf("  value.f = %p\n", v->value.f);
     printf("  value.i = %p\n", v->value.i);
     printf("  extra   = %p\n", v->extra);
+    */
 
     void *data_ptr = NULL;
 
@@ -86,7 +88,7 @@ void vector_delete(vector_t *v)
 
     // --- LIBERAR DADOS PRINCIPAIS ---
     if (!v->externalData && data_ptr != NULL) {
-        printf("  freeing data_ptr (%p)\n", data_ptr);
+      //  printf("  freeing data_ptr (%p)\n", data_ptr);
         free(data_ptr);
         data_ptr = NULL;
 
@@ -98,15 +100,15 @@ void vector_delete(vector_t *v)
     // --- LIBERAR EXTRA ---
     if (v->extra != NULL) {
         if (!extra_is_alias) {
-            printf("  freeing extra (%p)\n", v->extra);
+     //       printf("  freeing extra (%p)\n", v->extra);
             free(v->extra);
         } else {
-            printf("  extra == data_ptr → NÃO liberar novamente!\n");
+    //        printf("  extra == data_ptr → NÃO liberar novamente!\n");
         }
         v->extra = NULL;
     }
 
-    printf("  freeing struct v (%p)\n", v);
+    //printf("  freeing struct v (%p)\n", v);
     free(v);
 }
 

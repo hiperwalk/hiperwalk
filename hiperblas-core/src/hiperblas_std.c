@@ -1314,7 +1314,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
  
 void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
-   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** permuteSparseMatrix( {\n");
+   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** permuteSparseMatrix( ... \n");
         //smatrix_t *U = mg->bridges[index].smatrix_new(C->nrow, C->nrow, C->type);
         //allocate_result(S, C, U);
 

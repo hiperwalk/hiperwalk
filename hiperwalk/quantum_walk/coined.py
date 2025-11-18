@@ -1070,19 +1070,19 @@ class Coined(QuantumWalk):
         inicioS = time.perf_counter()
         self._set_shift(**S_kwargs)
         fimS    = time.perf_counter()
-        print(f"_set_shift     : Tempo decorrido: {fimS - inicioS:.6f} segundos")
+        print(f"_set_shift     :   Tempo decorrido: {fimS - inicioS:.6f} segundos")
         inicioC = time.perf_counter()
         self._set_coin(**C_kwargs)
         fimC    = time.perf_counter()
-        print(f"_set_coin      : Tempo decorrido: {fimC - inicioC:.6f} segundos")
+        print(f"_set_coin      :   Tempo decorrido: {fimC - inicioC:.6f} segundos")
         inicioM = time.perf_counter()
         self._set_marked(**R_kwargs)
         fimM    = time.perf_counter()
-        print(f"_set_marked    : Tempo decorrido: {fimM - inicioM:.6f} segundos")
+        print(f"_set_marked    :   Tempo decorrido: {fimM - inicioM:.6f} segundos")
         inicioE = time.perf_counter()
         self._set_evolution()
         fimE    = time.perf_counter()
-        print(f"_set_evolution : Tempo decorrido: {fimE - inicioE:.6f} segundos")
+        print(f"_set_evolution :   Tempo decorrido: {fimE - inicioE:.6f} segundos")
         return
 
     def probability_distribution(self, states):

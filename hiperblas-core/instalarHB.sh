@@ -66,6 +66,7 @@ mkdir -p "$hwLIB" "$hwINC" "$hwBIN"
   comando="cmake \
     -DGTEST_INCLUDE_DIR="$GTEST_INCLUDE_DIR" \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
+    -DCMAKE_INSTALL_LIBDIR="lib"
     ."
   #echo $comando; 
   #read -p "cmake ..";

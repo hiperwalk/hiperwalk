@@ -21,8 +21,9 @@ public:
         idx = 0;
         string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
         plugin_name = "/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantHiago/Bhiperblas-core-old/libhiperblas-cpu-bridge.so";
-        plugin_name = "/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
         plugin_name = "/home/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
+        plugin_name = "/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
+        plugin_name = "/prj/cenapadrjsd/eduardo.garcia2/hiperblas/lib/libhiperblas-cpu-bridge.so";
         load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
         m.bridges[idx].InitEngine_f(0);
     }
