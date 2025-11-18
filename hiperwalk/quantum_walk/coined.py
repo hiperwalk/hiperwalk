@@ -904,14 +904,6 @@ class Coined(QuantumWalk):
         #formatted = "\n".join( " ".join(f"{v:8.1e}" for v in row) for row in C.toarray())
         #formatted = "\n".join( " ".join(f"{v:5.1f}" for v in row) for row in C.toarray())
         #if C.shape[0] <=16 : print(formatted); print()
-        if nbl.get_hpc() is not None:
-            from warnings import warn
-            warn('HPC sparse matrix multiplication implemented by HiperBlas. ')
-            #warn('HPC sparse matrix multiplication is not implemented. '
-            #     + 'Using standard scipy multiplication instead.')
-            # # TODO: implement sparse matrix multiplication with hpc
-            # S = S.todense()
-            # C = C.todense()
 
         #S.indices = np.array([2, 5, 0, 7, 6, 1, 4, 3])
         #S.indices = np.arange(len(S.indices))
@@ -985,9 +977,9 @@ class Coined(QuantumWalk):
             nbl.permute_sparse_matrix(hbS, hbC, hbU); 
         #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix(hbS, hbC, hbU);  ");
         #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix,  hbU  = "); nbl.sparse_matrix_print(hbU); 
-            ##print("BD, em coined.py: U.indptr    = ", U.indptr) 
-            ##print("BD, em coined.py: U.indices   = ", U.indices) 
-            ##print("BD, em coined.py: U.data      = ", U.data) 
+        #print("BD, em coined.py: U.indptr    = ", U.indptr) 
+        #print("BD, em coined.py: U.indices   = ", U.indices) 
+        #print("BD, em coined.py: U.data      = ", U.data) 
             #print("BD, em _set_evolution, exit() ");  exit()
 
         #np.set_printoptions(precision=3, suppress=True)

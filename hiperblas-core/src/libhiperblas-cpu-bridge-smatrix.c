@@ -212,7 +212,7 @@ void smatreqdev(smatrix_t *m) {
 }
 
 void smatrix_delete(smatrix_t *smatrix) {
-    printf("BD, WARNING, em void smatrix_delete(smatrix_t *smatrix), NO FREE!!! \n");
+    printf("BD, ATENCAO, em %s: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {\n", __FILE__); // _NAME__);
     return;
     if (!smatrix) { return; }
     // Free linked lists in smat if allocated
@@ -266,13 +266,21 @@ void print_vectorT(vector_t *v_) {
     int n = v_->len;
     if (n <= 0) { printf("BD, em %s: print_vectorT, vetor vazio\n", __FILE__); return; }
 
-    if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
+    //if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
 
     printf("BD, em %s: print_vectorT, ", __FILE_NAME__); setvbuf(stdout, NULL, _IONBF, 0);
 
-    char formatoF[] = " %.2f";
-    double *data = (double *) v_->extra;
+    printf("\n  extra   (%p)\n", v_->extra);
+    printf("  value.f (%p)\n", v_->value.f);
 
+    char formatoF[] = " %.2f";
+    double *data = (double *) v_->value.f;
+    if(data != NULL ) {
+      printf("from v_->value.f [%d:%d]:", 0, n - 1);
+    } else {
+      data = (double *) v_->extra;
+      printf("from v_->extra [%d:%d]:", 0, n - 1);
+    }
     // Detecta se é complexo — pode usar flag interna ou inferir
     int is_complex = (v_->type == T_COMPLEX); // (v_->is_complex != 0); // suponha que vector_t tenha um campo is_complex
 
@@ -280,7 +288,6 @@ void print_vectorT(vector_t *v_) {
 
     if (!is_complex) {
         // ---------- Vetor Real ----------
-        printf("from v_->extra [%d:%d]:", 0, n - 1);
         if (n <= 20) {
             for (i = 0; i < n; i++) {
                 sum += data[i] * data[i];

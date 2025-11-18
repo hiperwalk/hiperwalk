@@ -59,26 +59,26 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     printf("\nBD, diagonal-gridStencil, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
 
     int n = 16;
-    vector_t  * a = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
     smatrix_t * b = m.bridges[idx].smatrix_new(n, n, T_FLOAT);
     b->nnz=36;
-    vector_t  * r = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
- 
  
 //initial state = [ 0.000  0.000  0.000  0.000  0.000  0.000  0.500 -0.500 -0.500  0.500  0.000  0.000  0.000  0.000  0 .000  0.000];  state.l2Norm= 1.0
+    vector_t  * a = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
     int i;
     for (i = 0; i < a->len; i++) { a->value.f[i] = 0.; }
     i=6; a->value.f[i] =  0.500; i=7; a->value.f[i] = -0.500;
     i=8; a->value.f[i] = -0.500; i=9; a->value.f[i] =  0.500;
-    a->extra=a->value.f;
+ //   a->extra=a->value.f;
     printf("BD, em TEST_F, vetor  entrada \n");
     m.bridges[idx].print_vectorT_f(a);
+ //return;
 
 //v_->extra [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
+    vector_t  * r = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
     for (i = 0; i < r->len; i++) { r->value.f[i] = 0.; }
     i=0;  r->value.f[i] = -0.500; i=3; r->value.f[i] =  0.500;
     i=12; r->value.f[i] = 0.500; i=15; r->value.f[i] = -0.500;
-    r->extra=r->value.f;
+  //  r->extra=r->value.f;
     printf("BD, em TEST_F, vetor  saida \n");
     m.bridges[idx].print_vectorT_f(r);
 
@@ -96,19 +96,19 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     b->col_idx = (long long int*) malloc((b->nnz)*sizeof(long long int)) ;
     i=0;
     b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=10;   b->col_idx[i++]=11; 
+    b->col_idx[i++]=10;  b->col_idx[i++]=11; 
     b->col_idx[i++]=4;   b->col_idx[i++]=5;
     b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=13;   b->col_idx[i++]=14;
+    b->col_idx[i++]=13;  b->col_idx[i++]=14;
     b->col_idx[i++]=1;   b->col_idx[i++]=2;
     b->col_idx[i++]=0;
     b->col_idx[i++]=3;
     b->col_idx[i++]=12;
     b->col_idx[i++]=15;
-    b->col_idx[i++]=13;   b->col_idx[i++]=14;
+    b->col_idx[i++]=13;  b->col_idx[i++]=14;
     b->col_idx[i++]=1;   b->col_idx[i++]=2;
     b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=10;   b->col_idx[i++]=11; 
+    b->col_idx[i++]=10;  b->col_idx[i++]=11; 
     b->col_idx[i++]=4;   b->col_idx[i++]=5;
     b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
 
@@ -131,53 +131,37 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     b->values[i++]=0.5;   b->values[i++]=-0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
     b->values[i++]=0.0;   b->values[i++]=1.0; 
     b->values[i++]=0.0;   b->values[i++]=1.0; 
-    b->values[i++]=-0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
+    b->values[i++]=-0.5;  b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
     printf("BD, em TEST_F, matriz U \n");
     m.bridges[idx].print_smatrix_f(b);
 
     //m.bridges[idx].smatrix_pack(b);
 
-    m.bridges[idx].vecreqdev(a);
-    m.bridges[idx].smatreqdev(b);
+    m.bridges[idx].vecreqdev (a); // r->extrai = (void*) r->value.f; 
+    //m.bridges[idx].smatreqdev(b);
 
-    object_t ** in = convertToObject4(a, b);
+    //vector_t  * rOut = (vector_t *) in[2];
+   // object_t ** in = convertToObject4(a, b);
+    vector_t  * rOut = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
+    object_t ** in = convertToObject4BD(b, a, rOut ); // rOut->extra contem o vetor de saida
 
-    //printf("BD, em TEST_F, before call matvec_mul3\n");
+    printf("BD, em TEST_F, before call matvec_mul3\n");
     //r = (vector_t *) matvec_mul3BD(&m, idx, (void **) in, NULL);
     matvec_mul3BD(&m, idx, (void **) in, NULL);
-    vector_t  * rOut = (vector_t *) in[2];
-    m.bridges[idx].vecreqhost(rOut);
-    printf("BD, em TEST_F, after  call matvec_mul3\n");
     m.bridges[idx].print_vectorT_f(rOut);
+    printf("BD, em TEST_F, after  call matvec_mul3\n");
+    m.bridges[idx].vecreqhost(rOut); // r->value.f = (double*) r->extra;
+    m.bridges[idx].print_vectorT_f(rOut);
+    for (int i = 0; i < r->len; i++) { EXPECT_EQ( rOut->value.f[i], r->value.f[i]); printf("%d:ok, ", i); }
+    printf("\n");
     
-    //printf("BD, em TEST_F, vetor resultado apos:  call matvec_mul3\n");
-    //for (int i = 0; i < r->len; i++) { printf("r[%2d]=%f\n", i,  r->value.f[i]); }
-
-    printf("BD, final  de TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {\n");
-    printf("meu exit(2222)\n"); exit(2222);
-
-    int tamBlocos=2;
-    for (int i = 0; i < r->len; i++) {
-    EXPECT_EQ(3.0*tamBlocos, r->value.f[i]);
-       }
-
-    return;
-
-    EXPECT_EQ(27., r->value.f[1]);
-    EXPECT_EQ(27., r->value.f[2]);
-    EXPECT_EQ(27., r->value.f[3]);
-    EXPECT_EQ(0., r->value.f[4]);
-    EXPECT_EQ(0., r->value.f[5]);
-    EXPECT_EQ(0., r->value.f[6]);
-    EXPECT_EQ(0., r->value.f[7]);
-    EXPECT_EQ(0., r->value.f[8]);
-    EXPECT_EQ(0., r->value.f[9]);
-
     delete_object_array(in, 2);
-
     m.bridges[idx].vector_delete(a);
     m.bridges[idx].vector_delete(r);
+    return;
+    m.bridges[idx].vector_delete(rOut);
     m.bridges[idx].smatrix_delete(b);
+    return;
 
 }
 

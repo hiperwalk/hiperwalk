@@ -30,3 +30,5 @@ grep ", matvec_mul3_WithSparseMatrix\| matvec_mul3\|smatreqdev\|sparseVecMul" te
  1452  grep hiperblas CMakeLists.txt 
  1453  history |tail
 
+(cd ..; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/diagonal-gridStencil.py )| grep "U\.\|initial\|print_vectorT" 
+
