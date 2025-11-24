@@ -38,8 +38,11 @@ echo ".......LD_LIBRARY_PATH=$LD_LIBRARY_PATH"+++;
 
 
 # Variáveis para build/link
+export GTest_ROOT="$HOME/local"
 export GTEST_INCLUDE_DIR=$hwINC
+export GTEST_INCLUDE_DIR=$GTest_ROOT/include/gtest
 export GTEST_LIBRARIES=$hwLIB
+export GTEST_LIBRARIES=$GTest_ROOT/lib
 
 # ==============================
 # Instalação
@@ -56,6 +59,10 @@ echo ">> Criando diretórios $prefix"
 #rm -rf "$hwLIB" "$hwINC" "$hwBIN"
 mkdir -p "$hwLIB" "$hwINC" "$hwBIN"
 
+#  -DGTEST_INCLUDE_DIR=$HOME/local/include \
+#  -DGTEST_LIBRARY=$HOME/local/lib/libgtest.a \
+#  -DGTEST_MAIN_LIBRARY=$HOME/local/lib/libgtest_main.a \
+#  -DCMAKE_PREFIX_PATH=$HOME/local \
 # Compilação e instalação
 (
   #cd "$prefix"
