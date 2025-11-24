@@ -11,7 +11,8 @@ sys.stdout.reconfigure(line_buffering=True)
 
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
-aNumSteps=0
+aNumSteps=1
+aDim=11
 
 dim          =aDim        # 10  
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -71,10 +72,10 @@ def main():
 
 
     print('\n')
-    return
+#    return
     probs = qw.probability_distribution(states)
 
-    #hpw.plot_probability_distribution(probs, graph=g)
+    hpw.plot_probability_distribution(probs, graph=g)
     #print(probs)
     #plt.savefig("grafico.png")
 

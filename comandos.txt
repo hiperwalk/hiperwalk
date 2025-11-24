@@ -8,3 +8,10 @@ grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" te
 export g=diagonal-grid;(cd ./; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/${g}Stencil.py 2>&1) >telaG${g}Sctencil.txt
 git clone https://github.com/hiperwalk/hiperwalk.git; cd hiperwalk; git fetch --all; git checkout bidu
 
+sudo apt update
+sudo apt install wslu
+ sudo apt install xdg-utils wslu
+ xdg-open https://www.google.com
+
+jupyter nbconvert --to notebook --execute examples/coined/notebooks/Grover-algorithm.ipynb
+

@@ -668,6 +668,7 @@ class QuantumWalk(ABC):
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
+       
         #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
         saved_states = np.zeros( (2, state.shape[0]), dtype=dtype)
         state_index  = 0 # index of the state to be saved
@@ -701,7 +702,7 @@ class QuantumWalk(ABC):
         self._simul_mat = None; #  self._simul_vec = None
         #hiperblas.vector_delete( self._simul_vec)
         print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
-        return #saved_states
+        return saved_states
 
     @staticmethod
     def _get_valid_kwargs(method):

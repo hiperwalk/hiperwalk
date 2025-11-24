@@ -393,7 +393,6 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 #include <omp.h>
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
    printf(" em computeU + Hiagogo, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
-    #pragma omp parallel 
 {
         int k=0;
     printf("BD em %s: void * void computeU, Thread %d of %d created!\n", __FILE__, omp_get_thread_num(), omp_get_num_threads()); 
@@ -412,7 +411,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
             }
         }
     } else if (C->type == T_FLOAT ) {
-        #pragma omp parallel for schedule(static)
+        #pragma omp parallel for schedule(static) firstprivate(k)
         for (int row = 0; row < S->nrow; ++row) {
             if (k++ < 3 ) {printf("Thread %d of %d created!, row=%d \n",  omp_get_thread_num(), omp_get_num_threads(), row); }
             int permuted_row = S->col_idx[row]; // Since A is a permutation matrix
@@ -436,7 +435,6 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
       smatrix_t* C = (smatrix_t*) C_;
       smatrix_t* U = (smatrix_t*) U_;
       computeRowptrU(S, C, U);
-      #pragma omp parallel 
       printf("BD em %s: void * permuteSparseMatrix\n", __FILE__); 
       computeU(S, C, U);
    }
