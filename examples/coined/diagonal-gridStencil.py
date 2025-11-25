@@ -26,7 +26,8 @@ aRange=(startStep,endStep,step)
 from warnings import warn
 def main():
 
-    hpw.set_hpc(myHPC_option)    
+    hpw.set_hpc(myHPC_option)
+
     inicioG = time.perf_counter()
     grid = hpw.Grid(dim, diagonal=True, periodic=False)
     fimG    = time.perf_counter()
@@ -43,7 +44,6 @@ def main():
     inicioS = time.perf_counter()
     for r in range(1): #50*1000*1000):
         psi_final = dtqw.simulate(range=aRange, state=psi0)
-    #KOR psi_final = dtqw.simulate(range=aRange, state=psi0)
     fimS = time.perf_counter()
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
@@ -66,12 +66,12 @@ def main():
     f"tempo computeU = {fimC - inicioC:.5e}, "
     f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep + 1):.5e}, "
     f"tempo total = {(fimS - inicioG) :.5e}")
+    print('\n')
 
     return
 
-    psi_final = dtqw.simulate(range=(1, 29 + 1), state=psi0)
     prob = dtqw.probability_distribution(psi_final)
-    #hpw.plot_probability_distribution(probs, graph=grid)
+    hpw.plot_probability_distribution(probs, graph=grid)
     #print(probs)
     #plt.savefig("grafico.png")
 

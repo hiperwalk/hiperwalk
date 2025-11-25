@@ -1,73 +1,86 @@
+import hiperwalk as hpw
 import numpy as np
 
+#nbl.init_engine(nbl.CPU,0)
+
+import time
 import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
-import time
+sys.stdout.reconfigure(line_buffering=True)
 
-import hiperwalk as hpw
-myOption=None
-myOption="cpu"
-hpw.set_hpc(myOption) 
-print("\nA, get_hpc()=", hpw.get_hpc() )
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aNumSteps=1
 
-step=1
-dim = 32*5*2*2*2; start=1; end=start+5+10000; #step=1 #10*300//1-1
-dim = 3*1; start=1; end=start+1+1; #step=1 #10*300//1-1
-aRange=(start,end,step)
+dim          =aDim        # 10
+coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
+myHPC_option =aHPCoPTION  # None   "cpu"    "gpu"
+myNumSteps   =aNumSteps
 
-grid = hpw.Grid(dim, diagonal=True, periodic=True)
-grid = hpw.Grid(dim, diagonal=True, periodic=False)
+coinT  = "Grover  coin,    real" if coin=="G"            else "Fourier coin, complex"
+algebra="SciPy"                  if myHPC_option == None else "HiperBlas"
 
-print(f"graph=hpw.grid({dim}),  aRange = {aRange}, get_hpc() = { hpw.get_hpc()}" )
+startStep=1;endStep=startStep+myNumSteps;step=1
+aRange=(startStep,endStep,step)
 
-inicioA = time.perf_counter()
-dtqw = hpw.Coined(grid, shift='persistent', coin='grover')
-fimA = time.perf_counter()
-print(f"computeU : Tempo decorrido: {fimA - inicioA:.6f} segundos");
-#exit()
-center = np.array([dim // 2, dim // 2])
-psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
+from warnings import warn
+def main():
+
+    hpw.set_hpc(myHPC_option)
+
+    inicioG = time.perf_counter()
+    grid = hpw.Grid(dim, diagonal=True, periodic=False)
+    fimG    = time.perf_counter()
+
+    inicioC = time.perf_counter()
+    dtqw = hpw.Coined(grid, shift='persistent', coin='grover')
+    fimC = time.perf_counter()
+
+    center = np.array([dim // 2, dim // 2])
+    psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
                    [-0.5, (center, center + (1, -1))],
                    [-0.5, (center, center + (-1, 1))],
                    [0.5, (center, center + (-1, -1))]])
-inicio = time.perf_counter()
-for r in range(1): #50*1000*1000):
-    psi_final = dtqw.simulate(range=aRange, state=psi0)
-#KOR psi_final = dtqw.simulate(range=aRange, state=psi0)
-fim = time.perf_counter()
-print("get_hpc()=", hpw.get_hpc() )
-print(f"computeU : Tempo decorrido: {fimA - inicioA:.6f} segundos")
-print(f"Iteracoes: Tempo decorrido: {fim - inicio:.6f} segundos")
-#psi_final = dtqw.simulate(range=(1, 29 + 1), state=psi0)
-#prob = dtqw.probability_distribution(psi_final)
-#hpw.plot_probability_distribution(prob, graph=grid)
+    inicioS = time.perf_counter()
+    for r in range(1): #50*1000*1000):
+        psi_final = dtqw.simulate(range=aRange, state=psi0)
+    fimS = time.perf_counter()
+    print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
+    print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
+    print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
+    print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
+    U = dtqw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
+    import os
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
+    print(
+    f"{nome:14s}, "
+    f"dim = {dim:4d}, "
+    f"numStep = {endStep - startStep:4d}, "
+    f"{coinT}, "
+    f"numArcs = {num_arcs:10d}, "
+    f"nnz = {U.nnz:12d}, "
+    f"densidade = {densidade:.5e}, "
+    f"algebra = {algebra:>10s}, "
+    f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
+    f"tempo computeU = {fimC - inicioC:.5e}, "
+    f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep + 1):.5e}, "
+    f"tempo total = {(fimS - inicioG) :.5e}")
+    print('\n')
 
+    return
 
-U = dtqw.get_evolution()
-print('--------------------------------------------------------------')
-print(hex(id(U.indices)))
-print(hex(id(U.indptr)))
-print("& U.data = " , hex(id(U.data)))
-print("data[0] = " , U.data[0])
+    prob = dtqw.probability_distribution(psi_final)
+    hpw.plot_probability_distribution(probs, graph=grid)
+    #print(probs)
+    #plt.savefig("grafico.png")
 
-data = U.data
-# Endereço base e tamanho de cada elemento
-addr_base = data.__array_interface__['data'][0]
-itemsize = data.itemsize
-print(f"Endereço base de U.data (U.data[0]): {hex(addr_base)}")
-for i in range(min(2, data.size)):  # mostra os dois primeiros
-    print(f"&U.data[{i}] = {hex(addr_base + i * itemsize)}")
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as e:
+        import traceback
+        print("Erro:", e, file=sys.stderr)
+        traceback.print_exc()
 
-indices = U.indices
-# Endereço base e tamanho de cada elemento
-addr_base = indices.__array_interface__['data'][0]
-itemsize = indices.itemsize
-print(f"Endereço base de U.indices (U.indices[0]): {hex(addr_base)}")
-for i in range(min(2, indices.size)):  # mostra os dois primeiros
-    print(f"&U.indices[{i}] = {hex(addr_base + i * itemsize)}")
-
-print('--------- TIPOS VETORES INTERNOS CSR ---------------------')
-print(type(U.indptr[0]))
-print(type(U.indices[0]))
-print(type(U.data[0]))
+#main()
