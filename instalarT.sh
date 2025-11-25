@@ -40,11 +40,12 @@ comandoLD="echo \":\$LD_LIBRARY_PATH:\" | grep -q \":\$SCRATCH/hiperblas/lib:\" 
 echo $comandoLD;  eval $comandoLD;
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 read -p " aguardando um enter para seguir ou um ctrl+C para interromper ...."
-comandoHB="(pwd; cd $relativeDir/hiperblas-core; pwd; . ./instalarHB.sh     )"; 
+comandoHB="(pwd; cd $relativeDir/hiperblas-core; pwd; make install   )"; 
+comandoHB="(pwd; cd $relativeDir/hiperblas-core; pwd; ./instalarHB.sh     )"; 
 echo $comandoHB
-comandoPyHB="(cd $relativeDir/pyhiperblas;    pwd; . ./instalarPyHB.sh . )";
+comandoPyHB="(cd $relativeDir/pyhiperblas;    pwd; ./instalarPyHB.sh . )";
 comandoPyHB="(cd $relativeDir/pyhiperblas; python3 -m pip install --user -e . --break-system-packages --no-deps --no-cache )"
-comandoPyHB="(pwd; cd $relativeDir/pyhiperblas;    pwd;  python3 -m pip install --user -e .  )";
+comandoPyHB="(pwd; cd $relativeDir/pyhiperblas;    pwd; pip install  .  )";
 echo $comandoPyHB
 comandoHW="(pwd; cd $relativeDir;  pip install -e .  )"; # só funciona se o backend suportar instalação editável.
 comandoHW="(pwd; cd $relativeDir;  pip install    .  )"; #  se o backend NAO suportar instalação editável.

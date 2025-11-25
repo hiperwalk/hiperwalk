@@ -8,8 +8,9 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
 aNumSteps=1
 
 dim          =aDim        # 10

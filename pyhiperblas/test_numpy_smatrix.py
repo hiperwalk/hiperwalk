@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.sparse import random
 
-import neblina as nbl
+import hiperblas as nbl
 
 n = 100
 # Set the seed for reproducibility (optional)

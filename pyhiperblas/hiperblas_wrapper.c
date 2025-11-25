@@ -338,34 +338,21 @@ static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
-static void* py_sparse_matvec_mulBD(PyObject* self, PyObject* args) {
-    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mulBD(PyObject* self, ... \n");
-    PyObject* m = NULL; PyObject* vIn = NULL;  PyObject* vOut = NULL;
-    if(!PyArg_ParseTuple(args, "OOO:py_sparse_matvec_mul", &m, &vIn, &vOut)) return NULL;
-    smatrix_t * aSmat = (smatrix_t *)PyCapsule_GetPointer(m, "py_sparse_matrix_new");
-    vector_t  * vec_In  = (vector_t  *)PyCapsule_GetPointer(vIn, "py_vector_new");
-    vector_t  * vec_Out  = (vector_t  *)PyCapsule_GetPointer(vOut, "py_vector_new");
-    object_t ** in = convertToObject4BD(aSmat, vec_In, vec_Out );
-    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
-    Py_RETURN_NONE;
-}
-
-/*
 static void* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... \n");
-    PyObject* a = NULL; PyObject* b = NULL;
-    if(!PyArg_ParseTuple(args, "OO:py_sparse_matvec_mul", &a, &b)) return NULL;
-    vector_t  * vec_a  = (vector_t  *)PyCapsule_GetPointer(a, "py_vector_new");
-    smatrix_t * smat_b = (smatrix_t *)PyCapsule_GetPointer(b, "py_sparse_matrix_new");
-    object_t ** in = convertToObject4(vec_a, smat_b);
+
+    PyObject* m = NULL; PyObject* vIn = NULL;  PyObject* vOut = NULL;
+    if(!PyArg_ParseTuple(args, "OOO:py_sparse_matvec_mul", &m, &vIn, &vOut)) return NULL;
+
+    smatrix_t * aSmat   = (smatrix_t *)PyCapsule_GetPointer(m,    "py_sparse_matrix_new");
+    vector_t  * vec_In  = (vector_t  *)PyCapsule_GetPointer(vIn,  "py_vector_new");
+    vector_t  * vec_Out = (vector_t  *)PyCapsule_GetPointer(vOut, "py_vector_new");
+
+    object_t ** in      = convertToObject4BD(aSmat, vec_In, vec_Out );
     matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
-   // vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
-   // PyObject* po = PyCapsule_New((void*)r, "py_vector_new", py_vector_delete);
-  //  return po;
+
     Py_RETURN_NONE;
 }
-*/
-
 
 static PyObject* py_vec_prod(PyObject* self, PyObject* args) {
     
@@ -711,8 +698,8 @@ static PyObject* BD00py_sparse_matrix_new(PyObject* self, PyObject* args){
 static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
     int rows; int cols; int data_type;
     printf("BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) \n");
-    if (!PyArg_ParseTuple(args, "iii", &rows,&cols,&data_type)) return NULL;
-    printf(" call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);\n");
+    if (!PyArg_ParseTuple(args, "iii", &rows, &cols, &data_type)) return NULL;
+    printf("BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);\n");
     smatrix_t * a = bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
     //printf("em py_sparse_matrix_new, a.value[0]=%f, ", a->values[0]); //printf("exit(2223);\n"); exit(2223);
     if (!a) { PyErr_SetString(PyExc_RuntimeError, "smatrix_new failed"); return NULL; }
@@ -1025,8 +1012,7 @@ static PyMethodDef mainMethods[] = {
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},
     {"move_sparse_matrix_device", py_move_sparse_matrix_device, METH_VARARGS, "move_sparse_matrix_device"},
     {"move_sparse_matrix_host", py_move_sparse_matrix_host, METH_VARARGS, "move_sparse_matrix_host"},
-    //{"sparse_matvec_mul", py_sparse_matvec_mul, METH_VARARGS, "sparse_matvec_mul"},
-    {"sparse_matvec_mulBD", py_sparse_matvec_mulBD, METH_VARARGS, "sparse_matvec_mul por bidu"},
+    {"sparse_matvec_mul", py_sparse_matvec_mul, METH_VARARGS, "sparse_matvec_mul por bidu"},
     {"sparse_matrix_print", py_sparse_matrix_print, METH_VARARGS, "sparse_matrix_print"}, //BD
     {"print_vectorT",       py_print_vectorT,       METH_VARARGS, "print_vectorT"},
     {"vec_add", py_vec_add, METH_VARARGS, "vec_add"},

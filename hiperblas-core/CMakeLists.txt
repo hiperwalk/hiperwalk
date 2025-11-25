@@ -89,15 +89,15 @@ include_directories(${GTEST_INCLUDE_DIRS})
 #add_executable(matrix_test ${PROJECT_TEST_DIR}/matrix_test.cpp)
 #target_link_libraries(matrix_test PRIVATE hiperblas-core ${GTEST_BOTH_LIBRARIES} Threads::Threads)
 
-add_executable(sparse_matrix_testBD ${PROJECT_TEST_DIR}/sparse_matrix_testBD.cpp)
-target_link_libraries(sparse_matrix_testBD PRIVATE hiperblas-core ${GTEST_BOTH_LIBRARIES} Threads::Threads)
+add_executable(sparse_matrix_test ${PROJECT_TEST_DIR}/sparse_matrix_test.cpp)
+target_link_libraries(sparse_matrix_test PRIVATE hiperblas-core ${GTEST_BOTH_LIBRARIES} Threads::Threads)
 
 #add_executable(hiperblas_test ${PROJECT_TEST_DIR}/hiperblas_test.cpp)
 #target_link_libraries(hiperblas_test PRIVATE hiperblas-core ${GTEST_BOTH_LIBRARIES} Threads::Threads)
 
 #add_test(NAME vector_test        COMMAND vector_test)
 #add_test(NAME matrix_test        COMMAND matrix_test)
-add_test(NAME sparse_matrix_testBD COMMAND sparse_matrix_testBD)
+add_test(NAME sparse_matrix_test COMMAND sparse_matrix_test)
 #add_test(NAME hiperblas_test       COMMAND hiperblas_test)
 
 # === Instalação ===

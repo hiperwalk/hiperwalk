@@ -15,3 +15,5 @@ sudo apt install wslu
 
 jupyter nbconvert --to notebook --execute examples/coined/notebooks/Grover-algorithm.ipynb
 
+grep "from\|vec_out\|state_index" tela*
+

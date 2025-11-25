@@ -455,7 +455,6 @@ class QuantumWalk(ABC):
 
     def _prepare_engine(self, state, hpc):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
-        np.set_printoptions(linewidth=220) 
         if hpc is not None:
             self._simul_vec_in  = nbl.send_vector(state)
             self.v_out          = state.copy();
@@ -487,6 +486,7 @@ class QuantumWalk(ABC):
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
                 #print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
+                #hiperblas.sparse_matvec_mul(self._simul_mat, self._simul_vec_in, self._simul_vec_out)
                 nbl.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         else:
@@ -655,6 +655,7 @@ class QuantumWalk(ABC):
         dtype = state.dtype
         #########################################################
 
+        np.set_printoptions(linewidth=120, threshold=20) 
         self._prepare_engine(state, hpc);
         #np.set_printoptions(precision=3, suppress=True)
         np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })

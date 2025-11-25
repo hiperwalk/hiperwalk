@@ -272,7 +272,7 @@ def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
     # the engine should have been already initiated
     if is_sparse:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto ")
-        hiperblas.sparse_matvec_mulBD(nbl_mat, nbl_vecIn, nbl_vecOut)
+        hiperblas.sparse_matvec_mul(nbl_mat, nbl_vecIn, nbl_vecOut)
     else:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.matvec_mul, DENSA, para continuo ")
         nbl_vecOut = hiperblas.matvec_mul(nbl_vecIn, nbl_mat)
