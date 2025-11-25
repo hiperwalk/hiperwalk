@@ -309,16 +309,17 @@ void print_vectorT(vector_t *v_) {
             for (i = 0; i < n_complex; i++) {
                 double re = data[2 * i], im = data[2 * i + 1];
                 sum += re * re + im * im;
-                printf(" (%.3f %+ .3fi)", re, im);
+                //printf(" (%.3f %+ .3fi)", re, im);
+		printf(" (%.3f %+.3fi)", re, im);
             }
         } else {
             int tamFaixa = 3;
             for (i = 0; i < n_complex; i++) {
                 double re = data[2 * i], im = data[2 * i + 1];
                 sum += re * re + im * im;
-                if (i < tamFaixa) printf(" (%.3f %+ .3fi)", re, im);
+		if (i < tamFaixa) printf(" (%.3f %+.3fi)", re, im);
                 else if (i == tamFaixa) printf(" ...");
-                else if (i >= n_complex - tamFaixa) printf(" (%.3f %+ .3fi)", re, im);
+                else if (i >= n_complex - tamFaixa) printf(" (%.3f %+.3fi)", re, im);
             }
         }
     }

@@ -270,7 +270,6 @@ def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
     """
     # if a matrix-vector operation is being requested,
     # the engine should have been already initiated
-    print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector( .., is_sparse=",is_sparse)
     if is_sparse:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto ")
         hiperblas.sparse_matvec_mulBD(nbl_mat, nbl_vecIn, nbl_vecOut)

@@ -425,17 +425,14 @@ class QuantumWalk(ABC):
         """
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
-        print("BD, em quantum_walk.py, def state(self, entries=", entries)
 
         dtype = np.array([entry[0] for entry in entries]).dtype
         dtype = (complex if np.issubdtype(dtype, np.complexfloating)
                  else float)
         state = np.zeros(self.hilb_dim, dtype=dtype)
-        print("BD, em def state(self ..., local states=", states)
 
         for ampl, vertex in entries:
             state[self._graph.vertex_number(vertex)] = ampl
-        print("BD, em def state(self ..., local states=", states)
 
         return self._normalize(state)
 
@@ -489,12 +486,12 @@ class QuantumWalk(ABC):
             # TODO: check if intermediate states are being freed
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
-                print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
+                #print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
                 nbl.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         else:
             for i in range(step):
-                print("BD, em def _simulate_step, SciPy, BEFORE CALL self._simul_mat @ self._simul_vec")
+                #print("BD, em def _simulate_step, SciPy, BEFORE CALL self._simul_mat @ self._simul_vec")
                 self._simul_vec_out[:] = self._simul_mat @ self._simul_vec_in
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         return
@@ -662,13 +659,11 @@ class QuantumWalk(ABC):
         #np.set_printoptions(precision=3, suppress=True)
         np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })
 
-        print(f"BD, em simulate, initial state, state=", state, end=";  ");
-        print("state.l2Norm=", np.linalg.norm(state)); 
+        print(f"BD, em simulate, initial state, state=", state, end=";  "); print("state.l2Norm=", np.linalg.norm(state)); 
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
-       
         #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
         saved_states = np.zeros( (2, state.shape[0]), dtype=dtype)
         state_index  = 0 # index of the state to be saved

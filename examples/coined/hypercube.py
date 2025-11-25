@@ -20,7 +20,7 @@ coin="F" # Fourier para Complex  para Real
 myOption=None
 myOption="cpu"
 
-aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
 
 dim      =aDim        # 10  
 coin     =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex

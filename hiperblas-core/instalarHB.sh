@@ -40,7 +40,7 @@ echo ".......LD_LIBRARY_PATH=$LD_LIBRARY_PATH"+++;
 # Variáveis para build/link
 export GTest_ROOT="$HOME/local"
 export GTEST_INCLUDE_DIR=$hwINC
-export GTEST_INCLUDE_DIR=$GTest_ROOT/include/gtest
+export GTEST_INCLUDE_DIR=$GTest_ROOT/include/
 export GTEST_LIBRARIES=$hwLIB
 export GTEST_LIBRARIES=$GTest_ROOT/lib
 

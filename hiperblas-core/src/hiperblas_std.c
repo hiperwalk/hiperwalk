@@ -1345,7 +1345,7 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
     
         object_t ** in = (object_t **) i;
         vector_t * v = (vector_t *) vvalue( *in[1] );
-        printf("BD, em matvec_mul3BD: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
+        //printf("BD, em matvec_mul3BD: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
         vector_t * r = (vector_t *) vvalue( *in[2] );
        
         //do I have to assume that it needs to be copied everytime?
@@ -1392,7 +1392,7 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
             }
 
             if (status != NULL) { *status = 0; }
-            printf("BD,   em matvec_mul3BD, RETURN (void *) r  \n");
+            //printf("BD,   em matvec_mul3BD, RETURN (void *) r  \n");
             return;
             
         } else if(  type( *in[0] ) == T_RMATRIX ) {

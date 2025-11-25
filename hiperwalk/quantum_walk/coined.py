@@ -898,7 +898,7 @@ class Coined(QuantumWalk):
         #formatted = "\n".join( " ".join(f"{v:2d}" for v in row) for row in S.toarray())
         #print(formatted); print(); 
 
-        print("BD, em _set_evolution, CALL  C = self.get_coin(), monta a matriz CSR ")
+        #print("BD, em _set_evolution, CALL  C = self.get_coin(), monta a matriz CSR ")
         C = self.get_coin()
         #print("type(C) = ", type(C)); print("C = self.get_coin(), C =  ")
         #formatted = "\n".join( " ".join(f"{v:8.1e}" for v in row) for row in C.toarray())
@@ -909,28 +909,28 @@ class Coined(QuantumWalk):
         #S.indices = np.arange(len(S.indices))
  
         np.set_printoptions(linewidth=240) 
-        print("type(S.indices)   = ", type(S.indices))
-        print("S.indices.dtype   = ", S.indices.dtype)
-        print("indices contiguous: ", S.indices.flags['C_CONTIGUOUS'])
-        print("S.indptr.dtype    = ", S.indptr.dtype)
-        print("indptr contiguous : ", S.indptr.flags['C_CONTIGUOUS'])
-        print("type(S)           = ", type(S))
-        print("S.dtype           = ", S.dtype)
-        print("S.data.dtype      = ", S.data.dtype)
-        print("data contiguous   : ", S.data.flags['C_CONTIGUOUS'])
-        #print("BD, em _set_evolution, S.toarray()  =\n", S.toarray()); 
-        #print("BD, em coined.py: S.indices    = ", S.indices) 
+        #print("type(S.indices)   = ", type(S.indices))
+        #print("S.indices.dtype   = ", S.indices.dtype)
+        #print("indices contiguous: ", S.indices.flags['C_CONTIGUOUS'])
+        #print("S.indptr.dtype    = ", S.indptr.dtype)
+        #print("indptr contiguous : ", S.indptr.flags['C_CONTIGUOUS'])
+        #print("type(S)           = ", type(S))
+        #print("S.dtype           = ", S.dtype)
+        #print("S.data.dtype      = ", S.data.dtype)
+        #print("data contiguous   : ", S.data.flags['C_CONTIGUOUS'])
+        ##print("BD, em _set_evolution, S.toarray()  =\n", S.toarray()); 
+        ##print("BD, em coined.py: S.indices    = ", S.indices) 
         perm = S.indices 
 
-        print("type(C.indices)   = ", type(C.indices))
-        print("C.indices.dtype   = ", C.indices.dtype)
-        print("indices contiguous: ", C.indices.flags['C_CONTIGUOUS'])
-        print("C.indptr.dtype    = ", C.indptr.dtype)
-        print("indptr contiguous : ", C.indptr.flags['C_CONTIGUOUS'])
-        print("type(C)           = ", type(C))
-        print("C.dtype           = ", C.dtype)
-        print("C.data.dtype      = ", C.data.dtype)
-        print("data contiguous   : ", C.data.flags['C_CONTIGUOUS'])
+        #print("type(C.indices)   = ", type(C.indices))
+        #print("C.indices.dtype   = ", C.indices.dtype)
+        #print("indices contiguous: ", C.indices.flags['C_CONTIGUOUS'])
+        #print("C.indptr.dtype    = ", C.indptr.dtype)
+        #print("indptr contiguous : ", C.indptr.flags['C_CONTIGUOUS'])
+        #print("type(C)           = ", type(C))
+        #print("C.dtype           = ", C.dtype)
+        #print("C.data.dtype      = ", C.data.dtype)
+        #print("data contiguous   : ", C.data.flags['C_CONTIGUOUS'])
         np.set_printoptions(precision=3, suppress=True)
         #print("BD, em _set_evolution, C.toarray()  =\n", C.toarray()); 
 
@@ -986,7 +986,6 @@ class Coined(QuantumWalk):
         #print("BD, em _set_evolution, U.toarray()  =\n", U.toarray()); 
         #print("BD, em _set_evolution, exit() =\n", exit()); 
         self._evolution = U
-        print("BD, em _set_evolution, RETURN "); return
         return # U
 
     def set_evolution(self, **kwargs):
