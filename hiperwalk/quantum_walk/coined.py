@@ -5,7 +5,8 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
 from scipy.linalg import hadamard, dft
-from . import _pyhiperblas_interface as nbl
+from . import _pyhiperblas_interface as hbi
+import hiperblas as hb
 
 class Coined(QuantumWalk):
     r"""
@@ -331,7 +332,7 @@ class Coined(QuantumWalk):
 
         # check if explict matrix
         try:
-            shift[0][0] #if this works, then shift is numpy or list of list
+            #shift[0][0] #if this works, then shift is numpy or list of list
             # convert to sparse
             shift = scipy.sparse.csr_array(shift)
         except NotImplementedError:
@@ -808,7 +809,6 @@ class Coined(QuantumWalk):
         degree = self._graph.degree
         blocks = [self._coin_funcs[coin_list[v]](degree(v))
                   for v in range(num_vert)]
-        print("em def _coin_list_to_explicit_coin, blocks[0].dtype=",blocks[0].dtype)
         C = scipy.sparse.block_diag(blocks, format='csr')
 
         C.indices = np.ascontiguousarray(C.indices, dtype=np.int64)
@@ -828,9 +828,7 @@ class Coined(QuantumWalk):
         --------
         set_coin
         """
-        print("++++++  em hiperwalk/quantum_walk/coined.py: get_coin(self)")
-        print("em get_coin: self._coin=", self._coin[:5])
-        print("em get_coin: scipy.sparse.issparse(self._coin) =", scipy.sparse.issparse(self._coin))
+        print("BD, em hiperwalk/quantum_walk/coined.py: get_coin(self)")
         if scipy.sparse.issparse(self._coin):
             if len(self._marked) == 0: return self._coin
 
@@ -838,7 +836,7 @@ class Coined(QuantumWalk):
             # and there are different coins for the marked vertices,
             # change them.
             def get_block(vertex):
-                print (" def get_block(vertex): ", vertex)
+      #          print (" def get_block(vertex): ", vertex)
                 g = self._graph
                 neighbors = g.neighbors(vertex)
                 # TODO: this technique wont work after the behavior of
@@ -864,10 +862,6 @@ class Coined(QuantumWalk):
 
             return scipy.sparse.csr_array(C)
 
-        print("em get_coin(self), semi-final ")
-
-        #print("C=",C)
-
         oracle_coin = self._oracle_coin
         if len(oracle_coin) > 0:
             coin = self._coin
@@ -877,9 +871,6 @@ class Coined(QuantumWalk):
         else:
             coin_list = self._coin
 
-        print("coin_list[:5]=",coin_list[:5])
-#        print("_coin_list_to_explicit_coin(coin_list)=",self._coin_list_to_explicit_coin(coin_list))
-        #print("em get_coin(self), final, coin_list[0].dtype = ", coin_list[0].dtype ); exit()
 
         
         return self._coin_list_to_explicit_coin(coin_list)
@@ -888,7 +879,7 @@ class Coined(QuantumWalk):
         # TODO: Check if matrix is sparse in pynelibna interface
         # TODO: Check if matrices are deleted from memory and GPU.
 
-        #from . import _pyhiperblas_interface as nbl  #BD
+        #from . import _pyhiperblas_interface as hbi  #BD
         print("BD, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
         U = None
 
@@ -936,7 +927,7 @@ class Coined(QuantumWalk):
 
         #U = C.copy()
 
-        if nbl.get_hpc() is  None:
+        if hbi.get_hpc() is  None:
             print("BD, em _set_evolution, computeU,  U = S @ C ");
             # U = S @ C
             U = C[S.indices,:]
@@ -949,9 +940,9 @@ class Coined(QuantumWalk):
             #print("BD, em _set_evolution, S.toarray()  = ", S.toarray()); 
             ##print("S.dtype=",S.dtype, ", np.complexfloating=", np.complexfloating)
             #exit()
-            hbS = nbl.send_matrix(S)
+            hbS = hbi.send_matrix(S)
             ##print("BD, +++++ em _set_evolution, exit() =\n", exit()); 
-            ##print("BD, em _set_evolution, hbS  = "); nbl.sparse_matrix_print(hbS); 
+            ##print("BD, em _set_evolution, hbS  = "); hbi.sparse_matrix_print(hbS); 
             ##print("BD, em coined.py: S.indptr    = ", S.indptr) 
             ##print("BD, em coined.py: S.indices   = ", S.indices) 
             ##print("BD, em coined.py: S.data      = ", S.data) 
@@ -959,8 +950,8 @@ class Coined(QuantumWalk):
             #C.indices = C.indices.astype(np.int32)
             #C.indptr  = C.indptr.astype(np.int32)
             #C.data  = C.data.astype(np.float64)
-            hbC = nbl.send_matrix(C)
-            ##print("BD, em _set_evolution, hbC  = "); nbl.sparse_matrix_print(hbC); 
+            hbC = hbi.send_matrix(C)
+            ##print("BD, em _set_evolution, hbC  = "); hbi.sparse_matrix_print(hbC); 
             ##print("BD, em coined.py: C.indptr    = ", C.indptr) 
             ##print("BD, em coined.py: C.indices   = ", C.indices) 
             ##print("BD, em coined.py: C.data      = ", C.data) 
@@ -972,11 +963,12 @@ class Coined(QuantumWalk):
             ##print("BD, em coined.py: (S @ C).data      = ", U.data) 
 
             U = C.copy()
-            hbU = nbl.send_matrix(U)
-            ##print("BD, em _set_evolution, computeU, nbl.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); nbl.sparse_matrix_print(hbU); 
-            nbl.permute_sparse_matrix(hbS, hbC, hbU); 
-        #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix(hbS, hbC, hbU);  ");
-        #    print("BD, em _set_evolution, AFTER : nbl.permute_sparse_matrix,  hbU  = "); nbl.sparse_matrix_print(hbU); 
+            hbU = hbi.send_matrix(U)
+            ##print("BD, em _set_evolution, computeU, hbi.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); hbi.sparse_matrix_print(hbU); 
+            #hbi.permute_sparse_matrix(hbS, hbC, hbU); 
+            hb.permute_sparse_matrix(hbS, hbC, hbU)
+        #    print("BD, em _set_evolution, AFTER : hbi.permute_sparse_matrix(hbS, hbC, hbU);  ");
+        #    print("BD, em _set_evolution, AFTER : hbi.permute_sparse_matrix,  hbU  = "); hbi.sparse_matrix_print(hbU); 
         #print("BD, em coined.py: U.indptr    = ", U.indptr) 
         #print("BD, em coined.py: U.indices   = ", U.indices) 
         #print("BD, em coined.py: U.data      = ", U.data) 

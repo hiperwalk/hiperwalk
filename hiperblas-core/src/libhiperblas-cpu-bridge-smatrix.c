@@ -75,9 +75,6 @@ void smatrix_pack_complex(smatrix_t * m) {
 }
 
 void smatrix_set_real_value(smatrix_t * m, int i, int j, double r) {
-    //printf(" src/libhiperblas-cpu-bridge-smatrix.c: void smatrix_set_real_value(smatrix_t * m, int i, int j, double r)\n");
-     //printf(" r = %f\n", r);
-
     if (i < 0 || i >= m->nrow || j < 0 || j >= m->ncol) {
         printf("Invalid index on loading sparse matrix: row %d, col %d\n", i, j);
         exit(-1);
@@ -167,7 +164,7 @@ void smatrix_load_complex(smatrix_t *m, FILE *f) {
 }
 
 void smatreqhost(smatrix_t *m) {
-    printf("em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqhost(smatrix_t *m) {\n");
+    printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqhost(smatrix_t *m) {\n");
     if (m->location != LOCHOS) {
         m->location  = LOCHOS;
         m->col_idx   = m->idxColMem;  // Transfer idxColMem to idx_col
@@ -178,18 +175,15 @@ void smatreqhost(smatrix_t *m) {
 }
 
 void smatreqdev(smatrix_t *m) {
-       printf("em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {\n");
-//       printf("em smatreqdev, inicio\n");
-
-       //print_smatrix(m); 
-       //printf("em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev, exit(2222); \n"); exit(2222);
-
+       printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {\n");
+       /*
        printf(" m->location = %d, LOCDEV = %d\n", m->location, LOCDEV);
        printf("   m->row_ptr   = %p\n", (void *) m->row_ptr);  
        printf("   m->col_idx   = %p\n", (void *) m->col_idx);  
        printf("   m->values    = %p\n", (void *) m->values);  
        printf("   m->idxColMem = %p\n", (void *) m->idxColMem);  
        printf("   m->extra     = %p\n", (void *) m->extra);  
+       */
     if (m->location != LOCDEV) {
         m->location = LOCDEV;
         m->idxColMem = m->col_idx;  // Transfer idx_col to idxColMem
@@ -202,17 +196,22 @@ void smatreqdev(smatrix_t *m) {
         //m->col_idx = NULL;  // Clear idx_col
         //m->values  = NULL;  // Clear values
     }
+    /*
        printf("em smatreqdev, ANTES DO fim\n");
        printf(" m->location  = %d, LOCDEV = %d\n", m->location, LOCDEV);
        printf(" nao coloque NULL.  m->col_idx   = %p\n", (void *) m->col_idx);  
        printf("   m->idxColMem = %p\n", (void *) m->idxColMem);  
        printf(" nao coloque NULL.  m->values = %p\n", (void *) m->values);  
        printf("   m->extra  = %p\n", (void *) m->extra);  
+       */
 //     printf("em smatreqdev, fim\n"); exit(2222);
 }
 
 void smatrix_delete(smatrix_t *smatrix) {
+    // em HW as matrizes em formato CSR são criadas pelo python 
+    //   não pode se desalocadas pelo ambiente do C
     printf("BD, ATENCAO, em %s: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {\n", __FILE__); // _NAME__);
+    free(smatrix);
     return;
     if (!smatrix) { return; }
     // Free linked lists in smat if allocated
@@ -250,7 +249,6 @@ void smatrix_delete(smatrix_t *smatrix) {
     smatrix->extra = NULL;
 
     // Finally, free the struct itself
-    free(smatrix);
     printf("BD, em smatrix_delete, FINAL ;\n");
 }
 

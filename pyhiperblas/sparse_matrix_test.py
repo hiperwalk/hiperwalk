@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from scipy.sparse import random
 from scipy.sparse import block_diag, csr_matrix
-import hiperblas as nbl
+import hiperblas as hb
 
 def csr_bloco_diagonal(blocos):
     """
@@ -23,7 +23,7 @@ def vector_normL2_one (n_):
     
 def main():
 
-    nbl.init_engine(nbl.CPU,0)
+    hb.init_engine(hb.CPU,0)
 
     reps = 1 # 10
 
@@ -38,24 +38,24 @@ def main():
 
     print(blocoDiagMat.toarray())
 
-    hb_mat = nbl.sparse_matrix_new(n, n, nbl.FLOAT)
+    hb_mat = hb.sparse_matrix_new(n, n, hb.FLOAT)
 
-    nbl.sparse_matrix_print(hb_mat);
-    nbl.smatrixConnect(hb_mat, blocoDiagMat);
-    nbl.sparse_matrix_print(hb_mat);
+    hb.sparse_matrix_print(hb_mat);
+    hb.smatrixConnect(hb_mat, blocoDiagMat);
+    hb.sparse_matrix_print(hb_mat);
 
-    hb_vIn  = nbl.load_numpy_array(float_vectorIn)
-    nbl.move_vector_device(hb_vIn)
-    nbl.print_vectorT(hb_vIn)
+    hb_vIn  = hb.load_numpy_array(float_vectorIn)
+    hb.move_vector_device(hb_vIn)
+    hb.print_vectorT(hb_vIn)
 
-    hb_vOut = nbl.load_numpy_array(float_vectorOut)
-    nbl.move_vector_device(hb_vOut)
-    nbl.print_vectorT(hb_vOut)
+    hb_vOut = hb.load_numpy_array(float_vectorOut)
+    hb.move_vector_device(hb_vOut)
+    hb.print_vectorT(hb_vOut)
 
-    nbl.sparse_matvec_mul(hb_mat, hb_vIn, hb_vOut) 
-    nbl.print_vectorT(hb_vOut)
-    nbl.move_vector_host       (hb_vOut) # tras do device para o host
-    nbl.print_vectorT(hb_vOut)
+    hb.sparse_matvec_mul(hb_mat, hb_vIn, hb_vOut) 
+    hb.print_vectorT(hb_vOut)
+    hb.move_vector_host       (hb_vOut) # tras do device para o host
+    hb.print_vectorT(hb_vOut)
 
     vectorOutRef=blocoDiagMat@float_vectorIn
     print("vetor referencia: ", vectorOutRef, end="; "); print("vectorOutRef.l2Norm=", np.linalg.norm(vectorOutRef));
@@ -68,7 +68,7 @@ def main():
 
     print()
     print("test complete")
-    nbl.stop_engine()
+    hb.stop_engine()
 
     return
 

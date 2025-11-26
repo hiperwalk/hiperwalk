@@ -392,10 +392,9 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 #include <omp.h>
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-   printf(" em computeU + Hiagogo, S->type = %d, C->type = %d, U->type = %d\n", S->type, C->type, U->type); //  exit(128+13+7);
 {
-        int k=0;
-    printf("BD em %s: void * void computeU, Thread %d of %d created!\n", __FILE__, omp_get_thread_num(), omp_get_num_threads()); 
+    int k=0;
+    printf("BD em %s: void computeU, Thread %d of %d created!\n", __FILE__, omp_get_thread_num(), omp_get_num_threads()); 
     if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {

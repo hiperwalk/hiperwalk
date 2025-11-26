@@ -6,8 +6,8 @@ from sys import modules as sys_modules
 from warnings import warn
 #from ..graph import Graph
 import scipy.optimize
-from . import _pyhiperblas_interface as nbl
-import hiperblas
+from . import _pyhiperblas_interface as hbi
+import hiperblas as hb
 
 class QuantumWalk(ABC):
     """
@@ -456,10 +456,10 @@ class QuantumWalk(ABC):
     def _prepare_engine(self, state, hpc):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
         if hpc is not None:
-            self._simul_vec_in  = nbl.send_vector(state)
+            self._simul_vec_in  = hbi.send_vector(state)
             self.v_out          = state.copy();
-            self._simul_vec_out = nbl.send_vector(self.v_out)
-            self._simul_mat     = nbl.send_matrix(self._evolution)
+            self._simul_vec_out = hbi.send_vector(self.v_out)
+            self._simul_mat     = hbi.send_matrix(self._evolution)
         else:
             #self._simul_vec_in  = np.asarray(state,        dtype=np.complex128)
             #self._simul_vec_out = np.asarray(state.copy(), dtype=np.complex128)
@@ -486,8 +486,8 @@ class QuantumWalk(ABC):
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
                 #print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
-                #hiperblas.sparse_matvec_mul(self._simul_mat, self._simul_vec_in, self._simul_vec_out)
-                nbl.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
+                hb.sparse_matvec_mul(self._simul_mat, self._simul_vec_in, self._simul_vec_out)
+                #hbi.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         else:
             for i in range(step):
@@ -497,11 +497,11 @@ class QuantumWalk(ABC):
         return
 
     def _save_simul_vec(self, hpc, continue_simulation):
-        # from . import _pyhiperblas_interface as nbl #BD
+        # from . import _pyhiperblas_interface as hbi #BD
         ret = None
 
         if hpc is not None:
-            ret = nbl.copy_vector(self._simul_vec)
+            ret = hbi.copy_vector(self._simul_vec)
         else:
             ret = self._simul_vec.copy()
 
@@ -601,7 +601,7 @@ class QuantumWalk(ABC):
         """
         import time
         import sys
-        # from . import _pyhiperblas_interface as nbl #BD
+        # from . import _pyhiperblas_interface as hbi #BD
         print("BD, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate")
         ############################################
         ### Check if simulation was set properly ###
@@ -635,7 +635,7 @@ class QuantumWalk(ABC):
 
         start, end, step = range
         print( f"BD, start={start}, end={end}, step={step}")
-        hpc = nbl.get_hpc()
+        hpc = hbi.get_hpc()
 
         #########################################################
         # autoconversion of matrix and vector types
@@ -684,9 +684,9 @@ class QuantumWalk(ABC):
             self._simulate_step(step, hpc)
             #saved_states[state_index] = self._save_simul_vec(hpc, state_index + 1 < num_states)
             state_index += 1
-            if  nbl.get_hpc() == 'cpu' :
+            if  hbi.get_hpc() == 'cpu' :
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
-                if state_index < 4 or state_index > num_states - 3: nbl.print_vectorT_py_inter(self._simul_vec_out)
+                if state_index < 4 or state_index > num_states - 3: hb.print_vectorT(self._simul_vec_out)
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             else:
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
@@ -696,7 +696,7 @@ class QuantumWalk(ABC):
                 self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
         fimS    = time.perf_counter()
         self._simul_mat = None; #  self._simul_vec = None
-        #hiperblas.vector_delete( self._simul_vec)
+        #hb.vector_delete( self._simul_vec)
         print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
         return saved_states
 

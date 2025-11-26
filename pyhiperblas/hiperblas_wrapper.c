@@ -319,12 +319,9 @@ static void py_sparse_matrix_delete(PyObject* capsule) {
     //exit(128+37);
     //return;
     if (a) {
-        printf("BD, em py_sparse_matrix_delete, BEFORE CALL smatrix_delete, Liberando smatrix_t em %p\n", (void*)a);
         // Chame a função apropriada do seu backend para liberar memória
         bridge_manager.bridges[bridge_index].smatrix_delete(a);
-        printf("BD, em py_sparse_matrix_delete, AFTER  CALL smatrix_delete, Liberando smatrix_t em %p\n", (void*)a);
     }
-    printf("BD, em final de py_sparse_matrix_delete\n");
 }
 
 static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
@@ -458,13 +455,13 @@ static void py_smatrix_delete(PyObject* self) {
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
-static PyObject* py_smatrixConnect(PyObject* self, PyObject* args)
+static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
 {
-    printf("→ Entrou em py_smatrixConnect()\n");
+    printf("BD, em %s: static PyObject* py_smatrix_connect( ...\n", __FILE__);// , __func__)
 
     // Argumentos: (capsule, csr_matrix)
     PyObject *aSmatObj = NULL, *csr_obj = NULL;
-    if (!PyArg_ParseTuple(args, "OO:py_smatrixConnect", &aSmatObj, &csr_obj))
+    if (!PyArg_ParseTuple(args, "OO:py_smatrix_connect", &aSmatObj, &csr_obj))
         return NULL;
 
     // Recupera ponteiro da cápsula
@@ -474,8 +471,6 @@ static PyObject* py_smatrixConnect(PyObject* self, PyObject* args)
         return NULL;
     }
     int data_type = smat_a->type ;
-
-    printf("data_type = %d, T_FLOAT = %d, T_COMPLEX = %d\n", data_type, T_FLOAT, T_COMPLEX); // exit(128+13);
 
     // Atributos da CSR
     PyObject *dataObj    = PyObject_GetAttrString(csr_obj, "data");
@@ -490,7 +485,6 @@ static PyObject* py_smatrixConnect(PyObject* self, PyObject* args)
     // --- Verifica tipos e contiguidade (sem cópias) ---
     PyArrayObject *indptrArr  = (PyArrayObject*) PyArray_FROM_OTF(indptrObj,  NPY_INT64, NPY_ARRAY_CARRAY);
     PyArrayObject *indicesArr = (PyArrayObject*) PyArray_FROM_OTF(indicesObj, NPY_INT64, NPY_ARRAY_CARRAY);
-//    PyArrayObject *dataArr    = (PyArrayObject*) dataObj;
     PyArrayObject *dataArr;
     if(data_type==T_FLOAT   ) {dataArr    = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_FLOAT64,    NPY_ARRAY_CARRAY);}
     if(data_type==T_COMPLEX ) {dataArr    = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_COMPLEX128, NPY_ARRAY_CARRAY);}
@@ -515,7 +509,6 @@ static PyObject* py_smatrixConnect(PyObject* self, PyObject* args)
             }
      }
 
-//    printf("data_type = %d, T_FLOAT = %d, T_COMPLEX = %d\n", data_type, T_FLOAT, T_COMPLEX);  exit(128+13);
     // --- Compartilhamento real de memória ---
     smat_a->row_ptr = (npy_int64*)   PyArray_DATA(indptrArr);
     smat_a->col_idx = (npy_int64*)   PyArray_DATA(indicesArr);
@@ -699,19 +692,13 @@ static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
     int rows; int cols; int data_type;
     printf("BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) \n");
     if (!PyArg_ParseTuple(args, "iii", &rows, &cols, &data_type)) return NULL;
-    printf("BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);\n");
     smatrix_t * a = bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
-    //printf("em py_sparse_matrix_new, a.value[0]=%f, ", a->values[0]); //printf("exit(2223);\n"); exit(2223);
     if (!a) { PyErr_SetString(PyExc_RuntimeError, "smatrix_new failed"); return NULL; }
-    printf(" before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete\n");
     PyObject* po = PyCapsule_New((void*)a, "py_sparse_matrix_new", py_sparse_matrix_delete);
-    // printf(" after  CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete\n");
     if (!po) {
         // evita vazamento caso PyCapsule_New falhe
         bridge_manager.bridges[bridge_index].smatrix_delete(a); return NULL;
     }
-    printf("em py_sparse_matrix_new FINAL %p\n",po);
-    //printf("em py_sparse_matrix_new, " ); printf("exit(2223);\n"); exit(2223);
     return po;
 }
 
@@ -1007,7 +994,7 @@ static PyMethodDef mainMethods[] = {
     {"move_matrix_host", py_move_matrix_host, METH_VARARGS, "move_matrix_host"},
     {"sparse_matrix_new", py_sparse_matrix_new, METH_VARARGS, "sparse_matrix_new"},
     {"sparse_new", py_matrix_new, METH_VARARGS, "sparse_new"},
-    {"smatrixConnect", py_smatrixConnect, METH_VARARGS, "smatrixConnect"},
+    {"smatrix_connect", py_smatrix_connect, METH_VARARGS, "ponteiros de iCSR scipy connect at smatrix hiperblas struct"},
     {"sparse_matrix_set", py_sparse_matrix_set, METH_VARARGS, "sparse_matrix_set"},
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},
     {"move_sparse_matrix_device", py_move_sparse_matrix_device, METH_VARARGS, "move_sparse_matrix_device"},

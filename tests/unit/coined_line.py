@@ -22,8 +22,8 @@ class TestCoinedLine(unittest.TestCase):
         hpw.set_hpc(HPC)
         hpw.set_hpc(None)
         hpw.set_hpc("CPU")
-        self.num_vert = 11; # 41
         self.num_vert =  3; # 5
+        self.num_vert = 11; # 41
         self.line = hpw.Line   (self.num_vert)
         self.qw   = hpw.Coined (self.line)
         print(f"\n2, em setUp:  +++  finalizando ")
@@ -47,16 +47,16 @@ class TestCoinedLine(unittest.TestCase):
         self.qw.set_marked([])
 
         print("1, em test04_per..,  self.num_vert = ", self.num_vert)
-        init_state = self.qw.state(
-            [[1, (self.num_vert - 1, self.num_vert - 2)]])
+        init_state = self.qw.state([[1, (self.num_vert - 1, self.num_vert - 2)]])
+        print ("init_state =", init_state)
 
         num_steps = self.num_vert - 1
         num_steps = self.num_vert - 1 + 2
         print("1.2,em semi-final, num_steps =  self.num_vert - 1 = ", num_steps)
-        final_state = self.qw.simulate((num_steps, num_steps + 1),
-                                       init_state)
-        final_state = final_state[0]
+        final_state = self.qw.simulate((num_steps, num_steps + 1), init_state)
         return
+        final_stateB = final_state[-1]
+        print ("final_stateB =", final_stateB)
 
         self.assertTrue(
             final_state[0] == 1 and np.all(final_state[1:] == 0)
@@ -155,6 +155,7 @@ class TestCoinedLine(unittest.TestCase):
             self.qw.uniform_state(vertices=np.arange(self.num_vert),
                                   arcs=np.arange(num_arcs))
         ))
+        
 
         # uniform superposition of all arcs
         # except odd arcs with tail in odd vertices

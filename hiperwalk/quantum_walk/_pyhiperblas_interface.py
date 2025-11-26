@@ -137,7 +137,7 @@ def retrieve_vector(nbl_vec):
 
     return py_vec
         
-def _send_sparse_matrix(M):
+def _send_sparse_matrix(csrM):
     r"""
     Transfers a sparse Matrix (M) stored in csr format to Hiperblas-core and
     moves it to the device (ready to be used).
@@ -151,53 +151,14 @@ def _send_sparse_matrix(M):
     TODO: isn't there a way for hiperblas-core to use the csr matrix directly?
       In order to avoid double memory usage
     """
-    
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)");
     # TODO: check if complex automatically?
-    print("M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
-    is_complex = np.issubdtype(M.dtype, np.complexfloating)
-    n = M.shape[0]
-
-    # creates hiperblas sparse matrix structure
-    # TODO: needs better support from pyhiperblas to
-    #   use next instruction (commented).
-    #   For example: hiperblas.sparse_matrix_set works, but in the real case,
-    #   it should not be needed to pass the imaginary part as argument.
-    #   In addition, there should be a way to
-    #   return the matrix and automatically
-    #   convert to a matrix of float or of complex numbers accordingly.
-    print(f"BD, is_complex={is_complex}")
-    print(f"BD, hiperblas.COMPLEX={hiperblas.COMPLEX}")
-    print(f"BD, hiperblas.FLOAT={hiperblas.FLOAT}"); #exit()
-    smat = (hiperblas.sparse_matrix_new(n, n, hiperblas.COMPLEX) if is_complex
-            else hiperblas.sparse_matrix_new(n, n, hiperblas.FLOAT))
-
-    # vBD = hiperblas.vector_new(n, hiperblas.FLOAT); hiperblas.print_vectorT(vBD)
-
-    hiperblas.smatrixConnect(smat, M ); 
-    #hiperblas.sparse_matrix_pack(smat)
-    #if n < 30 :
-    #    print("BD3, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M), CALL hiperblas.sparse_matrix_print(smat)");
-    #    hiperblas.sparse_matrix_print(smat)
+    is_complex = np.issubdtype(csrM.dtype, np.complexfloating)
+    dtype = hiperblas.COMPLEX if is_complex else hiperblas.FLOAT
+    nrows, ncols = csrM.shape
+    smat = hiperblas.sparse_matrix_new(nrows, ncols, dtype)
+    hiperblas.smatrix_connect    (smat, csrM )
     hiperblas.move_sparse_matrix_device(smat)
-    return smat
-
-    #KOR print("em def _send_sparse_matrix(M); A "); 
-    #KOR for row in range(n):
-    #KOR     start = M.indptr[row]; end   = M.indptr[row + 1]
-    #KOR     # columns must be added in reverse order
-    #KOR     for index in range(end - 1, start - 1, -1):
-    #KOR         col = M.indices[index]
-    #KOR         if is_complex:
-    #KOR             hiperblas.sparse_matrix_set(smat, row, col, M[row, col].real, M[row, col].imag)
-    #KOR         else:
-    #KOR             hiperblas.sparse_matrix_set(smat, row, col, M[row, col].real, 0)
-
-    #KOR print("em def _send_sparse_matrix(M);") # quit()"); quit()
-    #KOR hiperblas.sparse_matrix_pack(smat)
-    #KOR hiperblas.move_sparse_matrix_device(smat)
-
-    print("em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M), FIM"); # exit()
     return smat
 
 def _send_dense_matrix(M):
@@ -208,7 +169,7 @@ def _send_dense_matrix(M):
 
 def send_matrix(M):
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)")
-    print("BD, M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
+    #print("BD, M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
     if scipy.sparse.issparse(M):
         s_matrix = _send_sparse_matrix(M)
         #hiperblas.print_smatrix(s_matrix); exit()
@@ -230,21 +191,6 @@ def retrieve_matrix(nbl_mat):
         )
 
     return mat
-
-def print_vectorT_py_inter(nbl_vec):
-    hiperblas.print_vectorT(nbl_vec)
-
-def sparse_matrix_print(nbl_mat):
-    hiperblas.sparse_matrix_print(nbl_mat)
-
-def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):
-        print("BD1, em _pyHiperblas_interface.py: def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):")
-        #print("BD2, def permute_sparse_matrix, CALL hiperblas.permute_sparse_matrix(")
-        hiperblas.permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU)
-        #print("BD3, :def permute_sparse_matrix, exit() = "); exit()
-        
-        #hiperblas.sparse_matrix_print(nbl_smatU);
-        return
 
 def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
     """

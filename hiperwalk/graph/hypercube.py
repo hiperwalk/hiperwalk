@@ -147,7 +147,6 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
     # adjacency matrix
     num_vert = 1 << dim
     num_arcs = dim*num_vert
-    print(" num_arcs =" , num_arcs)
 
     data = np.ones(num_arcs, dtype=np.int64)
     indptr = np.arange(0, num_arcs + 1, dim)
@@ -156,8 +155,6 @@ def Hypercube(dim, multiedges=None, weights=None, copy=False):
     adj_matrix = csr_array((data, indices, indptr),
                            shape=(num_vert, num_vert))
     g = Graph(adj_matrix, copy=False)
-    print("em hiperwalk/graph/hypercube.py: def Hypercube(dim, multiedges=")
-    print("em hiperwalk/graph/hypercube.py: g=", g)
 
     data = weights if weights is not None else multiedges
     if data is not None:
