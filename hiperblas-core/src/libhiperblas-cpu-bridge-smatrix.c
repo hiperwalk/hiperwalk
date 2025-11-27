@@ -24,10 +24,10 @@ void slist_clear( slist * l ) {
 
 void smatrix_pack(smatrix_t * m) {
 
-    m->row_ptr = (long long int *) malloc((m->nrow + 1) * sizeof(long long int));
-    m->col_idx = (long long int *) malloc(m->nnz * sizeof(long long int));
-    //m->row_ptr = (int *) malloc((m->nrow + 1) * sizeof(int)); //ou long long int*
-    //m->col_idx = (int *) malloc(m->nnz * sizeof(int)); //ou long long int*
+    m->row_ptr = (long int *) malloc((m->nrow + 1) * sizeof(long int));
+    m->col_idx = (long int *) malloc(m->nnz * sizeof(long int));
+    //m->row_ptr = (int *) malloc((m->nrow + 1) * sizeof(int)); //ou long int*
+    //m->col_idx = (int *) malloc(m->nnz * sizeof(int)); //ou long int*
 
     m->values = (double *) malloc(m->nnz * sizeof(double));
     
@@ -50,8 +50,8 @@ void smatrix_pack(smatrix_t * m) {
 }
 
 void smatrix_pack_complex(smatrix_t * m) {
-    m->row_ptr = (long long int *) malloc((m->nrow + 1) * sizeof(long long int)); 
-    m->col_idx = (long long int *) malloc(m->nnz * sizeof(long long int)); 
+    m->row_ptr = (long int *) malloc((m->nrow + 1) * sizeof(long int)); 
+    m->col_idx = (long int *) malloc(m->nnz * sizeof(long int)); 
     //m->row_ptr = (int *) malloc((m->nrow + 1) * sizeof(int));
     //m->col_idx = (int *) malloc(m->nnz * sizeof(int));
     m->values = (double *) malloc(2 * m->nnz * sizeof(double));

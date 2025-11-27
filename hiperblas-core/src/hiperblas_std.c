@@ -1158,7 +1158,7 @@ void print_smatrix(const smatrix_t* matrix) {
     if (matrix->row_ptr) {
         printf("  row_ptr: ");
         for (int i = 0; i <= matrix->nrow; i++) {
-            printf("%lld ", matrix->row_ptr[i]);
+            printf("%ld ", matrix->row_ptr[i]);
         }
         printf("\n");
     } else {
@@ -1168,7 +1168,7 @@ void print_smatrix(const smatrix_t* matrix) {
     if (matrix->col_idx) {
         printf("  col_idx: ");
         for (int i = 0; i < matrix->nnz; i++) {
-            printf("%lld ", matrix->col_idx[i]);
+            printf("%ld ", matrix->col_idx[i]);
         }
         printf("\n");
     } else {
@@ -1252,8 +1252,8 @@ void printIdxColMem(void* idxColMem, int size) {
 }
 
 void allocate_result(smatrix_t *p, smatrix_t *d, smatrix_t *r){
-    r->row_ptr = (long long int*)    malloc((p->nrow + 1) * sizeof(long long int));
-    r->col_idx = (long long int*)    malloc((d->nnz)      * sizeof(long long int));
+    r->row_ptr = (long int*)    malloc((p->nrow + 1) * sizeof(long int));
+    r->col_idx = (long int*)    malloc((d->nnz)      * sizeof(long int));
     //r->row_ptr = (int*)    malloc((p->nrow + 1) * sizeof(int));
     //r->col_idx = (int*)    malloc((d->nnz)      * sizeof(int));
     r->type    = d->type;

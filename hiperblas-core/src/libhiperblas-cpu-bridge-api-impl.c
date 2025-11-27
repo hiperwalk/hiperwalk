@@ -451,8 +451,8 @@ void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, 
     double* vec_in  = (double*)vecIn_;
     double* vec_out = (double*)vecOut_;
 
-    long long int* row_ptr   = (long long int*)m_row_ptr;
-    long long int* col_idx   = (long long int*)m_col_idx;
+    long int* row_ptr   = (long int*)m_row_ptr;
+    long int* col_idx   = (long int*)m_col_idx;
     double* values = (double*)m_values;
     #pragma omp parallel for
     for (int row = 0; row < m_nrows; row++) {
@@ -498,8 +498,8 @@ void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_ro
     */
     double* vec_in = (double*)vecIn_; // Real and imaginary parts are stored separately
     double* vec_Out = (double*)vecOut_; // Real and imaginary parts are stored separately
-    long long int* row_ptr = (long long int*)m_row_ptr;
-    long long int* col_idx = (long long int*)m_col_idx;
+    long int* row_ptr = (long int*)m_row_ptr;
+    long int* col_idx = (long int*)m_col_idx;
     double* values = (double*)m_values; // Store real and imaginary parts separately
     
     //printf(" posicoes = "); for (int row = 0; row < m_nrows; row++) printf(" %d, ", row_ptr[row]); printf("\n");

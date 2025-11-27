@@ -28,7 +28,7 @@ typedef struct __smatrix_t {
     int ncol;
     int nnz;
 
-    long long int  *row_ptr, *col_idx;
+    long int  *row_ptr, *col_idx;
     double* values;
 
     slist ** smat;

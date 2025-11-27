@@ -13,6 +13,7 @@ extern "C" {
     
 #define new_str(i) (char *) malloc( sizeof(char)*(i))
 
+void print_smatrix(const smatrix_t* matrix); //BD em duvida
  void delete_object_array(object_t ** in, int len);
  void delete_object(object_t * in);
  object_t ** convertToObject(vector_t * a, vector_t * b);

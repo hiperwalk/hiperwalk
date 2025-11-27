@@ -1,28 +1,27 @@
 from distutils.core import setup, Extension
-import numpy
+import numpy as np
 import os
 
 home = os.path.expanduser("~")
-home = os.environ.get("home", os.path.expanduser("~"))
-print("home = ", home); #exit()
-#home = "/mnt/c/Users/bidu/"
-#home = "/home/bidu"
 
 hiperblas_module = Extension(
-    'hiperblas',
-    define_macros=[('MAJOR_VERSION', '0'),
-                   ('MINOR_VERSION', '4')],
-    libraries=['hiperblas-core', 'hiperblas-cpu-bridge'],  # inclui ambas
-    include_dirs=[os.path.join(home, 'hiperblas/include'), numpy.get_include()],
-    library_dirs=[os.path.join(home, 'hiperblas/lib')],
-    #extra_compile_args=["-g", "-O1", "-fsanitize=address", "-fno-omit-frame-pointer"], extra_link_args=["-fsanitize=address"],
-    sources=['hiperblas_wrapper.c']
+    "hiperblas",
+    define_macros=[("MAJOR_VERSION", "0"),
+                   ("MINOR_VERSION", "4")],
+    libraries=["hiperblas-core", "hiperblas-cpu-bridge"],
+    include_dirs=[
+        os.path.join(home, "hiperblas/include"),
+        np.get_include()
+    ],
+    library_dirs=[os.path.join(home, "hiperblas/lib")],
+    runtime_library_dirs=[os.path.join(home, "hiperblas/lib")],
+    sources=["hiperblas_wrapper.c"],
 )
+
 setup(
-    name='HiperblasExtension',
-    version='0.4',
-    description='This is the hiperblas math package',
+    name="HiperblasExtension",
+    version="0.4",
+    description="HiperBLAS math package",
     ext_modules=[hiperblas_module],
-    include_dirs=[numpy.get_include()]
 )
 

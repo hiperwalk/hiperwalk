@@ -33,6 +33,8 @@ def main():
     blocoDiagMat = csr_bloco_diagonal([blA, blB, blC])
 
     n = blocoDiagMat.shape[0]
+    semente_inteira = 1
+    np.random.seed(semente_inteira)
     float_vectorIn  = vector_normL2_one(n) #  np.ones(n)
     float_vectorOut = np.zeros(n)
 
@@ -41,7 +43,7 @@ def main():
     hb_mat = hb.sparse_matrix_new(n, n, hb.FLOAT)
 
     hb.sparse_matrix_print(hb_mat);
-    hb.smatrixConnect(hb_mat, blocoDiagMat);
+    hb.smatrix_connect(hb_mat, blocoDiagMat);
     hb.sparse_matrix_print(hb_mat);
 
     hb_vIn  = hb.load_numpy_array(float_vectorIn)
@@ -56,6 +58,14 @@ def main():
     hb.print_vectorT(hb_vOut)
     hb.move_vector_host       (hb_vOut) # tras do device para o host
     hb.print_vectorT(hb_vOut)
+
+    hb_vIn, hb_vOut = hb_vOut, hb_vIn
+
+    hb.sparse_matvec_mul(hb_mat, hb_vIn, hb_vOut) 
+    hb.print_vectorT(hb_vOut)
+    hb.move_vector_host       (hb_vOut) # tras do device para o host
+    hb.print_vectorT(hb_vOut)
+
 
     vectorOutRef=blocoDiagMat@float_vectorIn
     print("vetor referencia: ", vectorOutRef, end="; "); print("vectorOutRef.l2Norm=", np.linalg.norm(vectorOutRef));

@@ -94,7 +94,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     //for (int i = 0; i < a->len; i++) { printf("r[%2d]=%f\n", i,  a->value.f[i]); }
 
 //U.indptr    =  [ 0  4  6  8 12 14 16 17 18 19 20 22 24 28 30 32 36]
-    b->row_ptr = (long long int*) malloc((n+1)*sizeof(long long int)) ;
+    b->row_ptr = (long int*) malloc((n+1)*sizeof(long int)) ;
     i=0;
     b->row_ptr[i++]=0;   b->row_ptr[i++]=4;   b->row_ptr[i++]=6;   b->row_ptr[i++]=8;
     b->row_ptr[i++]=12;  b->row_ptr[i++]=14;  b->row_ptr[i++]=16;  b->row_ptr[i++]=17;
@@ -102,7 +102,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     b->row_ptr[i++]=24;  b->row_ptr[i++]=28;  b->row_ptr[i++]=30;  b->row_ptr[i++]=32;
     b->row_ptr[i++]=36;
 //U.indices   =  [ 6  7  8  9 10 11  4  5  6  7  8  9 13 14  1  2  0  3 12 15 13 14  1  2  6  7  8  9 10 11  4  5  6  7  8  9]
-    b->col_idx = (long long int*) malloc((b->nnz)*sizeof(long long int)) ;
+    b->col_idx = (long int*) malloc((b->nnz)*sizeof(long int)) ;
     i=0;
     b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
     b->col_idx[i++]=10;  b->col_idx[i++]=11; 

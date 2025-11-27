@@ -45,7 +45,7 @@ def main():
 
     smatF = hb.sparse_matrix_new(n, n, hb.FLOAT)
     hb.sparse_matrix_print(smatF);
-    hb.smatrixConnect(smatF, csrMat);
+    hb.smatrix_connect(smatF, csrMat);
     hb.sparse_matrix_print(smatF);
 
     #hb.move_sparse_matrix_device(smatF)

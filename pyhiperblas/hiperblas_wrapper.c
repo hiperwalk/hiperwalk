@@ -84,6 +84,7 @@ static PyObject* py_stop_engine(PyObject* self, PyObject* args){
 static void py_complex_delete(PyObject* self) {
     complex_t* comp = (complex_t*)PyCapsule_GetPointer(self, "py_complex_new");
     bridge_manager.bridges[bridge_index].complex_delete(comp);
+    //Py_RETURN_NONE;
 }
 
 
@@ -99,14 +100,15 @@ static PyObject* py_complex_new(PyObject* self, PyObject* args){
     return po;
 }
 
-static void py_vector_delete(PyObject* self) {
-    vector_t* vec = (vector_t*)PyCapsule_GetPointer(self, "py_vector_new");
-    //printf("vec %p\n",vec);
-    //printf("vec->value %p\n",&(vec->value));
-    //free ((void *)vec->value.f);
-    //free ((void *)vec);
+static void py_vector_delete(PyObject *capsule) 
+{
+    vector_t *vec = (vector_t*) PyCapsule_GetPointer(capsule, "py_vector_new");
+    if (vec == NULL) return;
+
+    // Chama seu destrutor da biblioteca C
     bridge_manager.bridges[bridge_index].vector_delete(vec);
 }
+
 
 
 static PyObject* py_vector_new(PyObject* self, PyObject* args){
@@ -298,7 +300,7 @@ static PyObject* py_vec_add(PyObject* self, PyObject* args) {
     return po;
 }
 
-static void* py_matvec_mul(PyObject* self, PyObject* args) {
+static PyObject* py_matvec_mul(PyObject* self, PyObject* args) {
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_matvec_mul(PyObject* self, ... \n");
     PyObject* M = NULL; PyObject* vI = NULL; PyObject* vO = NULL;
     if(!PyArg_ParseTuple(args, "OOO:py_matvec_mul", &M, &vI, &vO)) return NULL;
@@ -322,6 +324,7 @@ static void py_sparse_matrix_delete(PyObject* capsule) {
         // Chame a função apropriada do seu backend para liberar memória
         bridge_manager.bridges[bridge_index].smatrix_delete(a);
     }
+    //Py_RETURN_NONE;
 }
 
 static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
@@ -335,7 +338,7 @@ static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 
-static void* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
+static PyObject* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... \n");
 
     PyObject* m = NULL; PyObject* vIn = NULL;  PyObject* vOut = NULL;
@@ -431,8 +434,9 @@ static void py_matrix_delete(PyObject* self) {
     //free ((void *)mat->value.f);
     //free ((void *)mat);
     bridge_manager.bridges[bridge_index].matrix_delete(mat);
+    //Py_RETURN_NONE;
 }
-
+/*
 static void py_smatrix_delete(PyObject* self) {
     smatrix_t* mat = (smatrix_t*)PyCapsule_GetPointer(self, "py_smatrix_new");
     //printf("mat %p\n",mat);
@@ -440,7 +444,9 @@ static void py_smatrix_delete(PyObject* self) {
     //free ((void *)mat->value.f);
     //free ((void *)mat);
     bridge_manager.bridges[bridge_index].smatrix_delete(mat);
+    //Py_RETURN_NONE;
 }
+*/
 
 /*
     // Limpa referências temporárias
@@ -485,7 +491,7 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
     // --- Verifica tipos e contiguidade (sem cópias) ---
     PyArrayObject *indptrArr  = (PyArrayObject*) PyArray_FROM_OTF(indptrObj,  NPY_INT64, NPY_ARRAY_CARRAY);
     PyArrayObject *indicesArr = (PyArrayObject*) PyArray_FROM_OTF(indicesObj, NPY_INT64, NPY_ARRAY_CARRAY);
-    PyArrayObject *dataArr;
+    PyArrayObject *dataArr=NULL;
     if(data_type==T_FLOAT   ) {dataArr    = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_FLOAT64,    NPY_ARRAY_CARRAY);}
     if(data_type==T_COMPLEX ) {dataArr    = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_COMPLEX128, NPY_ARRAY_CARRAY);}
 
@@ -518,8 +524,8 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
     smat_a->nnz  = smat_a->row_ptr[smat_a->nrow];
     smat_a->isPacked = 1;
 
-    printf("CSR conectado: nrow=%lld, ncol=%lld, nnz=%lld\n",
-           (long long) smat_a->nrow, (long long) smat_a->ncol, (long long) smat_a->nnz);
+    printf("BD2, CSR spipy conectado com smatrix HB: nrow=%ld, ncol=%ld, nnz=%ld\n",
+           (long int) smat_a->nrow, (long int) smat_a->ncol, (long int) smat_a->nnz);
 
     //print_smatrix(smat_a); 
 
@@ -975,7 +981,6 @@ static PyMethodDef mainMethods[] = {
     {"init_engine", py_init_engine, METH_VARARGS, "init_engine"},
     {"stop_engine", py_stop_engine, METH_VARARGS, "stop_engine"},
     {"vector_new",  py_vector_new, METH_VARARGS, "vector_new"},
-    {"vector_delete", py_vector_delete, METH_VARARGS, " desallocate memory alocatted by calloc"},
     {"load_numpy_array", py_load_numpy_array, METH_VARARGS, "load_numpy_array"},
     {"retrieve_numpy_array", py_retrieve_numpy_array, METH_VARARGS, "retrieve_numpy_array"},
     {"vector_set", py_vector_set, METH_VARARGS, "vector_set"},
@@ -993,7 +998,7 @@ static PyMethodDef mainMethods[] = {
     {"move_matrix_device", py_move_matrix_device, METH_VARARGS, "move_matrix_device"},
     {"move_matrix_host", py_move_matrix_host, METH_VARARGS, "move_matrix_host"},
     {"sparse_matrix_new", py_sparse_matrix_new, METH_VARARGS, "sparse_matrix_new"},
-    {"sparse_new", py_matrix_new, METH_VARARGS, "sparse_new"},
+    //{"sparse_new", py_matrix_new, METH_VARARGS, "sparse_new"},
     {"smatrix_connect", py_smatrix_connect, METH_VARARGS, "ponteiros de iCSR scipy connect at smatrix hiperblas struct"},
     {"sparse_matrix_set", py_sparse_matrix_set, METH_VARARGS, "sparse_matrix_set"},
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},
