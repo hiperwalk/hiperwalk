@@ -16,43 +16,24 @@ bridge_manager_t bridge_manager;
 int bridge_index = 0;
 
 static PyObject* py_init_engine(PyObject* self, PyObject* args){
-    //cl_int err;
-    //cl_uint num_platforms;
     int device;
     int bridge;
-    
     if (!PyArg_ParseTuple(args, "ii", &bridge, &device)) return NULL;
-    //err = clGetPlatformIDs(0, NULL, &num_platforms);
-    //if (err == CL_SUCCESS) {
-            //std::cout << "Success. Platforms available: " << num_platforms
-            //        << std::endl;
-    //} else {
-            //std::cout << "Error. Platforms available: " << num_platforms
-            //        << std::endl;
-    //}
-
-    //InitCLEngine(device);
     const char *home = getenv("HOME");
     bridge_index = device;
     char  *lib_name; 
     lib_name = (char*) malloc ( 1024 *sizeof(char));
     switch(bridge){
         case 0:
-/*
-            lib_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
-            lib_name = "/home/bidu/libs/lib/libhiperblas-cpu-bridge.so";
-            lib_name = "~/hiperblas/lib/libhiperblas-cpu-bridge.so";
-            lib_name = "/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
-            lib_name = "/home/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
-	    */
+        //    lib_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
 	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
             printf("lib_name = %s\n", lib_name);
             break;
         case 1:
-	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib64/libhiperblas-opencl-bridge.so");
+	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-opencl-bridge.so");
             break;
         default:
-	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib64/libhiperblas-cpu-bridge.so");
+	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
             break;
     }
     printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_init_engine, lib_name =%s\n", lib_name); //exit(2222);
@@ -84,7 +65,6 @@ static PyObject* py_stop_engine(PyObject* self, PyObject* args){
 static void py_complex_delete(PyObject* self) {
     complex_t* comp = (complex_t*)PyCapsule_GetPointer(self, "py_complex_new");
     bridge_manager.bridges[bridge_index].complex_delete(comp);
-    //Py_RETURN_NONE;
 }
 
 
@@ -104,22 +84,17 @@ static void py_vector_delete(PyObject *capsule)
 {
     vector_t *vec = (vector_t*) PyCapsule_GetPointer(capsule, "py_vector_new");
     if (vec == NULL) return;
-
     // Chama seu destrutor da biblioteca C
     bridge_manager.bridges[bridge_index].vector_delete(vec);
 }
-
 
 
 static PyObject* py_vector_new(PyObject* self, PyObject* args){
     int len;
     int data_type;
     if (!PyArg_ParseTuple(args, "ii", &len,&data_type)) return NULL;
-    //printf("create %d\n",len);
     vector_t * a = bridge_manager.bridges[bridge_index].vector_new(len, data_type, 1, NULL);
-    //printf("malloc %p\n",a);
     PyObject* po = PyCapsule_New((void*)a, "py_vector_new", py_vector_delete);
-    //printf("capsule_new %p\n",po);
     return po;
 }
 
@@ -145,36 +120,17 @@ static PyObject* py_load_numpy_array(PyObject* self, PyObject* args){
 }
 
 static PyObject* py_retrieve_numpy_array(PyObject* self, PyObject* args){
-    
     PyObject* pf = NULL;
-
     if(!PyArg_ParseTuple(args, "O:py_retrieve_numpy_array", &pf)) return NULL;
-
-    // printf("pf %p\n",pf);
     vector_t * vec = (vector_t *)PyCapsule_GetPointer(pf, "py_vector_new");
-    // printf("vec %p\n",vec);
-    // printf("%p\n",vec->value.f);
     bridge_manager.bridges[bridge_index].vecreqhost(vec);
     vec->externalData = 1; //to make sure it will not be deallocated
-
-    // for (int i=0; i < vec->len; i++){
-    //     printf("%d %lf\n", i, vec->value.f[i]);
-    // }
     int rows = vec->len;
     npy_intp dims[1] = {rows};  // Array dimensions
     int data_type = (vec->type == T_FLOAT ? NPY_FLOAT64 : NPY_COMPLEX128);
-
     PyObject* numpyArray = PyArray_SimpleNewFromData(1, dims, data_type, vec->value.f);
-
-    // double* outputData = (double*)PyArray_DATA((PyArrayObject*)numpyArray);
-
-    // for (int i=0; i < dims[0]; i++) {
-    //     printf("%d %f\n",i,outputData[i]);
-    // }
-
     // Make sure to set flags to the NumPy array to manage memory correctly
     PyArray_ENABLEFLAGS((PyArrayObject*)numpyArray, NPY_ARRAY_OWNDATA);
-    
     return numpyArray;
 }
 
@@ -186,42 +142,27 @@ static PyObject* py_vector_set(PyObject* self, PyObject* args) {
     double imag;
     if(!PyArg_ParseTuple(args, "Oidd:py_vector_set", &pf, &n, &real, &imag)) return NULL;
 
-    //printf("print %d\n",n);
-    //printf("pf %p\n",pf);
     vector_t * vec = (vector_t *)PyCapsule_GetPointer(pf, "py_vector_new");
-    //printf("vec %p\n",vec);
     if (vec->type == T_COMPLEX) {
         vec->value.f[2*n] = real;
         vec->value.f[2*n+1] = imag;
     } else {
         vec->value.f[n] = real;
     }
-    //printf("%lf\n",vec->value.f[n]);
     Py_RETURN_NONE;
 }
 
 static PyObject* py_vector_get(PyObject* self, PyObject* args) {
-    
-    PyObject* pf = NULL;
-    int n;
+    PyObject* pf = NULL; int n;
     if(!PyArg_ParseTuple(args, "Oi:py_vector_get", &pf, &n)) return NULL;
-
-    // printf("print %d\n",n);
-    // printf("pf %p\n",pf);
     vector_t * vec = (vector_t *)PyCapsule_GetPointer(pf, "py_vector_new");
-    // printf("vec %p\n",vec);
-    // printf("%lf\n",vec->value.f[n]);
     PyObject * result = PyFloat_FromDouble((double)vec->value.f[n]);
     return result;
 }
 
 static PyObject* py_move_vector_device(PyObject* self, PyObject* args) {
-    
     PyObject* pf = NULL;
     if(!PyArg_ParseTuple(args, "O:py_move_vector_device", &pf)) return NULL;
-
-    //printf("pf %p\n",pf);
-    
     vector_t * vec = (vector_t *)PyCapsule_GetPointer(pf, "py_vector_new");
     //printf("vec %p\n",vec);
     bridge_manager.bridges[bridge_index].vecreqdev(vec);
@@ -274,7 +215,6 @@ static PyObject* py_vec_add(PyObject* self, PyObject* args) {
         //printf("vec_a %p\n",vec_a);
     vector_t * vec_b = (vector_t *)PyCapsule_GetPointer(b, "py_vector_new");
         //printf("vec_b %p\n",vec_b);
-
     
     //TODO completar o vec_add
     object_t ** in = convertToObject(vec_a,vec_b);
@@ -355,25 +295,13 @@ static PyObject* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
 }
 
 static PyObject* py_vec_prod(PyObject* self, PyObject* args) {
-    
     PyObject* a = NULL;
     PyObject* b = NULL;
     if(!PyArg_ParseTuple(args, "OO:py_vec_add", &a, &b)) return NULL;
-
-    //printf("a %p\n",a);
-    //printf("b %p\n",b);
-    
     vector_t * vec_a = (vector_t *)PyCapsule_GetPointer(a, "py_vector_new");
-        //printf("vec_a %p\n",vec_a);
     vector_t * vec_b = (vector_t *)PyCapsule_GetPointer(b, "py_vector_new");
-        //printf("vec_b %p\n",vec_b);
-
-    
     object_t ** in = convertToObject(vec_a,vec_b);
-    
     vector_t * r = (vector_t *) vec_prod(&bridge_manager, bridge_index, (void **) in, NULL );
-    
-
     PyObject* po = PyCapsule_New((void*)r, "py_vector_new", py_vector_delete);
     return po;
 }
@@ -436,28 +364,7 @@ static void py_matrix_delete(PyObject* self) {
     bridge_manager.bridges[bridge_index].matrix_delete(mat);
     //Py_RETURN_NONE;
 }
-/*
-static void py_smatrix_delete(PyObject* self) {
-    smatrix_t* mat = (smatrix_t*)PyCapsule_GetPointer(self, "py_smatrix_new");
-    //printf("mat %p\n",mat);
-    //printf("mat->value %p\n",&(mat->value));
-    //free ((void *)mat->value.f);
-    //free ((void *)mat);
-    bridge_manager.bridges[bridge_index].smatrix_delete(mat);
-    //Py_RETURN_NONE;
-}
-*/
 
-/*
-    // Limpa referências temporárias
-    Py_DECREF(dataArr);
-    Py_DECREF(indicesArr);
-    Py_DECREF(indptrArr);
-    Py_DECREF(dataObj);
-    Py_DECREF(indicesObj);
-    Py_DECREF(indptrObj);
-
-*/
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
@@ -534,58 +441,29 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
 
 static PyObject* py_load_numpy_matrix(PyObject* self, PyObject* args){
     PyObject* a = NULL;
-
     if(!PyArg_ParseTuple(args, "O:py_load_numpy_matrix", &a)) return NULL;
-
     float* dataArrayA = (float*)PyArray_DATA((PyArrayObject*)a);
-
     npy_intp* shape = PyArray_DIMS((PyArrayObject*)a);
-
-    int rows = shape[0];
-    int cols = shape[1];
+    int rows = shape[0], cols = shape[1];
     PyArray_Descr* dtype = PyArray_DESCR((PyArrayObject*) a);
-
     int data_type = (dtype->kind == 'f' ? T_FLOAT : T_COMPLEX);
-
     matrix_t * mat_a = bridge_manager.bridges[bridge_index].matrix_new(rows, cols, data_type, 0, dataArrayA);
-
     PyObject* po = PyCapsule_New((void*)mat_a, "py_matrix_new", py_matrix_delete);
-
     return po;
 }
 
 static PyObject* py_retrieve_numpy_matrix(PyObject* self, PyObject* args){
-    
     PyObject* pf = NULL;
-
     if(!PyArg_ParseTuple(args, "O:py_retrieve_numpy_matrix", &pf)) return NULL;
-
-    // printf("pf %p\n",pf);
     matrix_t * mat = (matrix_t *)PyCapsule_GetPointer(pf, "py_matrix_new");
-    // printf("vec %p\n",vec);
-    // printf("%p\n",vec->value.f);
     bridge_manager.bridges[bridge_index].matreqhost(mat);
     mat->externalData = 1; //to make sure it will not be deallocated
-
-    // for (int i=0; i < vec->len; i++){
-    //     printf("%d %lf\n", i, vec->value.f[i]);
-    // }
     int rows = mat->nrow;
     int cols = mat->ncol;
     npy_intp dims[2] = {rows, cols};  // Array dimensions
     int data_type = (mat->type == T_FLOAT ? NPY_FLOAT64 : NPY_COMPLEX128);
-
     PyObject* numpyArray = PyArray_SimpleNewFromData(2, dims, data_type, mat->value.f);
-
-    // double* outputData = (double*)PyArray_DATA((PyArrayObject*)numpyArray);
-
-    // for (int i=0; i < dims[0]; i++) {
-    //     printf("%d %f\n",i,outputData[i]);
-    // }
-
-    // Make sure to set flags to the NumPy array to manage memory correctly
     PyArray_ENABLEFLAGS((PyArrayObject*)numpyArray, NPY_ARRAY_OWNDATA);
-    
     return numpyArray;
 }
 
@@ -594,12 +472,8 @@ static PyObject* py_matrix_new(PyObject* self, PyObject* args){
     int cols;
     int data_type;
     if (!PyArg_ParseTuple(args, "iii", &rows,&cols,&data_type)) return NULL;
-    //printf("create %d\n",rows);
-    //printf("create %d\n",cols);
     matrix_t * a = bridge_manager.bridges[bridge_index].matrix_new(rows, cols, data_type, 1, NULL);
-    //printf("malloc %p\n",a);
     PyObject* po = PyCapsule_New((void*)a, "py_matrix_new", py_matrix_delete);
-    //printf("capsule_new %p\n",po);
     return po;
 }
 
@@ -612,10 +486,7 @@ static PyObject* py_matrix_set(PyObject* self, PyObject* args) {
     double imag;
     if(!PyArg_ParseTuple(args, "Oiidd:py_matrix_set", &pf, &i, &j, &real, &imag)) return NULL;
 
-    //printf("print (%d,%d)\n",i,j);
-    //printf("pf %p\n",pf);
     matrix_t * mat = (matrix_t *)PyCapsule_GetPointer(pf, "py_matrix_new");
-    //printf("mat %p\n",mat);
     int idx = (i*mat->ncol + j);
     if (mat->type == T_COMPLEX) {
         mat->value.f[2 * idx] = real;
@@ -623,77 +494,37 @@ static PyObject* py_matrix_set(PyObject* self, PyObject* args) {
     } else {
         mat->value.f[idx] = real;
     }
-    //printf("%lf\n",mat->value.f[i*mat->ncol + j]);
     Py_RETURN_NONE;
 }
 
 static PyObject* py_matrix_get(PyObject* self, PyObject* args) {
-    
     PyObject* pf = NULL;
     int i;
     int j;
     if(!PyArg_ParseTuple(args, "Oii:py_matrix_get", &pf, &i, &j)) return NULL;
-
-    //printf("print (%d,%d)\n",i,j);
-    //printf("pf %p\n",pf);
     matrix_t * mat = (matrix_t *)PyCapsule_GetPointer(pf, "py_matrix_new");
-    //printf("mat %p\n",mat);
-    //printf("%lf\n",mat->value.f[i*mat->ncol + j]);
     PyObject * result = PyFloat_FromDouble((double)mat->value.f[i*mat->ncol + j]);
     return result;
 }
 
 
 static PyObject* py_move_matrix_device(PyObject* self, PyObject* args) {
-    
     PyObject* pf = NULL;
     if(!PyArg_ParseTuple(args, "O:py_move_matrix_device", &pf)) return NULL;
-
-    //printf("pf %p\n",pf);
-    
     matrix_t * mat = (matrix_t *)PyCapsule_GetPointer(pf, "py_matrix_new");
-    //printf("mat %p\n",mat);
     bridge_manager.bridges[bridge_index].matreqdev(mat);
     Py_RETURN_NONE;
 }
 
 static PyObject* py_move_matrix_host(PyObject* self, PyObject* args) {
-    
     PyObject* pf = NULL;
     if(!PyArg_ParseTuple(args, "O:py_move_matrix_device", &pf)) return NULL;
-
-    //printf("pf %p\n",pf);
-    
     matrix_t * mat = (matrix_t *)PyCapsule_GetPointer(pf, "py_matrix_new");
     bridge_manager.bridges[bridge_index].matreqhost(mat); //should use this function? It seems that it creates the object in the stack
-    //    //printf("mat %p\n",mat);
-//    int n = (mat->type==T_FLOAT?mat->nrow*mat->ncol:2*mat->nrow*mat->ncol);
-//    matrix_t * out = matrix_new(mat->nrow, mat->ncol, mat->type);
-//    cl_int status = clEnqueueReadBuffer(clinfo.q, mat->extra, CL_TRUE, 0, n * sizeof (double), out->value.f, 0, NULL, NULL);
-//    CLERR
-//    PyObject* po = PyCapsule_New((void*)out, "py_matrix_new", py_matrix_delete);
-//    return po;
     Py_RETURN_NONE;
 }
 
 
-
-#define SMATRIX_CAPSULE_NAME "hiperblas.smatrix"
-
-
-/*
-static PyObject* BD00py_sparse_matrix_new(PyObject* self, PyObject* args){
-    int rows, cols, data_type;
-    if (!PyArg_ParseTuple(args, "iii", &rows, &cols, &data_type)) return NULL;
-    smatrix_t *a = bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
-    if (!a) {
-        PyErr_SetString(PyExc_RuntimeError, "smatrix_new failed"); return NULL;
-    }
-    PyObject* po = PyCapsule_New((void*)a, SMATRIX_CAPSULE_NAME, py_sparse_matrix_delete);
-    return po;
-}
-*/
-
 static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
     int rows; int cols; int data_type;
     printf("BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) \n");
@@ -707,54 +538,22 @@ static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
     }
     return po;
 }
-
-
-/*
-static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
-    int rows; int cols; int data_type;
-    printf("BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) \n");
-    if (!PyArg_ParseTuple(args, "O", &scipyCsrMat)) return NULL;
-    rows=scipyCsrMat.shape[0]
-    // if (!PyArg_ParseTuple(args, "OOO:", &)) return NULL;
-    printf(" call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);\n");
-    smatrix_t * a = bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
-    //printf("em py_sparse_matrix_new, a.value[0]=%f, ", a->values[0]); //printf("exit(2223);\n"); exit(2223);
-    if (!a) { PyErr_SetString(PyExc_RuntimeError, "smatrix_new failed"); return NULL; }
-    printf(" before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete\n");
-    PyObject* po = PyCapsule_New((void*)a, "py_sparse_matrix_new", py_sparse_matrix_delete);
-    // printf(" after  CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete\n");
-    if (!po) {
-        // evita vazamento caso PyCapsule_New falhe
-        bridge_manager.bridges[bridge_index].smatrix_delete(a); return NULL;
-    }
-    printf("em py_sparse_matrix_new FINAL %p\n",po);
-    //printf("em py_sparse_matrix_new, " ); printf("exit(2223);\n"); exit(2223);
-    return po;
-}
-
-*/
 
 static PyObject* py_print_vectorT      (PyObject* self, PyObject* args) {
+    printf("BD, em pyhiperblas/hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)\n");
     PyObject* pV = NULL;
-    printf("BD, em hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)\n");
     if(!PyArg_ParseTuple(args, "O:py_print_vectorT", &pV)) {printf("return NULL\n"); exit(2222);  return NULL;}
     vector_t * v  = (vector_t *)PyCapsule_GetPointer(pV, "py_vector_new");
-    //print_vectorT(v); 
-    //exit(2222);
-    //     OU    OU   a linha de baixo 
-    bridge_manager.bridges[bridge_index].print_vectorT_f(v);
+    print_vectorT(v); 
     Py_RETURN_NONE;
 }
+
 static PyObject* py_sparse_matrix_print(PyObject* self, PyObject* args) {
-    PyObject* pM = NULL;
     printf("BD, em hiperblas_wraper.c: static PyObject* py_sparse_matrix_print(PyObject* self, PyObject* args)\n");
+    PyObject* pM = NULL;
     if(!PyArg_ParseTuple(args, "O:py_sparse_matrix_print", &pM)) return NULL;
     smatrix_t * sMat = (smatrix_t *)PyCapsule_GetPointer(pM, "py_sparse_matrix_new");
-    printf("BD, em hiperblas_wraper.c: static PyObject* py_sparse_matrix_print(.., CALL print_smatrix(sMat); \n");
     print_smatrix(sMat); 
-    //     OU    OU   a linha de baixo 
-    //printf("BD, em hiperblas_wraper.c: static PyObject* py_sparse_matrix_print(.., CALL bridge_manager.bridges[bridge_index].print_smatrix_f(sMat); \n");
-    //bridge_manager.bridges[bridge_index].print_smatrix_f(sMat);
     Py_RETURN_NONE;
 }
 
@@ -985,7 +784,6 @@ static PyMethodDef mainMethods[] = {
     {"retrieve_numpy_array", py_retrieve_numpy_array, METH_VARARGS, "retrieve_numpy_array"},
     {"vector_set", py_vector_set, METH_VARARGS, "vector_set"},
     {"vector_get", py_vector_get, METH_VARARGS, "vector_get"},
-//{"print_vectorT", py_print_vectorT, METH_VARARGS, "escrever na tela os elementos do vetor de reais do tipo vector_t"},
     {"move_vector_device", py_move_vector_device, METH_VARARGS, "move_vector_device"},
     {"copy_vector_from_device", py_copy_vector_from_device, METH_VARARGS, "copy_vector_from_device"},
     {"move_vector_host", py_move_vector_host, METH_VARARGS, "move_vector_host"},
@@ -998,7 +796,6 @@ static PyMethodDef mainMethods[] = {
     {"move_matrix_device", py_move_matrix_device, METH_VARARGS, "move_matrix_device"},
     {"move_matrix_host", py_move_matrix_host, METH_VARARGS, "move_matrix_host"},
     {"sparse_matrix_new", py_sparse_matrix_new, METH_VARARGS, "sparse_matrix_new"},
-    //{"sparse_new", py_matrix_new, METH_VARARGS, "sparse_new"},
     {"smatrix_connect", py_smatrix_connect, METH_VARARGS, "ponteiros de iCSR scipy connect at smatrix hiperblas struct"},
     {"sparse_matrix_set", py_sparse_matrix_set, METH_VARARGS, "sparse_matrix_set"},
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},

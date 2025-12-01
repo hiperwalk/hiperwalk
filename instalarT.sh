@@ -45,10 +45,10 @@ comandoHB="(pwd; cd $relativeDir/hiperblas-core; pwd; ./instalarHB.sh     )";
 echo $comandoHB
 comandoPyHB="(cd $relativeDir/pyhiperblas;    pwd; ./instalarPyHB.sh . )";
 comandoPyHB="(cd $relativeDir/pyhiperblas; python3 -m pip install --user -e . --break-system-packages --no-deps --no-cache )"
-comandoPyHB="(pwd; cd $relativeDir/pyhiperblas;    pwd; pip install  .  )";
+comandoPyHB="(cd $relativeDir/pyhiperblas;    pwd; python3 -m pip install --user -e . --break-system-packages)"
 echo $comandoPyHB
 comandoHW="(pwd; cd $relativeDir;  pip install -e .  )"; # só funciona se o backend suportar instalação editável.
-comandoHW="(pwd; cd $relativeDir;  pip install    .  )"; #  se o backend NAO suportar instalação editável.
+comandoHW="(pwd; cd $relativeDir;   python3 -m pip install --user -e . --break-system-packages )"; #  se o backend NAO suportar instalação editável.
 echo $comandoHW;
 comandoR1="(pwd; cd $relativeDir; pwd;  OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/diagonal-grid.py 2>&1) " ; 
 comandoR2="(pwd; cd $relativeDir; pwd;  OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/hypercube.py     2>&1) " ;

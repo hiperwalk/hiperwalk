@@ -172,12 +172,7 @@ def send_matrix(M):
     #print("BD, M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
     if scipy.sparse.issparse(M):
         s_matrix = _send_sparse_matrix(M)
-        #hiperblas.print_smatrix(s_matrix); exit()
-        #print("BD, em send_matrix(M): call hiperblas.sparse_matrix_print(s_matrix);")
-        #hiperblas.sparse_matrix_print(s_matrix); exit()
-        #print("BD, em quantum_walk/_pyhiperblas_interface.py:  send_matrix(M): return sparse_matrix;")
         return s_matrix
-
     return _send_dense_matrix(M)
 
 def retrieve_matrix(nbl_mat):

@@ -427,8 +427,7 @@ class QuantumWalk(ABC):
             raise TypeError("Entries were not specified.")
 
         dtype = np.array([entry[0] for entry in entries]).dtype
-        dtype = (complex if np.issubdtype(dtype, np.complexfloating)
-                 else float)
+        dtype = (complex if np.issubdtype(dtype, np.complexfloating) else float)
         state = np.zeros(self.hilb_dim, dtype=dtype)
 
         for ampl, vertex in entries:
@@ -457,14 +456,18 @@ class QuantumWalk(ABC):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
         if hpc is not None:
             self._simul_vec_in  = hbi.send_vector(state)
-            self.v_out          = state.copy();
-            self._simul_vec_out = hbi.send_vector(self.v_out)
-            self._simul_mat     = hbi.send_matrix(self._evolution)
+
+            #self.v_out          = np.zeros(state.shape[0])
+            #self._simul_vec_out = hbi.send_vector(self.v_out)
+            self._simul_vec_out = hb.load_numpy_array(np.zeros(state.shape[0])) # return a hb vector
+            #hb.move_vector_device(self._simul_vec_out)
+
+            #self._simul_mat     = hbi.send_matrix(self._evolution)
+            dtype           = hb.FLOAT if np.issubdtype(self._evolution.dtype, np.floating) else hb.COMPLEX
+            self._simul_mat = hb.sparse_matrix_new(self._evolution.shape[0], self._evolution.shape[1], dtype)
+            hb.smatrix_connect          (self._simul_mat, self._evolution )
+            #hb.move_sparse_matrix_device(self._simul_mat)
         else:
-            #self._simul_vec_in  = np.asarray(state,        dtype=np.complex128)
-            #self._simul_vec_out = np.asarray(state.copy(), dtype=np.complex128)
-            #self._simul_vec_in  = np.asarray(state,        dtype=np.float64)
-            #self._simul_vec_out = np.asarray(state.copy(), dtype=np.float64)
             self._simul_vec_in  = state
             stateC              = state.copy()
             self._simul_vec_out = stateC

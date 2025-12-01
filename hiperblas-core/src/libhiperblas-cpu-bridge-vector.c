@@ -63,8 +63,9 @@ vector_t *vector_new(int len, data_type type, int initialize, void *data) {
 void vector_delete(vector_t *v)
 {
 // chatGPT em 18.11.2025, bidu
-    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE__); // _NAME__);
-    if (!v) return;
+    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), only the instance of struct vector_t\n", __FILE__); // _NAME__);
+    if (v !=NULL ) free(v); 
+    return;
 
     /*
     printf("vector_delete: INICIO\n");

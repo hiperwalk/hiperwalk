@@ -210,8 +210,8 @@ void smatreqdev(smatrix_t *m) {
 void smatrix_delete(smatrix_t *smatrix) {
     // em HW as matrizes em formato CSR são criadas pelo python 
     //   não pode se desalocadas pelo ambiente do C
-    printf("BD, ATENCAO, em %s: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {\n", __FILE__); // _NAME__);
-    free(smatrix);
+    printf("BD, ATENCAO, em %s: void smatrix_delete, only the instance of struct smatrix_t \n", __FILE__); 
+    if( smatrix != NULL ) free(smatrix);
     return;
     if (!smatrix) { return; }
     // Free linked lists in smat if allocated
@@ -245,86 +245,14 @@ void smatrix_delete(smatrix_t *smatrix) {
 
     // Free additional pointers if allocated
     printf("BD, ATENCAO, em smatrix_delete, REMOVIDO  free(smatrix->extra);\n");
-    //if (  smatrix->extra != NULL ) free(smatrix->extra);
     smatrix->extra = NULL;
 
-    // Finally, free the struct itself
     printf("BD, em smatrix_delete, FINAL ;\n");
 }
 
 #ifndef __FILE_NAME__
 #define __FILE_NAME__ __FILE__
 #endif
-
-
-#include <math.h>
-void print_vectorT(vector_t *v_) {
-    if (v_ == NULL) { printf("BD, em %s: print_vectorT, vetor NULL\n", __FILE__); return; }
-
-    int n = v_->len;
-    if (n <= 0) { printf("BD, em %s: print_vectorT, vetor vazio\n", __FILE__); return; }
-
-    //if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
-
-    printf("BD, em %s: print_vectorT, ", __FILE_NAME__); setvbuf(stdout, NULL, _IONBF, 0);
-
-    //printf("\n  extra   (%p),  value.f (%p)\n",  v_->extra, v_->value.f);
-
-    char formatoF[] = " %.2f";
-    double *data = (double *) v_->value.f;
-    if(data != NULL ) {
-      printf("\nfrom v_->value.f [%d:%d]:", 0, n - 1);
-    } else {
-      data = (double *) v_->extra;
-      printf("\nfrom v_->extra   [%d:%d]:", 0, n - 1);
-    }
-    // Detecta se é complexo — pode usar flag interna ou inferir
-    int is_complex = (v_->type == T_COMPLEX); // (v_->is_complex != 0); // suponha que vector_t tenha um campo is_complex
-
-    double sum = 0.0; int i;
-
-    if (!is_complex) {
-        // ---------- Vetor Real ----------
-        if (n <= 20) {
-            for (i = 0; i < n; i++) {
-                sum += data[i] * data[i];
-                printf(formatoF, data[i]);
-            }
-        } else {
-            int tamFaixa = 5;
-            for (i = 0; i < n; i++) {
-                sum += data[i] * data[i];
-                if (i < tamFaixa) printf(formatoF, data[i]);
-                else if (i == tamFaixa) printf(" ...");
-                else if (i >= n - tamFaixa) printf(formatoF, data[i]);
-            }
-        }
-    } else {
-        // ---------- Vetor Complexo ----------
-        int n_complex = n / 1; // cada número tem parte real e imaginária
-        printf("from v_->extra [0:%d]:", n_complex - 1);
-        if (n_complex <= 10) {
-            for (i = 0; i < n_complex; i++) {
-                double re = data[2 * i], im = data[2 * i + 1];
-                sum += re * re + im * im;
-                //printf(" (%.3f %+ .3fi)", re, im);
-		printf(" (%.3f %+.3fi)", re, im);
-            }
-        } else {
-            int tamFaixa = 3;
-            for (i = 0; i < n_complex; i++) {
-                double re = data[2 * i], im = data[2 * i + 1];
-                sum += re * re + im * im;
-		if (i < tamFaixa) printf(" (%.3f %+.3fi)", re, im);
-                else if (i == tamFaixa) printf(" ...");
-                else if (i >= n_complex - tamFaixa) printf(" (%.3f %+.3fi)", re, im);
-            }
-        }
-    }
-    printf(", L2Norm = %.6f\n", sqrt(sum));
-    return;
-}
-
 
 void print_smatrix(const smatrix_t* matrix) {
     printf("em %s: void print_smatrix(const smatrix_t* matrix)\n",__FILE__);
@@ -344,7 +272,7 @@ void print_smatrix(const smatrix_t* matrix) {
     if (matrix->row_ptr) {
         printf("  row_ptr: ");
         for (int i = 0; i <= matrix->nrow; i++) {
-            printf("%lld ", matrix->row_ptr[i]);
+            printf("%ld ", matrix->row_ptr[i]);
         }
         printf("\n");
     } else {
@@ -354,7 +282,7 @@ void print_smatrix(const smatrix_t* matrix) {
     if (matrix->col_idx) {
         printf("  col_idx: ");
         for (int i = 0; i < matrix->nnz; i++) {
-            printf("%lld ", matrix->col_idx[i]);
+            printf("%ld ", matrix->col_idx[i]);
         }
         printf("\n");
     } else {

@@ -281,9 +281,6 @@ void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
     
     load_function(manager, &(manager->bridges[index].print_smatrix_f), "print_smatrix", index);
 
-    load_function(manager, &(manager->bridges[index].print_vectorT_f), "print_vectorT", index);
-
-    //load_function(manager, &(manager->bridges[index].print_vectorT_f), "print_vectorT_hiperblas_std", index);
 }
 
 void release_plugin(bridge_manager_t *manager, int index) {
