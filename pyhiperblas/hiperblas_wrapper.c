@@ -69,14 +69,10 @@ static void py_complex_delete(PyObject* self) {
 
 
 static PyObject* py_complex_new(PyObject* self, PyObject* args){
-    double real;
-    double imag;
+    double real; double imag;
     if (!PyArg_ParseTuple(args, "dd", &real, &imag)) return NULL;
-
     complex_t * a = bridge_manager.bridges[bridge_index].complex_new(real, imag);
-
     PyObject* po = PyCapsule_New((void*)a, "py_complex_new", py_complex_delete);
-
     return po;
 }
 
@@ -92,7 +88,16 @@ static void py_vector_delete(PyObject *capsule)
 static PyObject* py_vector_new(PyObject* self, PyObject* args){
     int len;
     int data_type;
-    if (!PyArg_ParseTuple(args, "ii", &len,&data_type)) return NULL;
+    if (!PyArg_ParseTuple(args, "ii", &len, &data_type)) return NULL;
+    vector_t * a = bridge_manager.bridges[bridge_index].vector_new(len, data_type, 0, NULL);
+    PyObject* po = PyCapsule_New((void*)a, "py_vector_new", py_vector_delete);
+    return po;
+}
+
+static PyObject* py_vector_new00(PyObject* self, PyObject* args){
+    int len;
+    int data_type;
+    if (!PyArg_ParseTuple(args, "ii", &len, &data_type)) return NULL;
     vector_t * a = bridge_manager.bridges[bridge_index].vector_new(len, data_type, 1, NULL);
     PyObject* po = PyCapsule_New((void*)a, "py_vector_new", py_vector_delete);
     return po;
@@ -100,22 +105,14 @@ static PyObject* py_vector_new(PyObject* self, PyObject* args){
 
 static PyObject* py_load_numpy_array(PyObject* self, PyObject* args){
     PyObject* a = NULL;
-
     if(!PyArg_ParseTuple(args, "O:py_load_numpy_array", &a)) return NULL;
-
     float* dataArrayA = (float*)PyArray_DATA((PyArrayObject*)a);
-
     npy_intp* shape = PyArray_DIMS((PyArrayObject*)a);
-
     int len = shape[0];
     PyArray_Descr* dtype = PyArray_DESCR((PyArrayObject*) a);
-    
     int data_type = (dtype->kind == 'f' ? T_FLOAT : T_COMPLEX);
-
     vector_t * vec_a = bridge_manager.bridges[bridge_index].vector_new(len, data_type, 0, dataArrayA);
-
     PyObject* po = PyCapsule_New((void*)vec_a, "py_vector_new", py_vector_delete);
-
     return po;
 }
 
@@ -368,6 +365,74 @@ static void py_matrix_delete(PyObject* self) {
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
+static PyObject* py_vector_connect(PyObject* self, PyObject* args)
+{
+    printf("BD, em %s: static PyObject* py_vector_connect( ... )\n", __FILE__);
+
+    // Argumentos: (capsule, numpy.ndarray)
+    PyObject *hb_vObj = NULL, *np_vObj = NULL;
+    if (!PyArg_ParseTuple(args, "OO:py_vector_connect", &hb_vObj, &np_vObj))
+        return NULL;
+
+    // Recupera a cápsula
+    vector_t* v = (vector_t*) PyCapsule_GetPointer(hb_vObj, "py_vector_new");
+    if (!v) {
+        PyErr_SetString(PyExc_RuntimeError, "PyCapsule inválida para vector_t");
+        return NULL;
+    }
+
+    int data_type = v->type;
+
+    // --- Converte NumPy array conforme tipo ---
+    PyArrayObject *np_arr = NULL;
+
+    if (data_type == T_FLOAT)
+        np_arr = (PyArrayObject*) PyArray_FROM_OTF(np_vObj, NPY_FLOAT64, NPY_ARRAY_CARRAY);
+    else if (data_type == T_COMPLEX)
+        np_arr = (PyArrayObject*) PyArray_FROM_OTF(np_vObj, NPY_COMPLEX128, NPY_ARRAY_CARRAY);
+    else {
+        PyErr_SetString(PyExc_TypeError, "vector_t possui tipo desconhecido");
+        return NULL;
+    }
+
+    if (!np_arr) {
+        PyErr_SetString(PyExc_TypeError, "Falha ao converter NumPy array");
+        return NULL;
+    }
+
+    // --- Verifica contiguidade e tipo ---
+    int expected_type = (data_type == T_FLOAT) ? NPY_FLOAT64 : NPY_COMPLEX128;
+
+    if (PyArray_TYPE(np_arr) != expected_type || !PyArray_ISCARRAY(np_arr)) {
+        PyErr_SetString(PyExc_TypeError, "Array deve ser contíguo e do tipo correto");
+        return NULL;
+    }
+
+    if (PyArray_NDIM(np_arr) != 1) {
+        PyErr_SetString(PyExc_ValueError, "Vetor deve ser 1D");
+        return NULL;
+    }
+
+    npy_intp size = PyArray_SIZE(np_arr);
+    if (size != v->len) {
+        PyErr_Format(PyExc_ValueError,
+            "Tamanho incompatível: vector_t.len=%ld mas numpy tem %ld",
+            (long)v->len, (long)size);
+        return NULL;
+    }
+
+    // --- Conecta ponteiros ---
+    if (data_type == T_FLOAT)   v->value.f = (double*)         PyArray_DATA(np_arr);
+
+    if (data_type == T_COMPLEX) v->value.f = (npy_complex128*) PyArray_DATA(np_arr);
+
+    printf("BD, vetor conectado: size=%ld, type=%s\n",
+        (long)v->len,
+        (data_type == T_FLOAT ? "float64" : "complex128"));
+
+    Py_RETURN_NONE;
+}
+
 static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
 {
     printf("BD, em %s: static PyObject* py_smatrix_connect( ...\n", __FILE__);// , __func__)
@@ -438,6 +503,127 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
 
     Py_RETURN_NONE;
 }
+
+/*
+static PyObject* py_smatrix_connectChatGPT(PyObject* self, PyObject* args)
+{
+    printf("BD, em %s: static PyObject* py_smatrix_connect( ...\n", __FILE__);
+
+    PyObject *aSmatObj = NULL, *csr_obj = NULL;
+    if (!PyArg_ParseTuple(args, "OO:py_smatrix_connect", &aSmatObj, &csr_obj))
+        return NULL;
+
+    smatrix_t* smat_a = (smatrix_t*) PyCapsule_GetPointer(aSmatObj, "py_sparse_matrix_new");
+    if (!smat_a) {
+        PyErr_SetString(PyExc_RuntimeError, "PyCapsule inválida para smatrix_t");
+        return NULL;
+    }
+
+    int data_type = smat_a->type;
+
+    // --------------------------------------------------------
+    // Pegando atributos
+    // --------------------------------------------------------
+    PyObject *dataObj    = PyObject_GetAttrString(csr_obj, "data");
+    PyObject *indicesObj = PyObject_GetAttrString(csr_obj, "indices");
+    PyObject *indptrObj  = PyObject_GetAttrString(csr_obj, "indptr");
+
+    if (!dataObj || !indicesObj || !indptrObj) {
+        Py_XDECREF(dataObj);
+        Py_XDECREF(indicesObj);
+        Py_XDECREF(indptrObj);
+        PyErr_SetString(PyExc_TypeError, "Objeto não é csr_matrix válido");
+        return NULL;
+    }
+
+    // --------------------------------------------------------
+    // Convertendo para arrays contíguos (sem cópia se possível)
+    // --------------------------------------------------------
+    PyArrayObject *indptrArr  = (PyArrayObject*) PyArray_FROM_OTF(indptrObj,  NPY_INT64,    NPY_ARRAY_CARRAY);
+    PyArrayObject *indicesArr = (PyArrayObject*) PyArray_FROM_OTF(indicesObj, NPY_INT64,    NPY_ARRAY_CARRAY);
+    PyArrayObject *dataArr    = NULL;
+
+    if (data_type == T_FLOAT)
+        dataArr = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_FLOAT64, NPY_ARRAY_CARRAY);
+
+    else if (data_type == T_COMPLEX)
+        dataArr = (PyArrayObject*) PyArray_FROM_OTF(dataObj, NPY_COMPLEX128, NPY_ARRAY_CARRAY);
+
+    // Limpa refs temporárias dos atributos
+    Py_DECREF(dataObj);
+    Py_DECREF(indicesObj);
+    Py_DECREF(indptrObj);
+
+    // --------------------------------------------------------
+    // Verificação de erro
+    // --------------------------------------------------------
+    if (!indptrArr || !indicesArr || !dataArr) {
+        Py_XDECREF(indptrArr);
+        Py_XDECREF(indicesArr);
+        Py_XDECREF(dataArr);
+        PyErr_SetString(PyExc_TypeError, "Falha ao criar arrays Numpy contíguos");
+        return NULL;
+    }
+
+    // --------------------------------------------------------
+    // Validando tipos
+    // --------------------------------------------------------
+    if (PyArray_TYPE(indptrArr) != NPY_INT64 || !PyArray_ISCARRAY(indptrArr)) {
+        goto fail_type;
+    }
+    if (PyArray_TYPE(indicesArr) != NPY_INT64 || !PyArray_ISCARRAY(indicesArr)) {
+        goto fail_type;
+    }
+
+    if (data_type == T_FLOAT  &&
+        (PyArray_TYPE(dataArr) != NPY_FLOAT64 || !PyArray_ISCARRAY(dataArr))) {
+        PyErr_SetString(PyExc_TypeError, "data deve ser np.float64 contíguo");
+        goto fail_type;
+    }
+
+    if (data_type == T_COMPLEX &&
+        (PyArray_TYPE(dataArr) != NPY_COMPLEX128 || !PyArray_ISCARRAY(dataArr))) {
+        PyErr_SetString(PyExc_TypeError, "data deve ser np.complex128 contíguo");
+        goto fail_type;
+    }
+
+    // --------------------------------------------------------
+    // Conectando ponteiros para o smatrix_t
+    // --------------------------------------------------------
+    smat_a->row_ptr  = (npy_int64*)   PyArray_DATA(indptrArr);
+    smat_a->col_idx  = (npy_int64*)   PyArray_DATA(indicesArr);
+
+    if (data_type == T_FLOAT)
+        smat_a->values = (npy_float64*) PyArray_DATA(dataArr);
+    else
+        smat_a->values = (npy_complex128*) PyArray_DATA(dataArr);
+
+    smat_a->nnz      = smat_a->row_ptr[smat_a->nrow];
+    smat_a->isPacked = 1;
+
+    printf("BD, CSR scipy conectado com smatrix HB: nrow=%ld, ncol=%ld, nnz=%ld\n",
+           (long int) smat_a->nrow, (long int) smat_a->ncol, (long int) smat_a->nnz);
+
+    // IMPORTANTE: guardar arrays nos campos privados da capsule se quiser mantê-los vivos
+    smat_a->row_ptr = (PyObject*)indptrArr;
+    smat_a->col_idx = (PyObject*)indicesArr;
+    smat_a->values  = (PyObject*)dataArr;
+
+    // Mantém eles vivos
+    Py_INCREF(indptrArr);
+    Py_INCREF(indicesArr);
+    Py_INCREF(dataArr);
+
+    Py_RETURN_NONE;
+
+fail_type:
+    Py_DECREF(indptrArr);
+    Py_DECREF(indicesArr);
+    Py_DECREF(dataArr);
+    return NULL;
+}
+*/
+
 
 static PyObject* py_load_numpy_matrix(PyObject* self, PyObject* args){
     PyObject* a = NULL;
@@ -540,7 +726,7 @@ static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
 }
 
 static PyObject* py_print_vectorT      (PyObject* self, PyObject* args) {
-    printf("BD, em pyhiperblas/hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)\n");
+    //printf("BD, em pyhiperblas/hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)\n");
     PyObject* pV = NULL;
     if(!PyArg_ParseTuple(args, "O:py_print_vectorT", &pV)) {printf("return NULL\n"); exit(2222);  return NULL;}
     vector_t * v  = (vector_t *)PyCapsule_GetPointer(pV, "py_vector_new");
@@ -796,7 +982,8 @@ static PyMethodDef mainMethods[] = {
     {"move_matrix_device", py_move_matrix_device, METH_VARARGS, "move_matrix_device"},
     {"move_matrix_host", py_move_matrix_host, METH_VARARGS, "move_matrix_host"},
     {"sparse_matrix_new", py_sparse_matrix_new, METH_VARARGS, "sparse_matrix_new"},
-    {"smatrix_connect", py_smatrix_connect, METH_VARARGS, "ponteiros de iCSR scipy connect at smatrix hiperblas struct"},
+    {"smatrix_connect", py_smatrix_connect, METH_VARARGS, "ponteiros de CSR scipy connect at smatrix hiperblas struct"},
+    {"vector_connect",  py_vector_connect,  METH_VARARGS, "ponteiros de numpy array connect at vector hiperblas struct"},
     {"sparse_matrix_set", py_sparse_matrix_set, METH_VARARGS, "sparse_matrix_set"},
     {"sparse_matrix_pack", py_sparse_matrix_pack, METH_VARARGS, "sparse_matrix_pack"},
     {"move_sparse_matrix_device", py_move_sparse_matrix_device, METH_VARARGS, "move_sparse_matrix_device"},

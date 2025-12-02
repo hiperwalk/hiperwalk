@@ -10,7 +10,8 @@ sys.stdout.reconfigure(line_buffering=True)
 
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
-aNumSteps=1
+aNumSteps=0
+aDim=400
 
 dim          =aDim        # 10
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex

@@ -456,10 +456,9 @@ class QuantumWalk(ABC):
         print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
         if hpc is not None:
             self._simul_vec_in  = hbi.send_vector(state)
-
             #self.v_out          = np.zeros(state.shape[0])
             #self._simul_vec_out = hbi.send_vector(self.v_out)
-            self._simul_vec_out = hb.load_numpy_array(np.zeros(state.shape[0])) # return a hb vector
+            self._simul_vec_out = hb.load_numpy_array(np.zeros(state.shape[0] , dtype=state.dtype)) # return a hb vector
             #hb.move_vector_device(self._simul_vec_out)
 
             #self._simul_mat     = hbi.send_matrix(self._evolution)
@@ -664,6 +663,9 @@ class QuantumWalk(ABC):
         np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })
 
         print(f"BD, em simulate, initial state, state=", state, end=";  "); print("state.l2Norm=", np.linalg.norm(state)); 
+        #hb.print_vectorT(self._simul_vec_in)
+        #hb.print_vectorT(self._simul_vec_out)
+        #print(f"BD, +++++++++++++++, exit()"); exit()
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step

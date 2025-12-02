@@ -876,107 +876,38 @@ class Coined(QuantumWalk):
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
-        # TODO: Check if matrix is sparse in pynelibna interface
+        np.set_printoptions(linewidth=240) 
+        np.set_printoptions(precision=3, suppress=True)
+        # TODO: Check if matrix is sparse in pyhiperblas interface
         # TODO: Check if matrices are deleted from memory and GPU.
 
-        #from . import _pyhiperblas_interface as hbi  #BD
         print("BD, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
-        U = None
 
         S = self.get_shift()
 
-        #print("type(S) = ", type(S)); print("S = self.get_shift(), S =  ")
-        #formatted = "\n".join( " ".join(f"{v:2d}" for v in row) for row in S.toarray())
-        #print(formatted); print(); 
-
-        #print("BD, em _set_evolution, CALL  C = self.get_coin(), monta a matriz CSR ")
         C = self.get_coin()
-        #print("type(C) = ", type(C)); print("C = self.get_coin(), C =  ")
-        #formatted = "\n".join( " ".join(f"{v:8.1e}" for v in row) for row in C.toarray())
-        #formatted = "\n".join( " ".join(f"{v:5.1f}" for v in row) for row in C.toarray())
-        #if C.shape[0] <=16 : print(formatted); print()
+
+        U = None
+        U = C.copy()
+        U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
+        U.indptr  = np.ascontiguousarray(U.indptr,  dtype=np.int64)
 
         #S.indices = np.array([2, 5, 0, 7, 6, 1, 4, 3])
         #S.indices = np.arange(len(S.indices))
- 
-        np.set_printoptions(linewidth=240) 
-        #print("type(S.indices)   = ", type(S.indices))
-        #print("S.indices.dtype   = ", S.indices.dtype)
-        #print("indices contiguous: ", S.indices.flags['C_CONTIGUOUS'])
-        #print("S.indptr.dtype    = ", S.indptr.dtype)
-        #print("indptr contiguous : ", S.indptr.flags['C_CONTIGUOUS'])
-        #print("type(S)           = ", type(S))
-        #print("S.dtype           = ", S.dtype)
-        #print("S.data.dtype      = ", S.data.dtype)
-        #print("data contiguous   : ", S.data.flags['C_CONTIGUOUS'])
-        ##print("BD, em _set_evolution, S.toarray()  =\n", S.toarray()); 
-        ##print("BD, em coined.py: S.indices    = ", S.indices) 
-        perm = S.indices 
-
-        #print("type(C.indices)   = ", type(C.indices))
-        #print("C.indices.dtype   = ", C.indices.dtype)
-        #print("indices contiguous: ", C.indices.flags['C_CONTIGUOUS'])
-        #print("C.indptr.dtype    = ", C.indptr.dtype)
-        #print("indptr contiguous : ", C.indptr.flags['C_CONTIGUOUS'])
-        #print("type(C)           = ", type(C))
-        #print("C.dtype           = ", C.dtype)
-        #print("C.data.dtype      = ", C.data.dtype)
-        #print("data contiguous   : ", C.data.flags['C_CONTIGUOUS'])
-        np.set_printoptions(precision=3, suppress=True)
-        #print("BD, em _set_evolution, C.toarray()  =\n", C.toarray()); 
-
-        #U = C.copy()
+        permS = S.indices 
 
         if hbi.get_hpc() is  None:
             print("BD, em _set_evolution, computeU,  U = S @ C ");
-            # U = S @ C
-            U = C[S.indices,:]
-            #print("BD, em _set_evolution, AFTER  U = S @ C ");
+            U[:] = C[permS,:]  # mantem os arrays anteriormente criados
+            #U = C[permS,:]  # mantem os arrays anteriormente criados
+            # U = S @ C        # cria novos os arrays 
         else: 
-
-            #S.indices = S.indices.astype(np.int32)
-            #S.indptr  = S.indptr.astype(np.int32)
-            #S.data    = S.data.astype(np.float64)
-            #print("BD, em _set_evolution, S.toarray()  = ", S.toarray()); 
-            ##print("S.dtype=",S.dtype, ", np.complexfloating=", np.complexfloating)
-            #exit()
             hbS = hbi.send_matrix(S)
-            ##print("BD, +++++ em _set_evolution, exit() =\n", exit()); 
-            ##print("BD, em _set_evolution, hbS  = "); hbi.sparse_matrix_print(hbS); 
-            ##print("BD, em coined.py: S.indptr    = ", S.indptr) 
-            ##print("BD, em coined.py: S.indices   = ", S.indices) 
-            ##print("BD, em coined.py: S.data      = ", S.data) 
-
-            #C.indices = C.indices.astype(np.int32)
-            #C.indptr  = C.indptr.astype(np.int32)
-            #C.data  = C.data.astype(np.float64)
             hbC = hbi.send_matrix(C)
-            ##print("BD, em _set_evolution, hbC  = "); hbi.sparse_matrix_print(hbC); 
-            ##print("BD, em coined.py: C.indptr    = ", C.indptr) 
-            ##print("BD, em coined.py: C.indices   = ", C.indices) 
-            ##print("BD, em coined.py: C.data      = ", C.data) 
-
-            ##U = S @ C
-            ##print("BD, em _set_evolution, (S @ C).toarray()  = ", U.toarray()); 
-            ##print("BD, em coined.py: (S @ C).indptr    = ", U.indptr) 
-            ##print("BD, em coined.py: (S @ C).indices   = ", U.indices) 
-            ##print("BD, em coined.py: (S @ C).data      = ", U.data) 
-
-            U = C.copy()
             hbU = hbi.send_matrix(U)
-            ##print("BD, em _set_evolution, computeU, hbi.permute_sparse_matrix(hbS, hbC, hbU)") #  hbU  = "); hbi.sparse_matrix_print(hbU); 
-            #hbi.permute_sparse_matrix(hbS, hbC, hbU); 
+            print("BD, em _set_evolution, computeU,  hb.permute_sparse_matrix(hbS, hbC, hbU) ");
             hb.permute_sparse_matrix(hbS, hbC, hbU)
-        #    print("BD, em _set_evolution, AFTER : hbi.permute_sparse_matrix(hbS, hbC, hbU);  ");
-        #    print("BD, em _set_evolution, AFTER : hbi.permute_sparse_matrix,  hbU  = "); hbi.sparse_matrix_print(hbU); 
-        #print("BD, em coined.py: U.indptr    = ", U.indptr) 
-        #print("BD, em coined.py: U.indices   = ", U.indices) 
-        #print("BD, em coined.py: U.data      = ", U.data) 
-            #print("BD, em _set_evolution, exit() ");  exit()
 
-        #np.set_printoptions(precision=3, suppress=True)
-        #print("BD, em _set_evolution, U.toarray()  =\n", U.toarray()); 
-        #print("BD, em _set_evolution, exit() =\n", exit()); 
         self._evolution = U
         return # U
 

@@ -1226,7 +1226,7 @@ void print_vectorT(vector_t *v_) {
 
     //if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
 
-    printf("BD, em %s: print_vectorT, ", __FILE_NAME__); setvbuf(stdout, NULL, _IONBF, 0);
+    printf("BD, em %s: print_vectorT, ", __FILE__); setvbuf(stdout, NULL, _IONBF, 0);
 
     //printf("\n  extra   (%p),  value.f (%p)\n",  v_->extra, v_->value.f);
 
@@ -1240,6 +1240,7 @@ void print_vectorT(vector_t *v_) {
     }
     // Detecta se é complexo — pode usar flag interna ou inferir
     int is_complex = (v_->type == T_COMPLEX); // (v_->is_complex != 0); // suponha que vector_t tenha um campo is_complex
+    //printf("\nv_->type == T_COMPLEX, %d == %d\n", v_->type , T_COMPLEX); exit(2222);
 
     double sum = 0.0; int i;
 
