@@ -205,21 +205,6 @@ object_t ** convertScaMatToObject(double s, matrix_t * a) {
     return in;
  }
 
-object_t ** BD00convertToObject4(vector_t * a, smatrix_t * b) {
-    object_t ** in;
-     if (b != NULL) {
-        in = (object_t **) malloc(2 * sizeof(object_t *));
-        in[1] = (object_t *) malloc(sizeof(object_t));
-        vvalue( *in[1] ) = b; 
-        in[1]->type = T_SMATRIX;
-     } else {
-        in = (object_t **) malloc(sizeof(object_t *));
-     }
-    in[0] = (object_t *) malloc(sizeof(object_t));
-    vvalue( *in[0] ) = a; 
-    in[0]->type = T_VECTOR;
-    return in;
- }
 
 object_t ** convertToObject4BD(smatrix_t * m, vector_t * vI, vector_t * vO){
 	//by bidu@lncc.br in nov.2025
@@ -1140,7 +1125,7 @@ matrix_t * mul_complex_scalar_float_mat( bridge_manager_t *mg, int index, comple
 //
 
 void print_smatrix(const smatrix_t* matrix) {
-    printf("em %s: void print_smatrix(const smatrix_t* matrix)\n",__FILE__);
+    printf("BD, em %s: %s\n",__FILE__, __func__);
     //return;
     if (!matrix) {
         printf("Matrix is NULL.\n");
@@ -1230,7 +1215,8 @@ void print_vectorT(vector_t *v_) {
 
     //printf("\n  extra   (%p),  value.f (%p)\n",  v_->extra, v_->value.f);
 
-    char formatoF[] = " %.2f";
+    char formatoF[] = " %6.3f";
+    char formatoC[] = " (%6.3f %+6.3fi)";
     double *data = (double *) v_->value.f;
     if(data != NULL ) {
       printf("\nfrom v_->value.f [%d:%d]:", 0, n - 1);
@@ -1263,26 +1249,26 @@ void print_vectorT(vector_t *v_) {
     } else {
         // ---------- Vetor Complexo ----------
         int n_complex = n / 1; // cada número tem parte real e imaginária
-        printf("from v_->extra [0:%d]:", n_complex - 1);
+        //printf("from v_->extra [0:%d]:", n_complex - 1);
         if (n_complex <= 10) {
             for (i = 0; i < n_complex; i++) {
                 double re = data[2 * i], im = data[2 * i + 1];
                 sum += re * re + im * im;
                 //printf(" (%.3f %+ .3fi)", re, im);
-        printf(" (%.3f %+.3fi)", re, im);
+                  printf(formatoC, re, im);
             }
         } else {
             int tamFaixa = 3;
             for (i = 0; i < n_complex; i++) {
                 double re = data[2 * i], im = data[2 * i + 1];
                 sum += re * re + im * im;
-        if (i < tamFaixa) printf(" (%.3f %+.3fi)", re, im);
+        if (i < tamFaixa) printf(formatoC, re, im);
                 else if (i == tamFaixa) printf(" ...");
-                else if (i >= n_complex - tamFaixa) printf(" (%.3f %+.3fi)", re, im);
+                else if (i >= n_complex - tamFaixa) printf(formatoC, re, im);
             }
         }
     }
-    printf(", L2Norm = %.6f\n", sqrt(sum));
+    printf(", L2Norm = %.16f\n", sqrt(sum));
     return;
 }
 
@@ -1376,8 +1362,8 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
             
   }
 
- void  matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
-   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {\n");
+ void  matvec_mul3( bridge_manager_t *mg, int index, void ** i, int * status ) {
+   printf("BD, em %s: %s\n",__FILE__, __func__);
     
         object_t ** in = (object_t **) i;
         vector_t * v = (vector_t *) vvalue( *in[1] );

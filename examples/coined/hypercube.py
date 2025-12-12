@@ -8,9 +8,10 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
-aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
 
 dim          =aDim        # 10
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -39,7 +40,7 @@ def main():
 
     inicioS = time.perf_counter()
     for r in range(1): #50*1000*1000):
-       states = qw.simulate(range=aRange, state=initialState)
+       states = qw.simulate(aRange, state=initialState)
     fimS    = time.perf_counter()
 
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
@@ -65,11 +66,11 @@ def main():
     f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep + 1):.5e}, "
     f"tempo total = {(fimS - inicioG) :.5e}")
     print('\n')
+    probs = qw.probability_distribution(states)
+    hpw.plot_probability_distribution(probs, graph=g)
 
     return
 
-    probs = qw.probability_distribution(states)
-    hpw.plot_probability_distribution(probs, graph=g)
     #print(probs)
     #plt.savefig("grafico.png")
 

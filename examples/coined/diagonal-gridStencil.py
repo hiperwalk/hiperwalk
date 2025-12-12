@@ -8,25 +8,29 @@ import sys
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
+
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
-aNumSteps=0
-aDim=400
+aNumSteps=15
+aDim=20
 
 dim          =aDim        # 10
-coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
+myCoin       =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
 myHPC_option =aHPCoPTION  # None   "cpu"    "gpu"
 myNumSteps   =aNumSteps
 
-coinT  = "Grover  coin,    real" if coin=="G"            else "Fourier coin, complex"
+coinT  = "Grover  coin,    real" if myCoin=="G"            else "Fourier coin, complex"
 algebra="SciPy"                  if myHPC_option == None else "HiperBlas"
 
-startStep=1;endStep=startStep+myNumSteps;step=1
+startStep=1;endStep=startStep+myNumSteps;step=1#+myNumSteps//20
 aRange=(startStep,endStep,step)
 
 from warnings import warn
 def main():
 
+    np.set_printoptions(linewidth=320, threshold=40)
     hpw.set_hpc(myHPC_option)
 
     inicioG = time.perf_counter()
@@ -34,7 +38,7 @@ def main():
     fimG    = time.perf_counter()
 
     inicioC = time.perf_counter()
-    dtqw = hpw.Coined(grid, shift='persistent', coin='grover')
+    dtqw = hpw.Coined(grid, shift='persistent', coin=myCoin)
     fimC = time.perf_counter()
 
     center = np.array([dim // 2, dim // 2])
@@ -44,7 +48,7 @@ def main():
                    [0.5, (center, center + (-1, -1))]])
     inicioS = time.perf_counter()
     for r in range(1): #50*1000*1000):
-        psi_final = dtqw.simulate(range=aRange, state=psi0)
+        psi_final = dtqw.simulate(aRange, state=psi0)
     fimS = time.perf_counter()
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)
@@ -69,9 +73,11 @@ def main():
     f"tempo total = {(fimS - inicioG) :.5e}")
     print('\n')
 
-    return
-
+    np.set_printoptions(linewidth=820, threshold=240)
     prob = dtqw.probability_distribution(psi_final)
+    print("prob = \n", prob)
+    print("np.sum(prob) = ", np.sum(prob))
+    return
     hpw.plot_probability_distribution(probs, graph=grid)
     #print(probs)
     #plt.savefig("grafico.png")

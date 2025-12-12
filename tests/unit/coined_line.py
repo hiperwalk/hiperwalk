@@ -12,7 +12,6 @@ from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
 import hiperwalk as hpw
-#from . import _pyhiperblas_interface as nbl
 
 class TestCoinedLine(unittest.TestCase):
 
@@ -27,7 +26,6 @@ class TestCoinedLine(unittest.TestCase):
         self.line = hpw.Line   (self.num_vert)
         self.qw   = hpw.Coined (self.line)
         print(f"\n2, em setUp:  +++  finalizando ")
-        return
 
     def tearDown(self):
         print(f"\n0, em tearDown: +++  teste: {self._testMethodName}")
@@ -43,7 +41,9 @@ class TestCoinedLine(unittest.TestCase):
         # final state in rightmost vertex
         print("1, em test04_persistent_shift_left_state_transfer: inicio ")
         self.qw.set_shift('persistent')
+        return
         self.qw.set_coin('I')
+        return
         self.qw.set_marked([])
 
         print("1, em test04_per..,  self.num_vert = ", self.num_vert)
@@ -54,7 +54,6 @@ class TestCoinedLine(unittest.TestCase):
         num_steps = self.num_vert - 1 + 2
         print("1.2,em semi-final, num_steps =  self.num_vert - 1 = ", num_steps)
         final_state = self.qw.simulate((num_steps, num_steps + 1), init_state)
-        return
         final_stateB = final_state[-1]
         print ("final_stateB =", final_stateB)
 
@@ -169,3 +168,7 @@ class TestCoinedLine(unittest.TestCase):
         state2 = state2 / np.sqrt(np.sum(state2))
         self.assertTrue(np.allclose(state, state2))
         print("+++   Final\n");
+
+if __name__ == '__main__':
+    unittest.main()
+

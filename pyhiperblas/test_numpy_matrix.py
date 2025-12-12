@@ -1,5 +1,5 @@
 import numpy as np
-import hiperblas as nbl
+import hiperblas as hb
 import time
 import pytest
 
@@ -38,73 +38,73 @@ print("np.dot(matrixc1, matrixc2) complex total", (end - ini) )
 # neblina calculations
 ###########################################################
 
-#nbl.init_engine(nbl.GPU,0)
-nbl.init_engine(nbl.CPU,0)
-# mat_c1 = nbl.matrix_new(n, n, nbl.FLOAT)
-# mat_c2 = nbl.matrix_new(n, n, nbl.FLOAT)
+#hb.init_engine(hb.GPU,0)
+hb.init_engine(hb.CPU,0)
+# mat_c1 = hb.matrix_new(n, n, hb.FLOAT)
+# mat_c2 = hb.matrix_new(n, n, hb.FLOAT)
 
 ini = current_milli_time()
-mat_f1 = nbl.load_numpy_matrix(matrix1)
-mat_f2 = nbl.load_numpy_matrix(matrix2)
+mat_f1 = hb.load_numpy_matrix(matrix1)
+mat_f2 = hb.load_numpy_matrix(matrix2)
 end = current_milli_time()
-print("nbl.load_numpy_matrix total", (end - ini) )
+print("hb.load_numpy_matrix total", (end - ini) )
 
 ini = current_milli_time()
-nbl.move_matrix_device(mat_f1)
-nbl.move_matrix_device(mat_f2)
+hb.move_matrix_device(mat_f1)
+hb.move_matrix_device(mat_f2)
 
 
-res = nbl.mat_mul(mat_f1, mat_f2)
+res = hb.mat_mul(mat_f1, mat_f2)
 end = current_milli_time()
-print("nbl.mat_mul(mat_f1, mat_f2) float total", (end - ini) )
+print("hb.mat_mul(mat_f1, mat_f2) float total", (end - ini) )
 
-nbl.move_matrix_host(res)
+hb.move_matrix_host(res)
 
-np_res = nbl.retrieve_numpy_matrix(res)
+np_res = hb.retrieve_numpy_matrix(res)
 # print(np_res.shape)
 # print(result.shape)
 
 if True:
     for i in range(0,n):
         for j in range(0,n):
-            print( nbl.matrix_get(res,i,j), " ",  result[i,j])
-            #assert nbl.matrix_get(res,i,j) == pytest.approx(result[i,j], 0.0000000000000001)
+            print( hb.matrix_get(res,i,j), " ",  result[i,j])
+            #assert hb.matrix_get(res,i,j) == pytest.approx(result[i,j], 0.0000000000000001)
             #assert np_res[i,j] == pytest.approx(result[i,j], 0.0000000000000001)
 
-# mat_c1 = nbl.matrix_new(n, n, nbl.COMPLEX)
-# mat_c2 = nbl.matrix_new(n, n, nbl.COMPLEX)
+# mat_c1 = hb.matrix_new(n, n, hb.COMPLEX)
+# mat_c2 = hb.matrix_new(n, n, hb.COMPLEX)
 
 ini = current_milli_time()
-mat_c1 = nbl.load_numpy_matrix(matrixc1)
-mat_c2 = nbl.load_numpy_matrix(matrixc2)
+mat_c1 = hb.load_numpy_matrix(matrixc1)
+mat_c2 = hb.load_numpy_matrix(matrixc2)
 end = current_milli_time()
-print("nbl.load_numpy_matrix complex total", (end - ini) )
+print("hb.load_numpy_matrix complex total", (end - ini) )
 
-nbl.move_matrix_device(mat_c1)
-nbl.move_matrix_device(mat_c2)
+hb.move_matrix_device(mat_c1)
+hb.move_matrix_device(mat_c2)
 
 ini = current_milli_time()
-res = nbl.mat_mul(mat_c1, mat_c2)
+res = hb.mat_mul(mat_c1, mat_c2)
 end = current_milli_time()
-print("nbl.mat_mul(mat_c1, mat_c2) complex total", (end - ini) )
+print("hb.mat_mul(mat_c1, mat_c2) complex total", (end - ini) )
 
-nbl.move_matrix_host(res)
+hb.move_matrix_host(res)
 
-np_res = nbl.retrieve_numpy_matrix(res)
+np_res = hb.retrieve_numpy_matrix(res)
 print(np_res.shape)
 print(resultc.shape)
 
 if True:
     for i in range(0,n):
         for j in range(0,n):
-            assert nbl.matrix_get(res,2*i,2*j) == pytest.approx(resultc[i,j].real, 0.0000000000000001)
-            assert nbl.matrix_get(res,2*i,2*j + 1) == pytest.approx(resultc[i,j].imag, 0.0000000000000001)
-            # print( nbl.matrix_get(res, 2*i, 2*j) + nbl.matrix_get(res, 2*i, 2*j + 1)*1j ," ", resultc[i,j])
-            # print( nbl.matrix_get(res, 2*i, 2*j), " ", nbl.matrix_get(res, 2*i, 2*j + 1)*1j ," ", resultc[i,j])
-            assert nbl.matrix_get(res, 2*i, 2*j) + nbl.matrix_get(res, 2*i, 2*j + 1)*1j == pytest.approx(resultc[i,j], 0.0000000000000001)
+            assert hb.matrix_get(res,2*i,2*j) == pytest.approx(resultc[i,j].real, 0.0000000000000001)
+            assert hb.matrix_get(res,2*i,2*j + 1) == pytest.approx(resultc[i,j].imag, 0.0000000000000001)
+            # print( hb.matrix_get(res, 2*i, 2*j) + hb.matrix_get(res, 2*i, 2*j + 1)*1j ," ", resultc[i,j])
+            # print( hb.matrix_get(res, 2*i, 2*j), " ", hb.matrix_get(res, 2*i, 2*j + 1)*1j ," ", resultc[i,j])
+            assert hb.matrix_get(res, 2*i, 2*j) + hb.matrix_get(res, 2*i, 2*j + 1)*1j == pytest.approx(resultc[i,j], 0.0000000000000001)
             assert np_res[i,j] == pytest.approx(resultc[i,j], 0.0000000000000001)
 
 
 
-nbl.stop_engine()
+hb.stop_engine()
 print("all tests passed")

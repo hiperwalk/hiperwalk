@@ -383,6 +383,7 @@ void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
 }
 
 void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     U->row_ptr[0] = 0; // First row starts at index 0
     for (int i = 0; i < S->nrow; i++) {
         int permuted_row = S->col_idx[i];  // Get the row index in C
@@ -392,9 +393,9 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 #include <omp.h>
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
 {
     int k=0;
-    printf("BD em %s: void computeU, Thread %d of %d created!\n", __FILE__, omp_get_thread_num(), omp_get_num_threads()); 
     if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
@@ -430,18 +431,18 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 
  void * permuteSparseMatrix( void * S_, void *C_, void *U_){
+      printf("BD, em %s: %s\n", __FILE__, __func__); 
       smatrix_t* S = (smatrix_t*) S_;
       smatrix_t* C = (smatrix_t*) C_;
       smatrix_t* U = (smatrix_t*) U_;
       computeRowptrU(S, C, U);
-      printf("BD em %s: void * permuteSparseMatrix\n", __FILE__); 
       computeU(S, C, U);
    }
 
 
 //[Hiago] 
 void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseVecMul(void* v, ...  {\n");
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
     if (!m_values) { fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n"); return ; }
@@ -473,7 +474,7 @@ void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, 
 }
 
 void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseComplexVecMul(void* v, ...  {\n");
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
 

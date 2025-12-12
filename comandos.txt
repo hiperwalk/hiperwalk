@@ -19,3 +19,5 @@ grep "from\|vec_out\|state_index" tela*
 
 grep "long long" . -r --include="*.c"  --include="*.h" | cut -d":" -f 1 |uniq |xargs sed 's/long long int/long int/g' -i
 
+jupyter nbconvert --to notebook --execute   examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb   --output output.ipyn
+find . -name output.ipynb |xargs grep "_simul_vec\|initial"

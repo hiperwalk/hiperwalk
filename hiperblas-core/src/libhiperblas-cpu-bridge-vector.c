@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 vector_t *vector_new(int len, data_type type, int initialize, void *data) {
+    printf("BD, em %s: %s\n", __FILE__, __func__); // _NAME__);
 // chatGPT em 18.11.2025, bidu
     vector_t *ret     = malloc(sizeof(vector_t));
     if (!ret) return NULL;

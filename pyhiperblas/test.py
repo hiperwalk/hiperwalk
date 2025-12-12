@@ -4,12 +4,12 @@ import time
 from datetime import datetime
 import pytest
 
-#from neblina import *
-import neblina as nbl
+#from hiperblas import *
+import hiperblas as hb
 
 def printVect( A, n) :
         for j in range(n):
-            v=str(nbl.vector_get(A, j))
+            v=str(hb.vector_get(A, j))
         #    print(i,j, str(v), sep=", ", end=" ")
             print( v, end=" ")
         print( end="\n")
@@ -18,7 +18,7 @@ def printMat( M, n) :
     for i in range(n):
        #printVect( M[i], n)
        for j in range(n):
-            v=str(nbl.matrix_get(M, i, j))
+            v=str(hb.matrix_get(M, i, j))
         #    print(i,j, str(v), sep=", ", end=" ")
             print( v, end=" ")
        print( end="\n")
@@ -32,13 +32,13 @@ def test_vec_add():
     print("test_vec_add")
 
     n = 3
-    vec_f = nbl.vector_new(n, nbl.FLOAT)
-    vec_2 = nbl.vector_new(n, nbl.FLOAT)
+    vec_f = hb.vector_new(n, hb.FLOAT)
+    vec_2 = hb.vector_new(n, hb.FLOAT)
 
     for i in range(n):
-        nbl.vector_set(vec_f, i,
+        hb.vector_set(vec_f, i,
                    1.0, 0.0)
-        nbl.vector_set(vec_2,
+        hb.vector_set(vec_2,
                    i, 2.0, 0.0)
 
     print("parcela da adicao")
@@ -46,12 +46,12 @@ def test_vec_add():
     print("parcela da adicao")
     printVect(vec_2, n)
 
-    nbl.move_vector_device(vec_f)
-    nbl.move_vector_device(vec_2)
+    hb.move_vector_device(vec_f)
+    hb.move_vector_device(vec_2)
 
-    res = nbl.vec_add(vec_f, vec_2)
+    res = hb.vec_add(vec_f, vec_2)
 
-    nbl.move_vector_host(res)
+    hb.move_vector_host(res)
 
     print("resultado da adicao:")
     printVect(res, n)
@@ -502,25 +502,25 @@ def test_mat_mul():
 
     n = 3
 
-    mat_a = nbl.matrix_new(n, n, nbl.FLOAT)
-    mat_b = nbl.matrix_new(n, n, nbl.FLOAT)
+    mat_a = hb.matrix_new(n, n, hb.FLOAT)
+    mat_b = hb.matrix_new(n, n, hb.FLOAT)
 
     for i in range(n):
         for j in range(n):
-            nbl.matrix_set(mat_a, i, j, 3.0, 0.0)
-            nbl.matrix_set(mat_b, i, j, 1.0, 0.0)
+            hb.matrix_set(mat_a, i, j, 3.0, 0.0)
+            hb.matrix_set(mat_b, i, j, 1.0, 0.0)
 
     print("fator da multiplicacao:")
     printMat (mat_a, n)
     print("fator da multiplicacao:")
     printMat (mat_b, n)
 
-    nbl.move_matrix_device(mat_a)
-    nbl.move_matrix_device(mat_b)
+    hb.move_matrix_device(mat_a)
+    hb.move_matrix_device(mat_b)
 
-    res = nbl.mat_mul(mat_a, mat_b)
+    res = hb.mat_mul(mat_a, mat_b)
 
-    nbl.move_matrix_host(res)
+    hb.move_matrix_host(res)
 
     print("resultado da multiplicacao:")
     printMat (res, n)
@@ -584,7 +584,7 @@ def test_mat_mul_withComplex():
     assert   27. == matrix_get(res,2,2)
     assert  -10. == matrix_get(res,2,3)
 
-nbl.init_engine(nbl.CPU,0)
+hb.init_engine(hb.CPU,0)
 
 test_vec_add()
 test_mat_mul()

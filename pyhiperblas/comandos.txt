@@ -22,3 +22,8 @@ python3 test.py
 python3-config --cflags
 -I/usr/include/python3.12 -I/usr/include/python3.12  -fno-strict-overflow -Wsign-compare  -DNDEBUG -g -O2 -Wall
 
+grep slist ../hiperblas-core/ -r --include="*.c" --include="*.h"
+
+rep list ../hiperblas-core/ -r --include="*.c" --include="*.h"
+grep list ../hiperblas-core/ -r --include="*.c" --include="*.h"
+

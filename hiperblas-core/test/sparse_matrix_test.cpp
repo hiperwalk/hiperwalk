@@ -155,13 +155,13 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     object_t ** in = convertToObject4BD(b, a, rOut ); // rOut->extra contem o vetor de saida
 
     printf("BD, em TEST_F, before call matvec_mul3\n");
-    //r = (vector_t *) matvec_mul3BD(&m, idx, (matvec_mul3BDvoid **) in, NULL);
-    matvec_mul3BD(&m, idx, (void **) in, NULL);
+    //r = (vector_t *) matvec_mul3(&m, idx, (void **) in, NULL);
+    matvec_mul3(&m, idx, (void **) in, NULL);
     m.bridges[idx].print_vectorT_f(rOut);
     printf("BD, em TEST_F, after  call matvec_mul3\n");
     m.bridges[idx].vecreqhost(rOut); // r->value.f = (double*) r->extra;
     m.bridges[idx].print_vectorT_f(rOut);
-    printf("verificação do resultado da função matvec_mul3BD:");
+    printf("verificação do resultado da função matvec_mul3:");
     for (int i = 0; i < r->len; i++) { EXPECT_EQ( rOut->value.f[i], r->value.f[i]); printf("%d:ok, ", i); }
     printf("\n");
     

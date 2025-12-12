@@ -1,7 +1,7 @@
 relativeDir=${1:-"./"}
 SCRATCH="${SCRATCH:-$HOME}"
-#comandoInstallC="if [ ! -f "/snap/bin/cmake" ] ; then sudo snap install cmake --classic; fi"
-comandoInstallC="if [ ! -f "cmake" ] ; then sudo apt install cmake --classic; fi"
+comandoInstallC="if [ ! -f "/snap/bin/cmake" ] ; then sudo snap install cmake --classic; fi"
+comandoInstallC="if [ ! -f "cmake"           ] ; then sudo  apt install cmake; fi"
 echo $comandoInstallC
 eval $comandoInstallC
 comandoInstallC="export PATH=/snap/bin:\"$PATH\""

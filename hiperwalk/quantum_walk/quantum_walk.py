@@ -6,7 +6,10 @@ from sys import modules as sys_modules
 from warnings import warn
 #from ..graph import Graph
 import scipy.optimize
-from . import _pyhiperblas_interface as hbi
+#from . import _pyhiperblas_interface as hbi
+#import _pyhiperblas_interface as hbi
+from hiperwalk.quantum_walk import _pyhiperblas_interface as hbi
+
 import hiperblas as hb
 
 class QuantumWalk(ABC):
@@ -311,6 +314,7 @@ class QuantumWalk(ABC):
         depends on the specifics of the quantum walk model when
         the Hilbert space is not spanned by the set of vertices.
         """
+        print("bd, em quantum.probability_distribution, 0")
         single_state = False
         try:
             len(states[0])
@@ -318,7 +322,9 @@ class QuantumWalk(ABC):
             single_state = True
             states = np.array([states])
 
+        print("bd, em quantum.probability_distribution, 1")
         prob = list(map(QuantumWalk._elementwise_probability, states))
+        print("bd, em quantum.probability_distribution, 2")
         prob = np.array(prob)
 
         return prob[0] if single_state else prob
@@ -453,24 +459,27 @@ class QuantumWalk(ABC):
     ######################################
 
     def _prepare_engine(self, state, hpc):
-        print("em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
-        if hpc is not None:
-            self._simul_vec_in  = hbi.send_vector(state)
-            #self.v_out          = np.zeros(state.shape[0])
-            #self._simul_vec_out = hbi.send_vector(self.v_out)
-            self._simul_vec_out = hb.load_numpy_array(np.zeros(state.shape[0] , dtype=state.dtype)) # return a hb vector
-            #hb.move_vector_device(self._simul_vec_out)
+        print("bd, em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
 
-            #self._simul_mat     = hbi.send_matrix(self._evolution)
-            dtype           = hb.FLOAT if np.issubdtype(self._evolution.dtype, np.floating) else hb.COMPLEX
-            self._simul_mat = hb.sparse_matrix_new(self._evolution.shape[0], self._evolution.shape[1], dtype)
-            hb.smatrix_connect          (self._simul_mat, self._evolution )
-            #hb.move_sparse_matrix_device(self._simul_mat)
-        else:
-            self._simul_vec_in  = state
-            stateC              = state.copy()
-            self._simul_vec_out = stateC
+        dtype           = hb.FLOAT if np.issubdtype(self._evolution.dtype, np.floating) else hb.COMPLEX
+        self._simul_vec_in  = state
+        self._simul_vec_out = np.zeros(state.shape[0] , dtype=state.dtype) # return a np vector
+
+        if hpc is  None:
+            self._hb_simul_vec_in, self._hb_simul_vec_out = None, None
             self._simul_mat     = self._evolution
+        else:
+            self._hb_simul_vec_in = hb.vector_new(self._evolution.shape[0], dtype)
+            hb.vector_connect    (self._hb_simul_vec_in, self._simul_vec_in) 
+            hb.move_vector_device(self._hb_simul_vec_in) 
+
+            self._hb_simul_vec_out = hb.vector_new(self._evolution.shape[0], dtype)  # return a np vector
+            hb.vector_connect    (self._hb_simul_vec_out, self._simul_vec_out) 
+            hb.move_vector_device(self._hb_simul_vec_out)
+
+            self._hb_simul_mat = hb.sparse_matrix_new(self._evolution.shape[0], self._evolution.shape[1], dtype)
+            hb.smatrix_connect          (self._hb_simul_mat, self._evolution )
+            hb.move_sparse_matrix_device(self._hb_simul_mat)
         return
 
 
@@ -480,38 +489,37 @@ class QuantumWalk(ABC):
         to the simulation vector.
         Simulation vector is then updated.
         """
-        print("BD, em def _simulate_step, step =", step)
+        print("bd, em def _simulate_step, step =", step)
+        if step == 0 : return
         if hpc is not None:
             # TODO: request multiple multiplications at once
             #       to hiperblas-core
             # TODO: check if intermediate states are being freed
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
-                #print("BD, em def _simulate_step, HiperBlas, BEFORE CALL multiply_matrix_vector")
-                hb.sparse_matvec_mul(self._simul_mat, self._simul_vec_in, self._simul_vec_out)
-                #hbi.multiply_matrix_vector(self._simul_mat, self._simul_vec_in, self._simul_vec_out, is_sparse)
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+                hb.sparse_matvec_mul(self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out)
+                if i < step - 1 :
+                   self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
         else:
             for i in range(step):
-                #print("BD, em def _simulate_step, SciPy, BEFORE CALL self._simul_mat @ self._simul_vec")
                 self._simul_vec_out[:] = self._simul_mat @ self._simul_vec_in
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+                if i < step - 1 :
+                   self._simul_vec_in,    self._simul_vec_out    = self._simul_vec_out,    self._simul_vec_in
         return
 
     def _save_simul_vec(self, hpc, continue_simulation):
-        # from . import _pyhiperblas_interface as hbi #BD
         ret = None
-
-        if hpc is not None:
-            ret = hbi.copy_vector(self._simul_vec)
+        print("bd, em quantum_walk, def _save_simul_vec")
+        if hpc is None:
+            ret = self._simul_vec_out.copy()
         else:
-            ret = self._simul_vec.copy()
-
+            res = hb.copy_vector_from_device(self._hb_simul_vec_out)
+            ret = hb.retrieve_numpy_array(res)
         return ret
 
 
 
-    def simulate(self, range=None, state=None):
+    def simulate(self, range_=None, state=None):
         r"""
         Simulates the quantum walk.
 
@@ -603,14 +611,14 @@ class QuantumWalk(ABC):
         """
         import time
         import sys
-        # from . import _pyhiperblas_interface as hbi #BD
-        print("BD, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate")
+        # from . import _pyhiperblas_interface as hbi #bd
+        print("bd, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate")
         ############################################
         ### Check if simulation was set properly ###
         ############################################
-        if range is None:
+        if range_ is None:
             raise ValueError(
-                "``range` not specified`. "
+                "``range_` not specified`. "
                 + "Must be an int or tuple of int."
             )
 
@@ -630,13 +638,13 @@ class QuantumWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
-        range = np.array(QuantumWalk._range_to_tuple(range))
+        aRange = np.array(QuantumWalk._range_to_tuple(range_))
 
-        if not np.all([e.is_integer() for e in range]):
+        if not np.all([e.is_integer() for e in range_]):
             raise ValueError("`range` has non-int entry.")
 
-        start, end, step = range
-        print( f"BD, start={start}, end={end}, step={step}")
+        start, end, step = aRange
+        print( f"bd, start={start}, end={end}, step={step}")
         hpc = hbi.get_hpc()
 
         #########################################################
@@ -657,21 +665,18 @@ class QuantumWalk(ABC):
         dtype = state.dtype
         #########################################################
 
-        np.set_printoptions(linewidth=120, threshold=20) 
+        np.set_printoptions(linewidth=320, threshold=40) 
         self._prepare_engine(state, hpc);
         #np.set_printoptions(precision=3, suppress=True)
         np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })
 
-        print(f"BD, em simulate, initial state, state=", state, end=";  "); print("state.l2Norm=", np.linalg.norm(state)); 
-        #hb.print_vectorT(self._simul_vec_in)
-        #hb.print_vectorT(self._simul_vec_out)
-        #print(f"BD, +++++++++++++++, exit()"); exit()
+        print(f"bd, em simulate, initial state, state=", state, end=";  "); print("state.l2Norm=", np.linalg.norm(state)); 
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
-        #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
-        saved_states = np.zeros( (2, state.shape[0]), dtype=dtype)
+        saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
+        #saved_states = np.zeros( (5, state.shape[0]), dtype=dtype)
         state_index  = 0 # index of the state to be saved
 
         # if save_state:
@@ -685,23 +690,19 @@ class QuantumWalk(ABC):
 
         inicioS = time.perf_counter()
         while state_index < num_states+0:
-            print("BD, em def simulate,                     state_index = ", state_index) 
+            print("bd, em def simulate,                     state_index = ", state_index) 
             self._simulate_step(step, hpc)
-            #saved_states[state_index] = self._save_simul_vec(hpc, state_index + 1 < num_states)
-            state_index += 1
+            if state_index < 4 or state_index > num_states - 3:
+                print("bd, self._simul_vec_in ", self._simul_vec_in,  end=", "); print(" self._simul_vec_in.l2Norm=", np.linalg.norm(self._simul_vec_in )); 
+                print("bd, self._simul_vec_out", self._simul_vec_out, end=", "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out )); 
             if  hbi.get_hpc() == 'cpu' :
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
-                if state_index < 4 or state_index > num_states - 3: hb.print_vectorT(self._simul_vec_out)
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
-            else:
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
-                #np.set_printoptions(precision=4, suppress=True)
+                self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
 
-                if state_index < 4 or state_index > num_states - 3: print("self._simul_vec_out=", self._simul_vec_out, end=";  "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out)); 
-                self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+            if  state_index < 50 :  saved_states[state_index] = self._simul_vec_out.copy()
+
+            self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+            state_index += 1
         fimS    = time.perf_counter()
-        self._simul_mat = None; #  self._simul_vec = None
-        #hb.vector_delete( self._simul_vec)
         print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
         return saved_states
 

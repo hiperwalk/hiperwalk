@@ -2,7 +2,7 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
-from . import _pyhiperblas_interface as nbl
+from . import _pyhiperblas_interface as hbi
 
 class ContinuousTime(QuantumWalk):
     r"""
@@ -438,7 +438,7 @@ class ContinuousTime(QuantumWalk):
         If this method is invoked,
         the evolution is recalculated
         """
-        #from . import _pyhiperblas_interface as nbl #BD
+        #from . import _pyhiperblas_interface as hbi #BD
         time = self._time
 
         if time == 0:
@@ -448,7 +448,7 @@ class ContinuousTime(QuantumWalk):
         n = number_of_terms - 1
         H = self.get_hamiltonian()
 
-        hpc = nbl.get_hpc()
+        hpc = hbi.get_hpc()
 
         #TODO: when scipy issue 18086 is solved,
         # invoke scipy.linalg.expm to calculate power series
@@ -465,7 +465,7 @@ class ContinuousTime(QuantumWalk):
             return U
 
         if hpc is not None:
-            U = nbl.matrix_power_series(-1j*time*H.todense(), n)
+            U = hbi.matrix_power_series(-1j*time*H.todense(), n)
         else:
             U = numpy_matrix_power_series(-1j*time*H.todense(), n)
 

@@ -57,8 +57,8 @@ void print_vectorT(vector_t *v_) ; // BD dez25
  void ** mat_transp     ( bridge_manager_t *m, int index, void ** i, int * status );
  void ** matvec_mul1    ( void ** i, int * status );
  void ** matvec_mul2    ( void ** i, int * status );
- void ** matvec_mul3    ( bridge_manager_t *m, int index, void ** i, int * status );
- void  matvec_mul3BD    ( bridge_manager_t *m, int index, void ** i, int * status );
+ //void ** matvec_mul3    ( bridge_manager_t *m, int index, void ** i, int * status );
+ void    matvec_mul3    ( bridge_manager_t *m, int index, void ** i, int * status );
  void  permuteSparseMatrix    ( bridge_manager_t *m, int index, smatrix_t*, smatrix_t*, smatrix_t*);
 
  void ** vec_sub_cpu    ( void ** i, int * status );

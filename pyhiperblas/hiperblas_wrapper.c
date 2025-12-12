@@ -14,6 +14,7 @@
 
 bridge_manager_t bridge_manager;
 int bridge_index = 0;
+int hpc = 0;
 
 static PyObject* py_init_engine(PyObject* self, PyObject* args){
     int device;
@@ -27,7 +28,6 @@ static PyObject* py_init_engine(PyObject* self, PyObject* args){
         case 0:
         //    lib_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
 	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
-            printf("lib_name = %s\n", lib_name);
             break;
         case 1:
 	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-opencl-bridge.so");
@@ -36,7 +36,7 @@ static PyObject* py_init_engine(PyObject* self, PyObject* args){
 	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
             break;
     }
-    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_init_engine, lib_name =%s\n", lib_name); //exit(2222);
+    printf("BD, em %s, %s, lib_name =%s\n", __FILE__, __func__, lib_name);
 														   
     load_plugin(&bridge_manager, lib_name, bridge_index);
     bridge_manager.bridges[bridge_index].InitEngine_f(device);
@@ -94,6 +94,7 @@ static PyObject* py_vector_new(PyObject* self, PyObject* args){
     return po;
 }
 
+/*
 static PyObject* py_vector_new00(PyObject* self, PyObject* args){
     int len;
     int data_type;
@@ -102,6 +103,7 @@ static PyObject* py_vector_new00(PyObject* self, PyObject* args){
     PyObject* po = PyCapsule_New((void*)a, "py_vector_new", py_vector_delete);
     return po;
 }
+*/
 
 static PyObject* py_load_numpy_array(PyObject* self, PyObject* args){
     PyObject* a = NULL;
@@ -130,6 +132,38 @@ static PyObject* py_retrieve_numpy_array(PyObject* self, PyObject* args){
     PyArray_ENABLEFLAGS((PyArrayObject*)numpyArray, NPY_ARRAY_OWNDATA);
     return numpyArray;
 }
+
+static PyObject* py_copy_numpy_array(PyObject* self, PyObject* args)
+{
+    PyObject* pf = NULL;
+    if(!PyArg_ParseTuple(args, "O:py_retrieve_numpy_array", &pf))
+        return NULL;
+
+    vector_t *vec = (vector_t *)PyCapsule_GetPointer(pf, "py_vector_new");
+
+    // Traz dados do device para host, se necessário
+    bridge_manager.bridges[bridge_index].vecreqhost(vec);
+
+    int rows = vec->len;
+    npy_intp dims[1] = { rows };
+
+    int data_type = (vec->type == T_FLOAT ? NPY_FLOAT64 : NPY_COMPLEX128);
+    size_t element_size = (vec->type == T_FLOAT ? sizeof(double) : sizeof(double complex));
+
+    // Criamos um novo array DONO da memória
+    PyObject* numpyArray = PyArray_SimpleNew(1, dims, data_type);
+    if (!numpyArray)
+        return NULL;
+
+    // Ponteiro para os dados novos
+    void *dest_data = PyArray_DATA((PyArrayObject*)numpyArray);
+
+    // Copia segura
+    memcpy(dest_data, vec->value.f, rows * element_size);
+
+    return numpyArray;
+}
+
 
 static PyObject* py_vector_set(PyObject* self, PyObject* args) {
     
@@ -238,21 +272,21 @@ static PyObject* py_vec_add(PyObject* self, PyObject* args) {
 }
 
 static PyObject* py_matvec_mul(PyObject* self, PyObject* args) {
-    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_matvec_mul(PyObject* self, ... \n");
+    printf("BD, em %s, %s\n", __FILE__, __func__);
     PyObject* M = NULL; PyObject* vI = NULL; PyObject* vO = NULL;
     if(!PyArg_ParseTuple(args, "OOO:py_matvec_mul", &M, &vI, &vO)) return NULL;
     matrix_t * mat_M = (matrix_t *)PyCapsule_GetPointer(M,  "py_matrix_new");
     vector_t * vec_I = (vector_t *)PyCapsule_GetPointer(vI, "py_vector_new");
     vector_t * vec_O = (vector_t *)PyCapsule_GetPointer(vO, "py_vector_new");
     object_t ** in = convertToObject3BD(mat_M, vec_I, vec_O);
-    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
+    matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
 //vector_t * r = (vector_t *) matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
     Py_RETURN_NONE;
 }
 
 // Destrutor do PyCapsule
 static void py_sparse_matrix_delete(PyObject* capsule) {
-    printf("BD, ATENCAO !!!  em ./pyhiperblas/hiperblas_wrapper.c: static void py_sparse_matrix_delete\n");
+    printf("BD, ATENCAO !!! em %s, %s\n", __FILE__, __func__);
     smatrix_t* a = (smatrix_t*) PyCapsule_GetPointer(capsule, "py_sparse_matrix_new");
     //free (a->values); free (a);
     //exit(128+37);
@@ -265,7 +299,7 @@ static void py_sparse_matrix_delete(PyObject* capsule) {
 }
 
 static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
-    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_permute_sparse_matrix(PyObject* self, ... \n");
+    printf("BD, em %s, %s\n", __FILE__, __func__);
     PyObject* objS = NULL; PyObject* objC = NULL; PyObject* objU = NULL;
     if(!PyArg_ParseTuple(args, "OOO:py_permute_sparse_matrix", &objS, &objC, &objU)) return NULL;
     smatrix_t * hb_smatS = (smatrix_t *) PyCapsule_GetPointer(objS, "py_sparse_matrix_new");
@@ -276,7 +310,7 @@ static PyObject* py_permute_sparse_matrix(PyObject* self, PyObject* args) {
 }
 
 static PyObject* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
-    printf("BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... \n");
+    printf("BD, em %s, %s\n", __FILE__, __func__);
 
     PyObject* m = NULL; PyObject* vIn = NULL;  PyObject* vOut = NULL;
     if(!PyArg_ParseTuple(args, "OOO:py_sparse_matvec_mul", &m, &vIn, &vOut)) return NULL;
@@ -286,7 +320,7 @@ static PyObject* py_sparse_matvec_mul(PyObject* self, PyObject* args) {
     vector_t  * vec_Out = (vector_t  *)PyCapsule_GetPointer(vOut, "py_vector_new");
 
     object_t ** in      = convertToObject4BD(aSmat, vec_In, vec_Out );
-    matvec_mul3BD(&bridge_manager, bridge_index, (void **) in, NULL );
+    matvec_mul3(&bridge_manager, bridge_index, (void **) in, NULL );
 
     Py_RETURN_NONE;
 }
@@ -367,7 +401,7 @@ static void py_matrix_delete(PyObject* self) {
 
 static PyObject* py_vector_connect(PyObject* self, PyObject* args)
 {
-    printf("BD, em %s: static PyObject* py_vector_connect( ... )\n", __FILE__);
+    printf("BD, em %s: %s )\n", __FILE__, __func__);
 
     // Argumentos: (capsule, numpy.ndarray)
     PyObject *hb_vObj = NULL, *np_vObj = NULL;
@@ -425,10 +459,6 @@ static PyObject* py_vector_connect(PyObject* self, PyObject* args)
     if (data_type == T_FLOAT)   v->value.f = (double*)         PyArray_DATA(np_arr);
 
     if (data_type == T_COMPLEX) v->value.f = (npy_complex128*) PyArray_DATA(np_arr);
-
-    printf("BD, vetor conectado: size=%ld, type=%s\n",
-        (long)v->len,
-        (data_type == T_FLOAT ? "float64" : "complex128"));
 
     Py_RETURN_NONE;
 }
@@ -490,14 +520,11 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
     // --- Compartilhamento real de memória ---
     smat_a->row_ptr = (npy_int64*)   PyArray_DATA(indptrArr);
     smat_a->col_idx = (npy_int64*)   PyArray_DATA(indicesArr);
-    if(data_type == T_FLOAT)   smat_a->values  = (npy_float64*) PyArray_DATA(dataArr);
+    if(data_type == T_FLOAT)   smat_a->values  = (npy_float64*)    PyArray_DATA(dataArr);
     if(data_type == T_COMPLEX) smat_a->values  = (npy_complex128*) PyArray_DATA(dataArr);
 
     smat_a->nnz  = smat_a->row_ptr[smat_a->nrow];
     smat_a->isPacked = 1;
-
-    printf("BD2, CSR spipy conectado com smatrix HB: nrow=%ld, ncol=%ld, nnz=%ld\n",
-           (long int) smat_a->nrow, (long int) smat_a->ncol, (long int) smat_a->nnz);
 
     //print_smatrix(smat_a); 
 
@@ -713,7 +740,7 @@ static PyObject* py_move_matrix_host(PyObject* self, PyObject* args) {
 
 static PyObject* py_sparse_matrix_new(PyObject* self, PyObject* args){
     int rows; int cols; int data_type;
-    printf("BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) \n");
+    printf("BD, em %s, %s\n", __FILE__, __func__);
     if (!PyArg_ParseTuple(args, "iii", &rows, &cols, &data_type)) return NULL;
     smatrix_t * a = bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
     if (!a) { PyErr_SetString(PyExc_RuntimeError, "smatrix_new failed"); return NULL; }
@@ -735,7 +762,7 @@ static PyObject* py_print_vectorT      (PyObject* self, PyObject* args) {
 }
 
 static PyObject* py_sparse_matrix_print(PyObject* self, PyObject* args) {
-    printf("BD, em hiperblas_wraper.c: static PyObject* py_sparse_matrix_print(PyObject* self, PyObject* args)\n");
+    printf("BD, em %s, %s\n", __FILE__, __func__);
     PyObject* pM = NULL;
     if(!PyArg_ParseTuple(args, "O:py_sparse_matrix_print", &pM)) return NULL;
     smatrix_t * sMat = (smatrix_t *)PyCapsule_GetPointer(pM, "py_sparse_matrix_new");
@@ -968,6 +995,7 @@ static PyMethodDef mainMethods[] = {
     {"vector_new",  py_vector_new, METH_VARARGS, "vector_new"},
     {"load_numpy_array", py_load_numpy_array, METH_VARARGS, "load_numpy_array"},
     {"retrieve_numpy_array", py_retrieve_numpy_array, METH_VARARGS, "retrieve_numpy_array"},
+    {"copy_numpy_array", py_copy_numpy_array, METH_VARARGS, " return a copy as new numpy array"},
     {"vector_set", py_vector_set, METH_VARARGS, "vector_set"},
     {"vector_get", py_vector_get, METH_VARARGS, "vector_get"},
     {"move_vector_device", py_move_vector_device, METH_VARARGS, "move_vector_device"},

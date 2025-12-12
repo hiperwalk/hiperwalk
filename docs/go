@@ -1,4 +1,0 @@
-rm -rfv documentation/generated
-rm -rfv documentation/graph_constructors/generated
-make clean
-make html

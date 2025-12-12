@@ -111,7 +111,7 @@ def send_vector(v):
     hiperblas.move_vector_device(vec)
     return vec
 
-def retrieve_vector(nbl_vec):
+def retrieve_vector(hb_vec):
     r"""
     Retrieves vector from the device and converts it to python array.
     By default, it is supposed that the vector is not going to be used in
@@ -122,45 +122,21 @@ def retrieve_vector(nbl_vec):
 
     # if a vector is being retrieved.
     # the engine should have been already initiated
-    hiperblas.move_vector_host(nbl_vec)
-    py_vec = hiperblas.retrieve_numpy_array(nbl_vec)
+    hiperblas.move_vector_host(hb_vec)
+    py_vec = hiperblas.retrieve_numpy_array(hb_vec)
 
-    # if not pynbl_vec.is_complex:
+    # if not pyhb_vec.is_complex:
     #     raise NotImplementedError("Cannot retrieve real-only vectors.")
     # py_vec = np.array(
-    #             [hiperblas.vector_get(nbl_vec, 2*i)
-    #              + 1j*hiperblas.vector_get(nbl_vec, 2*i + 1)
-    #              for i in range(pynbl_vec.shape)]
+    #             [hiperblas.vector_get(hb_vec, 2*i)
+    #              + 1j*hiperblas.vector_get(hb_vec, 2*i + 1)
+    #              for i in range(pyhb_vec.shape)]
     #         )
 
     # TODO: check if vector is being deleted (or not)
 
     return py_vec
         
-def _send_sparse_matrix(csrM):
-    r"""
-    Transfers a sparse Matrix (M) stored in csr format to Hiperblas-core and
-    moves it to the device (ready to be used).
-    By default, a matrix with complex elements is expected.
-    If the matrix has only real elements, invoke this function by
-    TransferSparseMatrix(M, False);
-    this saves half the memory that would be used.
-    TODO: Add tests
-      - Transfer and check real Matrix
-      - Transfer and check complex Matrix
-    TODO: isn't there a way for hiperblas-core to use the csr matrix directly?
-      In order to avoid double memory usage
-    """
-    print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)");
-    # TODO: check if complex automatically?
-    is_complex = np.issubdtype(csrM.dtype, np.complexfloating)
-    dtype = hiperblas.COMPLEX if is_complex else hiperblas.FLOAT
-    nrows, ncols = csrM.shape
-    smat = hiperblas.sparse_matrix_new(nrows, ncols, dtype)
-    hiperblas.smatrix_connect    (smat, csrM )
-    hiperblas.move_sparse_matrix_device(smat)
-    return smat
-
 def _send_dense_matrix(M):
     print("em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_dense_matrix(M)")
     mat = hiperblas.load_numpy_matrix(M)
@@ -169,17 +145,13 @@ def _send_dense_matrix(M):
 
 def send_matrix(M):
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)")
-    #print("BD, M.dtype=",M.dtype, ", np.complexfloating=", np.complexfloating)
-    if scipy.sparse.issparse(M):
-        s_matrix = _send_sparse_matrix(M)
-        return s_matrix
     return _send_dense_matrix(M)
 
-def retrieve_matrix(nbl_mat):
+def retrieve_matrix(hb_mat):
 
     try:
-        hiperblas.move_matrix_host(nbl_mat)
-        mat = hiperblas.retrieve_numpy_matrix(nbl_mat)
+        hiperblas.move_matrix_host(hb_mat)
+        mat = hiperblas.retrieve_numpy_matrix(hb_mat)
     except:
         raise NotImplementedError(
             "Cannot retrieve sparse matrix."
@@ -187,7 +159,7 @@ def retrieve_matrix(nbl_mat):
 
     return mat
 
-def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
+def multiply_matrix_vector(hb_mat, hb_vecIn, hb_vecOut, is_sparse):
     """
     Request matrix multiplication to hiperblas.
 
@@ -212,16 +184,16 @@ def multiply_matrix_vector(nbl_mat, nbl_vecIn, nbl_vecOut, is_sparse):
     # if a matrix-vector operation is being requested,
     # the engine should have been already initiated
     if is_sparse:
-        print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto ")
-        hiperblas.sparse_matvec_mul(nbl_mat, nbl_vecIn, nbl_vecOut)
+        print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL hb_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto ")
+        hiperblas.sparse_matvec_mul(hb_mat, hb_vecIn, hb_vecOut)
     else:
-        print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.matvec_mul, DENSA, para continuo ")
-        nbl_vecOut = hiperblas.matvec_mul(nbl_vecIn, nbl_mat)
+        print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL hb_vec = hiperblas.matvec_mul, DENSA, para continuo ")
+        hb_vecOut = hiperblas.matvec_mul(hb_vecIn, hb_mat)
 
     return 
 
-def multiply_matrices(nbl_A, nbl_B):
-    return hiperblas.mat_mul(nbl_A, nbl_B)
+def multiply_matrices(hb_A, hb_B):
+    return hiperblas.mat_mul(hb_A, hb_B)
 
 def matrix_power_series(A, n):
     r"""
@@ -253,7 +225,3 @@ def matrix_power_series(A, n):
     #return hiperblas.retrieve_numpy_matrix(pM)
     return retrieve_matrix(pM)
 
-def copy_vector(v):
-    res = hiperblas.copy_vector_from_device(v)
-    vec = hiperblas.retrieve_numpy_array(res)
-    return vec
