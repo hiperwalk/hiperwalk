@@ -21,3 +21,10 @@ grep "long long" . -r --include="*.c"  --include="*.h" | cut -d":" -f 1 |uniq |x
 
 jupyter nbconvert --to notebook --execute   examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb   --output output.ipyn
 find . -name output.ipynb |xargs grep "_simul_vec\|initial"
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHB_DockeImage
+docker run --rm -it hb:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHW_DockeImage
+docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-gridStencil.py
+

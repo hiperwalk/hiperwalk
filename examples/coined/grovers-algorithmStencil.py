@@ -12,7 +12,7 @@ N = 47
 
 aDim=5; aNumSteps=3; aCoin="F"; aHPCoPTION=None
 aDim=5; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
-aNumSteps=0
+aNumSteps=20
 
 myDim    =aDim        # 10
 myCoin   =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -44,9 +44,9 @@ def main():
     t_final = round(4*np.pi*np.sqrt(N)/4) + 1
 
     aRange=(startStep,endStep,step)
-    #states = qw.simulate(range=t_final, state=qw.uniform_state())
+    #states = qw.simulate(range_=t_final, state=qw.uniform_state())
     inicioS = time.perf_counter()
-    states = qw.simulate(range=aRange, state=qw.uniform_state())
+    states = qw.simulate(range_=aRange, state=qw.uniform_state())
     fimS    = time.perf_counter()
     print(f"Hypercube: Tempo decorrido: {fimG - inicioG:.6f} segundos", file=sys.stderr)
     print(f"computeU : Tempo decorrido: {fimC - inicioC:.6f} segundos", file=sys.stderr)

@@ -79,8 +79,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     i=8; a->value.f[i] = -0.500; i=9; a->value.f[i] =  0.500;
  //   a->extra=a->value.f;
     printf("BD, em TEST_F, vetor  entrada \n");
-    m.bridges[idx].print_vectorT_f(a);
- //return;
+    print_vectorT(a);
 
 //v_->extra [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
     vector_t  * r = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
@@ -89,7 +88,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     i=12; r->value.f[i] = 0.500; i=15; r->value.f[i] = -0.500;
   //  r->extra=r->value.f;
     printf("BD, em TEST_F, vetor  saida \n");
-    m.bridges[idx].print_vectorT_f(r);
+    print_vectorT(r);
 
     //for (int i = 0; i < a->len; i++) { printf("r[%2d]=%f\n", i,  a->value.f[i]); }
 
@@ -142,7 +141,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     b->values[i++]=0.0;   b->values[i++]=1.0; 
     b->values[i++]=-0.5;  b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
     printf("BD, em TEST_F, matriz U \n");
-    m.bridges[idx].print_smatrix_f(b);
+    print_smatrix(b);
 
     //m.bridges[idx].smatrix_pack(b);
 
@@ -157,10 +156,10 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     printf("BD, em TEST_F, before call matvec_mul3\n");
     //r = (vector_t *) matvec_mul3(&m, idx, (void **) in, NULL);
     matvec_mul3(&m, idx, (void **) in, NULL);
-    m.bridges[idx].print_vectorT_f(rOut);
+    print_vectorT(rOut);
     printf("BD, em TEST_F, after  call matvec_mul3\n");
     m.bridges[idx].vecreqhost(rOut); // r->value.f = (double*) r->extra;
-    m.bridges[idx].print_vectorT_f(rOut);
+    print_vectorT(rOut);
     printf("verificação do resultado da função matvec_mul3:");
     for (int i = 0; i < r->len; i++) { EXPECT_EQ( rOut->value.f[i], r->value.f[i]); printf("%d:ok, ", i); }
     printf("\n");

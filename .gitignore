@@ -1,11 +1,13 @@
 #telA*
-include/
+#include/
 lib64
 examples/coined/a*
 examples/coined/notebooks/.ipynb_checkpoints/
 hiperblas-core/DartConfiguration.tcl
 hiperblas-core/sparse_matrix_testBD
 pyhiperblas/HiperblasExtension.egg-info/
+docs
+Archive
 #
 # =======================================
 # 🧠 GERAL
