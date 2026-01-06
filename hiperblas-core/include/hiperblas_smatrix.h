@@ -11,8 +11,8 @@
  * Created on 26 de agosto de 2021, 00:05
  */
 
-#ifndef NEBLINA_SMATRIX_H
-#define NEBLINA_SMATRIX_H
+#ifndef HIPERBLAS_SMATRIX_H
+#define HIPERBLAS_SMATRIX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,5 +61,5 @@ typedef struct __smatrix_t {
 }
 #endif
 
-#endif /* NEBLINA_SMATRIX_H */
+#endif /* HIPERBLAS_SMATRIX_H */
 

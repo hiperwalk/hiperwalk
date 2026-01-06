@@ -1,5 +1,5 @@
-#ifndef __LIBNEBLINA_H_
-#define __LIBNEBLINA_H_
+#ifndef __LIBHIPERBLAS_H_
+#define __LIBHIPERBLAS_H_
 
 #ifdef	__cplusplus
 extern "C" {

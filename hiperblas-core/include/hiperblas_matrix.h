@@ -5,8 +5,8 @@
  * Created on 25 de agosto de 2021, 00:07
  */
 
-#ifndef NEBLINA_MATRIX_H
-#define NEBLINA_MATRIX_H
+#ifndef HIPERBLAS_MATRIX_H
+#define HIPERBLAS_MATRIX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +42,5 @@ extern "C" {
 }
 #endif
 
-#endif /* NEBLINA_MATRIX_H */
+#endif /* HIPERBLAS_MATRIX_H */
 

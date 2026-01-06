@@ -5,8 +5,8 @@
  * Created on 16 de outubro de 2021, 11:30
  */
 
-#ifndef NEBLINA_COMPLEX_H
-#define NEBLINA_COMPLEX_H
+#ifndef HIPERBLAS_COMPLEX_H
+#define HIPERBLAS_COMPLEX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,5 +27,5 @@ typedef struct __complex_t {
 }
 #endif
 
-#endif /* NEBLINA_COMPLEX_H */
+#endif /* HIPERBLAS_COMPLEX_H */
 

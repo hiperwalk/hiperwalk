@@ -639,9 +639,11 @@ class QuantumWalk(ABC):
         ###############################
 
         aRange = np.array(QuantumWalk._range_to_tuple(range_))
-
-        if not np.all([e.is_integer() for e in range_]):
+        if not all(isinstance(e, (int, np.integer)) for e in range_):
             raise ValueError("`range` has non-int entry.")
+
+        #if not np.all([e.is_integer() for e in range_]): # ocorreu um erro no jupyter
+        #    raise ValueError("`range` has non-int entry.")
 
         start, end, step = aRange
         print( f"bd, start={start}, end={end}, step={step}")

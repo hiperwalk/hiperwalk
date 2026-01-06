@@ -1,5 +1,5 @@
-#ifndef __NEBLINASTD___
-#define __NEBLINASTD___
+#ifndef __HIPERBLASSTD___
+#define __HIPERBLASSTD___
 #ifdef	__cplusplus
 extern "C" {
 #endif

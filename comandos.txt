@@ -28,3 +28,85 @@ docker run --rm -it hb:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiag
 docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHW_DockeImage
 docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-gridStencil.py
 
+#bidu@lncc.br, dez.2025
+
+#docker build --build-arg USER_NAME=bidu --build-arg USER_ID=1001 --build-arg GROUP_ID=1001 -t hb:cpu . -f  buildHW_DockefFile
+#docker run --rm -it hw:cpu bash
+#docker run --rm -it hw:cpu /home/bidu/hiperblas-core/build/sparse_matrix_test
+
+#docker run --rm -it hw:cpu python3 -c "import hiperblas; print(hiperblas.__file__) "
+#   /home/bidu/.local/lib/python3.12/site-packages/hiperblas.cpython-312-x86_64-linux-gnu.so
+
+#docker run --rm -it hw:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+#docker run --rm -it hw:cpu python3 -c "import hiperwalk; print(hiperwalk.__file__) "
+#   /home/bidu/hiperwalk/hiperwalk/__init__.py
+
+#docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-grid.py
+
+#docker run --rm -it hw:cpu /home/bidu/hiperwalk/rodarExps.sh 
+
+#docker build --build-arg CACHE_BUST=$(date +%s) -t hw:cpu . -f  buildHW_DockefFile
+
+#docker run --rm -it --user bidu:$(id -g) -v /prj/meus_dados/exp1:/outA hw:cpu  /home/bidu/hiperwalk/rodarExps.sh outA
+
+grafo=hypercube;    dim=18;  grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" telas/telAa${grafo}_${dim}_coinF_H*
+
+
+(cd ../hiperwalk; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/agrovers-algorithm_600_coin"G"_HB_01T.py 2>&1) |grep ": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed"
+
+export g=diagonal-grid;(cd ./; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/${g}Stencil.py 2>&1) >telaG${g}Sctencil.txt
+git clone https://github.com/hiperwalk/hiperwalk.git; cd hiperwalk; git fetch --all; git checkout bidu
+
+sudo apt update
+sudo apt install wslu
+ sudo apt install xdg-utils wslu
+ xdg-open https://www.google.com
+
+jupyter nbconvert --to notebook --execute examples/coined/notebooks/Grover-algorithm.ipynb
+
+grep "from\|vec_out\|state_index" tela*
+
+grep "long long" . -r --include="*.c"  --include="*.h" | cut -d":" -f 1 |uniq |xargs sed 's/long long int/long int/g' -i
+
+jupyter nbconvert --to notebook --execute   examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb   --output output.ipyn
+find . -name output.ipynb |xargs grep "_simul_vec\|initial"
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHB_DockeImage
+docker run --rm -it hb:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHW_DockeImage
+docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-gridStencil.py
+
+#bidu@lncc.br, dez.2025
+
+#docker build --build-arg USER_NAME=bidu --build-arg USER_ID=1001 --build-arg GROUP_ID=1001 -t hb:cpu . -f  buildHW_DockefFile
+#docker run --rm -it hw:cpu bash
+#docker run --rm -it hw:cpu /home/bidu/hiperblas-core/build/sparse_matrix_test
+
+#docker run --rm -it hw:cpu python3 -c "import hiperblas; print(hiperblas.__file__) "
+#   /home/bidu/.local/lib/python3.12/site-packages/hiperblas.cpython-312-x86_64-linux-gnu.so
+
+#docker run --rm -it hw:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+#docker run --rm -it hw:cpu python3 -c "import hiperwalk; print(hiperwalk.__file__) "
+#   /home/bidu/hiperwalk/hiperwalk/__init__.py
+
+#docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-grid.py
+
+#docker run --rm -it hw:cpu /home/bidu/hiperwalk/rodarExps.sh 
+
+#docker build --build-arg CACHE_BUST=$(date +%s) -t hw:cpu . -f  buildHW_DockefFile
+
+#docker run --rm -it --user bidu:$(id -g) -v /prj/meus_dados/exp1:/outA hw:cpu  /home/bidu/hiperwalk/rodarExps.sh outA
+
+docker run -it --rm -p 8888:8888 -v /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work hw:cpu jupyter lab --ip=0.0.0.0 --no-browser docker stop
+
+
+docker run -it --rm -p 8888:8888 -v /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work hb:cpu jupyter lab --ip=0.0.0.0 --no-browser
+docker run -it --rm -p 8888:8888 -v /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work -w /home/bidu/work hb:cpu jupyter lab --ip=0.0.0.0 --no-browser
+
+git status --short | awk 'BEGIN{print "git add" } /^ M/ {print $2}' | paste -sd' '
+

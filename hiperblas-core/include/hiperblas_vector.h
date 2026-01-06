@@ -5,8 +5,8 @@
  * Created on 24 de agosto de 2021, 23:09
  */
 
-#ifndef NEBLINA_VECTOR_H
-#define NEBLINA_VECTOR_H
+#ifndef HIPERBLAS_VECTOR_H
+#define HIPERBLAS_VECTOR_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,5 +32,5 @@ typedef struct __vector_t {
 }
 #endif
 
-#endif /* NEBLINA_VECTOR_H */
+#endif /* HIPERBLAS_VECTOR_H */
 

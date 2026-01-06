@@ -1,5 +1,5 @@
-#ifndef __NEBLINAVECTOROCL
-#define __NEBLINAVECTOROCL
+#ifndef __HIPERBLASVECTOROCL
+#define __HIPERBLASVECTOROCL
 #define  BLOCK_DIM 16
 
 #include <math.h>

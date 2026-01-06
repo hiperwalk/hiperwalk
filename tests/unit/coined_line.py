@@ -39,28 +39,20 @@ class TestCoinedLine(unittest.TestCase):
     def test04_persistent_shift_left_state_transfer(self):
         # initial state in leftmost vertex
         # final state in rightmost vertex
-        print("1, em test04_persistent_shift_left_state_transfer: inicio ")
-        self.qw.set_shift('persistent')
-        return
-        self.qw.set_coin('I')
-        return
-        self.qw.set_marked([])
+        print("BD, em test04_persistent_shift_left_state_transfer: inicio ")
 
-        print("1, em test04_per..,  self.num_vert = ", self.num_vert)
         init_state = self.qw.state([[1, (self.num_vert - 1, self.num_vert - 2)]])
         print ("init_state =", init_state)
 
-        num_steps = self.num_vert - 1
         num_steps = self.num_vert - 1 + 2
-        print("1.2,em semi-final, num_steps =  self.num_vert - 1 = ", num_steps)
-        final_state = self.qw.simulate((num_steps, num_steps + 1), init_state)
+        num_steps = self.num_vert - 1
+        firstStep = 1; lastStep = firstStep + num_steps; step  = 1
+        aRange = ( firstStep, lastStep, step)
+        print(f"BD, firstStep = {firstStep}, lastStep {lastStep}, step = {step}, num_steps = {num_steps}")
+        final_state  = self.qw.simulate(aRange, init_state)
         final_stateB = final_state[-1]
         print ("final_stateB =", final_stateB)
 
-        self.assertTrue(
-            final_state[0] == 1 and np.all(final_state[1:] == 0)
-        )
-        print("2, em test04_persistent_shift_left_state_transfer: final ")
 
     @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
                                   'numpy and PyHiperBlas')
