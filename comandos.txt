@@ -110,3 +110,12 @@ docker run -it --rm -p 8888:8888 -v /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQua
 
 git status --short | awk 'BEGIN{print "git add" } /^ M/ {print $2}' | paste -sd' '
 
+
+docker push ebiduardo/hiperwalk:2.0.0
+docker tag ebiduardo/hiperwalk:2.0.0 ebiduardo/hiperwalk:latest
+docker push ebiduardo/hiperwalk:latest
+
+docker pull ebiduardo/hiperwalk:2.0.0
+docker run --rm -it ebiduardo/hiperwalk:2.0.0
+grep " segundos\|algebra" examples/coined/notebooks/saida.ipynb |grep -v "\" \|print"
+

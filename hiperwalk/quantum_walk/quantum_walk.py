@@ -677,8 +677,8 @@ class QuantumWalk(ABC):
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
-        saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
-        #saved_states = np.zeros( (5, state.shape[0]), dtype=dtype)
+        #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
+        saved_states = np.zeros( (10, state.shape[0]), dtype=dtype)
         state_index  = 0 # index of the state to be saved
 
         # if save_state:
@@ -700,7 +700,7 @@ class QuantumWalk(ABC):
             if  hbi.get_hpc() == 'cpu' :
                 self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
 
-            if  state_index < 50 :  saved_states[state_index] = self._simul_vec_out.copy()
+            if  state_index < 10 :  saved_states[state_index] = self._simul_vec_out.copy()
 
             self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             state_index += 1

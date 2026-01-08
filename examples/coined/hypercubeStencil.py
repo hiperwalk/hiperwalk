@@ -5,14 +5,15 @@ import numpy as np
 
 import time
 import sys
+import os
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
-aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
-aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
+aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
-#aNumSteps=15; aDim=10
+aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
+aNumSteps=500; aDim=18
 
 dim          =aDim        # 10
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
@@ -28,6 +29,8 @@ from warnings import warn
 def main():
     
     hpw.set_hpc(myHPC_option)
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
+    print( f"{nome:14s}, " f"dim = {dim:4d}, " f"numStep = {endStep - startStep:4d}, " f"{str(coinT):>8s}, " f"algebra = {algebra:>10s}, " f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s} ")
 
     inicioG = time.perf_counter()
     g = hpw.Hypercube(dim)
@@ -51,28 +54,26 @@ def main():
 
 
     U = qw.get_evolution(); num_arcs=U.shape[0];  densidade=U.nnz/(num_arcs*num_arcs)
-    import os
-    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     print(
     f"{nome:14s}, "
     f"dim = {dim:4d}, "
     f"numStep = {endStep - startStep:4d}, "
-    f"{coinT}, "
+    f"{str(coinT):>8s}, "
+    f"algebra = {algebra:>10s}, "
+    f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
     f"numArcs = {num_arcs:10d}, "
     f"nnz = {U.nnz:12d}, "
     f"densidade = {densidade:.5e}, "
-    f"algebra = {algebra:>10s}, "
-    f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s}, "
     f"tempo computeU = {fimC - inicioC:.5e}, "
     f"tempo Iteracoes = {(fimS - inicioS) / (endStep - startStep + 1):.5e}, "
     f"tempo total = {(fimS - inicioG) :.5e}")
     print('\n')
 
+    return
     probs = qw.probability_distribution(states)
     np.set_printoptions(linewidth=820, threshold=240)
     print("probs =\n", probs)
     print("np.sum(prob) = ", np.sum(probs))
-    return
     hpw.plot_probability_distribution(probs, graph=g)
     #print(probs)
     #plt.savefig("grafico.png")

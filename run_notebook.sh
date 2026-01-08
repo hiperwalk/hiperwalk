@@ -4,10 +4,12 @@
 #  CONFIGURAÇÕES DO USUÁRIO
 # ================================
 INTEL_PY="/opt/intel/oneapi/intelpython/python3.12/bin/python"
+INTEL_PY="python3"
 KERNEL_NAME="hiperwalk"
 DISPLAY_NAME="Python (hiperwalk)"
 OMP_THREADS="${OMP_THREADS:-4}"    # valor padrão = 4
 NOTEBOOK_IN="examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb"
+NOTEBOOK_IN="examples/coined/notebooks/coinedQW-on-HypercubeBD.nbconvert.ipynb"
 NOTEBOOK_OUT="saida.ipynb"
 # ================================
 
