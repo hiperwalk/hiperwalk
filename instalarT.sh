@@ -1,7 +1,8 @@
 relativeDir=${1:-"./"}
 SCRATCH="${SCRATCH:-$HOME}"
-comandoInstallC="if [ ! -f "/snap/bin/cmake" ] ; then sudo snap install cmake --classic; fi"
-comandoInstallC="if [ ! -f "cmake"           ] ; then sudo  apt install cmake; fi"
+#comandoInstallC="if [ ! -f "/snap/bin/cmake" ] ; then sudo snap install cmake --classic; fi"
+comandoInstallC='command -v cmake >/dev/null 2>&1 || sudo apt install -y cmake'
+
 echo $comandoInstallC
 eval $comandoInstallC
 comandoInstallC="export PATH=/snap/bin:\"$PATH\""
@@ -36,9 +37,9 @@ export PYTHONUNBUFFERED=1
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 comandoLD="export LD_LIBRARY_PATH=$HOME/hiperblas/lib:$SCRATCH/hiperblas/lib:$LD_LIBRARY_PATH"
 comandoLD="echo \":\$LD_LIBRARY_PATH:\" | grep -q \":\$HOME/hiperblas/lib:\" || export LD_LIBRARY_PATH=\"\$HOME/hiperblas/lib:\$LD_LIBRARY_PATH\" "
-echo $comandoLD;  eval $comandoLD;
+#echo $comandoLD;  eval $comandoLD;
 comandoLD="echo \":\$LD_LIBRARY_PATH:\" | grep -q \":\$SCRATCH/hiperblas/lib:\" || export LD_LIBRARY_PATH=\"\$SCRATCH/hiperblas/lib:\$LD_LIBRARY_PATH\" "
-echo $comandoLD;  eval $comandoLD;
+#echo $comandoLD;  eval $comandoLD;
 echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 read -p " aguardando um enter para seguir ou um ctrl+C para interromper ...."
 comandoHB="(pwd; cd $relativeDir/hiperblas-core; pwd; make install   )"; 
@@ -58,8 +59,13 @@ echo " os comandos são possiveis comandos para exeucão de exemplos, não serã
 echo $comandoR1; echo $comandoR2
 read -p " aguardando um enter para seguir ou um ctrl+C para interromper ...."
 
+echo $comandoHB
 eval $comandoHB
+echo $comandoPyHB
+export HIPERBLAS_PREFIX=/home/bidu/hiperblas
+export HIPERBLAS_PREFIX="~/hiperblas"
 eval $comandoPyHB
+echo $comandoHW
 eval $comandoHW
 
 echo "foram executados os seguintes comandos:"
@@ -67,3 +73,8 @@ echo $comandoLD; echo $comandoHB; echo $comandoPyHB; echo $comandoHW;
 echo "linha de execuão possivel:"
 echo $comandoR1
 echo $comandoR2
+
+pip show -f hiperblas
+
+readelf -d pyhiperblas/hiperblas*.so | grep -E 'RPATH|RUNPATH'
+

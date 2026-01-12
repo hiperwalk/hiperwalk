@@ -12,7 +12,7 @@ void load_function(bridge_manager_t *manager, void* (**function_ptr)(), char* fu
     *function_ptr = externalFunction;
     char *result = dlerror();
     if (result) {
-        printf("BD, em libhiperblas.c, void load_function: Cannot find init in %s: %s", function_name, result);
+        printf("\nBD, em libhiperblas.c, void load_function: Cannot find init in %s: %s\n", function_name, result);
     }
 }
 

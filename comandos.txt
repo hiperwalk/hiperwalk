@@ -119,3 +119,43 @@ docker pull ebiduardo/hiperwalk:2.0.0
 docker run --rm -it ebiduardo/hiperwalk:2.0.0
 grep " segundos\|algebra" examples/coined/notebooks/saida.ipynb |grep -v "\" \|print"
 
+docker build -t bidu/hiperwalk:2.0.0 . --no-cache
+
+
+docker build -t ebiduardo/hiperwalk:2.0.0 . --no-cache
+
+docker run --rm -it ebiduardo/hiperwalk:2.0.0
+
+docker push ebiduardo/hiperwalk:2.0.0
+git clone     --branch bidu     --single-branch     https://github.com/hiperwalk/hiperwalk.git     ./hiperwalk 
+
+docker tag ebiduardo/hiperwalk:2.0.0 ebiduardo/hiperwalk:lates
+
+
+
+
+docker push ebiduardo/hiperwalk:latest
+
+
+rodar o hiperwalk em jupyter com hiperblas de um container docker
+
+docker pull ebiduardo/hiperwalk:latest
+
+no host 
+docker run -p 8888:8888  --rm -it ebiduardo/hiperwalk:latest
+
+no container
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --ServerApp.token='' --ServerApp.password=''
+
+no browser
+http://localhost:8888/lab
+
+
+
+grep "seg\|tempo Iteracoes =" examples/coined/notebooks/saida*_dim18_*st.ipynb  |grep -v "print\|endStep"
+
+
+docker build --target dev -t hiperwalk:dev .
+
+docker build --target notebook-slim -t hiperwalk:notebook .
+

@@ -240,7 +240,7 @@ void* matMulFloat(  double* m1, double* m2, int nrows, int ncols, int ncol_m1 ) 
             double sum = 0;
             double v1;
             double v2;
-            #pragma omp unroll
+            //#pragma omp unroll
             for(int k=0; k < ncol_m1; k++) {
                 v1 = m1[i*ncol_m1+k]; //m1 row
                 v2 = m2[k*ncols+j];   //m2 col
@@ -262,7 +262,7 @@ void* matMulComplex(  double* m1, double* m2, int nrows, int ncols, int ncol_m1 
             int k;
             double sumre = 0, sumim = 0;
             double re1, im1, re2, im2;
-            #pragma omp unroll
+            //#pragma omp unroll
             for(k=0; k < ncol_m1; k++) {
                 int idx = matrix_get_complex_real_index(ncols,i,k);
                 re1 = m1[idx];
@@ -293,7 +293,7 @@ void* matMulFloatComplex(  double* m1, double* m2, int nrows, int ncols, int nco
             int k;
             double sumre = 0, sumim = 0;
             double re1, re2, im2;
-            #pragma omp unroll
+            //#pragma omp unroll
             for(k=0; k < ncol_m1; k++) {
                 int idx = matrix_get_complex_real_index(ncol_m1,i,k);
                 re1 = m1[idx];
@@ -347,7 +347,7 @@ void matVecMul3BD(  double* mat, double* vecIn, double* vecOut, int ncols, int n
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
         double sum = 0;
-        #pragma omp unroll
+        //#pragma omp unroll
         for(int j=0; j < ncols; j++) {
             double v1;
             double v2;
@@ -367,7 +367,7 @@ void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
         double sum = 0;
-        #pragma omp unroll
+        //#pragma omp unroll
         for(int j=0; j < ncols; j++) {
             double v1;
             double v2;

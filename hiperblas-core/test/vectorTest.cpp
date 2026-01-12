@@ -16,10 +16,20 @@ public:
     int idx;
 
     NeblinaCoreFixture() {
+        //string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
+
         idx = 0;
-        string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
-        load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
-        m.bridges[idx].InitEngine_f(0);
+        const char *home = getenv("HOME");
+        char  *plugin_name  = (char*) malloc ( 1024 *sizeof(char));
+        snprintf(plugin_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+        printf("plugin_name = %s\n", plugin_name);
+
+        //load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
+        load_plugin(&m, plugin_name, idx);
+        m.bridges[idx].InitEngine_f(idx); 
+
+
+
     }
 
     protected:
