@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -69,3 +70,113 @@ docs/documentation/graph_constructors/generated/
 
 # Test constants
 tests/test_constants.py
+.venv/
+=======
+#telA*
+#include/
+lib64
+examples/coined/a*
+examples/coined/notebooks/.ipynb_checkpoints/
+hiperblas-core/DartConfiguration.tcl
+hiperblas-core/sparse_matrix_testBD
+pyhiperblas/HiperblasExtension.egg-info/
+docs
+Archive
+#
+# =======================================
+# 🧠 GERAL
+# =======================================
+*.DS_Store
+*.swp
+*.swo
+*.tmp
+*.log
+*.bak
+*.old
+
+# =======================================
+# 🧱 CMake
+# =======================================
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+build/
+_build/
+out/
+bin/
+lib/
+Testing/
+install_manifest.txt
+
+# =======================================
+# ⚙️ Compilação / binários
+# =======================================
+*.o
+*.obj
+*.so
+*.dll
+*.dylib
+*.a
+*.lib
+*.exe
+*.out
+*.app
+
+# =======================================
+# 🧩 CLion (JetBrains)
+# =======================================
+.idea/
+cmake-build-*/
+
+# =======================================
+# 💻 VSCode
+# =======================================
+.vscode/
+.vscode-ipch/
+.ipch/
+*.code-workspace
+
+# =======================================
+# 🪟 Visual Studio (se usado no Windows)
+# =======================================
+*.vcxproj*
+*.sln
+*.ncb
+*.sdf
+*.opensdf
+*.VC.db
+*.VC.opendb
+*.pdb
+*.user
+*.opendb
+*.idb
+*.ilk
+Debug/
+Release/
+x64/
+x86/
+*.aps
+
+# =======================================
+# 🧪 Testes / Cobertura
+# =======================================
+*.gcno
+*.gcda
+*.gcov
+coverage/
+lcov.info
+
+# =======================================
+# 🧰 Outros
+# =======================================
+*.pyc
+*.pyo
+*.class
+*.cache
+*.clangd
+*.clang-tidy
+compile_commands.json
+>>>>>>> bidu

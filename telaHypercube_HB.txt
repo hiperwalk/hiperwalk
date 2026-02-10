@@ -1,0 +1,209 @@
+/prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk
+/prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk
+BD, em def set_hpc(hpc), hpc= cpu
+lib_name = /prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so
+BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_init_engine, lib_name =/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so
+em src/libhiperblas.c: void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
+so bridge library name: /prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so, 
+ num_arcs = 24
+em hiperwalk/graph/hypercube.py: def Hypercube(dim, multiedges=
+em hiperwalk/graph/hypercube.py: g= <hiperwalk.graph.graph.Graph object at 0x79db44970830>
+em coined.py, __init__
+_set_shift     :   Tempo decorrido: 0.000095 segundos
+_set_coin      :   Tempo decorrido: 0.000008 segundos
+_set_marked    :   Tempo decorrido: 0.000015 segundos
+BD, em hiperwalk/quantum_walk/coined.py: def _set_evolution
+++++++  em hiperwalk/quantum_walk/coined.py: get_coin(self)
+em get_coin: self._coin= ['grover', 'grover', 'grover', 'grover', 'grover']
+em get_coin: scipy.sparse.issparse(self._coin) = False
+em get_coin(self), semi-final 
+coin_list[:5]= ['grover', 'grover', 'grover', 'grover', 'grover']
+em def _coin_list_to_explicit_coin, blocks[0].dtype= float64
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)
+BD, M.dtype= int8 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)
+M.dtype= int8 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, is_complex=False
+BD, hiperblas.COMPLEX=3
+BD, hiperblas.FLOAT=2
+BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) 
+BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c, smatrix_new
+ before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete
+em py_sparse_matrix_new FINAL 0x79db50f37b40
+→ Entrou em py_smatrixConnect()
+data_type = 2, T_FLOAT = 2, T_COMPLEX = 3
+CSR conectado: nrow=24, ncol=24, nnz=24
+em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {
+ m->location = 0, LOCDEV = 128
+   m->row_ptr   = 0x5b4509084e80
+   m->col_idx   = 0x5b45086a7dc0
+   m->values    = 0x5b4508e96af0
+   m->idxColMem = (nil)
+   m->extra     = (nil)
+em smatreqdev, ANTES DO fim
+ m->location  = 128, LOCDEV = 128
+ nao coloque NULL.  m->col_idx   = 0x5b45086a7dc0
+   m->idxColMem = 0x5b45086a7dc0
+ nao coloque NULL.  m->values = 0x5b4508e96af0
+   m->extra  = 0x5b4508e96af0
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)
+BD, M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)
+M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, is_complex=False
+BD, hiperblas.COMPLEX=3
+BD, hiperblas.FLOAT=2
+BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) 
+BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c, smatrix_new
+ before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete
+em py_sparse_matrix_new FINAL 0x79db50f37900
+→ Entrou em py_smatrixConnect()
+data_type = 2, T_FLOAT = 2, T_COMPLEX = 3
+CSR conectado: nrow=24, ncol=24, nnz=72
+em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {
+ m->location = 0, LOCDEV = 128
+   m->row_ptr   = 0x5b4508ee1a70
+   m->col_idx   = 0x5b450919c430
+   m->values    = 0x5b4509178800
+   m->idxColMem = (nil)
+   m->extra     = (nil)
+em smatreqdev, ANTES DO fim
+ m->location  = 128, LOCDEV = 128
+ nao coloque NULL.  m->col_idx   = 0x5b450919c430
+   m->idxColMem = 0x5b450919c430
+ nao coloque NULL.  m->values = 0x5b4509178800
+   m->extra  = 0x5b4509178800
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)
+BD, M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)
+M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, is_complex=False
+BD, hiperblas.COMPLEX=3
+BD, hiperblas.FLOAT=2
+BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) 
+BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c, smatrix_new
+ before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete
+em py_sparse_matrix_new FINAL 0x79db44522940
+→ Entrou em py_smatrixConnect()
+data_type = 2, T_FLOAT = 2, T_COMPLEX = 3
+CSR conectado: nrow=24, ncol=24, nnz=72
+em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {
+ m->location = 0, LOCDEV = 128
+   m->row_ptr   = 0x5b4508db79c0
+   m->col_idx   = 0x5b4508e81300
+   m->values    = 0x5b4509171580
+   m->idxColMem = (nil)
+   m->extra     = (nil)
+em smatreqdev, ANTES DO fim
+ m->location  = 128, LOCDEV = 128
+ nao coloque NULL.  m->col_idx   = 0x5b4508e81300
+   m->idxColMem = 0x5b4508e81300
+ nao coloque NULL.  m->values = 0x5b4509171580
+   m->extra  = 0x5b4509171580
+BD1, em _pyHiperblas_interface.py: def permute_sparse_matrix(nbl_smatS, nbl_smatC, nbl_smatU):
+BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_permute_sparse_matrix(PyObject* self, ... 
+BD em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void * permuteSparseMatrix
+ em computeU + Hiagogo, S->type = 2, C->type = 2, U->type = 2
+BD em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void * void computeU, Thread 0 of 1 created!
+Thread 0 of 1 created!, row=0 
+Thread 0 of 1 created!, row=1 
+Thread 0 of 1 created!, row=2 
+BD, ATENCAO !!!  em ./pyhiperblas/hiperblas_wrapper.c: static void py_sparse_matrix_delete
+BD, em py_sparse_matrix_delete, BEFORE CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e14760
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {
+BD, em py_sparse_matrix_delete, AFTER  CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e14760
+BD, em final de py_sparse_matrix_delete
+BD, ATENCAO !!!  em ./pyhiperblas/hiperblas_wrapper.c: static void py_sparse_matrix_delete
+BD, em py_sparse_matrix_delete, BEFORE CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e13a20
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {
+BD, em py_sparse_matrix_delete, AFTER  CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e13a20
+BD, em final de py_sparse_matrix_delete
+BD, ATENCAO !!!  em ./pyhiperblas/hiperblas_wrapper.c: static void py_sparse_matrix_delete
+BD, em py_sparse_matrix_delete, BEFORE CALL smatrix_delete, Liberando smatrix_t em 0x5b4508ca4070
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {
+BD, em py_sparse_matrix_delete, AFTER  CALL smatrix_delete, Liberando smatrix_t em 0x5b4508ca4070
+BD, em final de py_sparse_matrix_delete
+_set_evolution :   Tempo decorrido: 0.000787 segundos
+BD, em hiperwalk/quantum_walk/coined.py, FINAL  def __init__(self, graph=None, **kwargs):
+em coined.py: def state
+em coined.py: def state, return
+BD, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate
+BD, start=1, end=4, step=1
+em quantum_walk.py: def _prepare_engine(self, state, hpc =  cpu
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)
+BD, M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)
+M.dtype= float64 , np.complexfloating= <class 'numpy.complexfloating'>
+BD, is_complex=False
+BD, hiperblas.COMPLEX=3
+BD, hiperblas.FLOAT=2
+BD, em pyhiperblas/hiperblas_wrapper.c: py_sparse_matrix_new( PyObject* self, PyObject* args) 
+BD, call bridge_manager.bridges[bridge_index].smatrix_new(rows, cols, data_type);
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c, smatrix_new
+ before CALL PyObject* po = PyCapsule_New((void*)a, py_sparse_matrix_new, py_sparse_matrix_delete
+em py_sparse_matrix_new FINAL 0x79db44523b70
+→ Entrou em py_smatrixConnect()
+data_type = 2, T_FLOAT = 2, T_COMPLEX = 3
+CSR conectado: nrow=24, ncol=24, nnz=72
+em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {
+ m->location = 0, LOCDEV = 128
+   m->row_ptr   = 0x5b4508db79c0
+   m->col_idx   = 0x5b4508e81300
+   m->values    = 0x5b4509171580
+   m->idxColMem = (nil)
+   m->extra     = (nil)
+em smatreqdev, ANTES DO fim
+ m->location  = 128, LOCDEV = 128
+ nao coloque NULL.  m->col_idx   = 0x5b4508e81300
+   m->idxColMem = 0x5b4508e81300
+ nao coloque NULL.  m->values = 0x5b4509171580
+   m->extra  = 0x5b4509171580
+BD, em simulate, initial state, state= [ 0.577  0.577  0.577 ...  0.000  0.000  0.000];  state.l2Norm= 1.0
+BD, em def _simulate_step, step = 0
+BD, em def simulate,                     state_index =  0
+BD, em def _simulate_step, step = 1
+BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto 
+BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... 
+BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
+BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseVecMul(void* v, ...  {
+BD, em hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: print_vectorT, 
+from v_->extra   [0:23]: 0.00 0.00 0.00 0.58 0.00 ... 0.00 0.00 0.00 0.00 0.00, L2Norm = 1.000000
+BD, em def simulate,                     state_index =  1
+BD, em def _simulate_step, step = 1
+BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto 
+BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... 
+BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
+BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseVecMul(void* v, ...  {
+BD, em hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: print_vectorT, 
+from v_->extra   [0:23]: -0.19 -0.19 -0.19 0.00 0.00 ... 0.38 0.38 0.00 0.00 0.00, L2Norm = 1.000000
+BD, em def simulate,                     state_index =  2
+BD, em def _simulate_step, step = 1
+BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL nbl_vec = hiperblas.sparse_matvec_mul, esparsa, para discreto 
+BD, em ./pyhiperblas/hiperblas_wrapper.c: static PyObject* py_sparse_matvec_mul(PyObject* self, ... 
+BD, em hiperblas-core/src/hiperblas_std.c: void ** matvec_mul3BD( bridge_manager_t *mg, int index, void ** i, int * status ) {
+BD, em hiperblas-core/src/libhiperblas-cpu-bridge-api-impl.c: void* sparseVecMul(void* v, ...  {
+BD, em hiperblas_wraper.c: static PyObject* py_print_vectorT(PyObject* self, PyObject* args)
+BD, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: print_vectorT, 
+from v_->extra   [0:23]: 0.00 0.00 0.00 -0.19 0.13 ... 0.00 0.00 0.51 0.51 0.51, L2Norm = 1.000000
+BD, ATENCAO !!!  em ./pyhiperblas/hiperblas_wrapper.c: static void py_sparse_matrix_delete
+BD, em py_sparse_matrix_delete, BEFORE CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e196f0
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatrix_delete(smatrix_t *smatrix ), NO FREE! {
+BD, em py_sparse_matrix_delete, AFTER  CALL smatrix_delete, Liberando smatrix_t em 0x5b4508e196f0
+BD, em final de py_sparse_matrix_delete
+WhileIt  : Tempo decorrido: 0.000131 segundos
+Hypercube: Tempo decorrido: 0.000342 segundos
+computeU : Tempo decorrido: 0.001009 segundos
+Iteracoes: Tempo decorrido: 0.000375 segundos
+Tempo total      decorrido: 0.001762 segundos
+hypercube     , dim =    3, numStep =    3, Grover  coin,    real, numArcs =         24, nnz =           72, densidade = 1.25000e-01, algebra =  HiperBlas, OMP_NUM_THREADS =   1, tempo computeU = 1.00943e-03, tempo Iteracoes = 9.37280e-05, tempo total = 1.76163e-03
+
+
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-vector.c: void vector_delete( vector_t * v ), NO FREE! {
+BD, ATENCAO, em /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk/hiperblas-core/src/libhiperblas-cpu-bridge-vector.c: void vector_delete( vector_t * v ), NO FREE! {
+0.41user 0.07system 0:00.49elapsed 100%CPU (0avgtext+0avgdata 112848maxresident)k
+0inputs+24outputs (0major+19387minor)pagefaults 0swaps

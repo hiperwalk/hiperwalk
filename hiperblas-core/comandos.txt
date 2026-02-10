@@ -1,0 +1,34 @@
+./sparse_matrix_test --gtest_filter=SparseMatrixFixture.matvec_mul3_WithSparseMatrixFloat
+
+./sparse_matrix_test --gtest_filter=SparseMatrixFixture.matvec_mul3_WithSparseMatrixComplex
+
+grep sparseVecMul . -R
+
+grep print_smatrix . -R
+
+grep -R "print_smatrix\|sparseVecMul" .  --include="*c" |grep -v Error
+grep ", matvec_mul3_WithSparseMatrix\| matvec_mul3\|smatreqdev\|sparseVecMul" test/sparse_matrix_test.cpp src/hiperblas_std.c  src/libhiperblas-cpu-bridge-smatrix.c em src/libhiperblas-cpu-bridge-api-impl.c |grep -v "fprint\|BD"
+
+1444  grep ").*{" src/hiperblas_std.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
+ 1445  grep ").*{" src/libhiperblas-cpu-bridge-api-impl.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
+ 1446  nm libhiperblas-cpu-bridge.so |grep sparseVecMul
+ 1447  more libhiperblas-core.so CMakeLists.txt 
+ 1448  grep libhiperblas-core.so CMakeLists.txt 
+ 1449  grep libhiperblas-core CMakeLists.txt 
+ 1450  grep libhiperblas CMakeLists.txt 
+ 1451  grep bridge CMakeLists.txt 
+ 1452  grep hiperblas CMakeLists.txt 
+ 1453  history |tail
+1444  grep ").*{" src/hiperblas_std.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
+ 1445  grep ").*{" src/libhiperblas-cpu-bridge-api-impl.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
+ 1446  nm libhiperblas-cpu-bridge.so |grep sparseVecMul
+ 1447  more libhiperblas-core.so CMakeLists.txt 
+ 1448  grep libhiperblas-core.so CMakeLists.txt 
+ 1449  grep libhiperblas-core CMakeLists.txt 
+ 1450  grep libhiperblas CMakeLists.txt 
+ 1451  grep bridge CMakeLists.txt 
+ 1452  grep hiperblas CMakeLists.txt 
+ 1453  history |tail
+
+(cd ..; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/diagonal-gridStencil.py )| grep "U\.\|initial\|print_vectorT" 
+

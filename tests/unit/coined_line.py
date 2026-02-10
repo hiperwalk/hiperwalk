@@ -1,24 +1,58 @@
+<<<<<<< HEAD
 import numpy as np
+=======
+#BDimport numpy as np
+#BDfrom sys import path as sys_path
+#BDsys_path.append('../')
+#BDsys_path.append('../../')
+#BDimport os
+#BDsys_path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+#BDimport hiperwalk as hpw
+import unittest
+from test_constants import HPC
+
+>>>>>>> bidu
 from sys import path as sys_path
 sys_path.append('../')
 sys_path.append('../../')
 import hiperwalk as hpw
+<<<<<<< HEAD
 import unittest
 from test_constants import HPC
+=======
+>>>>>>> bidu
 
 class TestCoinedLine(unittest.TestCase):
 
     def setUp(self):
+<<<<<<< HEAD
         hpw.set_hpc(HPC)
         self.num_vert = 41
         self.line = hpw.Line(self.num_vert)
         self.qw = hpw.Coined(self.line)
 
     def tearDown(self):
+=======
+        print(f"\n1, em setUp: teste: {self._testMethodName}")
+        print(f"\n1, em setUp:  +++  Iniciando")
+        hpw.set_hpc(HPC)
+        hpw.set_hpc(None)
+        hpw.set_hpc("CPU")
+        self.num_vert =  3; # 5
+        self.num_vert = 11; # 41
+        self.line = hpw.Line   (self.num_vert)
+        self.qw   = hpw.Coined (self.line)
+        print(f"\n2, em setUp:  +++  finalizando ")
+
+    def tearDown(self):
+        print(f"\n0, em tearDown: +++  teste: {self._testMethodName}")
+        print(f"\n1, em tearDown: +++  iniciando ")
+>>>>>>> bidu
         del self.line
         self.line = None
         del self.qw
         self.qw = None
+<<<<<<< HEAD
 
     def test_persistent_shift_right_state_transfer(self):
         # initial state in leftmost vertex
@@ -61,6 +95,32 @@ class TestCoinedLine(unittest.TestCase):
                                   'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
 
+=======
+        print(f"\n2, em tearDown: +++  Finalizando")
+
+    def test04_persistent_shift_left_state_transfer(self):
+        # initial state in leftmost vertex
+        # final state in rightmost vertex
+        print("BD, em test04_persistent_shift_left_state_transfer: inicio ")
+
+        init_state = self.qw.state([[1, (self.num_vert - 1, self.num_vert - 2)]])
+        print ("init_state =", init_state)
+
+        num_steps = self.num_vert - 1 + 2
+        num_steps = self.num_vert - 1
+        firstStep = 1; lastStep = firstStep + num_steps; step  = 1
+        aRange = ( firstStep, lastStep, step)
+        print(f"BD, firstStep = {firstStep}, lastStep {lastStep}, step = {step}, num_steps = {num_steps}")
+        final_state  = self.qw.simulate(aRange, init_state)
+        final_stateB = final_state[-1]
+        print ("final_stateB =", final_stateB)
+
+
+    @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
+                                  'numpy and PyHiperBlas')
+
+    def Btest02_hpc_default_evolution_operator(self):
+>>>>>>> bidu
         # simulation parameters
         num_steps = self.num_vert // 2
         center = self.num_vert // 2
@@ -95,13 +155,22 @@ class TestCoinedLine(unittest.TestCase):
             np.allclose(states, hpc_states, rtol=1e-15, atol=1e-15)
         )
 
+<<<<<<< HEAD
     def test_set_explicit_coin(self):
+=======
+    def Btest03_set_explicit_coin(self):
+>>>>>>> bidu
         C = self.qw.get_coin()
         self.qw.set_coin(coin=C)
         C2 = self.qw.get_coin()
         self.assertTrue((C - C2).nnz == 0)
 
+<<<<<<< HEAD
     def test_uniform_state(self):
+=======
+    def Btest01_uniform_state(self):
+        print("+++   Inicio\n");
+>>>>>>> bidu
         state = self.qw.uniform_state()
         num_arcs = self.qw._graph.number_of_arcs()
         
@@ -148,6 +217,10 @@ class TestCoinedLine(unittest.TestCase):
             self.qw.uniform_state(vertices=np.arange(self.num_vert),
                                   arcs=np.arange(num_arcs))
         ))
+<<<<<<< HEAD
+=======
+        
+>>>>>>> bidu
 
         # uniform superposition of all arcs
         # except odd arcs with tail in odd vertices
@@ -160,3 +233,11 @@ class TestCoinedLine(unittest.TestCase):
                   for a in range(num_arcs)]
         state2 = state2 / np.sqrt(np.sum(state2))
         self.assertTrue(np.allclose(state, state2))
+<<<<<<< HEAD
+=======
+        print("+++   Final\n");
+
+if __name__ == '__main__':
+    unittest.main()
+
+>>>>>>> bidu

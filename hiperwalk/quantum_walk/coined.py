@@ -5,7 +5,8 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
 from scipy.linalg import hadamard, dft
-from . import _pyneblina_interface as nbl
+from . import _pyhiperblas_interface as hpbi
+import hiperblas as hpb
 
 class Coined(QuantumWalk):
     r"""
@@ -174,6 +175,9 @@ class Coined(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
+        print("bd, em coined.py, __init__")
+        print("graph:", graph)
+        print("kwargs:", kwargs)
         # create symmetric directed multigraph from input
         sdmg = SDMultigraph(graph)
 
@@ -238,7 +242,7 @@ class Coined(QuantumWalk):
         # Note that there is only one entry per row and column
         S = scipy.sparse.csr_array(
             ( np.ones(num_arcs, dtype=np.int8),
-              S_cols, np.arange(num_arcs+1) ),
+              S_cols, np.arange(num_arcs + 1) ),
             shape=(num_arcs, num_arcs)
         )
 
@@ -281,7 +285,12 @@ class Coined(QuantumWalk):
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
         S = scipy.sparse.csr_array(
+<<<<<<< HEAD
             ( np.ones(num_arcs, dtype=np.int8),
+=======
+            ( np.ones(num_arcs, dtype=np.float64),  # BDmodif
+            #( np.ones(num_arcs, dtype=np.int8), # BDmodif
+>>>>>>> bidu
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
@@ -493,7 +502,7 @@ class Coined(QuantumWalk):
         self._coin = coin_list
 
     def set_coin(self, coin='default'):
-        """
+        r"""
         Set the coin operator based on the graph's structure.
 
         Builds a coin operator considering the degree of each vertex.
@@ -757,6 +766,13 @@ class Coined(QuantumWalk):
         blocks = [self._coin_funcs[coin_list[v]](degree(v))
                   for v in range(num_vert)]
         C = scipy.sparse.block_diag(blocks, format='csr')
+<<<<<<< HEAD
+=======
+
+        C.indices = np.ascontiguousarray(C.indices, dtype=np.int64)
+        C.indptr  = np.ascontiguousarray(C.indptr,  dtype=np.int64)
+
+>>>>>>> bidu
         return scipy.sparse.csr_array(C)
 
     def get_coin(self):
@@ -771,14 +787,24 @@ class Coined(QuantumWalk):
         --------
         set_coin
         """
+<<<<<<< HEAD
         if scipy.sparse.issparse(self._coin):
             if len(self._marked) == 0:
                 return self._coin
+=======
+        print("BD, em hiperwalk/quantum_walk/coined.py: get_coin(self)")
+        if scipy.sparse.issparse(self._coin):
+            if len(self._marked) == 0: return self._coin
+>>>>>>> bidu
 
             # if coin was explicitly set,
             # and there are different coins for the marked vertices,
             # change them.
             def get_block(vertex):
+<<<<<<< HEAD
+=======
+      #          print (" def get_block(vertex): ", vertex)
+>>>>>>> bidu
                 g = self._graph
                 neighbors = g.neighbors(vertex)
                 # TODO: this technique wont work after the behavior of
@@ -786,11 +812,16 @@ class Coined(QuantumWalk):
                 a1 = g.arc_number((vertex, neighbors[0]))
                 a2 = g.arc_number((vertex, neighbors[-1]))
                 # arc order may change
+<<<<<<< HEAD
                 start = min(a1, a2)
                 end = max(a1, a2) + 1
 
                 return scipy.sparse.csr_array(self._coin[start:end,
                                                          start:end])
+=======
+                start = min(a1, a2); end = max(a1, a2) + 1
+                return scipy.sparse.csr_array(self._coin[start:end, start:end])
+>>>>>>> bidu
 
             num_vert = self._graph.number_of_vertices()
             degree = self._graph.degree
@@ -800,6 +831,12 @@ class Coined(QuantumWalk):
                       if oracle_coin[v] != ''
                       else get_block(v)
                       for v in range(num_vert)]
+<<<<<<< HEAD
+=======
+
+            #print("++++ em get_coin: blocks=", blocks); exit()
+
+>>>>>>> bidu
             C = scipy.sparse.block_diag(blocks, format='csr')
 
             return scipy.sparse.csr_array(C)
@@ -813,6 +850,7 @@ class Coined(QuantumWalk):
         else:
             coin_list = self._coin
 
+<<<<<<< HEAD
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
@@ -847,6 +885,64 @@ class Coined(QuantumWalk):
 
         self._evolution = U
         return U
+=======
+
+        
+        return self._coin_list_to_explicit_coin(coin_list)
+
+    def _set_evolution(self):
+        np.set_printoptions(linewidth=240) 
+        np.set_printoptions(precision=3, suppress=True)
+        # TODO: Check if matrix is sparse in pyhiperblas interface
+        # TODO: Check if matrices are deleted from memory and GPU.
+
+        print("bd, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
+
+        scipy_S = self.get_shift()
+
+        scipy_C = self.get_coin()
+
+        scipy_U = None
+
+        #S.indices = np.array([2, 5, 0, 7, 6, 1, 4, 3])
+        #S.indices = np.arange(len(S.indices))
+        #permS = S.indices 
+
+        if hpbi.get_hpc()  is  None:
+            print("bd, em _set_evolution, computeU,  U = S @ C ");
+            #U[:] = C[permS,:]  # mantem os arrays anteriormente criados
+            print("U = S @ C        # cria novos os arrays ")
+            scipy_U = scipy_S @ scipy_C        # cria novos os arrays 
+            scipy_U.indices = np.ascontiguousarray(scipy_U.indices, dtype=np.int64)
+            scipy_U.indptr  = np.ascontiguousarray(scipy_U.indptr,  dtype=np.int64)
+        else: 
+            scipy_U = scipy_C.copy()
+            scipy_U.indices = np.ascontiguousarray(scipy_U.indices, dtype=np.int64)
+            scipy_U.indptr  = np.ascontiguousarray(scipy_U.indptr,  dtype=np.int64)
+
+            #hb_S = hpbi.send_matrix(scipy_S)
+
+            #is_complex = np.issubdtype(scipy_S.dtype, np.complexfloating)
+            #hbS_dtype = hpb.COMPLEX if is_complex else hpb.FLOAT
+            hb_S = hpb.sparse_matrix_new(scipy_S.shape[0], scipy_S.shape[1],  self.hb_dtype)
+            hpb.smatrix_connect    (hb_S, scipy_S )
+            hpb.move_sparse_matrix_device(hb_S)
+
+            #hb_C = hpbi.send_matrix(scipy_C)
+            hb_C = hpb.sparse_matrix_new(scipy_C.shape[0], scipy_C.shape[1], self.hb_dtype)
+            hpb.smatrix_connect    (hb_C, scipy_C )
+            hpb.move_sparse_matrix_device(hb_C)
+
+            #hb_U = hpbi.send_matrix(scipy_U)
+            hb_U = hpb.sparse_matrix_new(scipy_U.shape[0], scipy_U.shape[1], self.hb_dtype)
+            hpb.smatrix_connect    (hb_U, scipy_U )
+            hpb.move_sparse_matrix_device(hb_U)
+
+            hpb.permute_sparse_matrix(hb_S, hb_C, hb_U)
+
+        self._evolution = scipy_U
+        return # U
+>>>>>>> bidu
 
     def set_evolution(self, **kwargs):
         """
@@ -913,6 +1009,7 @@ class Coined(QuantumWalk):
         .. [1] R. Portugal. "Quantum walks and search algorithms",
             2nd edition, Springer, 2018.
         """
+<<<<<<< HEAD
 
         S_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
@@ -928,6 +1025,38 @@ class Coined(QuantumWalk):
         self._set_coin(**C_kwargs)
         self._set_marked(**R_kwargs)
         self._set_evolution()
+=======
+        import time
+
+        S_kwargs = Coined._filter_valid_kwargs( kwargs,
+                              Coined._valid_kwargs['shift'])
+        C_kwargs = Coined._filter_valid_kwargs( kwargs,
+                              Coined._valid_kwargs['coin'])
+        R_kwargs = Coined._filter_valid_kwargs( kwargs,
+                              Coined._valid_kwargs['marked'])
+
+        self.is_complex = True       if str(C_kwargs.get('coin'))[0].upper() == 'F' else False 
+        self.hb_dtype   = hpb.COMPLEX if self.is_complex else hpb.FLOAT
+
+        inicioS = time.perf_counter()
+        self._set_shift(**S_kwargs)
+        fimS    = time.perf_counter()
+        print(f"\n_set_shift     :   Tempo decorrido: {fimS - inicioS:.6f} segundos")
+        inicioC = time.perf_counter()
+        self._set_coin(**C_kwargs)
+        fimC    = time.perf_counter()
+        print(f"\n_set_coin      :   Tempo decorrido: {fimC - inicioC:.6f} segundos")
+        inicioM = time.perf_counter()
+        self._set_marked(**R_kwargs)
+        fimM    = time.perf_counter()
+        print(f"\n_set_marked    :   Tempo decorrido: {fimM - inicioM:.6f} segundos")
+        inicioE = time.perf_counter()
+        self._set_evolution()
+        fimE    = time.perf_counter()
+        print(f"\n_set_evolution :   Tempo decorrido: {fimE - inicioE:.6f} segundos")
+        print("")
+        return
+>>>>>>> bidu
 
     def probability_distribution(self, states):
         r"""
@@ -982,6 +1111,10 @@ class Coined(QuantumWalk):
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
         """
+<<<<<<< HEAD
+=======
+        print("bd, em coined.probability_distribution, 0")
+>>>>>>> bidu
         try:
             states.shape == 1
         except:
@@ -991,6 +1124,10 @@ class Coined(QuantumWalk):
             states = np.array([states], copy=False)
 
 
+<<<<<<< HEAD
+=======
+        print("bd, em coined.probability_distribution, 1")
+>>>>>>> bidu
         graph = self._graph
         num_vert = graph.number_of_vertices()
         prob = np.array([[Coined._elementwise_probability(
@@ -998,6 +1135,11 @@ class Coined(QuantumWalk):
                           for v in range(num_vert)]
                          for i in range(len(states))])
 
+<<<<<<< HEAD
+=======
+        print("bd, em coined.probability_distribution, 5")
+
+>>>>>>> bidu
         return prob
 
     def state(self, entries):
@@ -1062,6 +1204,10 @@ class Coined(QuantumWalk):
         >>> np.all(psi1 == psi2)
         np.True_
         """
+<<<<<<< HEAD
+=======
+        print("bd, em coined.py: def state") 
+>>>>>>> bidu
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 

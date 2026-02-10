@@ -4,7 +4,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "hiperwalk"
+<<<<<<< HEAD
 version = "2.0b"
+=======
+version = "2.0rc1"
+>>>>>>> bidu
 description = "High-Performance Quantum Walk Simulator"
 license = {file="LICENSE"}
 readme = "README.md"
@@ -12,6 +16,10 @@ authors = [
   { name="Gustavo Bezerra", email="gbezerra@posgrad.lncc.br" },
   { name="Paulo Motta", email="prmottajr@gmail.com" },
   { name="Renato Portugal", email="portugal@lncc.br" },
+<<<<<<< HEAD
+=======
+  { name="Eduardo Garcia", email="bidu@lncc.br" },
+>>>>>>> bidu
 ]
 maintainers = [
   { name="Hiperwalk Organization", email="hiperwalk@gmail.com"},

@@ -4,9 +4,9 @@ import scipy.sparse
 import inspect
 from sys import modules as sys_modules
 from warnings import warn
-from ..graph import Graph
 import scipy.optimize
-from . import _pyneblina_interface as nbl
+from hiperwalk.quantum_walk import _pyhiperblas_interface as hbi
+import hiperblas as hpb
 
 class QuantumWalk(ABC):
     """
@@ -33,7 +33,7 @@ class QuantumWalk(ABC):
         ### Simulation attributes. ###
         ##############################
         # Matrix object used during simulation.
-        # It may by a scipy matrix or a neblina matrix.
+        # It may by a scipy matrix or a hiperblas matrix.
         # Should be different from None during simulation only.
         self._simul_mat = None
         # Vector object used during simulation.
@@ -310,6 +310,7 @@ class QuantumWalk(ABC):
         depends on the specifics of the quantum walk model when
         the Hilbert space is not spanned by the set of vertices.
         """
+        print("bd, em quantum.probability_distribution, 0")
         single_state = False
         try:
             len(states[0])
@@ -317,7 +318,9 @@ class QuantumWalk(ABC):
             single_state = True
             states = np.array([states])
 
+        print("bd, em quantum.probability_distribution, 1")
         prob = list(map(QuantumWalk._elementwise_probability, states))
+        print("bd, em quantum.probability_distribution, 2")
         prob = np.array(prob)
 
         return prob[0] if single_state else prob
@@ -426,7 +429,8 @@ class QuantumWalk(ABC):
             raise TypeError("Entries were not specified.")
 
         dtype = np.array([entry[0] for entry in entries]).dtype
-        dtype = (complex if np.issubdtype(dtype, np.complexfloating)
+        dtype = (complex
+                 if np.issubdtype(dtype, np.complexfloating)
                  else float)
         state = np.zeros(self.hilb_dim, dtype=dtype)
 
@@ -453,14 +457,33 @@ class QuantumWalk(ABC):
     ######################################
 
     def _prepare_engine(self, state, hpc):
+        print("bd, em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
 
-        if hpc is not None:
-            self._simul_mat = nbl.send_matrix(self._evolution)
-            self._simul_vec = nbl.send_vector(state)
-
-        else:
+        if hpc is None:
             self._simul_mat = self._evolution
             self._simul_vec = state
+
+        else:
+            dim = state.shape[0]
+            dtype = (hpb.FLOAT
+                     if np.issubdtype(self._evolution.dtype, np.floating)
+                     else hpb.COMPLEX)
+            self._simul_vec_in = state
+            #TODO: what if simul_matrix and vec have different data types?
+            self._simul_vec_out = np.copy(state)
+
+            self._hb_simul_vec_in = hpb.vector_new(dim, dtype)
+            hpb.vector_connect(self._hb_simul_vec_in, self._simul_vec_in) 
+            hpb.move_vector_device(self._hb_simul_vec_in) 
+
+            self._hb_simul_vec_out = hpb.vector_new(dim, dtype)
+            hpb.vector_connect(self._hb_simul_vec_out, self._simul_vec_out) 
+            hpb.move_vector_device(self._hb_simul_vec_out)
+
+            self._hb_simul_mat = hpb.sparse_matrix_new(dim, dim, dtype)
+            #TODO: Not always sparse
+            hpb.smatrix_connect(self._hb_simul_mat, self._evolution)
+            hpb.move_sparse_matrix_device(self._hb_simul_mat)
 
     def _simulate_step(self, step, hpc):
         """
@@ -468,29 +491,39 @@ class QuantumWalk(ABC):
         to the simulation vector.
         Simulation vector is then updated.
         """
-        if hpc is not None:
-            # TODO: request multiple multiplications at once
-            #       to neblina-core
-            # TODO: check if intermediate states are being freed
-            is_sparse = scipy.sparse.issparse(self._evolution)
-            for i in range(step):
-                self._simul_vec = nbl.multiply_matrix_vector(
-                    self._simul_mat, self._simul_vec, is_sparse)
-        else:
+        print("bd, em def _simulate_step, step =", step)
+
+        if hpc is None:
             for i in range(step):
                 self._simul_vec = self._simul_mat @ self._simul_vec
 
-            # TODO: compare with numpy.linalg.matrix_power
+        else hpc is not None:
+            for i in range(step):
+                # swap
+                temp = self._hb_simul_vec_in
+                self._hb_simul_vec_in = self._hb_simul_vec_out
+                self._hb_simul_vec_out = temp
+
+                hpb.sparse_matvec_mul(self._hb_simul_mat,
+                                      self._hb_simul_vec_in,
+                                      self._hb_simul_vec_out)
 
     def _save_simul_vec(self, hpc, continue_simulation):
-        ret = None
+        print("bd, em quantum_walk, def _save_simul_vec")
+        # ret = None
 
-        if hpc is not None:
-            ret = nbl.copy_vector(self._simul_vec)
-        else:
-            ret = self._simul_vec.copy()
+        # if hpc is None:
+        #     ret = self._simul_vec_out.copy()
+        # else:
+        #     #TODO: if hb_simul_vec_out shara the same memory space,
+        #     #      is it necessary to copy from device?
+        #     #      couldn't we simply self._hb_simul_vec_out.copy()?
+        #     res = hpb.copy_vector_from_device(self._hb_simul_vec_out)
+        #     ret = hpb.retrieve_numpy_array(res)
+        # return ret
 
-        return ret
+        #TODO: If this works, remove _save_simul_vec()
+        return self._simul_vec_out.copy()
 
 
 
@@ -584,6 +617,11 @@ class QuantumWalk(ABC):
         the initial state (t=0), intermediate states (t=3, 6, and 9),
         and the concluding state (t=12).
         """
+        #TODO: import if debug flag is set
+        import time
+        import sys
+        # from . import _pyhiperblas_interface as hbi #bd
+        print("bd, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate")
         ############################################
         ### Check if simulation was set properly ###
         ############################################
@@ -608,14 +646,14 @@ class QuantumWalk(ABC):
         ###############################
         ### simulate implemantation ###
         ###############################
-
         range = np.array(QuantumWalk._range_to_tuple(range))
 
         if not np.all([e.is_integer() for e in range]):
             raise ValueError("`range` has non-int entry.")
 
         start, end, step = range
-        hpc = nbl.get_hpc()
+        print( f"bd, start={start}, end={end}, step={step}")
+        hpc = hbi.get_hpc()
 
         #########################################################
         # autoconversion of matrix and vector types
@@ -627,6 +665,7 @@ class QuantumWalk(ABC):
                                        np.complexfloating)
         is_vec_complex = np.issubdtype(state.dtype,
                                        np.complexfloating)
+
         if is_mat_complex != is_vec_complex:
             if not is_mat_complex:
                 self._evolution = self._evolution.astype(complex)
@@ -636,14 +675,16 @@ class QuantumWalk(ABC):
         dtype = state.dtype
         #########################################################
 
-        self._prepare_engine(state, hpc)
+        # TODO: move set_printoptions to examples
+        # np.set_printoptions(linewidth=320, threshold=40) 
+        # np.set_printoptions(formatter={'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j"})
+        print(f"bd, em simulate, initial state, state=", state, end=";  ")
+        print("state.l2Norm=", np.linalg.norm(state)); 
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
-        saved_states = np.zeros(
-            (num_states, state.shape[0]), dtype=dtype
-        )
+        saved_states = np.zeros((num_states, state.shape[0]), dtype=dtype)
         state_index = 0 # index of the state to be saved
 
         # if save_state:
@@ -655,15 +696,27 @@ class QuantumWalk(ABC):
         if start > 0:
             self._simulate_step(start - step, hpc)
 
+        #TODO: add debug or benchmark tag
+        start_time = time.perf_counter()
+
         while state_index < num_states:
+            print("bd, em def simulate, state_index = ", state_index)
             self._simulate_step(step, hpc)
-            saved_states[state_index] = self._save_simul_vec(
-                    hpc, state_index + 1 < num_states)
+
+            #TODO: move to tests
+            # print("bd, self._simul_vec_in ", self._simul_vec_in,  end=", ")
+            # print(" self._simul_vec_in.l2Norm=", np.linalg.norm(self._simul_vec_in ))
+            # print("bd, self._simul_vec_out", self._simul_vec_out, end=", ")
+            # print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out )) 
+            cont_sim = state_index + 1 < num_states
+            saved_states[state_index] = self._save_simul_vec(hpc, cont_sim)
+
             state_index += 1
 
-        # TODO: free vector from neblina core
-        self._simul_mat = None
-        self._simul_vec = None
+        #TODO: add debug or benchmark tag
+        end_time = time.perf_counter()
+        print(f"WhileIt: Tempo decorrido: {fimS - inicioS:.6f} segundos",
+              file=sys.stderr)
 
         return saved_states
 
