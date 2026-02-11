@@ -456,34 +456,34 @@ class QuantumWalk(ABC):
     ### Auxiliary Simulation functions ###
     ######################################
 
-    def _prepare_engine(self, state, hpc):
-        print("bd, em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
+    # def _prepare_engine(self, state, hpc):
+    #     print("bd, em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
 
-        if hpc is None:
-            self._simul_mat = self._evolution
-            self._simul_vec = state
+    #     if hpc is None:
+    #         self._simul_mat = self._evolution
+    #         self._simul_vec = state
 
-        else:
-            dim = state.shape[0]
-            dtype = (hpb.FLOAT
-                     if np.issubdtype(self._evolution.dtype, np.floating)
-                     else hpb.COMPLEX)
-            self._simul_vec_in = state
-            #TODO: what if simul_matrix and vec have different data types?
-            self._simul_vec_out = np.copy(state)
+    #     else:
+    #         dim = state.shape[0]
+    #         dtype = (hpb.FLOAT
+    #                  if np.issubdtype(self._evolution.dtype, np.floating)
+    #                  else hpb.COMPLEX)
+    #         self._simul_vec_in = state
+    #         #TODO: what if simul_matrix and vec have different data types?
+    #         self._simul_vec_out = np.copy(state)
 
-            self._hb_simul_vec_in = hpb.vector_new(dim, dtype)
-            hpb.vector_connect(self._hb_simul_vec_in, self._simul_vec_in) 
-            hpb.move_vector_device(self._hb_simul_vec_in) 
+    #         self._hb_simul_vec_in = hpb.vector_new(dim, dtype)
+    #         hpb.vector_connect(self._hb_simul_vec_in, self._simul_vec_in) 
+    #         hpb.move_vector_device(self._hb_simul_vec_in) 
 
-            self._hb_simul_vec_out = hpb.vector_new(dim, dtype)
-            hpb.vector_connect(self._hb_simul_vec_out, self._simul_vec_out) 
-            hpb.move_vector_device(self._hb_simul_vec_out)
+    #         self._hb_simul_vec_out = hpb.vector_new(dim, dtype)
+    #         hpb.vector_connect(self._hb_simul_vec_out, self._simul_vec_out) 
+    #         hpb.move_vector_device(self._hb_simul_vec_out)
 
-            self._hb_simul_mat = hpb.sparse_matrix_new(dim, dim, dtype)
-            #TODO: Not always sparse
-            hpb.smatrix_connect(self._hb_simul_mat, self._evolution)
-            hpb.move_sparse_matrix_device(self._hb_simul_mat)
+    #         self._hb_simul_mat = hpb.sparse_matrix_new(dim, dim, dtype)
+    #         #TODO: Not always sparse
+    #         hpb.smatrix_connect(self._hb_simul_mat, self._evolution)
+    #         hpb.move_sparse_matrix_device(self._hb_simul_mat)
 
     def _simulate_step(self, step, hpc):
         """
