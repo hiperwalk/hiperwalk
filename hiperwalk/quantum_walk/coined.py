@@ -12,8 +12,8 @@ class Coined(QuantumWalk):
     r"""
     Manage instances of coined quantum walks on arbitrary graphs.
 
-    The class provides methods to handle and generate operators in the 
-    coined quantum walk model. It also facilitates the simulation of 
+    The class provides methods to handle and generate operators in the
+    coined quantum walk model. It also facilitates the simulation of
     coined quantum walks on graphs.
     
     For additional details about coined quantum walks,
@@ -49,11 +49,11 @@ class Coined(QuantumWalk):
     Notes
     -----
 
-    The coined quantum walk model is a quantum analog of 
-    classical random walks, incorporating an additional 
-    quantum coin-toss mechanism. It uses an extra quantum 
+    The coined quantum walk model is a quantum analog of
+    classical random walks, incorporating an additional
+    quantum coin-toss mechanism. It uses an extra quantum
     internal degree of freedom, represented by the coin state,
-    to determine the direction of the walker's movement 
+    to determine the direction of the walker's movement
     on a graph.
 
     In the coined model, the graph is interpreted
@@ -84,18 +84,18 @@ class Coined(QuantumWalk):
     For simple graphs, the cardinality of the computational
     basis is :math:`2|E|`, where :math:`E`
     represents the graph's edge set.
-    When a loop is added to the graph, the cardinality of the 
+    When a loop is added to the graph, the cardinality of the
     computational basis increases by one for each loop.
     
-    The arcs are arranged within the computational basis 
-    to ensure that the coin operator adopts a block-diagonal 
+    The arcs are arranged within the computational basis
+    to ensure that the coin operator adopts a block-diagonal
     matrix form.
     For additional information on the arc ordering,
     please consult the respective graph descriptions.
 
     For a more detailed understanding of coined quantum walks,
     refer to Section 7.2: Coined Walks on Arbitrary Graphs,
-    found in the book  'Quantum Walks and Search Algorithms' [1]_.
+    found in the book 'Quantum Walks and Search Algorithms' [1]_.
 
     For example, the graph :math:`G(V, E)` shown in
     Figure 1 has an adjacency matrix ``adj_matrix``.
@@ -105,10 +105,10 @@ class Coined(QuantumWalk):
         import numpy as np
 
     >>> adj_matrix = np.array([
-    ...     [0, 1, 0, 0],
-    ...     [1, 0, 1, 1],
-    ...     [0, 1, 0, 1],
-    ...     [0, 1, 1, 0]])
+    ... [0, 1, 0, 0],
+    ... [1, 0, 1, 1],
+    ... [0, 1, 0, 1],
+    ... [0, 1, 1, 0]])
     >>> adj_matrix
     array([[0, 1, 0, 0],
            [1, 0, 1, 1],
@@ -126,7 +126,7 @@ class Coined(QuantumWalk):
     the arcs of the associated digraph in the arc notation are
 
     >>> arcs = [(i, j) for i in range(4)
-    ...                for j in range(4) if adj_matrix[i,j] == 1]
+    ... for j in range(4) if adj_matrix[i,j] == 1]
     >>> arcs
     [(0, 1), (1, 0), (1, 2), (1, 3), (2, 1), (2, 3), (3, 1), (3, 2)]
 
@@ -148,8 +148,8 @@ class Coined(QuantumWalk):
     we obtain matrix ``adj_labels`` as follows:
 
     >>> adj_labels = [[arcs_labels[(i,j)] if (i,j) in arcs_labels
-    ...                                   else '' for j in range(4)]
-    ...               for i in range(4)]
+    ... else '' for j in range(4)]
+    ... for i in range(4)]
     >>> adj_labels = np.matrix(adj_labels)
     >>> adj_labels
     matrix([['', '0', '', ''],
@@ -284,13 +284,9 @@ class Coined(QuantumWalk):
 
         # Using csr_array((data, indices, indptr), shape)
         # Note that there is only one entry per row and column
+        #TODO: why not np.int8?
         S = scipy.sparse.csr_array(
-<<<<<<< HEAD
-            ( np.ones(num_arcs, dtype=np.int8),
-=======
-            ( np.ones(num_arcs, dtype=np.float64),  # BDmodif
-            #( np.ones(num_arcs, dtype=np.int8), # BDmodif
->>>>>>> bidu
+            ( np.ones(num_arcs, dtype=np.float64),
               S_cols, np.arange(num_arcs+1) ),
             shape=(num_arcs, num_arcs)
         )
@@ -388,19 +384,19 @@ class Coined(QuantumWalk):
             S \ket{v, u} = \ket{u, v},
 
         in the context of arc notation, where :math:`(v, u)` and
-        :math:`(u, v)` represent opposite arcs. This can be equivalently 
-        expressed as :math:`S\ket{i} = \ket{j}`, where :math:`i` is the 
-        label of the arc :math:`(v, u)` and :math:`j` is the label of 
-        the arc :math:`(u, v)`. The flip-flop shift satisfies the 
+        :math:`(u, v)` represent opposite arcs. This can be equivalently
+        expressed as :math:`S\ket{i} = \ket{j}`, where :math:`i` is the
+        label of the arc :math:`(v, u)` and :math:`j` is the label of
+        the arc :math:`(u, v)`. The flip-flop shift satisfies the
         property :math:`S^2 = I`.
 
-        The persistent shift, also known as the *moving shift*, 
+        The persistent shift, also known as the *moving shift*,
         is defined for graphs with a clear notion of direction or rotation.
-        When the shift operator is applied repeatedly, it causes the walker 
-        to continue moving persistently in the same direction. Unlike the 
+        When the shift operator is applied repeatedly, it causes the walker
+        to continue moving persistently in the same direction. Unlike the
         flip-flop shift, the persistent shift does not satisfy :math:`S^2 = I`.
         
-        For a more comprehensive understanding of the 
+        For a more comprehensive understanding of the
         shift operator, refer to Section 7.2: Coined Walks on Arbitrary
         Graphs in the book "Quantum Walks and Search Algorithms" [1]_.
         
@@ -427,9 +423,9 @@ class Coined(QuantumWalk):
 
             >>> import hiperwalk as hpw
             >>> A = scipy.sparse.csr_array([[0, 1, 0, 0],
-            ...                             [1, 0, 1, 1],
-            ...                             [0, 1, 0, 1],
-            ...                             [0, 1, 1, 0]])
+            ... [1, 0, 1, 1],
+            ... [0, 1, 0, 1],
+            ... [0, 1, 1, 0]])
             >>> qw = hpw.Coined(hpw.Graph(A))
             >>> qw.set_shift(shift='flipflop')
             >>> S = qw.get_shift().todense()
@@ -506,8 +502,8 @@ class Coined(QuantumWalk):
         Set the coin operator based on the graph's structure.
 
         Builds a coin operator considering the degree of each vertex.
-        The same coin can be applied to all vertices, or multiple 
-        coins can be assigned, each to a specific subset of vertices. 
+        The same coin can be applied to all vertices, or multiple
+        coins can be assigned, each to a specific subset of vertices.
         After setting the coin operator,
         the evolution operator is updated accordingly.
 
@@ -555,14 +551,14 @@ class Coined(QuantumWalk):
         Notes
         -----
         
-        The output of this method is a block-diagonal 
-        operator, which results from the specific ordering of arcs 
-        in the computational basis 
-        (refer to the Notes in :class:`Coined` for more details).        
+        The output of this method is a block-diagonal
+        operator, which results from the specific ordering of arcs
+        in the computational basis
+        (refer to the Notes in :class:`Coined` for more details).
         Each block is associated with a :math:`\deg(v)`-dimensional ``coin``.
         As a result, there are :math:`|V|` blocks in total.
         Note that a loop at a vertex :math:`u` is treated
-        as the arc :math:`(u,u)`, contributing an additional 
+        as the arc :math:`(u,u)`, contributing an additional
         one to the degree of :math:`u`.
         """
         self.set_evolution(shift=self._shift,
@@ -727,12 +723,12 @@ class Coined(QuantumWalk):
         r"""
         Set the marked vertices.
 
-        When a set or list of vertices is provided, they 
+        When a set or list of vertices is provided, they
         are set as marked.
         The evolution operator is updated accordingly.
 
         If a dictionary is passed, the coin of those vertices is
-        replaced solely for the purpose of generating the evolution 
+        replaced solely for the purpose of generating the evolution
         operator. This can only be done if the set coin operator is
         not an explicit matrix.
 
@@ -766,13 +762,9 @@ class Coined(QuantumWalk):
         blocks = [self._coin_funcs[coin_list[v]](degree(v))
                   for v in range(num_vert)]
         C = scipy.sparse.block_diag(blocks, format='csr')
-<<<<<<< HEAD
-=======
-
         C.indices = np.ascontiguousarray(C.indices, dtype=np.int64)
-        C.indptr  = np.ascontiguousarray(C.indptr,  dtype=np.int64)
+        C.indptr = np.ascontiguousarray(C.indptr, dtype=np.int64)
 
->>>>>>> bidu
         return scipy.sparse.csr_array(C)
 
     def get_coin(self):
@@ -787,24 +779,15 @@ class Coined(QuantumWalk):
         --------
         set_coin
         """
-<<<<<<< HEAD
+        print("BD, em hiperwalk/quantum_walk/coined.py: get_coin(self)")
         if scipy.sparse.issparse(self._coin):
             if len(self._marked) == 0:
                 return self._coin
-=======
-        print("BD, em hiperwalk/quantum_walk/coined.py: get_coin(self)")
-        if scipy.sparse.issparse(self._coin):
-            if len(self._marked) == 0: return self._coin
->>>>>>> bidu
 
             # if coin was explicitly set,
             # and there are different coins for the marked vertices,
             # change them.
             def get_block(vertex):
-<<<<<<< HEAD
-=======
-      #          print (" def get_block(vertex): ", vertex)
->>>>>>> bidu
                 g = self._graph
                 neighbors = g.neighbors(vertex)
                 # TODO: this technique wont work after the behavior of
@@ -812,16 +795,11 @@ class Coined(QuantumWalk):
                 a1 = g.arc_number((vertex, neighbors[0]))
                 a2 = g.arc_number((vertex, neighbors[-1]))
                 # arc order may change
-<<<<<<< HEAD
                 start = min(a1, a2)
                 end = max(a1, a2) + 1
 
                 return scipy.sparse.csr_array(self._coin[start:end,
                                                          start:end])
-=======
-                start = min(a1, a2); end = max(a1, a2) + 1
-                return scipy.sparse.csr_array(self._coin[start:end, start:end])
->>>>>>> bidu
 
             num_vert = self._graph.number_of_vertices()
             degree = self._graph.degree
@@ -831,12 +809,6 @@ class Coined(QuantumWalk):
                       if oracle_coin[v] != ''
                       else get_block(v)
                       for v in range(num_vert)]
-<<<<<<< HEAD
-=======
-
-            #print("++++ em get_coin: blocks=", blocks); exit()
-
->>>>>>> bidu
             C = scipy.sparse.block_diag(blocks, format='csr')
 
             return scipy.sparse.csr_array(C)
@@ -850,99 +822,52 @@ class Coined(QuantumWalk):
         else:
             coin_list = self._coin
 
-<<<<<<< HEAD
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
-        # TODO: Check if matrix is sparse in pynelibna interface
-        # TODO: Check if matrices are deleted from memory and GPU.
+        #TODO: move print options to example
+        # np.set_printoptions(linewidth=240)
+        # np.set_printoptions(precision=3, suppress=True)
         U = None
+
+        print("bd, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
 
         S = self.get_shift()
         C = self.get_coin()
 
-        if nbl.get_hpc() is not None:
-            from warnings import warn
-            warn('HPC sparse matrix multiplication is not implemented. '
-                 + 'Using standard scipy multiplication instead.')
-            # # TODO: implement sparse matrix multiplication with hpc
-            # S = S.todense()
-            # C = C.todense()
+        if hpbi.get_hpc() is None:
+            print("bd, em _set_evolution, computeU, U = S @ C ");
+            print("U = S @ C # cria novos os arrays ")
+            U = S @ C # cria novos os arrays
 
-            # nbl_S = nbl.send_matrix(S)
-            # del S
-            # nbl_C = nbl.send_matrix(C)
-            # del C
-            # nbl_C = nbl.multiply_matrices(nbl_S, nbl_C)
+            #TODO: is this necessary? Why U.data is not contiguous?
+            U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
+            U.indptr = np.ascontiguousarray(U.indptr, dtype=np.int64)
+        else:
+            U = C.copy()
+            #TODO: is this necessary? Why U.data is not contiguous?
+            U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
+            U.indptr = np.ascontiguousarray(U.indptr, dtype=np.int64)
 
-            # del nbl_S
+            hpb_dtype = hpb.COMPLEX if np.iscomplex(U) else hpb.FLOAT
+            dim = self.hilb_dim
 
-            # U = nbl.retrieve_matrix(nbl_C)
-            # del nbl_C
-            # U = scipy.sparse.csr_array(U)
+            hpb_S = hpb.sparse_matrix_new(dim, dim, hpb_dtype)
+            hpb.smatrix_connect(hpb_S, S)
+            hpb.move_sparse_matrix_device(hpb_S)
 
-        U = S @ C
+            hpb_C = hpb.sparse_matrix_new(dim, dim, hpb_dtype)
+            hpb.smatrix_connect (hpb_C, C)
+            hpb.move_sparse_matrix_device(hpb_C)
 
-        self._evolution = U
-        return U
-=======
-
-        
-        return self._coin_list_to_explicit_coin(coin_list)
-
-    def _set_evolution(self):
-        np.set_printoptions(linewidth=240) 
-        np.set_printoptions(precision=3, suppress=True)
-        # TODO: Check if matrix is sparse in pyhiperblas interface
-        # TODO: Check if matrices are deleted from memory and GPU.
-
-        print("bd, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
-
-        scipy_S = self.get_shift()
-
-        scipy_C = self.get_coin()
-
-        scipy_U = None
-
-        #S.indices = np.array([2, 5, 0, 7, 6, 1, 4, 3])
-        #S.indices = np.arange(len(S.indices))
-        #permS = S.indices 
-
-        if hpbi.get_hpc()  is  None:
-            print("bd, em _set_evolution, computeU,  U = S @ C ");
-            #U[:] = C[permS,:]  # mantem os arrays anteriormente criados
-            print("U = S @ C        # cria novos os arrays ")
-            scipy_U = scipy_S @ scipy_C        # cria novos os arrays 
-            scipy_U.indices = np.ascontiguousarray(scipy_U.indices, dtype=np.int64)
-            scipy_U.indptr  = np.ascontiguousarray(scipy_U.indptr,  dtype=np.int64)
-        else: 
-            scipy_U = scipy_C.copy()
-            scipy_U.indices = np.ascontiguousarray(scipy_U.indices, dtype=np.int64)
-            scipy_U.indptr  = np.ascontiguousarray(scipy_U.indptr,  dtype=np.int64)
-
-            #hb_S = hpbi.send_matrix(scipy_S)
-
-            #is_complex = np.issubdtype(scipy_S.dtype, np.complexfloating)
-            #hbS_dtype = hpb.COMPLEX if is_complex else hpb.FLOAT
-            hb_S = hpb.sparse_matrix_new(scipy_S.shape[0], scipy_S.shape[1],  self.hb_dtype)
-            hpb.smatrix_connect    (hb_S, scipy_S )
-            hpb.move_sparse_matrix_device(hb_S)
-
-            #hb_C = hpbi.send_matrix(scipy_C)
-            hb_C = hpb.sparse_matrix_new(scipy_C.shape[0], scipy_C.shape[1], self.hb_dtype)
-            hpb.smatrix_connect    (hb_C, scipy_C )
-            hpb.move_sparse_matrix_device(hb_C)
-
-            #hb_U = hpbi.send_matrix(scipy_U)
-            hb_U = hpb.sparse_matrix_new(scipy_U.shape[0], scipy_U.shape[1], self.hb_dtype)
-            hpb.smatrix_connect    (hb_U, scipy_U )
-            hpb.move_sparse_matrix_device(hb_U)
+            hpb_U = hpb.sparse_matrix_new(dim, dim, hpb_dtype)
+            hpb.smatrix_connect(hpb_U, U)
+            hpb.move_sparse_matrix_device(hpb_U)
 
             hpb.permute_sparse_matrix(hb_S, hb_C, hb_U)
 
-        self._evolution = scipy_U
-        return # U
->>>>>>> bidu
+        self._evolution = U
+        return U
 
     def set_evolution(self, **kwargs):
         """
@@ -953,15 +878,15 @@ class Coined(QuantumWalk):
         They are set using the appropriate ``**kwargs``.
         If ``**kwargs`` is empty, the default arguments are used.
 
-        Subsequently, the evolution operator is constructed by 
-        multiplying the shift and coin operators. 
-        If the coin operator is given as an explicit matrix, 
-        its definition remains unaltered 
-        even in the presence of marked vertices. However, if the coin 
-        operator is defined using coin names, any marked vertices will 
+        Subsequently, the evolution operator is constructed by
+        multiplying the shift and coin operators.
+        If the coin operator is given as an explicit matrix,
+        its definition remains unaltered
+        even in the presence of marked vertices. However, if the coin
+        operator is defined using coin names, any marked vertices will
         prompt an update to the coin operator.
         Specifically, the coin names
-        for each marked vertex will default to a replacement with -I, 
+        for each marked vertex will default to a replacement with -I,
         unless an alternative substitution is provided.
 
         Parameters
@@ -990,10 +915,10 @@ class Coined(QuantumWalk):
         any marked vertices, the coin operator is
         modified accordingly [1]_.
 
-        When the coin operator is set as an explicit matrix, it remains 
-        unaltered by marked vertices. However, if it's not provided in 
-        matrix form (e.g., as a list of coins), the coin for each marked 
-        vertex will be substituted based on the most recent 
+        When the coin operator is set as an explicit matrix, it remains
+        unaltered by marked vertices. However, if it's not provided in
+        matrix form (e.g., as a list of coins), the coin for each marked
+        vertex will be substituted based on the most recent
         :meth:`set_marked` invocation.
 
 
@@ -1009,7 +934,8 @@ class Coined(QuantumWalk):
         .. [1] R. Portugal. "Quantum walks and search algorithms",
             2nd edition, Springer, 2018.
         """
-<<<<<<< HEAD
+        #TODO: add debug or benchmark tag
+        import time
 
         S_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
@@ -1021,42 +947,26 @@ class Coined(QuantumWalk):
                               kwargs,
                               Coined._valid_kwargs['marked'])
 
+        #TODO: add benchmark tag
+        start = time.perf_counter()
         self._set_shift(**S_kwargs)
+        end = time.perf_counter()
+        print(f"\n_set_shift: {end - start:.6f} seconds")
+
+        start = time.perf_counter()
         self._set_coin(**C_kwargs)
+        end = time.perf_counter()
+        print(f"\n_set_coin: {end - start:.6f} seconds")
+
+        start = time.perf_counter()
         self._set_marked(**R_kwargs)
+        end = time.perf_counter()
+        print(f"\n_set_marked: {end - start:.6f} seconds")
+        
+        start = time.perf_counter()
         self._set_evolution()
-=======
-        import time
-
-        S_kwargs = Coined._filter_valid_kwargs( kwargs,
-                              Coined._valid_kwargs['shift'])
-        C_kwargs = Coined._filter_valid_kwargs( kwargs,
-                              Coined._valid_kwargs['coin'])
-        R_kwargs = Coined._filter_valid_kwargs( kwargs,
-                              Coined._valid_kwargs['marked'])
-
-        self.is_complex = True       if str(C_kwargs.get('coin'))[0].upper() == 'F' else False 
-        self.hb_dtype   = hpb.COMPLEX if self.is_complex else hpb.FLOAT
-
-        inicioS = time.perf_counter()
-        self._set_shift(**S_kwargs)
-        fimS    = time.perf_counter()
-        print(f"\n_set_shift     :   Tempo decorrido: {fimS - inicioS:.6f} segundos")
-        inicioC = time.perf_counter()
-        self._set_coin(**C_kwargs)
-        fimC    = time.perf_counter()
-        print(f"\n_set_coin      :   Tempo decorrido: {fimC - inicioC:.6f} segundos")
-        inicioM = time.perf_counter()
-        self._set_marked(**R_kwargs)
-        fimM    = time.perf_counter()
-        print(f"\n_set_marked    :   Tempo decorrido: {fimM - inicioM:.6f} segundos")
-        inicioE = time.perf_counter()
-        self._set_evolution()
-        fimE    = time.perf_counter()
-        print(f"\n_set_evolution :   Tempo decorrido: {fimE - inicioE:.6f} segundos")
-        print("")
-        return
->>>>>>> bidu
+        end = time.perf_counter()
+        print(f"\n_set_evolution: {end - start:.6f} seconds\n")
 
     def probability_distribution(self, states):
         r"""
@@ -1105,16 +1015,13 @@ class Coined(QuantumWalk):
             \sum_{v \in N(u)}|\alpha_{u, v}|^2,
         
         with :math:`N(u)` being the set of out neighbors of :math:`u`.
-        A loop at :math:`u` is the arc :math:`(u,u)`. 
+        A loop at :math:`u` is the arc :math:`(u,u)`.
         
         The probability distribution, which is returned by this
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
         """
-<<<<<<< HEAD
-=======
         print("bd, em coined.probability_distribution, 0")
->>>>>>> bidu
         try:
             states.shape == 1
         except:
@@ -1124,10 +1031,7 @@ class Coined(QuantumWalk):
             states = np.array([states], copy=False)
 
 
-<<<<<<< HEAD
-=======
         print("bd, em coined.probability_distribution, 1")
->>>>>>> bidu
         graph = self._graph
         num_vert = graph.number_of_vertices()
         prob = np.array([[Coined._elementwise_probability(
@@ -1135,11 +1039,8 @@ class Coined(QuantumWalk):
                           for v in range(num_vert)]
                          for i in range(len(states))])
 
-<<<<<<< HEAD
-=======
         print("bd, em coined.probability_distribution, 5")
 
->>>>>>> bidu
         return prob
 
     def state(self, entries):
@@ -1194,20 +1095,17 @@ class Coined(QuantumWalk):
 
         >>> psi = qw.state([(1, (0, 1)), [1, 1], (1, 2)])
         >>> psi1 = qw.state([(1, ([0, 0], [0, 1])),
-        ...                  [1, [(0, 0), (dim - 1, 0)]],
-        ...                  (1, (0, 1))])
+        ... [1, [(0, 0), (dim - 1, 0)]],
+        ... (1, (0, 1))])
         >>> psi2 = qw.state([(1, [[0, 0], [0, 1]]),
-        ...                  [1, ((0, 0), (dim - 1, 0))],
-        ...                  (1, [0, 1])])
+        ... [1, ((0, 0), (dim - 1, 0))],
+        ... (1, [0, 1])])
         >>> np.all(psi == psi1)
         np.True_
         >>> np.all(psi1 == psi2)
         np.True_
         """
-<<<<<<< HEAD
-=======
-        print("bd, em coined.py: def state") 
->>>>>>> bidu
+        print("bd, em coined.py: def state")
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 
@@ -1246,7 +1144,7 @@ class Coined(QuantumWalk):
         r"""
         Create a uniform state.
 
-        The uniform state is a unit vector with entries 
+        The uniform state is a unit vector with entries
         that have the same real amplitudes.
         If both ``vertices is None`` and ``arcs is None``,
         create the uniform superposition of all arcs.
@@ -1277,11 +1175,11 @@ class Coined(QuantumWalk):
         .. math::
             \ket{d} = \frac{1}{\sqrt{N}} \sum_{i = 0}^{N - 1} \ket{i}
 
-        where :math:`N` represents the dimension of the Hilbert space, and 
-        :math:`i` is a label within the graph. 
-        In the continuous-time quantum walk model, 
-        :math:`i` corresponds to the label of a vertex, 
-        while in the coined quantum walk model, 
+        where :math:`N` represents the dimension of the Hilbert space, and
+        :math:`i` is a label within the graph.
+        In the continuous-time quantum walk model,
+        :math:`i` corresponds to the label of a vertex,
+        while in the coined quantum walk model,
         :math:`i` is the label of an arc.
         """
         if vertices is None and arcs is None:
@@ -1305,7 +1203,7 @@ class Coined(QuantumWalk):
         Computes the sum of probabilities for the specified vertices.
         
         Computes the probability of the walker being located on a
-        vertex within the set of provided vertices, given that the walk 
+        vertex within the set of provided vertices, given that the walk
         is on specified states.
         
         Parameters
@@ -1315,7 +1213,7 @@ class Coined(QuantumWalk):
             ``states`` can be a single state or a list of states.
         
         vertices: list of int
-           The subset of vertices. 
+           The subset of vertices.
         
         Returns
         -------
@@ -1334,14 +1232,14 @@ class Coined(QuantumWalk):
         Notes
         -----
         
-        The probability of finding the walker on vertex 
+        The probability of finding the walker on vertex
         :math:`v`, given the state of the walk
         :math:`|\psi \rangle`, is calculated as
 
         .. math::
-            \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \, 
+            \sum_{\substack{a\in{\mathcal{A}}\\ \operatorname{tail}(a)=v}} \,
             \left|{\langle a} | {\psi \rangle}\right|^2,
 
-        where :math:`\mathcal{A}` denotes the set of arcs.        
+        where :math:`\mathcal{A}` denotes the set of arcs.
         """
         return super().probability(states, vertices)
