@@ -108,7 +108,6 @@ class ContinuousTime(QuantumWalk):
 
         self._gamma = None
         self._hamil_type = None
-        self._number_of_terms = None
         self._hamiltonian = None
 
         self._time = None
@@ -273,7 +272,6 @@ class ContinuousTime(QuantumWalk):
             Phys. Rev. A 70, 022314, 2004.
         """
         self.set_evolution(time=self._time,
-                           number_of_terms=self._number_of_terms,
                            gamma=gamma,
                            type=type,
                            marked=marked)
@@ -386,54 +384,11 @@ class ContinuousTime(QuantumWalk):
         :math:`t` is the time.
         """
         self.set_evolution(time=time,
-                           number_of_terms=self._number_of_terms,
                            gamma=self._gamma,
                            type=self._hamil_type,
                            marked=self._marked)
 
-    def _set_number_of_terms(self, number_of_terms=21):
-        if self._number_of_terms != number_of_terms:
-            self._number_of_terms = number_of_terms
-            return True
-        return False
-
-    def set_number_of_terms(self, number_of_terms=21):
-        r"""
-        Set the number of terms used to calculate the
-        evolution operator as a power series.
-
-        Parameters
-        ----------
-        numer_of_terms : int, default=21
-            Number of terms in the truncated Taylor series expansion.
-
-        See Also
-        --------
-        set_evolution
-        """
-        self.set_evolution(time=self._time,
-                           number_of_terms=number_of_terms,
-                           gamma=self._gamma,
-                           type=self._hamil_type,
-                           marked=self._marked)
-
-    def get_number_of_terms(self):
-        r"""
-        Retrieve the number of terms in the power series used to
-        calculate the evolution operator.
-
-        Returns
-        -------
-        int
-
-        See Also
-        --------
-        set_number_of_terms
-        set_evolution
-        """
-        return self._number_of_terms
-
-    def _set_evolution(self, number_of_terms=21):
+    def _set_evolution(self):
         r"""
         If this method is invoked,
         the evolution is recalculated
@@ -444,31 +399,18 @@ class ContinuousTime(QuantumWalk):
             self._evolution = np.eye(self.hilb_dim)
             return
 
-        n = number_of_terms - 1
-        H = self.get_hamiltonian()
+        H = self.get_hamiltonian().todense()
+        evals, evecs = scipy.linalg.eigh(H)
+        evecs = evecs.T
 
-        hpc = nbl.get_hpc()
-
-        #TODO: when scipy issue 18086 is solved,
-        # invoke scipy.linalg.expm to calculate power series
-        def numpy_matrix_power_series(A, n):
-            """
-            I + A + A^2/2 + A^3/3! + ... + A^n/n!
-            """
-            U = np.eye(A.shape[0], dtype=A.dtype)
-            curr_term = U.copy()
-            for i in range(1, n + 1):
-                curr_term = curr_term @ A / i
-                U += curr_term
-
-            return U
-
-        if hpc is not None:
-            U = nbl.matrix_power_series(-1j*time*H.todense(), n)
-        else:
-            U = numpy_matrix_power_series(-1j*time*H.todense(), n)
+        U = np.zeros((self.hilb_dim, self.hilb_dim), dtype=complex)
+        for i in range(len(evals)):
+            vec = evecs[i, np.newaxis]
+            U += np.exp(1j*time*evals[i]) * vec.T @ vec.conjugate()
 
         self._evolution = U
+
+        #TODO: test if storing eigenvalues is more efficient for simulation
 
     def set_evolution(self, **kwargs):
         r"""
@@ -476,11 +418,6 @@ class ContinuousTime(QuantumWalk):
 
         This method defines the evolution operator for a specified 
         ``time``.
-        It first determines the Hamiltonian and subsequently derives 
-        the evolution operator via a truncated Taylor series. 
-        The default number of terms in this series is set to 
-        ``number_of_terms=21``, which is adequate when the Hamiltonian
-        is derived from the adjacency matrix and gamma is less than 1.
 
         Parameters
         ----------
@@ -489,47 +426,35 @@ class ContinuousTime(QuantumWalk):
             If omitted, the default arguments are used.
             See :meth:`hiperwalk.ContinuousTime.set_hamiltonian`,
             :meth:`hiperwalk.ContinuousTime.set_time`, and
-            :meth:`hiperwalk.ContinuousTime.set_number_of_terms`.
 
         See Also
         --------
         set_hamiltonian
         set_time
-        set_number_of_terms
 
         Notes
         -----
         The evolution operator is given by
 
         .. math::
-            U(t) = 	\text{e}^{-\text{i}tH},
+            U(t) = 	\text{exp}(-\text{i}tH),
 
         where :math:`H` is the Hamiltonian, and
         :math:`t` is the time.
 
-        The :math:`n\text{th}` partial sum of
-        the Taylor series expansion is given by
-        
+        To calculate :math:`U(t)`,
+        the eigenvalues of :math:`H` are calculated first,
+
         .. math::
-            \text{e}^{-\text{i}tH} \approx
-            \sum_{j = 0}^{n-1} (-\text{i}tH)^j / j!
+            H = \sum_\lambda \lambda \ket{\lambda} \bra{\lambda}.
 
-        where ``number_of_terms``:math:`=n`.
-        This choice reflects default Python loops over integers,
-        such as ``range`` and ``np.arange``.
+        Then, the evolution operator is computed by
 
-        .. warning::
-            For non-integer time (floating number),
-            the result is approximate. It is recommended 
-            to select a small time interval and perform 
-            multiple matrix multiplications to minimize 
-            rounding errors.
+        .. math::
+            U(t) = \sum_\lambda \text{exp}(-\text{i}t\lambda)
+                \ket{\lambda} \bra{\lambda}.
+
         """
-        # TODO: Use ``scipy.linalg.expm`` when ``hpc=None`` once the
-        #       `scipy issue 18086
-        #       <https://github.com/scipy/scipy/issues/18086>`_
-        #       is solved.
-
         def filter_and_call(method, update):
             valid = self._get_valid_kwargs(method)
             filtered = self._filter_valid_kwargs(kwargs, valid)
@@ -537,6 +462,5 @@ class ContinuousTime(QuantumWalk):
 
         update = filter_and_call(self._set_time, False)
         update = filter_and_call(self._set_hamiltonian, update)
-        update = filter_and_call(self._set_number_of_terms, update)
         if (update):
             filter_and_call(self._set_evolution, update)
