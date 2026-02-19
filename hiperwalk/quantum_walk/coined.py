@@ -322,14 +322,7 @@ class Coined(QuantumWalk):
         except AttributeError:
             pass
 
-        # check if explict matrix
-        try:
-            shift[0][0] #if this works, then shift is numpy or list of list
-            # convert to sparse
-            shift = scipy.sparse.csr_array(shift)
-        except NotImplementedError:
-            # already sparse
-            pass
+        shift = scipy.sparse.csr_array(shift)
 
         if (len(shift.shape) != 2 or shift.shape[0] != shift.shape[1]):
             raise TypeError('Explicit coin is not a square matrix.')
