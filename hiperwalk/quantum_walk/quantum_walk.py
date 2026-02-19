@@ -497,7 +497,7 @@ class QuantumWalk(ABC):
             for i in range(step):
                 self._simul_vec = self._simul_mat @ self._simul_vec
 
-        else hpc is not None:
+        else:
             for i in range(step):
                 # swap
                 temp = self._hb_simul_vec_in
