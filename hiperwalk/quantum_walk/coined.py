@@ -5,8 +5,11 @@ import networkx as nx
 from .quantum_walk import QuantumWalk
 from ..graph import SDMultigraph
 from scipy.linalg import hadamard, dft
-from . import _pyhiperblas_interface as hpbi
-import hiperblas as hpb
+from ._pyhiperblas_interface import get_hpc
+try:
+    import hiperblas as hpb
+except ModuleNotFoundError:
+    pass
 
 class Coined(QuantumWalk):
     r"""
@@ -175,9 +178,6 @@ class Coined(QuantumWalk):
 
     def __init__(self, graph=None, **kwargs):
 
-        print("bd, em coined.py, __init__")
-        print("graph:", graph)
-        print("kwargs:", kwargs)
         # create symmetric directed multigraph from input
         sdmg = SDMultigraph(graph)
 
@@ -779,7 +779,6 @@ class Coined(QuantumWalk):
         --------
         set_coin
         """
-        print("BD, em hiperwalk/quantum_walk/coined.py: get_coin(self)")
         if scipy.sparse.issparse(self._coin):
             if len(self._marked) == 0:
                 return self._coin
@@ -825,19 +824,12 @@ class Coined(QuantumWalk):
         return self._coin_list_to_explicit_coin(coin_list)
 
     def _set_evolution(self):
-        #TODO: move print options to example
-        # np.set_printoptions(linewidth=240)
-        # np.set_printoptions(precision=3, suppress=True)
         U = None
-
-        print("bd, em hiperwalk/quantum_walk/coined.py: def _set_evolution")
 
         S = self.get_shift()
         C = self.get_coin()
 
-        if hpbi.get_hpc() is None:
-            print("bd, em _set_evolution, computeU, U = S @ C ");
-            print("U = S @ C # cria novos os arrays ")
+        if get_hpc() is None:
             U = S @ C # cria novos os arrays
 
             #TODO: is this necessary? Why U.data is not contiguous?
@@ -951,22 +943,18 @@ class Coined(QuantumWalk):
         start = time.perf_counter()
         self._set_shift(**S_kwargs)
         end = time.perf_counter()
-        print(f"\n_set_shift: {end - start:.6f} seconds")
 
         start = time.perf_counter()
         self._set_coin(**C_kwargs)
         end = time.perf_counter()
-        print(f"\n_set_coin: {end - start:.6f} seconds")
 
         start = time.perf_counter()
         self._set_marked(**R_kwargs)
         end = time.perf_counter()
-        print(f"\n_set_marked: {end - start:.6f} seconds")
         
         start = time.perf_counter()
         self._set_evolution()
         end = time.perf_counter()
-        print(f"\n_set_evolution: {end - start:.6f} seconds\n")
 
     def probability_distribution(self, states):
         r"""
@@ -1021,7 +1009,6 @@ class Coined(QuantumWalk):
         method as a ``numpy.ndarray``, is the collection of these
         probabilities for all vertices.
         """
-        print("bd, em coined.probability_distribution, 0")
         try:
             states.shape == 1
         except:
@@ -1031,15 +1018,14 @@ class Coined(QuantumWalk):
             states = np.array([states], copy=False)
 
 
-        print("bd, em coined.probability_distribution, 1")
         graph = self._graph
         num_vert = graph.number_of_vertices()
-        prob = np.array([[Coined._elementwise_probability(
-                              states[i, graph.arcs_with_tail(v)]).sum()
-                          for v in range(num_vert)]
-                         for i in range(len(states))])
+        prob = np.array([
+            [Coined._elementwise_probability(
+                states[i, graph.arcs_with_tail(v)]).sum()
+                for v in range(num_vert)]
+            for i in range(len(states))])
 
-        print("bd, em coined.probability_distribution, 5")
 
         return prob
 
@@ -1105,7 +1091,6 @@ class Coined(QuantumWalk):
         >>> np.all(psi1 == psi2)
         np.True_
         """
-        print("bd, em coined.py: def state")
         if len(entries) == 0:
             raise TypeError("Entries were not specified.")
 

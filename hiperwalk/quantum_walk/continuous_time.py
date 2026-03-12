@@ -2,7 +2,11 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
-from . import _pyhiperblas_interface as hbi
+from ._pyhiperblas_interface import get_hpc
+try:
+    import hiperblas as hpb
+except ModuleNotFoundError:
+    pass
 
 class ContinuousTime(QuantumWalk):
     r"""
@@ -447,7 +451,7 @@ class ContinuousTime(QuantumWalk):
         n = number_of_terms - 1
         H = self.get_hamiltonian()
 
-        hpc = hbi.get_hpc()
+        hpc = get_hpc()
 
         #TODO: when scipy issue 18086 is solved,
         # invoke scipy.linalg.expm to calculate power series
