@@ -38,10 +38,11 @@ class QuantumWalk(ABC):
         # Matrix object used during simulation.
         # It may by a scipy matrix or a hiperblas matrix.
         # Should be different from None during simulation only.
-        self._simul_mat = None
+        self._sim_mat = None
         # Vector object used during simulation.
         # Should be different from None during simulation only.
-        self._simul_vec = None
+        self._sim_vec = None
+        self._sim_aux = None
 
         self._graph = graph
         self.hilb_dim = 0
@@ -461,36 +462,16 @@ class QuantumWalk(ABC):
 
         if hpc is None:
             for i in range(step):
-                self._simul_vec = self._simul_mat @ self._simul_vec
+                self._sim_vec = self._sim_mat @ self._sim_vec
+            return
 
-        else:
-            for i in range(step):
-                # swap
-                temp = self._hb_simul_vec_in
-                self._hb_simul_vec_in = self._hb_simul_vec_out
-                self._hb_simul_vec_out = temp
+        for i in range(step):
+            # swap
+            self._sim_vec, self._sim_aux = self._sim_aux, self._sim_vec
 
-                hpb.sparse_matvec_mul(self._hb_simul_mat,
-                                      self._hb_simul_vec_in,
-                                      self._hb_simul_vec_out)
-
-    def _save_simul_vec(self, hpc, continue_simulation):
-        # ret = None
-
-        # if hpc is None:
-        #     ret = self._simul_vec_out.copy()
-        # else:
-        #     #TODO: if hb_simul_vec_out shara the same memory space,
-        #     #      is it necessary to copy from device?
-        #     #      couldn't we simply self._hb_simul_vec_out.copy()?
-        #     res = hpb.copy_vector_from_device(self._hb_simul_vec_out)
-        #     ret = hpb.retrieve_numpy_array(res)
-        # return ret
-
-        #TODO: If this works, remove _save_simul_vec()
-        return self._simul_vec_out.copy()
-
-
+            hpb.sparse_matvec_mul(self._sim_mat,
+                                  self._sim_aux, #in
+                                  self._sim_vec) #out
 
     def simulate(self, range=None, state=None):
         r"""
@@ -614,6 +595,10 @@ class QuantumWalk(ABC):
 
         start, end, step = range
         hpc = get_hpc()
+        self._sim_vec = state.copy()
+        if hpc is not None:
+            self._sim_aux = state.copy()
+        self._sim_mat = self.get_evolution()
 
         #########################################################
         # autoconversion of matrix and vector types
@@ -652,12 +637,13 @@ class QuantumWalk(ABC):
 
         while state_index < num_states:
             self._simulate_step(step, hpc)
-
-            #TODO: move to tests
-            cont_sim = state_index + 1 < num_states
-            saved_states[state_index] = self._save_simul_vec(hpc, cont_sim)
-
+            saved_states[state_index] = self._sim_vec.copy()
             state_index += 1
+
+        self._sim_vec = None
+        if hpc is not None:
+            self._sim_aux = None
+        self._sim_mat = None
 
         return saved_states
 
