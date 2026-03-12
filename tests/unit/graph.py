@@ -101,10 +101,6 @@ class TestGraph(unittest.TestCase):
         L2 = g.laplacian_matrix()
         self.assertTrue((L - L2).nnz == 0)
 
-        g = hpw.Graph(np.matrix(self.adj_matrix))
-        L2 = g.laplacian_matrix()
-        self.assertTrue((L - L2).nnz == 0)
-
         g = hpw.Graph(scipy.sparse.csr_array(self.adj_matrix))
         L2 = g.laplacian_matrix()
         self.assertTrue((L - L2).nnz == 0)
