@@ -919,9 +919,6 @@ class Coined(QuantumWalk):
         .. [1] R. Portugal. "Quantum walks and search algorithms",
             2nd edition, Springer, 2018.
         """
-        #TODO: add debug or benchmark tag
-        import time
-
         S_kwargs = Coined._filter_valid_kwargs(
                               kwargs,
                               Coined._valid_kwargs['shift'])
@@ -932,22 +929,10 @@ class Coined(QuantumWalk):
                               kwargs,
                               Coined._valid_kwargs['marked'])
 
-        #TODO: add benchmark tag
-        start = time.perf_counter()
         self._set_shift(**S_kwargs)
-        end = time.perf_counter()
-
-        start = time.perf_counter()
         self._set_coin(**C_kwargs)
-        end = time.perf_counter()
-
-        start = time.perf_counter()
         self._set_marked(**R_kwargs)
-        end = time.perf_counter()
-        
-        start = time.perf_counter()
         self._set_evolution()
-        end = time.perf_counter()
 
     def probability_distribution(self, states):
         r"""
