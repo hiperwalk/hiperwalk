@@ -620,6 +620,13 @@ class QuantumWalk(ABC):
         #########################################################
         self._sim_vec = state.copy()
         self._sim_mat = self.get_evolution()
+
+        try:
+            self._sim_mat.nnz
+        except:
+            warn("HPC dense matrix multiplication not implemented")
+            hpc = None
+
         if hpc is not None:
             hpb_dtype = (hpb.FLOAT
                          if np.issubdtype(dtype, np.floating)
