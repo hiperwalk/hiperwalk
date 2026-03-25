@@ -849,7 +849,7 @@ class Coined(QuantumWalk):
             hpb.smatrix_connect(hpb_U, U)
             hpb.move_sparse_matrix_device(hpb_U)
 
-            hpb.permute_sparse_matrix(hb_S, hb_C, hb_U)
+            hpb.permute_sparse_matrix(hpb_S, hpb_C, hpb_U)
 
         self._evolution = U
         return U

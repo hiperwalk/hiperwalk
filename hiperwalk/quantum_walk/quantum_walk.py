@@ -41,7 +41,9 @@ class QuantumWalk(ABC):
         self._sim_mat = None
         # Vector object used during simulation.
         # Should be different from None during simulation only.
+        self._vec = None
         self._sim_vec = None
+        self._aux = None
         self._sim_aux = None
 
         self._graph = graph
@@ -467,6 +469,7 @@ class QuantumWalk(ABC):
 
         for i in range(step):
             # swap
+            self._vec, self._aux = self._aux, self._vec
             self._sim_vec, self._sim_aux = self._sim_aux, self._sim_vec
 
             hpb.sparse_matvec_mul(self._sim_mat,
@@ -595,10 +598,6 @@ class QuantumWalk(ABC):
 
         start, end, step = range
         hpc = get_hpc()
-        self._sim_vec = state.copy()
-        if hpc is not None:
-            self._sim_aux = state.copy()
-        self._sim_mat = self.get_evolution()
 
         #########################################################
         # autoconversion of matrix and vector types
@@ -619,6 +618,29 @@ class QuantumWalk(ABC):
 
         dtype = state.dtype
         #########################################################
+        self._sim_vec = state.copy()
+        self._sim_mat = self.get_evolution()
+        if hpc is not None:
+            hpb_dtype = (hpb.FLOAT
+                         if np.issubdtype(dtype, np.floating)
+                         else hpb.COMPLEX)
+
+            self._vec = self._sim_vec
+            self._sim_vec = hpb.vector_new(self.hilb_dim, hpb_dtype)
+            hpb.vector_connect(self._sim_vec, self._vec)
+            hpb.move_vector_device(self._sim_vec)
+
+            self._aux = self._vec.copy()
+            self._sim_aux = hpb.vector_new(self.hilb_dim, hpb_dtype)
+            hpb.vector_connect(self._sim_aux, self._aux)
+            hpb.move_vector_device(self._sim_aux)
+
+            print("TODO: identify if matrix is sparse or dense")
+            self._sim_mat = hpb.sparse_matrix_new(self.hilb_dim,
+                                                  self.hilb_dim,
+                                                  hpb_dtype)
+            hpb.smatrix_connect(self._sim_mat, self._evolution)
+            hpb.move_sparse_matrix_device(self._sim_mat)
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
@@ -637,11 +659,16 @@ class QuantumWalk(ABC):
 
         while state_index < num_states:
             self._simulate_step(step, hpc)
-            saved_states[state_index] = self._sim_vec.copy()
+            if hpc is None:
+                saved_states[state_index] = self._sim_vec.copy()
+            else:
+                saved_states[state_index] = self._vec.copy()
             state_index += 1
 
         self._sim_vec = None
         if hpc is not None:
+            self._vec = None
+            self._aux = None
             self._sim_aux = None
         self._sim_mat = None
 
