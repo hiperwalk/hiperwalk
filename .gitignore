@@ -179,4 +179,5 @@ lcov.info
 *.clangd
 *.clang-tidy
 compile_commands.json
+pyhiperblas/hiperblas.egg-info/
 >>>>>>> bidu
