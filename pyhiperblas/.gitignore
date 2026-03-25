@@ -1,0 +1,12 @@
+/build/
+/dist/
+*.o
+*.cmake
+*.make
+*.so
+Makefile
+*.log
+/nbproject
+*.h
+/CL
+*.ipynb

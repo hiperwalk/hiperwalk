@@ -69,3 +69,15 @@ docs/documentation/graph_constructors/generated/
 
 # Test constants
 tests/test_constants.py
+.venv/
+
+# Other
+hiperblas-core/CMakeCache.txt
+hiperblas-core/CMakeFiles/
+hiperblas-core/CTestTestfile.cmake
+hiperblas-core/DartConfiguration.tcl
+hiperblas-core/Makefile
+hiperblas-core/cmake_install.cmake
+hiperblas-core/install_manifest.txt
+hiperblas-core/sparseMatrixTest
+hiperblas-core/vectorTest

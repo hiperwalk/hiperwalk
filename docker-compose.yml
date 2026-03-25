@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  jupyter:
+    image: ebiduardo/hiperwalk:2.1.0
+    container_name: hw_jupyter
+
+    ports:
+      - "8888:8888"
+
+    volumes:
+      - ./:/home/bidu/hiperwalk/localDisk
+
+    working_dir: /home/bidu/hiperwalk
+
+    command: >
+      python3 -m jupyterlab
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --IdentityProvider.token=''
+      --ServerApp.password=''
+      --ServerApp.allow_origin='*'
+      --ServerApp.allow_remote_access=True
+
+    restart: unless-stopped
+

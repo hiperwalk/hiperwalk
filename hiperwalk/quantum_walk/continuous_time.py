@@ -2,7 +2,11 @@ import numpy as np
 import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
-from . import _pyneblina_interface as nbl
+from ._pyhiperblas_interface import get_hpc
+try:
+    import hiperblas as hpb
+except ModuleNotFoundError:
+    pass
 
 class ContinuousTime(QuantumWalk):
     r"""

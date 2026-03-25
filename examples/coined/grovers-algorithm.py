@@ -4,7 +4,7 @@ import networkx as nx
 
 N = 128
 K_N = nx.complete_graph(N)
-A = nx.adjacency_matrix(K_N)+np.eye(N)
+A = nx.adjacency_matrix(K_N) + np.eye(N)
 graph = hpw.Graph(A)
 qw = hpw.Coined(graph, shift='flipflop', coin='G', marked={'-G': [0]})
 t_final = round(4*np.pi*np.sqrt(N)/4) + 1

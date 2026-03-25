@@ -9,9 +9,10 @@ description = "High-Performance Quantum Walk Simulator"
 license = {file="LICENSE"}
 readme = "README.md"
 authors = [
-  { name="Gustavo Bezerra", email="gbezerra@posgrad.lncc.br" },
+  { name="Gustavo Bezerra", email="bezerra@lncc.br" },
   { name="Paulo Motta", email="prmottajr@gmail.com" },
   { name="Renato Portugal", email="portugal@lncc.br" },
+  { name="Eduardo Garcia", email="bidu@lncc.br" },
 ]
 maintainers = [
   { name="Hiperwalk Organization", email="hiperwalk@gmail.com"},

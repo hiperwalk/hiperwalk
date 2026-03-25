@@ -60,7 +60,6 @@ class TestCoinedLine(unittest.TestCase):
     @unittest.skipIf(HPC is None, 'Skipping comparison tests between '
                                   'numpy and PyHiperBlas')
     def test_hpc_default_evolution_operator(self):
-
         # simulation parameters
         num_steps = self.num_vert // 2
         center = self.num_vert // 2

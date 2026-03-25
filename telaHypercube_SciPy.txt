@@ -1,0 +1,46 @@
+/prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk
+/prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantNov25/hiperwalk
+BD, em def set_hpc(hpc), hpc= None
+ num_arcs = 24
+em hiperwalk/graph/hypercube.py: def Hypercube(dim, multiedges=
+em hiperwalk/graph/hypercube.py: g= <hiperwalk.graph.graph.Graph object at 0x791179a7eae0>
+em coined.py, __init__
+_set_shift     :   Tempo decorrido: 0.000089 segundos
+_set_coin      :   Tempo decorrido: 0.000008 segundos
+_set_marked    :   Tempo decorrido: 0.000015 segundos
+BD, em hiperwalk/quantum_walk/coined.py: def _set_evolution
+++++++  em hiperwalk/quantum_walk/coined.py: get_coin(self)
+em get_coin: self._coin= ['grover', 'grover', 'grover', 'grover', 'grover']
+em get_coin: scipy.sparse.issparse(self._coin) = False
+em get_coin(self), semi-final 
+coin_list[:5]= ['grover', 'grover', 'grover', 'grover', 'grover']
+em def _coin_list_to_explicit_coin, blocks[0].dtype= float64
+BD, em _set_evolution, computeU,  U = S @ C 
+_set_evolution :   Tempo decorrido: 0.000527 segundos
+BD, em hiperwalk/quantum_walk/coined.py, FINAL  def __init__(self, graph=None, **kwargs):
+em coined.py: def state
+em coined.py: def state, return
+BD, em hiperwalk/quantum_walk/quantum_walk.py:    def simulate
+BD, start=1, end=4, step=1
+em quantum_walk.py: def _prepare_engine(self, state, hpc =  None
+BD, em simulate, initial state, state= [ 0.577  0.577  0.577 ...  0.000  0.000  0.000];  state.l2Norm= 1.0
+BD, em def _simulate_step, step = 0
+BD, em def simulate,                     state_index =  0
+BD, em def _simulate_step, step = 1
+self._simul_vec_out= [ 0.000  0.000  0.000 ...  0.000  0.000  0.000];  self._simul_vec_out.l2Norm= 1.0
+BD, em def simulate,                     state_index =  1
+BD, em def _simulate_step, step = 1
+self._simul_vec_out= [-0.192 -0.192 -0.192 ...  0.000  0.000  0.000];  self._simul_vec_out.l2Norm= 0.9999999999999999
+BD, em def simulate,                     state_index =  2
+BD, em def _simulate_step, step = 1
+self._simul_vec_out= [ 0.000  0.000  0.000 ...  0.513  0.513  0.513];  self._simul_vec_out.l2Norm= 0.9999999999999999
+WhileIt  : Tempo decorrido: 0.000213 segundos
+Hypercube: Tempo decorrido: 0.000346 segundos
+computeU : Tempo decorrido: 0.000744 segundos
+Iteracoes: Tempo decorrido: 0.000377 segundos
+Tempo total      decorrido: 0.001502 segundos
+hypercube     , dim =    3, numStep =    3, Grover  coin,    real, numArcs =         24, nnz =           72, densidade = 1.25000e-01, algebra =      SciPy, OMP_NUM_THREADS =   1, tempo computeU = 7.43608e-04, tempo Iteracoes = 9.41996e-05, tempo total = 1.50174e-03
+
+
+0.39user 0.08system 0:00.47elapsed 100%CPU (0avgtext+0avgdata 112596maxresident)k
+0inputs+0outputs (0major+19368minor)pagefaults 0swaps

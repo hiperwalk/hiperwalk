@@ -1,0 +1,34 @@
+# Neblina-core
+For more info, access
+[Paulo Motta's webpage](https://paulomotta.pro.br/wp/2021/05/01/pyhiperblas-and-hiperblas-core/).
+
+# Requirements
+- OpenCL
+- Google test framework
+- lcov
+
+# Installation
+To install hiperblas-core, run the following commands.
+Note that it may be necessary to restart the computer.
+```bash
+git clone https://github.com/paulomotta/hiperblas-core
+cd hiperblas-core
+cmake .
+make
+sudo make install
+sudo ldconfig
+```
+- [ ] TODO: create script?
+
+## Testing Installation
+To check whether the installation was successful or not,
+run the unitary tests by executing ``./hiperblas-core_test``
+(gtest required).
+If any of the tests failed, please contact the developer(s).
+
+## Code Coverage
+To generate the code coverage report, run the script below:
+
+```bash
+./scripts/coverage.sh
+```
