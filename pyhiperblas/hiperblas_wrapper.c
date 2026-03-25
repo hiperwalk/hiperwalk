@@ -411,7 +411,7 @@ static PyObject* py_vector_connect(PyObject* self, PyObject* args)
     // Recupera a cápsula
     vector_t* v = (vector_t*) PyCapsule_GetPointer(hb_vObj, "py_vector_new");
     if (!v) {
-        PyErr_SetString(PyExc_RuntimeError, "PyCapsule inválida para vector_t");
+        PyErr_SetString(PyExc_RuntimeError, "invalid PyCapsule for vector_t");
         return NULL;
     }
 
@@ -425,12 +425,12 @@ static PyObject* py_vector_connect(PyObject* self, PyObject* args)
     else if (data_type == T_COMPLEX)
         np_arr = (PyArrayObject*) PyArray_FROM_OTF(np_vObj, NPY_COMPLEX128, NPY_ARRAY_CARRAY);
     else {
-        PyErr_SetString(PyExc_TypeError, "vector_t possui tipo desconhecido");
+        PyErr_SetString(PyExc_TypeError, "vector_t has unkown type");
         return NULL;
     }
 
     if (!np_arr) {
-        PyErr_SetString(PyExc_TypeError, "Falha ao converter NumPy array");
+        PyErr_SetString(PyExc_TypeError, "Failed to convert NumPy array");
         return NULL;
     }
 
@@ -438,19 +438,19 @@ static PyObject* py_vector_connect(PyObject* self, PyObject* args)
     int expected_type = (data_type == T_FLOAT) ? NPY_FLOAT64 : NPY_COMPLEX128;
 
     if (PyArray_TYPE(np_arr) != expected_type || !PyArray_ISCARRAY(np_arr)) {
-        PyErr_SetString(PyExc_TypeError, "Array deve ser contíguo e do tipo correto");
+        PyErr_SetString(PyExc_TypeError, "Array must be contiguous and of the correct type");
         return NULL;
     }
 
     if (PyArray_NDIM(np_arr) != 1) {
-        PyErr_SetString(PyExc_ValueError, "Vetor deve ser 1D");
+        PyErr_SetString(PyExc_ValueError, "Vector must be 1D");
         return NULL;
     }
 
     npy_intp size = PyArray_SIZE(np_arr);
     if (size != v->len) {
         PyErr_Format(PyExc_ValueError,
-            "Tamanho incompatível: vector_t.len=%ld mas numpy tem %ld",
+            "Incompatible size: vector_t.len=%ld but numpy has %ld",
             (long)v->len, (long)size);
         return NULL;
     }
@@ -475,7 +475,7 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
     // Recupera ponteiro da cápsula
     smatrix_t* smat_a = (smatrix_t*) PyCapsule_GetPointer(aSmatObj, "py_sparse_matrix_new");
     if (!smat_a) {
-        PyErr_SetString(PyExc_RuntimeError, "PyCapsule inválida para smatrix_t");
+        PyErr_SetString(PyExc_RuntimeError, "Invalid PyCapsule for smatrix_t");
         return NULL;
     }
     int data_type = smat_a->type ;
@@ -486,7 +486,7 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
     PyObject *indptrObj  = PyObject_GetAttrString(csr_obj, "indptr");
 
     if (!dataObj || !indicesObj || !indptrObj ) {
-        PyErr_SetString(PyExc_TypeError, "Objeto não é csr_matrix válido");
+        PyErr_SetString(PyExc_TypeError, "Object is not valid csr_matrix");
         return NULL;
     }
 
@@ -499,20 +499,20 @@ static PyObject* py_smatrix_connect(PyObject* self, PyObject* args)
 
 
     if (!PyArray_Check(indptrArr) || PyArray_TYPE(indptrArr) != NPY_INT64 || !PyArray_ISCARRAY(indptrArr)) {
-        PyErr_SetString(PyExc_TypeError, "indptr deve ser np.int64 contíguo"); return NULL;
+        PyErr_SetString(PyExc_TypeError, "indptr must be contiguous np.int64"); return NULL;
     }
     if (!PyArray_Check(indicesArr) || PyArray_TYPE(indicesArr) != NPY_INT64 || !PyArray_ISCARRAY(indicesArr)) {
-        PyErr_SetString(PyExc_TypeError, "indices deve ser np.int64 contíguo"); return NULL;
+        PyErr_SetString(PyExc_TypeError, "indices must be contiguous np.int64"); return NULL;
     }
 
     if (data_type == T_COMPLEX || data_type == T_FLOAT) {
         int expected_type = (data_type == T_COMPLEX) ? NPY_COMPLEX128 : NPY_FLOAT64;
-        const char *type_str = (data_type == T_COMPLEX) ? "np.complex128 contíguo" : "np.float64 contíguo";
+        const char *type_str = (data_type == T_COMPLEX) ? "np.complex128 contiguous" : "np.float64 contiguous";
 
         if (!PyArray_Check(dataArr) ||
             PyArray_TYPE((PyArrayObject *)dataArr) != expected_type ||
             !PyArray_ISCARRAY((PyArrayObject *)dataArr)) {
-                PyErr_Format(PyExc_TypeError, "data deve ser %s", type_str);
+                PyErr_Format(PyExc_TypeError, "data must be %s", type_str);
                 return NULL;
             }
      }
