@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 vector_t *vector_new(int len, data_type type, int initialize, void *data) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); // _NAME__);
+    // printf("BD, em %s: %s\n", __FILE__, __func__); // _NAME__);
 // chatGPT em 18.11.2025, bidu
     vector_t *ret     = malloc(sizeof(vector_t));
     if (!ret) return NULL;
@@ -64,7 +64,7 @@ vector_t *vector_new(int len, data_type type, int initialize, void *data) {
 void vector_delete(vector_t *v)
 {
 // chatGPT em 18.11.2025, bidu
-    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), only the instance of struct vector_t\n", __FILE__); // _NAME__);
+    // printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), only the instance of struct vector_t\n", __FILE__); // _NAME__);
     if (v !=NULL ) free(v); 
     return;
 

@@ -1125,7 +1125,7 @@ matrix_t * mul_complex_scalar_float_mat( bridge_manager_t *mg, int index, comple
 //
 
 void print_smatrix(const smatrix_t* matrix) {
-    printf("BD, em %s: %s\n",__FILE__, __func__);
+    // printf("BD, em %s: %s\n",__FILE__, __func__);
     //return;
     if (!matrix) {
         printf("Matrix is NULL.\n");
@@ -1204,14 +1204,14 @@ void printIdxColMem(void* idxColMem, int size) {
 // void print_vectorT_hiperblas_std(vector_t * v_){
 //	printf("BD, em %s: print_vectorT_hiperblas_std, ", __FILE__);
 void print_vectorT(vector_t *v_) {
-    if (v_ == NULL) { printf("BD, em %s: print_vectorT, vetor NULL\n", __FILE__); return; }
+    // if (v_ == NULL) { printf("BD, em %s: print_vectorT, vetor NULL\n", __FILE__); return; }
 
     int n = v_->len;
-    if (n <= 0) { printf("BD, em %s: print_vectorT, vetor vazio\n", __FILE__); return; }
+    // if (n <= 0) { printf("BD, em %s: print_vectorT, vetor vazio\n", __FILE__); return; }
 
     //if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
 
-    printf("BD, em %s: print_vectorT, ", __FILE__); setvbuf(stdout, NULL, _IONBF, 0);
+    // printf("BD, em %s: print_vectorT, ", __FILE__); setvbuf(stdout, NULL, _IONBF, 0);
 
     //printf("\n  extra   (%p),  value.f (%p)\n",  v_->extra, v_->value.f);
 
@@ -1363,7 +1363,7 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
   }
 
  void  matvec_mul3( bridge_manager_t *mg, int index, void ** i, int * status ) {
-   printf("BD, em %s: %s\n",__FILE__, __func__);
+   // printf("BD, em %s: %s\n",__FILE__, __func__);
     
         object_t ** in = (object_t **) i;
         vector_t * v = (vector_t *) vvalue( *in[1] );

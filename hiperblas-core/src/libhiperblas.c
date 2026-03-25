@@ -142,8 +142,8 @@ void load_long_function(bridge_manager_t *manager, long (**function_ptr)(), char
 void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
     setvbuf(stdout, NULL, _IONBF, 0);  // Desativa buffer do stdout
 
-    printf("BD, em %s, %s \n", __FILE__, __func__);
-    printf("BD, so library name: %s, \n", library_name );
+    // printf("BD, em %s, %s \n", __FILE__, __func__);
+    // printf("BD, so library name: %s, \n", library_name );
 
     manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW);
     if (!manager->bridges[index].plugin_handle) {

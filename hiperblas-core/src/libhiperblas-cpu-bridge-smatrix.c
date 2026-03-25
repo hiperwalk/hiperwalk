@@ -97,7 +97,7 @@ void smatrix_set_complex_value(smatrix_t * m, int i, int j, double r, double im)
 }
 
 smatrix_t * smatrix_new(int nrow, int ncol, data_type type) {
-    printf("BD, em %s, %s\n", __FILE__, __func__); 
+    // printf("BD, em %s, %s\n", __FILE__, __func__); 
 
     //smatrix_t *smatrix = (smatrix_t *) malloc(sizeof(smatrix_t));
 
@@ -164,7 +164,7 @@ void smatrix_load_complex(smatrix_t *m, FILE *f) {
 }
 
 void smatreqhost(smatrix_t *m) {
-    printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqhost(smatrix_t *m) {\n");
+    // printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqhost(smatrix_t *m) {\n");
     if (m->location != LOCHOS) {
         m->location  = LOCHOS;
         m->col_idx   = m->idxColMem;  // Transfer idxColMem to idx_col
@@ -175,7 +175,7 @@ void smatreqhost(smatrix_t *m) {
 }
 
 void smatreqdev(smatrix_t *m) {
-       printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {\n");
+       // printf("BD, em hiperblas-core/src/libhiperblas-cpu-bridge-smatrix.c: void smatreqdev(smatrix_t *m) {\n");
        /*
        printf(" m->location = %d, LOCDEV = %d\n", m->location, LOCDEV);
        printf("   m->row_ptr   = %p\n", (void *) m->row_ptr);  
@@ -210,7 +210,7 @@ void smatreqdev(smatrix_t *m) {
 void smatrix_delete(smatrix_t *smatrix) {
     // em HW as matrizes em formato CSR são criadas pelo python 
     //   não pode se desalocadas pelo ambiente do C
-    printf("BD, ATENCAO, em %s: void smatrix_delete, only the instance of struct smatrix_t \n", __FILE__); 
+    // printf("BD, ATENCAO, em %s: void smatrix_delete, only the instance of struct smatrix_t \n", __FILE__); 
     if( smatrix != NULL ) free(smatrix);
     return;
     if (!smatrix) { return; }
@@ -244,10 +244,10 @@ void smatrix_delete(smatrix_t *smatrix) {
     smatrix->values = NULL;
 
     // Free additional pointers if allocated
-    printf("BD, ATENCAO, em smatrix_delete, REMOVIDO  free(smatrix->extra);\n");
+    // printf("BD, ATENCAO, em smatrix_delete, REMOVIDO  free(smatrix->extra);\n");
     smatrix->extra = NULL;
 
-    printf("BD, em smatrix_delete, FINAL ;\n");
+    // printf("BD, em smatrix_delete, FINAL ;\n");
 }
 
 #ifndef __FILE_NAME__

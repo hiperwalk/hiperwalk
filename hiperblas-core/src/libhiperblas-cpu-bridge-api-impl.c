@@ -383,7 +383,7 @@ void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
 }
 
 void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    // printf("BD, em %s: %s\n", __FILE__, __func__); 
     U->row_ptr[0] = 0; // First row starts at index 0
     for (int i = 0; i < S->nrow; i++) {
         int permuted_row = S->col_idx[i];  // Get the row index in C
@@ -393,13 +393,13 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 #include <omp.h>
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    // printf("BD, em %s: %s\n", __FILE__, __func__); 
 {
     int k=0;
     if (C->type == T_COMPLEX ) {
         #pragma omp parallel for schedule(static)
         for (int row = 0; row < S->nrow; ++row) {
-            if (row == 0) { printf("Thread %d of %d created!\n", omp_get_thread_num(), omp_get_num_threads()); }
+            // if (row == 0) { printf("Thread %d of %d created!\n", omp_get_thread_num(), omp_get_num_threads()); }
             int permuted_row = S->col_idx[row]; // Since S is a permutation matrix
             int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
             int startU = U->row_ptr[row];
@@ -413,7 +413,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
     } else if (C->type == T_FLOAT ) {
         #pragma omp parallel for schedule(static) firstprivate(k)
         for (int row = 0; row < S->nrow; ++row) {
-            if (k++ < 3 ) {printf("Thread %d of %d created!, row=%d \n",  omp_get_thread_num(), omp_get_num_threads(), row); }
+            // if (k++ < 3 ) {printf("Thread %d of %d created!, row=%d \n",  omp_get_thread_num(), omp_get_num_threads(), row); }
             int permuted_row = S->col_idx[row]; // Since A is a permutation matrix
             int startC = C->row_ptr[permuted_row], endC   = C->row_ptr[permuted_row + 1];
             int startU = U->row_ptr[row];
@@ -431,7 +431,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 
  void * permuteSparseMatrix( void * S_, void *C_, void *U_){
-      printf("BD, em %s: %s\n", __FILE__, __func__); 
+      // printf("BD, em %s: %s\n", __FILE__, __func__); 
       smatrix_t* S = (smatrix_t*) S_;
       smatrix_t* C = (smatrix_t*) C_;
       smatrix_t* U = (smatrix_t*) U_;
@@ -442,7 +442,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 
 //[Hiago] 
 void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    // printf("BD, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
     if (!m_values) { fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n"); return ; }
@@ -474,7 +474,7 @@ void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, 
 }
 
 void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    // printf("BD, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
 
