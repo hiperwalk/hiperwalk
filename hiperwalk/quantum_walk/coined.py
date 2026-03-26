@@ -834,7 +834,7 @@ class Coined(QuantumWalk):
             U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
             U.indptr = np.ascontiguousarray(U.indptr, dtype=np.int64)
 
-            hpb_dtype = hpb.COMPLEX if np.iscomplex(U) else hpb.FLOAT
+            hpb_dtype = hpb.COMPLEX if np.iscomplexobj(U) else hpb.FLOAT
             dim = self.hilb_dim
 
             hpb_S = hpb.sparse_matrix_new(dim, dim, hpb_dtype)
