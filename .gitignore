@@ -81,3 +81,4 @@ hiperblas-core/cmake_install.cmake
 hiperblas-core/install_manifest.txt
 hiperblas-core/sparseMatrixTest
 hiperblas-core/vectorTest
+pyhiperblas/hiperblas.egg-info/
