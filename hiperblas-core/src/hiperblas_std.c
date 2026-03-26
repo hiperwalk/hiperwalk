@@ -1125,7 +1125,6 @@ matrix_t * mul_complex_scalar_float_mat( bridge_manager_t *mg, int index, comple
 //
 
 void print_smatrix(const smatrix_t* matrix) {
-    // printf("BD, em %s: %s\n",__FILE__, __func__);
     //return;
     if (!matrix) {
         printf("Matrix is NULL.\n");
@@ -1202,17 +1201,8 @@ void printIdxColMem(void* idxColMem, int size) {
 }
 
 // void print_vectorT_hiperblas_std(vector_t * v_){
-//	printf("BD, em %s: print_vectorT_hiperblas_std, ", __FILE__);
 void print_vectorT(vector_t *v_) {
-    // if (v_ == NULL) { printf("BD, em %s: print_vectorT, vetor NULL\n", __FILE__); return; }
-
     int n = v_->len;
-    // if (n <= 0) { printf("BD, em %s: print_vectorT, vetor vazio\n", __FILE__); return; }
-
-    //if (v_->extra == NULL) { printf("BD, em %s: print_vectorT, v_->extra é NULL\n", __FILE__); return; }
-
-    // printf("BD, em %s: print_vectorT, ", __FILE__); setvbuf(stdout, NULL, _IONBF, 0);
-
     //printf("\n  extra   (%p),  value.f (%p)\n",  v_->extra, v_->value.f);
 
     char formatoF[] = " %6.3f";
@@ -1336,21 +1326,10 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
  
 void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
-   printf("BD, em hiperblas-core/src/hiperblas_std.c: void ** permuteSparseMatrix( ... \n");
         //smatrix_t *U = mg->bridges[index].smatrix_new(C->nrow, C->nrow, C->type);
         //allocate_result(S, C, U);
 
-//        printf("BD, em permuteSparseMatrix, CALL compute_U_row_ptr\n");
-//        printf("BD, em permuteSparseMatrix, CALL print_smatrix(S_) \n"); print_smatrix(S_); 
-//        printf("BD, em permuteSparseMatrix, CALL print_smatrix(C_) \n"); print_smatrix(C_); 
-//        printf("BD, em permuteSparseMatrix, CALL print_smatrix(U_) \n"); print_smatrix(U_); 
-
         computeRowptrU(S_, C_, U_);
-        //printf("BD, em permuteSparseMatrix, EXIT ANTES DO FIM!!!! _\n"); exit(128+13); // (void *) U_;
-        printf("BD, em permuteSparseMatrix, CALL computeU\n"); computeU(S_, C_, U_);
-        //printf("BD, em permuteSparseMatrix, CALL print_smatrix(U_) \n"); print_smatrix(U_); 
-        //printf("BD, em permuteSparseMatrix, RETURN ANTES DO FIM!!!! _\n"); return; // (void *) U_;
-        printf("BD, em permuteSparseMatrix, CALLed computeU, return'\n");
         //exit(128+13+11);
         return; // (void *) U_;
  
@@ -1363,11 +1342,8 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
   }
 
  void  matvec_mul3( bridge_manager_t *mg, int index, void ** i, int * status ) {
-   // printf("BD, em %s: %s\n",__FILE__, __func__);
-    
         object_t ** in = (object_t **) i;
         vector_t * v = (vector_t *) vvalue( *in[1] );
-        //printf("BD, em matvec_mul3BD: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
         vector_t * r = (vector_t *) vvalue( *in[2] );
        
         //do I have to assume that it needs to be copied everytime?
@@ -1394,12 +1370,10 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
             smatrix_t * m = (smatrix_t *) vvalue( *in[0] );
            // r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
             mg->bridges[index].vecreqdev( r );
-//            printf("BD, em matvec_mul3BD, Before call smatreqdev( m ), m->location: %d\n", m->location);
             if (m->location != LOCDEV) { mg->bridges[index].smatreqdev( m ); }
                     // m->values  volta em m->extra 
                     // m->col_idx volta em m->idxColMem, 
                     // m->crow_ptr não altera 
- //           printf("BD, em matvec_mul3BD, After  call smatreqdev( m ), m->location: %d\n", m->location);
 
             if(m->type == T_FLOAT && v->type == T_FLOAT ) {
                 // idxColMem é nome de variavel de do neblinaa, implementacao em abandono

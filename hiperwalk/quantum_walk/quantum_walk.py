@@ -642,7 +642,6 @@ class QuantumWalk(ABC):
             hpb.vector_connect(self._sim_aux, self._aux)
             hpb.move_vector_device(self._sim_aux)
 
-            print("TODO: identify if matrix is sparse or dense")
             self._sim_mat = hpb.sparse_matrix_new(self.hilb_dim,
                                                   self.hilb_dim,
                                                   hpb_dtype)
