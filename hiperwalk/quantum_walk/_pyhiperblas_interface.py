@@ -1,5 +1,5 @@
 try:
-    from hiperblas import init_engine, stop_engine
+    import hiperblas as hpb
 except ModuleNotFoundError:
     pass
 from .._constants import *
@@ -62,7 +62,7 @@ def set_hpc(hpc):
         if not __engine_initiated and __hpc_type is not None:
             hiperblas_imported = True
             try:
-                init_engine(__hpc_type, 0)
+                hpb.init_engine(__hpc_type, 0)
             except NameError:
                 hiperblas_imported = False
             if not hiperblas_imported:
@@ -76,7 +76,7 @@ def exit_handler():
     global __engine_initiated
 
     if __engine_initiated:
-        stop_engine()
+        hpb.stop_engine()
         __engine_initiated = False
 
 atexit.register(exit_handler)
