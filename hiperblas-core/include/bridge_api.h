@@ -97,7 +97,8 @@ typedef struct __bridge_t {
     void *  (*print_smatrix_f) (const smatrix_t* matrix); //[Hiago]
     void *  (*print_vectorT_f) (const vector_t* v); //[Bidu]
    
-    void * (*matVecMul3Complex_f)(  void * mDev, void * vDev, int ncols, int nrows ); 
+    //BDjan26 void * (*matVecMul3Complex_f)(  void * mDev, void * vDev,  int ncols, int nrows ); 
+    void * (*matVecMul3Complex_f)(  void * mDev, void * vDev, void * vOut,  int ncols, int nrows ); 
     void * (*matTranspose_f)(  void * mDev, int ncols, int nrows ); 
     double (*sumVector_f)( void * vDev, int len ); 
     double (*normVector_f)( void * vDev, int len ); 

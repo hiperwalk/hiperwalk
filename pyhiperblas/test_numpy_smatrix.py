@@ -3,7 +3,7 @@ from scipy.sparse import random
 
 import hiperblas as hb
 
-n = 100
+n = 10
 # Set the seed for reproducibility (optional)
 np.random.seed(42)
 

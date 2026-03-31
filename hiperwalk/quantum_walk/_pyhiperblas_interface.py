@@ -107,6 +107,10 @@ def send_vector(v):
     I think an auxiliary vector is beign created,
     thus twice the memory needed is being used
     """
+    #BDjan26 self._hb_simul_vec_out = hb.vector_new(self._evolution.shape[0], dtype)  # return a np vector
+    #BDjan26 hb.vector_connect    (self._hb_simul_vec_out, self._simul_vec_out)
+    #BDjan26 hb.move_vector_device(self._hb_simul_vec_out)
+
     vec = hiperblas.load_numpy_array(v)
     hiperblas.move_vector_device(vec)
     return vec
@@ -139,12 +143,23 @@ def retrieve_vector(hb_vec):
         
 def _send_dense_matrix(M):
     print("em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_dense_matrix(M)")
-    mat = hiperblas.load_numpy_matrix(M)
-    hiperblas.move_matrix_device(mat)
-    return mat
+    hb_mat = hiperblas.load_numpy_matrix(M)
+    hiperblas.move_matrix_device(hb_mat)
+    return hb_mat
+
+def _send_sparse_matrix(M):
+    print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def _send_sparse_matrix(M)")
+    dtype = hiperblas.FLOAT if np.issubdtype(M.dtype, np.floating) else hiperblas.COMPLEX
+    hb_sparse_mat = hiperblas.sparse_matrix_new(M.shape[0], M.shape[1], dtype)
+    hiperblas.smatrix_connect          (hb_sparse_mat, M )
+    hiperblas.move_sparse_matrix_device(hb_sparse_mat)
+    return hb_sparse_mat
+
 
 def send_matrix(M):
     print("BD, em hiperwalk/quantum_walk/_pyhiperblas_interface.py: def send_matrix(M)")
+    if scipy.sparse.issparse(M):
+        return _send_sparse_matrix(M)
     return _send_dense_matrix(M)
 
 def retrieve_matrix(hb_mat):
@@ -188,7 +203,8 @@ def multiply_matrix_vector(hb_mat, hb_vecIn, hb_vecOut, is_sparse):
         hiperblas.sparse_matvec_mul(hb_mat, hb_vecIn, hb_vecOut)
     else:
         print("BD, em ./hiperwalk/quantum_walk/_pyhiperblas_interface.py, def multiply_matrix_vector, CALL hb_vec = hiperblas.matvec_mul, DENSA, para continuo ")
-        hb_vecOut = hiperblas.matvec_mul(hb_vecIn, hb_mat)
+        hiperblas.matvec_mul(hb_mat, hb_vecIn, hb_vecOut)
+        #hb_vecOut = hiperblas.matvec_mul(hb_vecIn, hb_mat)
 
     return 
 

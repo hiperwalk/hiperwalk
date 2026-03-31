@@ -2,8 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// vector_new (n, T_FLOAT, 1, NULL ); // new vector at Dev
+
 vector_t *vector_new(int len, data_type type, int initialize, void *data) {
     printf("BD, em %s: %s\n", __FILE__, __func__); // _NAME__);
+    
 // chatGPT em 18.11.2025, bidu
     vector_t *ret     = malloc(sizeof(vector_t));
     if (!ret) return NULL;
@@ -37,8 +40,12 @@ vector_t *vector_new(int len, data_type type, int initialize, void *data) {
             break;
         case T_FLOAT:
             bytes = len * sizeof(double);
-            ret->value.f = malloc(bytes);
+            //ret->value.f = malloc( len * sizeof(double));
+            ret->value.f = calloc( len, sizeof(double)); // BD, 26.march
+   //         printf(" +++++++++++++ len = %d \n", len);
+  //           for (int i = 0; i < len; i++) { ret->value.f[i]=1.0; }
             if (!ret->value.f) { free(ret); return NULL; }
+ //exit(2222);
             break;
         case T_COMPLEX:
             // 2 doubles: real + imag

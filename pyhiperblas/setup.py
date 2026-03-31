@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 HIPERBLAS_PREFIX = os.path.expanduser(
-    os.environ.get("HIPERBLAS_PREFIX", "~/hiperblas")
+    os.environ.get("HIPERBLAS_PREFIX", "~/local")
 )
 
 hiperblas_module = Extension(

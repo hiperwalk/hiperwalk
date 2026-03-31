@@ -9,7 +9,7 @@ KERNEL_NAME="hiperwalk"
 DISPLAY_NAME="Python (hiperwalk)"
 OMP_THREADS="${OMP_THREADS:-4}"    # valor padrão = 4
 NOTEBOOK_IN="examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb"
-NOTEBOOK_IN="examples/coined/notebooks/coinedQW-on-HypercubeBD.nbconvert.ipynb"
+NOTEBOOK_IN="localDisk/examples/coined/notebooks/coinedQW-on-HypercubeBD.nbconvert.ipynb"
 NOTEBOOK_OUT="saida.ipynb"
 # ================================
 
@@ -44,7 +44,9 @@ comando="$INTEL_PY -m jupyter nbconvert \
     --TagFilterPreprocessor.enabled=True \
     --TagFilterPreprocessor.include=\"header\" \
     --output \"$NOTEBOOK_OUT\" "
-echo $comando; eval $comando
+echo $comando;
+read -p " aguardando um sinal de ok !"
+ eval $comando
 
 STATUS=$?
 

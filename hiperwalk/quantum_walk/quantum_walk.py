@@ -460,26 +460,15 @@ class QuantumWalk(ABC):
 
     def _prepare_engine(self, state, hpc):
         print("bd, em quantum_walk.py: def _prepare_engine(self, state, hpc = ", hpc)
-
-        dtype           = hb.FLOAT if np.issubdtype(self._evolution.dtype, np.floating) else hb.COMPLEX
+        #dtype           = hb.FLOAT if np.issubdtype(self._evolution.dtype, np.floating) else hb.COMPLEX
         self._simul_vec_in  = state
         self._simul_vec_out = np.zeros(state.shape[0] , dtype=state.dtype) # return a np vector
+        self._simul_mat     = self._evolution
 
-        if hpc is  None:
-            self._hb_simul_vec_in, self._hb_simul_vec_out = None, None
-            self._simul_mat     = self._evolution
-        else:
-            self._hb_simul_vec_in = hb.vector_new(self._evolution.shape[0], dtype)
-            hb.vector_connect    (self._hb_simul_vec_in, self._simul_vec_in) 
-            hb.move_vector_device(self._hb_simul_vec_in) 
-
-            self._hb_simul_vec_out = hb.vector_new(self._evolution.shape[0], dtype)  # return a np vector
-            hb.vector_connect    (self._hb_simul_vec_out, self._simul_vec_out) 
-            hb.move_vector_device(self._hb_simul_vec_out)
-
-            self._hb_simul_mat = hb.sparse_matrix_new(self._evolution.shape[0], self._evolution.shape[1], dtype)
-            hb.smatrix_connect          (self._hb_simul_mat, self._evolution )
-            hb.move_sparse_matrix_device(self._hb_simul_mat)
+        if hpc is not  None:
+            self._hb_simul_mat     = hbi.send_matrix(self._simul_mat)
+            self._hb_simul_vec_in  = hbi.send_vector(self._simul_vec_in)
+            self._hb_simul_vec_out = hbi.send_vector(self._simul_vec_out)
         return
 
 
@@ -497,9 +486,13 @@ class QuantumWalk(ABC):
             # TODO: check if intermediate states are being freed
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
-                hb.sparse_matvec_mul(self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out)
-                if i < step - 1 :
-                   self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
+
+                #BDjan26
+                self._simul_vec = hbi.multiply_matrix_vector( self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out, is_sparse)
+
+                #hb.sparse_matvec_mul(self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out)
+           #     if i < step - 1 :
+           #        self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
         else:
             for i in range(step):
                 self._simul_vec_out[:] = self._simul_mat @ self._simul_vec_in
@@ -677,8 +670,8 @@ class QuantumWalk(ABC):
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
 
-        #saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
-        saved_states = np.zeros( (10, state.shape[0]), dtype=dtype)
+        saved_states = np.zeros( (num_states, state.shape[0]), dtype=dtype)
+        #saved_states = np.zeros( (10, state.shape[0]), dtype=dtype)
         state_index  = 0 # index of the state to be saved
 
         # if save_state:

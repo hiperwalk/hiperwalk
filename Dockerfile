@@ -1,95 +1,117 @@
-
 # ============================================================
-# Base comum (Jupyter + Python)
+# BASE
 # ============================================================
 FROM jupyter/minimal-notebook AS base
-
-LABEL description="Hiperwalk Quantum Walks Simulator"
-
-ARG USER_NAME=bidu
-ARG USER_ID=1001
-ARG GROUP_ID=1001
 
 USER root
 
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        ca-certificates \
-        git \
-    && rm -rf /var/lib/apt/lists/*
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        ca-certificates git && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN groupadd -g ${GROUP_ID} ${USER_NAME} || true && \
-    useradd -m -u ${USER_ID} -g ${GROUP_ID} -s /bin/bash ${USER_NAME}
-
-ENV HOME=/home/${USER_NAME}
+# usa o usuário padrão da imagem
+ENV HOME=/home/jovyan
 WORKDIR ${HOME}
 
 # ============================================================
-# DEV (imagem completa – compila tudo)
+# DEV (build do hiperblas)
 # ============================================================
 FROM base AS dev
 
+USER root
+
 RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
         build-essential \
         cmake \
-        pkg-config \
-        gdb \
         libgtest-dev \
+        pkg-config \
         vim \
         less \
-        procps \
-        time \
+        gdb \
     && rm -rf /var/lib/apt/lists/*
 
-RUN git clone \
-    --branch bidu \
-    --single-branch \
-    https://github.com/hiperwalk/hiperwalk.git \
-    ${HOME}/hiperwalk
+# clone
+#RUN git clone --branch bidu --single-branch \
+#    https://github.com/hiperwalk/hiperwalk.git \
+#    ${HOME}/hiperwalk
 
-WORKDIR ${HOME}/hiperwalk
+COPY ./hiperwalk ${HOME}/hiperwalk
 
-RUN cd hiperblas-core && \
-    mkdir -p build && cd build && \
-    cmake .. \
-      -DCMAKE_INSTALL_PREFIX=${HOME}/hiperblas \
-      -DCMAKE_BUILD_TYPE=Release && \
+WORKDIR ${HOME}/hiperwalk/hiperblas-core
+
+# PREFIX
+ENV PREFIX=${HOME}/local
+ENV LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
+
+RUN mkdir -p ${PREFIX}/lib ${PREFIX}/include ${PREFIX}/bin
+
+# build
+RUN rm -rf CMakeCache.txt CMakeFiles && \
+    cmake . \
+      -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+      -DCMAKE_INSTALL_LIBDIR=lib && \
     make -j$(nproc) && \
     make install
 
-# após make install do hiperblas
-RUN cp ${HOME}/hiperblas/lib/*.so ${HOME}/hiperwalk/pyhiperblas/
+# copia libs para pyhiperblas
+#RUN cp ${PREFIX}/lib/*.so ${HOME}/hiperwalk/pyhiperblas/
 
+ENV CPATH=${PREFIX}/include
+ENV LIBRARY_PATH=${PREFIX}/lib
+ENV LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
 
-#ENV HIPERBLAS_PREFIX=${HOME}/hiperblas
-#ENV LD_LIBRARY_PATH=${HIPERBLAS_PREFIX}/lib
-ENV HIPERBLAS_PREFIX=/opt/hiperblas
+# python (ainda como root)
+WORKDIR ${HOME}/hiperwalk
 
 RUN pip install --no-cache-dir numpy scipy pytest
-RUN cd pyhiperblas && pip install -e .
+RUN pip install -e pyhiperblas
 RUN pip install -e .
 
-USER ${USER_NAME}
-CMD ["/bin/bash"]
+# remove node_modules (evita problema futuro)
+RUN rm -rf ${HOME}/hiperwalk/node_modules
+
+# garante permissão correta
+RUN chown -R jovyan:users ${HOME}
 
 # ============================================================
-# NOTEBOOK-SLIM (só runtime)
+# NOTEBOOK (runtime final)
 # ============================================================
 FROM base AS notebook
 
-# copia apenas o resultado pronto
-COPY --from=dev /home/bidu/hiperblas /home/bidu/hiperblas
-COPY --from=dev /home/bidu/hiperwalk /home/bidu/hiperwalk
+USER root
 
-ENV HIPERBLAS_PREFIX=/home/bidu/hiperblas
-ENV LD_LIBRARY_PATH=${HIPERBLAS_PREFIX}/lib
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libgomp1 time && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir numpy scipy
-RUN cd /home/bidu/hiperwalk/pyhiperblas && pip install .
-RUN pip install /home/bidu/hiperwalk
+# copia build pronto
+COPY --from=dev /home/jovyan/local /home/jovyan/local
+COPY --from=dev /home/jovyan/hiperwalk /home/jovyan/hiperwalk
 
-USER ${USER_NAME}
-CMD ["start-notebook.sh"]
+# env
+ENV PREFIX=/home/jovyan/local
+ENV HIPERBLAS_PREFIX=${PREFIX}
+ENV HIPERBLAS_PLUGIN=${PREFIX}/lib/libhiperblas-cpu-bridge.so
+ENV LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
+ENV PYTHONPATH=/home/jovyan/hiperwalk/pyhiperblas:$PYTHONPATH
 
+# python runtime
+RUN pip install --no-cache-dir numpy scipy networkx matplotlib
+RUN pip install -e /home/jovyan/hiperwalk
 
+# 🔥 remove LSP (resolve seus erros)
+RUN pip uninstall -y jupyter-lsp
+
+# 🔥 garante que NÃO sobra node_modules
+RUN rm -rf /home/jovyan/hiperwalk/node_modules
+
+# 🔥 permissões finais corretas
+RUN chown -R jovyan:users /home/jovyan
+
+USER jovyan
+WORKDIR /home/jovyan/hiperwalk
+
+CMD ["start-notebook.py"]

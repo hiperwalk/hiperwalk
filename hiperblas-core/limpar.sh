@@ -19,7 +19,8 @@ fi
 
 echo "==> Limpando artefatos no diretório de testes..."
 rm -f test/*.out test/*.log test/*.txt || true
-rm -f test/libhiperblas-core.so || true
+rm -f $BUILD_DIR/libhiperblas-core.so || true
+rm -fr $BUILD_DIR/Makefile CMakeCache.txt CMakeFiles || true
 
 echo "==> Limpeza completa."
 

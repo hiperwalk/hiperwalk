@@ -1,0 +1,94 @@
+docker compose up -d
+
+docker compose up jupyter -d
+
+
+
+dentro do container
+
+jupyter notebook --allow-root
+
+
+
+docker compose down
+docker rm -f hw_jupyter
+docker compose up -d
+
+
+
+docker exec -it hw_jupyter python3 examples/coined/hypercube.py
+
+docker run --rm ebiduardo/hiperwalk:2.1.0   python3 examples/coined/hypercube.py
+
+docker ps -a
+
+
+no browser
+
+http://0.0.0.0:8888/lab
+
+docker images ebiduardo/hiperwalk
+
+docker pull ebiduardo/hiperwalk:2.1.0
+
+docker pull ebiduardo/hiperwalk:dev
+
+docker run -d --name hw_jupyter --restart unless-stopped -p 8888:8888 -v "$(pwd)":/home/bidu/hiperwalk/localDisk -w /home/bidu/hiperwalk ebiduardo/hiperwalk:2.1.0 jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True
+
+Use no navegador:    http://localhost:8888
+
+docker exec  -it hw_jupyter  bash -c "export OMP_NUM_THREADS=4; python3 localDisk/verifyThreads.py"
+
+docker exec  -it hw_jupyter  bash -c "export OMP_NUM_THREADS=4; python3 localDisk/examples/coined/hypercubeStencil.py" |tail -n 20
+                                      export OMP_NUM_THREADS=4; python3 ./examples/coined/hypercubeStencil.py          |tail -n 20
+
+docker exec -it hw_jupyter bash -c '
+env \
+  OMP_NUM_THREADS=4 \
+  OMP_PLACES=cores \
+  OMP_PROC_BIND=close \
+  python3 localDisk/examples/coined/hypercubeStencil.py
+'
+
+
+
+
+docker run -d --name hw_jupyter --restart unless-stopped -p 8888:8888 -v "$(pwd)":/home/bidu/hiperwalk/localDisk -w /home/bidu/hiperwalk ebiduardo/hiperwalk:dev jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True
+
+
+docker run --cpuset-cpus="0-3" -d --name hw_jupyter --restart unless-stopped -p 8888:8888 -v "$(pwd)":/home/bidu/hiperwalk/localDisk -w /home/bidu/hiperwalk ebiduardo/hiperwalk:dev jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True
+
+
+
+docker run --cpuset-cpus="0-8" -d --name hw_jupyter --restart unless-stopped -p 8888:8888 -v "$(pwd)":/home/bidu/hiperwalk/localDisk -w /home/bidu/hiperwalk ebiduardo/hiperwalk:dev jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --ServerApp.token='' --ServerApp.password='' --ServerApp.allow_origin='*' --ServerApp.allow_remote_access=True
+
+
+docker exec -it hw_jupyter bash -c '
+taskset -c 0-3 \
+env \
+  OMP_NUM_THREADS=4 \
+  OMP_PLACES=cores \
+  OMP_PROC_BIND=close \
+  MKL_NUM_THREADS=4 \
+  python3 localDisk/examples/coined/hypercubeStencil.py
+'
+
+docker run -it -p 8888:8888 \
+  -v /home/bidu/projetos/hiperwalk:/home/jovyan/hiperwalk  hiperwalk 
+
+
+(cd /home/bidu/projetos; docker build -t hiperwalk -f Dockerfile  .)
+
+para iniciar o container em prompt de comando 
+docker run -it -p 8889:8888  -v /home/bidu/projetos/hiperwalk:/home/jovyan/hiperwalk -e OMP_NUM_THREADS=2 hiperwalk bash
+
+para iniciar o container SEM prompt de comando, diretamento o jupyter
+docker run -it -p 8889:8888  -v /home/bidu/projetos/hiperwalk:/home/jovyan/hiperwalk -e OMP_NUM_THREADS=2 hiperwalk
+
+para fazer instalacoes temporarias
+docker run -it -p 8889:8888 --user root -v /home/bidu/projetos/hiperwalk:/home/jovyan/hiperwalk -e OMP_NUM_THREADS=2 hiperwalk bash
+
+para iniciar o jupyter apos o container ser aberto
+docker run -it -p 8888:8888  -v /home/bidu/projetos/hiperwalk:/home/jovyan/hiperwalk -e OMP_NUM_THREADS=2  hiperwalk bash
+jupyter lab --ip=0.0.0.0 --no-browser &
+jupyter server list

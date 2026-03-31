@@ -13,7 +13,7 @@ aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
 aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
-aNumSteps=500; aDim=18
+aNumSteps=500; aDim=18+2
 
 dim          =aDim        # 10
 coin         =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex

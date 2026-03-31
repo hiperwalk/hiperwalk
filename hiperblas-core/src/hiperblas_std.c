@@ -1219,10 +1219,10 @@ void print_vectorT(vector_t *v_) {
     char formatoC[] = " (%6.3f %+6.3fi)";
     double *data = (double *) v_->value.f;
     if(data != NULL ) {
-      printf("\nfrom v_->value.f [%d:%d]:", 0, n - 1);
+      printf("\nfrom v_->value.f [%d:%d]: ", 0, n - 1);
     } else {
       data = (double *) v_->extra;
-      printf("\nfrom v_->extra   [%d:%d]:", 0, n - 1);
+      printf("\nfrom v_->extra   [%d:%d]: ", 0, n - 1);
     }
     // Detecta se é complexo — pode usar flag interna ou inferir
     int is_complex = (v_->type == T_COMPLEX); // (v_->is_complex != 0); // suponha que vector_t tenha um campo is_complex
@@ -1242,7 +1242,7 @@ void print_vectorT(vector_t *v_) {
             for (i = 0; i < n; i++) {
                 sum += data[i] * data[i];
                 if (i < tamFaixa) printf(formatoF, data[i]);
-                else if (i == tamFaixa) printf(" ...");
+                else if (i == tamFaixa) printf("...");
                 else if (i >= n - tamFaixa) printf(formatoF, data[i]);
             }
         }
@@ -1367,23 +1367,32 @@ void permuteSparseMatrix(smatrix_t * S_,  smatrix_t * C_, smatrix_t * U_){
     
         object_t ** in = (object_t **) i;
         vector_t * v = (vector_t *) vvalue( *in[1] );
-        //printf("BD, em matvec_mul3BD: v->location= %d, LOCDEV = %d\n", v->location, LOCDEV);
         vector_t * r = (vector_t *) vvalue( *in[2] );
-       
+
+        printf("BD, em %s, input,  v = %p \n", __func__, (void*) v);
+        printf("BD, em %s, output, r = %p \n", __func__, (void*) r);
+
+        if (!v || !r) {
+        fprintf(stderr, "%s: input or output vector is NULL\n", __func__);
+         exit( 2222);
+        }
+
         //do I have to assume that it needs to be copied everytime?
 	//BD if (v->location != LOCDEV){mg->bridges[index].vecreqdev( v );}
         
         if( type( *in[0] ) == T_MATRIX ) {        
             matrix_t * m = (matrix_t *) vvalue( *in[0] );
-            r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
+            //BDjan2026 r = mg->bridges[index].vector_new(m->nrow, m->type, 0, NULL );
             mg->bridges[index].vecreqdev( r );
             if (m->location != LOCDEV) {mg->bridges[index].matreqdev( m );}
 
             if(        m->type == T_FLOAT && v->type == T_FLOAT ) {
+                printf("BD, em %s, call matVecMul3_f ( m->extra, v->extra, r->extra, m->ncol, m->nrow )\n", __func__);
                 mg->bridges[index].matVecMul3_f( m->extra, v->extra, r->extra, m->ncol, m->nrow );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_FLOAT;
             } else if( m->type == T_COMPLEX && v->type == T_COMPLEX ) {
-                //BD mg->bridges[index].matVecMul3Complex_f( m->extra, v->extra, r->extra, m->ncol, m->nrow );
+                printf("BD, em %s, call matVecMul3Complex_f ( m->extra, v->extra, r->extra, m->ncol, m->nrow )\n", __func__);
+                mg->bridges[index].matVecMul3Complex_f( m->extra, v->extra, r->extra, m->ncol, m->nrow );
 //              r->location = LOCDEV; r->value.f = NULL; r->len = m->nrow; r->type = T_COMPLEX;
             }
             if (status != NULL) { *status = 0; }

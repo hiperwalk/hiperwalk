@@ -13,7 +13,7 @@ using namespace std;
 class SparseMatrixFixture : public ::testing::Test {
 protected:
 public:
-    bridge_manager_t m;
+    bridge_manager_t bridgeManager;
     int idx;
     
     SparseMatrixFixture() {
@@ -28,12 +28,13 @@ public:
 
         const char *home = getenv("HOME");
         char  *plugin_name  = (char*) malloc ( 1024 *sizeof(char));
-        snprintf(plugin_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+ //  compondo o nome absoluto do arquivo de biblioteca: plugin_nam= home+"/hiperbl...-cpu-bridge.so"
+        snprintf(plugin_name, 1024, "%s%s", home,"/local/lib/libhiperblas-cpu-bridge.so");
         printf("plugin_name = %s\n", plugin_name);
 
-        //load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
-        load_plugin(&m, plugin_name, idx);
-        m.bridges[idx].InitEngine_f(0);
+        //load_plugin(&bridgeManager, const_cast<char *>(plugin_name.c_str()), idx);
+        load_plugin(&bridgeManager, plugin_name, idx);
+        bridgeManager.bridges[idx].InitEngine_f(0);
     }
 
     protected:
@@ -63,113 +64,125 @@ public:
 
 TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
 
-    printf("\nBD, inicio de TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {\n");
-    printf("\nBD, ./examples/coined/diagonal-grid.py data) {\n");
-    printf("\nBD, diagonal-gridStencil, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
+    printf("\nbd, inicio de TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {\n");
+    printf("\nbd, ./examples/coined/diagonal-grid.py data) {\n");
+    printf("\nbd, diagonal-gridStencil, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
 
+    // Compressed Sparse Row Matrix
     int n = 16;
-    smatrix_t * b = m.bridges[idx].smatrix_new(n, n, T_FLOAT);
-    b->nnz=36;
  
 //initial state = [ 0.000  0.000  0.000  0.000  0.000  0.000  0.500 -0.500 -0.500  0.500  0.000  0.000  0.000  0.000  0 .000  0.000];  state.l2Norm= 1.0
-    vector_t  * a = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
-    int i;
-    for (i = 0; i < a->len; i++) { a->value.f[i] = 0.; }
-    i=6; a->value.f[i] =  0.500; i=7; a->value.f[i] = -0.500;
-    i=8; a->value.f[i] = -0.500; i=9; a->value.f[i] =  0.500;
+    vector_t  * inV = bridgeManager.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
+    int i; for (i = 0; i < inV->len; i++) { inV->value.f[i] = 0.; }
+    i=6; inV->value.f[i] =  0.500; i=7; inV->value.f[i] = -0.500;
+    i=8; inV->value.f[i] = -0.500; i=9; inV->value.f[i] =  0.500;
  //   a->extra=a->value.f;
-    printf("BD, em TEST_F, vetor  entrada \n");
-    print_vectorT(a);
+    printf("bd, em TEST_F, vetor  entrada \n");
+    print_vectorT(inV);
 
 //v_->extra [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
-    vector_t  * r = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
-    for (i = 0; i < r->len; i++) { r->value.f[i] = 0.; }
-    i=0;  r->value.f[i] = -0.500; i=3; r->value.f[i] =  0.500;
-    i=12; r->value.f[i] = 0.500; i=15; r->value.f[i] = -0.500;
-  //  r->extra=r->value.f;
-    printf("BD, em TEST_F, vetor  saida \n");
-    print_vectorT(r);
-
-    //for (int i = 0; i < a->len; i++) { printf("r[%2d]=%f\n", i,  a->value.f[i]); }
+    vector_t  * referenceOut = bridgeManager.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
+    for (i = 0; i < referenceOut->len; i++) { referenceOut->value.f[i] = 0.; }
+    i=0;  referenceOut->value.f[i] = -0.500;  i=3; referenceOut->value.f[i] =  0.500;
+    i=12; referenceOut->value.f[i] =  0.500; i=15; referenceOut->value.f[i] = -0.500;
+    //printf("bd, em TEST_F, vetor  saida, apos uma iteracao:\n");
+    //print_vectorT(referenceOut);
 
 //U.indptr    =  [ 0  4  6  8 12 14 16 17 18 19 20 22 24 28 30 32 36]
-    b->row_ptr = (long int*) malloc((n+1)*sizeof(long int)) ;
+    smatrix_t * csrM = bridgeManager.bridges[idx].smatrix_new(n, n, T_FLOAT);
+    csrM->nnz=36;
+    csrM->row_ptr = (long int*) malloc((n+1)*sizeof(long int)) ;
     i=0;
-    b->row_ptr[i++]=0;   b->row_ptr[i++]=4;   b->row_ptr[i++]=6;   b->row_ptr[i++]=8;
-    b->row_ptr[i++]=12;  b->row_ptr[i++]=14;  b->row_ptr[i++]=16;  b->row_ptr[i++]=17;
-    b->row_ptr[i++]=18;  b->row_ptr[i++]=19;  b->row_ptr[i++]=20;  b->row_ptr[i++]=22;
-    b->row_ptr[i++]=24;  b->row_ptr[i++]=28;  b->row_ptr[i++]=30;  b->row_ptr[i++]=32;
-    b->row_ptr[i++]=36;
+    csrM->row_ptr[i++]=0;   csrM->row_ptr[i++]=4;   csrM->row_ptr[i++]=6;   csrM->row_ptr[i++]=8;
+    csrM->row_ptr[i++]=12;  csrM->row_ptr[i++]=14;  csrM->row_ptr[i++]=16;  csrM->row_ptr[i++]=17;
+    csrM->row_ptr[i++]=18;  csrM->row_ptr[i++]=19;  csrM->row_ptr[i++]=20;  csrM->row_ptr[i++]=22;
+    csrM->row_ptr[i++]=24;  csrM->row_ptr[i++]=28;  csrM->row_ptr[i++]=30;  csrM->row_ptr[i++]=32;
+    csrM->row_ptr[i++]=36;
 //U.indices   =  [ 6  7  8  9 10 11  4  5  6  7  8  9 13 14  1  2  0  3 12 15 13 14  1  2  6  7  8  9 10 11  4  5  6  7  8  9]
-    b->col_idx = (long int*) malloc((b->nnz)*sizeof(long int)) ;
+    csrM->col_idx = (long int*) malloc((csrM->nnz)*sizeof(long int)) ;
     i=0;
-    b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=10;  b->col_idx[i++]=11; 
-    b->col_idx[i++]=4;   b->col_idx[i++]=5;
-    b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=13;  b->col_idx[i++]=14;
-    b->col_idx[i++]=1;   b->col_idx[i++]=2;
-    b->col_idx[i++]=0;
-    b->col_idx[i++]=3;
-    b->col_idx[i++]=12;
-    b->col_idx[i++]=15;
-    b->col_idx[i++]=13;  b->col_idx[i++]=14;
-    b->col_idx[i++]=1;   b->col_idx[i++]=2;
-    b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
-    b->col_idx[i++]=10;  b->col_idx[i++]=11; 
-    b->col_idx[i++]=4;   b->col_idx[i++]=5;
-    b->col_idx[i++]=6;   b->col_idx[i++]=7;   b->col_idx[i++]=8;   b->col_idx[i++]=9;
+    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
+    csrM->col_idx[i++]=10;  csrM->col_idx[i++]=11; 
+    csrM->col_idx[i++]=4;   csrM->col_idx[i++]=5;
+    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
+    csrM->col_idx[i++]=13;  csrM->col_idx[i++]=14;
+    csrM->col_idx[i++]=1;   csrM->col_idx[i++]=2;
+    csrM->col_idx[i++]=0;
+    csrM->col_idx[i++]=3;
+    csrM->col_idx[i++]=12;
+    csrM->col_idx[i++]=15;
+    csrM->col_idx[i++]=13;  csrM->col_idx[i++]=14;
+    csrM->col_idx[i++]=1;   csrM->col_idx[i++]=2;
+    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
+    csrM->col_idx[i++]=10;  csrM->col_idx[i++]=11; 
+    csrM->col_idx[i++]=4;   csrM->col_idx[i++]=5;
+    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
 
 //U.data      =  [ 0.5  0.5  0.5 -0.5  1.   0.   1.   0.   0.5  0.5 -0.5  0.5  1.   0.   1.   0.   1.   1.   1.   1.   0.   1.   0.   1.   0.5 -0.5  0.5  0.5  0.   1.   0.   1.  -0.5  0.5  0.5  0.5]
-    b->values= (double*) malloc((b->nnz)*sizeof(double)) ;
+    csrM->values= (double*) malloc((csrM->nnz)*sizeof(double)) ;
     i=0;
-    b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=-0.5;
-    b->values[i++]=1.0;   b->values[i++]=0.0; 
-    b->values[i++]=1.0;   b->values[i++]=0.0; 
-    b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=-0.5;   b->values[i++]=0.5;
-    b->values[i++]=1.0;   b->values[i++]=0.0; 
-    b->values[i++]=1.0;   b->values[i++]=0.0; 
+    csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;
+    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
+    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
+    csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;   csrM->values[i++]=0.5;
+    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
+    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
 
-    b->values[i++]=1.0; 
-    b->values[i++]=1.0; 
-    b->values[i++]=1.0; 
-    b->values[i++]=1.0; 
-    b->values[i++]=0.0;   b->values[i++]=1.0; 
-    b->values[i++]=0.0;   b->values[i++]=1.0; 
-    b->values[i++]=0.5;   b->values[i++]=-0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
-    b->values[i++]=0.0;   b->values[i++]=1.0; 
-    b->values[i++]=0.0;   b->values[i++]=1.0; 
-    b->values[i++]=-0.5;  b->values[i++]=0.5;   b->values[i++]=0.5;   b->values[i++]=0.5;
-    printf("BD, em TEST_F, matriz U \n");
-    print_smatrix(b);
+    csrM->values[i++]=1.0; 
+    csrM->values[i++]=1.0; 
+    csrM->values[i++]=1.0; 
+    csrM->values[i++]=1.0; 
+    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
+    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
+    csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;
+    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
+    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
+    csrM->values[i++]=-0.5;  csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;
+    printf("bd, em TEST_F, matriz U \n");
+    print_smatrix(csrM);
 
-    //m.bridges[idx].smatrix_pack(b);
+    bridgeManager.bridges[idx].vecreqdev (inV);  // create new vector at Dev with inV values
 
-    m.bridges[idx].vecreqdev (a); // r->extrai = (void*) r->value.f; 
-    //m.bridges[idx].smatreqdev(b);
+    vector_t  * outV = bridgeManager.bridges[idx].vector_new (n, T_FLOAT, 1, NULL ); // new vector at Dev
+    bridgeManager.bridges[idx].vecreqdev (outV);
+    print_vectorT(outV);
 
-    //vector_t  * rOut = (vector_t *) in[2];
-   // object_t ** in = convertToObject4(a, b);
-    vector_t  * rOut = m.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
-    object_t ** in = convertToObject4BD(b, a, rOut ); // rOut->extra contem o vetor de saida
+    object_t ** in3RefObj = convertToObject4BD(csrM, inV, outV ); // pack a 3 references at an object 
+								
+    for (int state_index=1; state_index<=2; state_index++){
 
-    printf("BD, em TEST_F, before call matvec_mul3\n");
-    //r = (vector_t *) matvec_mul3(&m, idx, (void **) in, NULL);
-    matvec_mul3(&m, idx, (void **) in, NULL);
-    print_vectorT(rOut);
-    printf("BD, em TEST_F, after  call matvec_mul3\n");
-    m.bridges[idx].vecreqhost(rOut); // r->value.f = (double*) r->extra;
-    print_vectorT(rOut);
-    printf("verificação do resultado da função matvec_mul3:");
-    for (int i = 0; i < r->len; i++) { EXPECT_EQ( rOut->value.f[i], r->value.f[i]); printf("%d:ok, ", i); }
-    printf("\n");
+       printf("bd, em TEST_F,  ..............  state_index = %d\n", state_index);
+       printf("bd, em TEST_F, just before call matvec_mul3\n");
+       printf("bd, em TEST_F, input  vetor \n"); print_vectorT(inV);
+       matvec_mul3(&bridgeManager, idx, (void **) in3RefObj, NULL);
+
+       printf("bd, em TEST_F, after  call matvec_mul3\n");
+       bridgeManager.bridges[idx].vecreqhost(outV); // r->value.f = (double*) r->extra;
+       printf("bd, em TEST_F, output vetor \n"); print_vectorT(outV);
+
+       if(state_index==1) {
+           printf("bd, em TEST_F, reference output \n"); print_vectorT(referenceOut);
+           printf("bd, verificação do resultado da função matvec_mul3:");
+           for (int i = 0; i < referenceOut->len; i++) { EXPECT_EQ( outV->value.f[i], referenceOut->value.f[i]); printf("%d:...OK!, ", i); }
+       }
+        printf("\n");
+        vector_t  * tmpV;
+        tmpV = outV; outV = inV; inV = tmpV;
+    }
+     
+
+       printf("bd, em TEST_F, before call matvec_mul3\n");
+       matvec_mul3(&bridgeManager, idx, (void **) in3RefObj, NULL);
+
+       printf("bd, em TEST_F, after  call matvec_mul3\n");
+       bridgeManager.bridges[idx].vecreqhost(outV); // r->value.f = (double*) r->extra;
+       printf("bd, em TEST_F, output vetor \n"); print_vectorT(outV);
     
-    delete_object_array(in, 2);
-    m.bridges[idx].vector_delete(a);
-    m.bridges[idx].vector_delete(r);
-    //return;
-    m.bridges[idx].vector_delete(rOut);
-    m.bridges[idx].smatrix_delete(b);
+    delete_object_array(in3RefObj, 2);
+    bridgeManager.bridges[idx].vector_delete(inV);
+    bridgeManager.bridges[idx].vector_delete(referenceOut);
+    bridgeManager.bridges[idx].vector_delete(outV);
+    bridgeManager.bridges[idx].smatrix_delete(csrM);
     return;
 
 }

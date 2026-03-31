@@ -145,13 +145,13 @@ void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
     printf("BD, em %s, %s \n", __FILE__, __func__);
     printf("BD, so library name: %s, \n", library_name );
 
-    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW);
+    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW| RTLD_GLOBAL); //BD | RTLD_GLOBAL
     if (!manager->bridges[index].plugin_handle) {
             printf("Cannot load %s: %s", library_name, dlerror());
         }
 /*
     char *plugin_name = NULL;
-    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW);
+    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW); 
     if (!manager->bridges[index].plugin_handle) {
         if (plugin_name != NULL) {
             printf("Cannot load %s: %s", plugin_name, dlerror());

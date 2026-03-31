@@ -3,6 +3,7 @@ import scipy.sparse
 import scipy.linalg
 from .quantum_walk import QuantumWalk
 from . import _pyhiperblas_interface as hbi
+import time 
 
 class ContinuousTime(QuantumWalk):
     r"""
@@ -536,8 +537,11 @@ class ContinuousTime(QuantumWalk):
             filtered = self._filter_valid_kwargs(kwargs, valid)
             return method(**filtered) or update
 
+        inicioH = time.perf_counter()
         update = filter_and_call(self._set_time, False)
         update = filter_and_call(self._set_hamiltonian, update)
         update = filter_and_call(self._set_number_of_terms, update)
         if (update):
             filter_and_call(self._set_evolution, update)
+        fimH    = time.perf_counter()
+        print(f"\nset_evolution   :   Tempo decorrido: {fimH - inicioH:.6f} segundos")

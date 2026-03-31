@@ -50,28 +50,28 @@ def main():
     reps = 3 # 10
     n = Uref.shape[0]
 
-    hb_Smat = hb.sparse_matrix_new(n, n, hb.FLOAT)
-    hb.smatrix_connect(hb_Smat, S);
-    hb.move_sparse_matrix_device(hb_Smat)
+    hb_csrS = hb.sparse_matrix_new(n, n, hb.FLOAT)
+    hb.smatrix_connect(hb_csrS, S);
+    hb.move_sparse_matrix_device(hb_csrS)
 
-    hb_Cmat = hb.sparse_matrix_new(n, n, hb.FLOAT)
-    hb.smatrix_connect(hb_Cmat, C);
-    hb.move_sparse_matrix_device(hb_Cmat)
+    hb_csrC = hb.sparse_matrix_new(n, n, hb.FLOAT)
+    hb.smatrix_connect(hb_csrC, C);
+    hb.move_sparse_matrix_device(hb_csrC)
 
     U = C.copy()
     U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
     U.indptr  = np.ascontiguousarray(U.indptr,  dtype=np.int64)
     #print("U = C.copy(0 = \n",U.toarray())
 
-    hb_Umat = hb.sparse_matrix_new(n, n, hb.FLOAT)
-    #hb.sparse_matrix_print(hb_Umat);
-    hb.smatrix_connect(hb_Umat, U);
-    #hb.move_sparse_matrix_device(hb_Umat)
-    hb.sparse_matrix_print(hb_Umat);
-    #hb_UmatDevice = hb.load_numpy_smatrix(hb_Umat)
+    hb_csrU = hb.sparse_matrix_new(n, n, hb.FLOAT)
+    #hb.sparse_matrix_print(hb_csrU);
+    hb.smatrix_connect(hb_csrU, U);
+    #hb.move_sparse_matrix_device(hb_csrU)
+    hb.sparse_matrix_print(hb_csrU);
+    #hb_UmatDevice = hb.load_numpy_smatrix(hb_csrU)
 
-    hb.permute_sparse_matrix(hb_Smat, hb_Cmat, hb_Umat)
-    #hb.sparse_matrix_print(hb_Umat);
+    hb.permute_sparse_matrix(hb_csrS, hb_csrC, hb_csrU)
+    #hb.sparse_matrix_print(hb_csrU);
     #print("U    = \n",U.toarray())
     #print("Uref = \n",Uref.toarray())
  
@@ -97,10 +97,13 @@ def main():
        print("\n +++ new iteration, i =  ", i)
        print("++ input  vector", end=", "); hb.print_vectorT(hb_vIn)
 
-       hb.sparse_matvec_mul(hb_Umat, hb_vIn, hb_vOut) 
+       hb.sparse_matvec_mul(hb_csrU, hb_vIn, hb_vOut) 
 
-       #hb.move_vector_host       (hb_vOut) # tras do device para o host
-       print("++ output vector", end=", "); hb.print_vectorT(hb_vOut)
+       if i == 1 :
+             hb.move_vector_host       (hb_vOut) # tras do device para o host
+             print("++ output vector", end=", "); hb.print_vectorT(hb_vOut)
+             #print("\n second_state = ", second_state) ; exit()
+             hb.move_vector_device(hb_vOut)
 
 #       print("input  vector reference: ", np_vIn, end="; "); print("np_vIn.l2Norm=", np.linalg.norm(np_vIn));
        np_vOut_ref=Uref@np_vIn
@@ -108,7 +111,7 @@ def main():
        print("(np_vOut_ref - np_vOut).l2Norm=", np.linalg.norm(np_vOut_ref-np_vOut));
 
        hb_vIn, hb_vOut = hb_vOut, hb_vIn
-       np_vIn, np_vOut = np_vOut, np_vIn
+       #np_vIn, np_vOut = np_vOut, np_vIn
 
     print()
     print("test complete")

@@ -27,18 +27,20 @@ static PyObject* py_init_engine(PyObject* self, PyObject* args){
     switch(bridge){
         case 0:
         //    lib_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
-	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+        //    lib_name = "~/local/lib/libhiperblas-cpu-bridge.so";
+	    snprintf(lib_name, 1024, "%s%s", home,"/local/lib/libhiperblas-cpu-bridge.so");
             break;
         case 1:
-	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-opencl-bridge.so");
+	    snprintf(lib_name, 1024, "%s%s", home,"/local/lib/libhiperblas-opencl-bridge.so");
             break;
         default:
-	    snprintf(lib_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+	    snprintf(lib_name, 1024, "%s%s", home,"/local/lib/libhiperblas-cpu-bridge.so");
             break;
     }
     printf("BD, em %s, %s, lib_name =%s\n", __FILE__, __func__, lib_name);
 														   
     load_plugin(&bridge_manager, lib_name, bridge_index);
+//    exit(2222);
     bridge_manager.bridges[bridge_index].InitEngine_f(device);
     // printf("3\n");
     setvbuf(stdout, NULL, _IONBF, 0); // BD

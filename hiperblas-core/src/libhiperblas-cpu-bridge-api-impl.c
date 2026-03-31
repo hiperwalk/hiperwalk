@@ -232,7 +232,7 @@ int matrix_get_complex_imag_index(int ncol, int i, int j){
 }
 
 void* matMulFloat(  double* m1, double* m2, int nrows, int ncols, int ncol_m1 ) {
-    
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     double * out = (double *) malloc( nrows * ncols * sizeof(double) );
     #pragma omp parallel for collapse(2)
     for (int i=0; i<nrows; i++) {
@@ -343,7 +343,8 @@ void matSquare( void* * outLin, void* * idxOutLin,
     // return (void *)NULL;
 }
 
-void matVecMul3BD(  double* mat, double* vecIn, double* vecOut, int ncols, int nrows ) {
+void matVecMul3(  double* mat, double* vecIn, double* vecOut, int ncols, int nrows ) {
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
         double sum = 0;
@@ -362,7 +363,8 @@ void matVecMul3BD(  double* mat, double* vecIn, double* vecOut, int ncols, int n
     return ;    
 }
 
-void* matVecMul3(  double* mat, double* vecIn, int ncols, int nrows ) {
+void* matVecMul300(  double* mat, double* vecIn, int ncols, int nrows ) {
+    printf("BD, em %s: %s\n", __FILE__, __func__); 
     double * out = (double *) malloc( nrows * sizeof(double) );
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
@@ -540,10 +542,11 @@ void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_ro
     return; 
 }
 
-void* matVecMul3Complex(  double* mat, double* vec, int ncols, int nrows ) {
+//void* matVecMul3Complex(  double* mat, double* vec, int ncols, int nrows ) {
+void* matVecMul3Complex(  double* mat, double* vec,  double* out, int ncols, int nrows ) {
     
     // printf("matVecMul3Complex 1 ---------\n");
-    double * out = (double *) malloc( 2 * nrows * sizeof(double) );
+    // BDjan26 double * out = (double *) malloc( 2 * nrows * sizeof(double) );
     // printf("matVecMul3Complex 2\n");
     
     #pragma omp parallel for

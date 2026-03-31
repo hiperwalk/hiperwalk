@@ -26,14 +26,16 @@ import scipy as sp
 import scipy.special
 import matplotlib.pylab as plt
 
-import qiskit
-from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
-from qiskit import *
-from qiskit.circuit import ControlledGate
-from qiskit.circuit.library import RYGate
-from qiskit.visualization import plot_histogram
+import os
 
-from qiskit_aer import *  # updated simulator
+#BDjan26 import qiskit
+#BDjan26 from qiskit import QuantumCircuit, QuantumRegister, ClassicalRegister, transpile
+#BDjan26 from qiskit import *
+#BDjan26 from qiskit.circuit import ControlledGate
+#BDjan26 from qiskit.circuit.library import RYGate
+#BDjan26 from qiskit.visualization import plot_histogram
+
+#BDjan26 from qiskit_aer import *  # updated simulator
 
 import hiperwalk as hpw # for exact calculation using Hiperwalk (http://hiperwalk.org)
 
@@ -42,8 +44,16 @@ import hiperwalk as hpw # for exact calculation using Hiperwalk (http://hiperwal
 
 # In[3]:
 
+hb="y"
+hb="n"
+myHPC_option="cpu" if hb == "y" else None
+hpw.set_hpc(myHPC_option)
+print('num nucleos    =', os.cpu_count());
+print('OMP_NUM_THREADS=', os.environ.get('OMP_NUM_THREADS'));
+print('MKL_NUM_THREADS=', os.environ.get('MKL_NUM_THREADS'))
 
-n = 8
+
+n = 8+4-3
 
 N = 2**n
 print('number of qubits = n =', n, '  number of vertices = N =', N)
@@ -67,10 +77,20 @@ qw = hpw.ContinuousTime(cube, gamma=S1(n), time=1, marked = {0})
 psi0 = qw.uniform_state()
 
 steps = int(np.pi*np.sqrt(2**n))
-states = qw.simulate(range=steps, state=psi0)
-succ_prob = qw.success_probability(states)
+steps=10
+aRange=(1,steps+1)
+states = qw.simulate(range_=aRange, state=psi0)
+prob = qw.probability_distribution(states)
+#succ_prob = qw.success_probability(states)
+
+np.set_printoptions(linewidth=820, threshold=240)
+print("prob =\n", prob)
+print("np.sum(prob) = ", np.sum(prob))
+exit()
+
 exact_n = [ (i,succ_prob[i]) for i in range(len(succ_prob))]
 hpw.plot_success_probability(steps, succ_prob, marker='.', figsize=(5,3.4), color='orange')
+
 
 
 # ### Circuit using Qiskit
