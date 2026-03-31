@@ -33,11 +33,11 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # clone
-#RUN git clone --branch bidu --single-branch \
-#    https://github.com/hiperwalk/hiperwalk.git \
-#    ${HOME}/hiperwalk
+RUN git clone --branch bidu --single-branch \
+    https://github.com/hiperwalk/hiperwalk.git \
+    ${HOME}/hiperwalk
 
-COPY ./hiperwalk ${HOME}/hiperwalk
+#COPY ./hiperwalk ${HOME}/hiperwalk
 
 WORKDIR ${HOME}/hiperwalk/hiperblas-core
 
@@ -65,9 +65,9 @@ ENV LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
 # python (ainda como root)
 WORKDIR ${HOME}/hiperwalk
 
-RUN pip install --no-cache-dir numpy scipy pytest
-RUN pip install -e pyhiperblas
-RUN pip install -e .
+RUN python -m pip install --no-cache-dir numpy scipy pytest
+RUN python -m pip install -e pyhiperblas
+RUN python -m pip install -e .
 
 # remove node_modules (evita problema futuro)
 RUN rm -rf ${HOME}/hiperwalk/node_modules
@@ -99,11 +99,11 @@ ENV LD_LIBRARY_PATH=${PREFIX}/lib:$LD_LIBRARY_PATH
 ENV PYTHONPATH=/home/jovyan/hiperwalk/pyhiperblas:$PYTHONPATH
 
 # python runtime
-RUN pip install --no-cache-dir numpy scipy networkx matplotlib
-RUN pip install -e /home/jovyan/hiperwalk
+RUN python -m pip install --no-cache-dir numpy scipy networkx matplotlib
+RUN python -m pip install -e /home/jovyan/hiperwalk
 
 # 🔥 remove LSP (resolve seus erros)
-RUN pip uninstall -y jupyter-lsp
+RUN python -m pip uninstall -y jupyter-lsp
 
 # 🔥 garante que NÃO sobra node_modules
 RUN rm -rf /home/jovyan/hiperwalk/node_modules
