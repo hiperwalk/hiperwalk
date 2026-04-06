@@ -36,10 +36,6 @@ setUpInicial() {
     echo ">> Atualizando pacotes (uma vez só)"
     sudo apt-get update -y
 
-    # limpar builds antigos
-    find . -name build -type d -exec rm -rf {} + 2>/dev/null || true
-    find . -name CMakeFiles -type d -exec rm -rf {} + 2>/dev/null || true
-    find . -name CMakeCache.txt -delete 2>/dev/null || true
 
     # cmake
     if command -v cmake >/dev/null 2>&1; then
@@ -111,6 +107,12 @@ instalarHB_core() {
     echo ">> Instalando hiperblas-core"
     cd "$relativeDir/hiperblas-core"
 
+    #
+    # limpar builds antigos
+    find . -name build -type d -exec rm -rf {} + 2>/dev/null || true
+    find . -name CMakeFiles -type d -exec rm -rf {} + 2>/dev/null || true
+    find . -name CMakeCache.txt -delete 2>/dev/null || true
+
     mkdir -p build
     cd build
 
@@ -159,21 +161,17 @@ experimentosIniciais() {
     echo $comandoB
     echo $comandoC
     echo Os 3 programas acima usam os mesmos dados: diagonal-grid, n = 3
-    read -p ">> Enter para rodar experimento"
 
-    echo ">> Teste C"
-    echo $comandoA
-    read -p ">> Enter para rodar experimento"
+    echo expA... : $comandoA
+    read -p ">>Aguardando um Enter para rodar experimento A, HB" 
     bash -c "$comandoA"
 
-    echo ">> Teste Python"
-    echo $comandoB
-    read -p ">> Enter para rodar experimento"
+    echo expB... : $comandoB
+    read -p ">>Aguardando um Enter para rodar experimento B, pyHB"
     bash -c "$comandoB"
 
-    echo ">> Exemplo"
-    echo $comandoC
-    read -p ">> Enter para rodar experimento"
+    echo expC... : $comandoC
+    read -p ">>Aguardando um Enter para rodar experimento C, HW"
     bash -c "$comandoC"
 }
 
@@ -187,19 +185,19 @@ main() {
     setUpInicial
 
     cd $cdWork
-    read -p ">> Enter para instalar hiperblas-core"
+    read -p ">> Aguardando um Enter para instalar .......... hiperblas-core"
     instalarHB_core
 
     cd $cdWork
-    read -p ">> Enter para instalar pyhiperblas"
+    read -p ">> Aguardando um Enter para instalar .......... pyhiperblas"
     instalarPyHB
 
     cd $cdWork
-    read -p ">> Enter para instalar hiperwalk"
+    read -p ">> Aguardando um Enter para instalar .......... hiperwalk"
     instalarHW
 
     cd $cdWork
-    read -p ">> Enter para rodar experimentos"
+    read -p ">> Aguardando um Enter para    rodar .......... 3 experimentos"
     experimentosIniciais
 
     echo ">> Finalizado com sucesso"
