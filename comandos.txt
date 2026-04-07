@@ -202,3 +202,13 @@ git clone --branch bidu --single-branch https://github.com/hiperwalk/hiperwalk.g
 cd ${HOME}/hiperwalk
 . instalarT.sh
 
+make -C build
+
+cmake --build build
+
+
+cmake --install build
+
+
+cmake --build build --target install
+
