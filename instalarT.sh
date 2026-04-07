@@ -106,7 +106,8 @@ setUpInicial() {
 instalarHB_core() {
     echo ">> Instalando hiperblas-core"
     cd "$relativeDir/hiperblas-core"
-
+    ./instalarHB.sh
+    return
     #
     # limpar builds antigos
     find . -name build -type d -exec rm -rf {} + 2>/dev/null || true
@@ -194,7 +195,7 @@ experimentosIniciais() {
 main() {
     
 
-    experimentosIniciais; return;
+    #experimentosIniciais; return;
 
     cdWork=$1
     setUpInicial

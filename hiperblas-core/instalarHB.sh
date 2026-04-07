@@ -1,11 +1,11 @@
 #!/bin/bash
 set -e
+cd "$(dirname "$0")"
 
 echo ">> instalarHB.sh (modo correto com build isolado)"
 
 prefix=${1:-$HOME/local}
 buildDir=build
-buildDir=.
 
 echo ">> prefix=$prefix"
 
@@ -16,37 +16,27 @@ echo ">> prefix=$prefix"
 export LD_LIBRARY_PATH="$prefix/lib:$LD_LIBRARY_PATH"
 export PATH="$prefix/bin:$PATH"
 
-# GoogleTest (usuário)
-export GTest_ROOT="$HOME/local"
-
 # ==============================
-# Limpeza correta
+# Limpeza
 # ==============================
 
 echo ">> Limpando build antigo"
-#rm -rf "$buildDir"
-
-# 🔴 IMPORTANTE: limpar lixo da raiz
-rm -rf CMakeFiles CMakeCache.txt Makefile
+rm -rf "$buildDir"
 
 # ==============================
 # Build isolado
 # ==============================
 
-mkdir -p "$buildDir"
-cd "$buildDir"
-
-echo ">> Rodando CMake"
-cmake \
+cmake -B "$buildDir" -S . \
   -DCMAKE_INSTALL_PREFIX="$prefix" \
-  -DCMAKE_PREFIX_PATH="$HOME/local" \
-  .
+  -DCMAKE_PREFIX_PATH="$prefix" \
+  -DENABLE_TESTS=ON
 
-echo ">> Compilando"
-make -j"$(nproc)"
+cmake --build "$buildDir" -j"$(nproc)"
 
 echo ">> Instalando"
-make install
+cmake --install "$buildDir"
+
 
 # ==============================
 # Pós-instalação

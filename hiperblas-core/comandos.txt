@@ -1,34 +1,214 @@
-./sparse_matrix_test --gtest_filter=SparseMatrixFixture.matvec_mul3_WithSparseMatrixFloat
+grafo=hypercube;    dim=18;  grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" telas/telAa${grafo}_${dim}_coinF_H*
 
-./sparse_matrix_test --gtest_filter=SparseMatrixFixture.matvec_mul3_WithSparseMatrixComplex
 
-grep sparseVecMul . -R
+(cd ../hiperwalk; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/agrovers-algorithm_600_coin"G"_HB_01T.py 2>&1) |grep ": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed"
 
-grep print_smatrix . -R
+export g=diagonal-grid;(cd ./; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/${g}Stencil.py 2>&1) >telaG${g}Sctencil.txt
+git clone https://github.com/hiperwalk/hiperwalk.git; cd hiperwalk; git fetch --all; git checkout bidu
 
-grep -R "print_smatrix\|sparseVecMul" .  --include="*c" |grep -v Error
-grep ", matvec_mul3_WithSparseMatrix\| matvec_mul3\|smatreqdev\|sparseVecMul" test/sparse_matrix_test.cpp src/hiperblas_std.c  src/libhiperblas-cpu-bridge-smatrix.c em src/libhiperblas-cpu-bridge-api-impl.c |grep -v "fprint\|BD"
+sudo apt update
+sudo apt install wslu
+ sudo apt install xdg-utils wslu
+ xdg-open https://www.google.com
 
-1444  grep ").*{" src/hiperblas_std.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
- 1445  grep ").*{" src/libhiperblas-cpu-bridge-api-impl.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
- 1446  nm libhiperblas-cpu-bridge.so |grep sparseVecMul
- 1447  more libhiperblas-core.so CMakeLists.txt 
- 1448  grep libhiperblas-core.so CMakeLists.txt 
- 1449  grep libhiperblas-core CMakeLists.txt 
- 1450  grep libhiperblas CMakeLists.txt 
- 1451  grep bridge CMakeLists.txt 
- 1452  grep hiperblas CMakeLists.txt 
- 1453  history |tail
-1444  grep ").*{" src/hiperblas_std.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
- 1445  grep ").*{" src/libhiperblas-cpu-bridge-api-impl.c |grep -v "//\|if\|else\|for\|==\|while\|printf\|switch"
- 1446  nm libhiperblas-cpu-bridge.so |grep sparseVecMul
- 1447  more libhiperblas-core.so CMakeLists.txt 
- 1448  grep libhiperblas-core.so CMakeLists.txt 
- 1449  grep libhiperblas-core CMakeLists.txt 
- 1450  grep libhiperblas CMakeLists.txt 
- 1451  grep bridge CMakeLists.txt 
- 1452  grep hiperblas CMakeLists.txt 
- 1453  history |tail
+jupyter nbconvert --to notebook --execute examples/coined/notebooks/Grover-algorithm.ipynb
 
-(cd ..; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/diagonal-gridStencil.py )| grep "U\.\|initial\|print_vectorT" 
+grep "from\|vec_out\|state_index" tela*
+
+grep "long long" . -r --include="*.c"  --include="*.h" | cut -d":" -f 1 |uniq |xargs sed 's/long long int/long int/g' -i
+
+jupyter nbconvert --to notebook --execute   examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb   --output output.ipyn
+find . -name output.ipynb |xargs grep "_simul_vec\|initial"
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHB_DockeImage
+docker run --rm -it hb:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHW_DockeImage
+docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-gridStencil.py
+
+#bidu@lncc.br, dez.2025
+
+#docker build --build-arg USER_NAME=bidu --build-arg USER_ID=1001 --build-arg GROUP_ID=1001 -t hb:cpu . -f  buildHW_DockefFile
+#docker run --rm -it hw:cpu bash
+#docker run --rm -it hw:cpu /home/bidu/hiperblas-core/build/sparse_matrix_test
+
+#docker run --rm -it hw:cpu python3 -c "import hiperblas; print(hiperblas.__file__) "
+#   /home/bidu/.local/lib/python3.12/site-packages/hiperblas.cpython-312-x86_64-linux-gnu.so
+
+#docker run --rm -it hw:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+#docker run --rm -it hw:cpu python3 -c "import hiperwalk; print(hiperwalk.__file__) "
+#   /home/bidu/hiperwalk/hiperwalk/__init__.py
+
+#docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-grid.py
+
+#docker run --rm -it hw:cpu /home/bidu/hiperwalk/rodarExps.sh 
+
+#docker build --build-arg CACHE_BUST=$(date +%s) -t hw:cpu . -f  buildHW_DockefFile
+
+#docker run --rm -it --user bidu:$(id -g) -v /prj/meus_dados/exp1:/outA hw:cpu  /home/bidu/hiperwalk/rodarExps.sh outA
+
+grafo=hypercube;    dim=18;  grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "Tempo" telas/telAa${grafo}_${dim}_coinF_S* telas/telAa${grafo}_${dim}_coinF_H*
+grafo=diagonal-grid;dim=800; grep "gra\|computeU :\|Iteracoes:\|Tempo.*total" telas/telAa${grafo}_${dim}_coinF_H*
+
+
+(cd ../hiperwalk; OMP_NUM_THREADS=01 stdbuf -oL time python3 -u ./examples/coined/agrovers-algorithm_600_coin"G"_HB_01T.py 2>&1) |grep ": print_vectorT\|_simul_vec_out=\|Tempo\|lge\|initial\|algebra\|Arcs\|elapsed"
+
+export g=diagonal-grid;(cd ./; OMP_NUM_THREADS=1 stdbuf -oL time python3 -u examples/coined/${g}Stencil.py 2>&1) >telaG${g}Sctencil.txt
+git clone https://github.com/hiperwalk/hiperwalk.git; cd hiperwalk; git fetch --all; git checkout bidu
+
+sudo apt update
+sudo apt install wslu
+ sudo apt install xdg-utils wslu
+ xdg-open https://www.google.com
+
+jupyter nbconvert --to notebook --execute examples/coined/notebooks/Grover-algorithm.ipynb
+
+grep "from\|vec_out\|state_index" tela*
+
+grep "long long" . -r --include="*.c"  --include="*.h" | cut -d":" -f 1 |uniq |xargs sed 's/long long int/long int/g' -i
+
+jupyter nbconvert --to notebook --execute   examples/coined/notebooks/coinedQW-on-HypercubeBD.ipynb   --output output.ipyn
+find . -name output.ipynb |xargs grep "_simul_vec\|initial"
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHB_DockeImage
+docker run --rm -it hb:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+docker build --build-arg USER_NAME=bidu -t hb:cpu . -f  buildHW_DockeImage
+docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-gridStencil.py
+
+#bidu@lncc.br, dez.2025
+
+#docker build --build-arg USER_NAME=bidu --build-arg USER_ID=1001 --build-arg GROUP_ID=1001 -t hb:cpu . -f  buildHW_DockefFile
+#docker run --rm -it hw:cpu bash
+#docker run --rm -it hw:cpu /home/bidu/hiperblas-core/build/sparse_matrix_test
+
+#docker run --rm -it hw:cpu python3 -c "import hiperblas; print(hiperblas.__file__) "
+#   /home/bidu/.local/lib/python3.12/site-packages/hiperblas.cpython-312-x86_64-linux-gnu.so
+
+#docker run --rm -it hw:cpu python3 /home/bidu/pyhiperblas/sparse_matrix_testDiagGridExp.py
+
+#docker run --rm -it hw:cpu python3 -c "import hiperwalk; print(hiperwalk.__file__) "
+#   /home/bidu/hiperwalk/hiperwalk/__init__.py
+
+#docker run --rm -it hw:cpu python3 /home/bidu/hiperwalk/examples/coined/diagonal-grid.py
+
+#docker run --rm -it hw:cpu /home/bidu/hiperwalk/rodarExps.sh 
+
+#docker build --build-arg CACHE_BUST=$(date +%s) -t hw:cpu . -f  buildHW_DockefFile
+
+#docker run --rm -it --user bidu:$(id -g) -v /prj/meus_dados/exp1:/outA hw:cpu  /home/bidu/hiperwalk/rodarExps.sh outA
+
+docker run -it --rm -p 8888:8888 -v /prj/prjedlg/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work hw:cpu jupyter lab --ip=0.0.0.0 --no-browser docker stop
+
+
+docker run -it --rm -p 8888:8888 -v /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work hb:cpu jupyter lab --ip=0.0.0.0 --no-browser
+docker run -it --rm -p 8888:8888 -v /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk:/home/bidu/work -w /home/bidu/work hb:cpu jupyter lab --ip=0.0.0.0 --no-browser
+
+git status --short | awk 'BEGIN{print "git add" } /^ M/ {print $2}' | paste -sd' '
+
+
+docker push ebiduardo/hiperwalk:2.0.0
+docker tag ebiduardo/hiperwalk:2.0.0 ebiduardo/hiperwalk:latest
+docker push ebiduardo/hiperwalk:latest
+
+docker pull ebiduardo/hiperwalk:2.0.0
+docker run --rm -it ebiduardo/hiperwalk:2.0.0
+grep " segundos\|algebra" examples/coined/notebooks/saida.ipynb |grep -v "\" \|print"
+
+docker build -t bidu/hiperwalk:2.0.0 . --no-cache
+
+
+docker build -t ebiduardo/hiperwalk:2.0.0 . --no-cache
+
+docker run --rm -it ebiduardo/hiperwalk:2.0.0
+
+docker push ebiduardo/hiperwalk:2.0.0
+git clone     --branch bidu     --single-branch     https://github.com/hiperwalk/hiperwalk.git     ./hiperwalk 
+
+docker tag ebiduardo/hiperwalk:2.0.0 ebiduardo/hiperwalk:lates
+
+
+
+
+docker push ebiduardo/hiperwalk:latest
+
+
+rodar o hiperwalk em jupyter com hiperblas de um container docker
+
+docker pull ebiduardo/hiperwalk:latest
+
+no host 
+docker run -p 8888:8888  --rm -it ebiduardo/hiperwalk:latest
+
+no container
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --ServerApp.token='' --ServerApp.password=''
+
+no browser
+http://localhost:8888/lab
+
+
+
+grep "seg\|tempo Iteracoes =" examples/coined/notebooks/saida*_dim18_*st.ipynb  |grep -v "print\|endStep"
+
+
+docker build --target dev -t hiperwalk:dev .
+
+docker build --target notebook-slim -t hiperwalk:notebook .
+
+docker compose up notebook
+docker compose <comando> <serviço>
+
+instalar docker atualizado
+
+Instalar Docker Compose V2 (plugin oficial)
+1️⃣ Crie o diretório de plugins (se não existir)
+mkdir -p ~/.docker/cli-plugins
+
+2️⃣ Baixe o Compose V2 (Linux x86_64)
+curl -SL https://github.com/docker/compose/releases/download/v2.27.0/docker-compose-linux-x86_64 \
+  -o ~/.docker/cli-plugins/docker-compose
+
+
+(versão estável e amplamente usada)
+
+3️⃣ Dê permissão de execução
+chmod +x ~/.docker/cli-plugins/docker-compose
+
+4️⃣ Teste
+docker compose version
+
+
+✔️ Saída esperada:
+
+Docker Compose version v2.27.0
+
+
+docker-compose down || true
+docker rm -f hw_jupyter || true
+
+cd ~; mkdir -p projetos; cp -r /mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantDez25/hiperwalk ~/projetos/; cd ~/projetos/hiperwalk;
+#python3 -m pip install --user pytest --break-system-packages
+(./hiperblas-core/sparseMatrixTest; read -p "aguardando um ok"; python3 pyhiperblas/sparse_matrix_testDiagGridExp.py )
+
+docker run -it -p 8888:8888 -e OMP_NUM_THREADS=2 hiperwalk
+
+
+# clone
+git clone --branch bidu --single-branch https://github.com/hiperwalk/hiperwalk.git ${HOME}/hiperwalk
+cd ${HOME}/hiperwalk
+. instalarT.sh
+
+make -C build
+
+cmake --build build
+
+
+cmake --install build
+
+
+cmake --build build --target install
 

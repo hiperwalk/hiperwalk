@@ -19,13 +19,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Flags comuns (sem OpenMP aqui!)
 add_compile_options(
-    -Wall
     -Wextra
     -Wpedantic
     -O3
     -g3
     -ggdb
 )
+#-Wall
 
 # =====================================================
 # RPATH – elimina LD_LIBRARY_PATH
@@ -44,7 +44,8 @@ find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
 # GoogleTest é opcional (só para testes)
-find_package(GTest QUIET)
+##find_package(GTest QUIET)
+find_package(GTest REQUIRED)
 
 # =====================================================
 # Paths
@@ -54,6 +55,7 @@ set(SRC_DIR  ${PROJECT_SOURCE_DIR}/src)
 set(INC_DIR  ${PROJECT_SOURCE_DIR}/include)
 set(TEST_DIR ${PROJECT_SOURCE_DIR}/test)
 
+#include_directories(${INC_DIR} ${HOME}/local/include)
 include_directories(${INC_DIR})
 
 # =====================================================
