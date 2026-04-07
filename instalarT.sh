@@ -157,31 +157,46 @@ experimentosIniciais() {
     comandoB='python3 pyhiperblas/sparse_matrix_testDiagGridExp.py | grep "state_index\|_simul_vec_\|500\|new" || true'
     comandoC='python3 examples/coined/diagonal-grid.py | grep "state_index\|_simul_vec_\|500\|new" || true'
 
+    comandoD='python3 examples/coined/diagonal-gridHB.py | grep "state_index\|_simul_vec_\|500\|new" || true'
+
     echo $comandoA
     echo $comandoB
     echo $comandoC
-    echo Os 3 programas acima usam os mesmos dados: diagonal-grid, n = 3
+    echo $comandoD
 
-    echo expA... : $comandoA
-    read -p ">>Aguardando um Enter para rodar experimento A, HB" 
+    echo Os 4 programas acima usam os mesmos dados: diagonal-grid, n = 3
+    read -p ">> Enter para rodar experimento"
+
+    echo ">> Teste libhiperblas-core.so"
+    echo $comandoA
+    read -p ">> Enter para rodar experimento"
     bash -c "$comandoA"
 
-    echo expB... : $comandoB
-    read -p ">>Aguardando um Enter para rodar experimento B, pyHB"
+    echo ">> Teste Python usando libhiperblas-core.so"
+    echo $comandoB
+    read -p ">> Enter para rodar experimento"
     bash -c "$comandoB"
 
-    echo expC... : $comandoC
-    read -p ">>Aguardando um Enter para rodar experimento C, HW"
+    echo ">> Exemplo HiperWalk SEM libhiperblas-core.so"
+    echo $comandoC
+    read -p ">> Enter para rodar experimento"
     bash -c "$comandoC"
+
+    echo ">> Exemplo HiperWalk COM libhiperblas-core.so"
+    echo $comandoD
+    read -p ">> Enter para rodar experimento"
+    bash -c "$comandoD"
 }
 
 # --------------------------------------------------
 # ▶️ Execução
 # --------------------------------------------------
 main() {
+    
 
-    cdWork=$PWD
+    experimentosIniciais; return;
 
+    cdWork=$1
     setUpInicial
 
     cd $cdWork
@@ -203,5 +218,6 @@ main() {
     echo ">> Finalizado com sucesso"
 }
 
-main
+export OMP_NUM_THREADS=3
+main $PWD
 

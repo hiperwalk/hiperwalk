@@ -199,3 +199,6 @@ docker run -it -p 8888:8888 -e OMP_NUM_THREADS=2 hiperwalk
 
 # clone
 git clone --branch bidu --single-branch https://github.com/hiperwalk/hiperwalk.git ${HOME}/hiperwalk
+cd ${HOME}/hiperwalk
+. instalarT.sh
+
