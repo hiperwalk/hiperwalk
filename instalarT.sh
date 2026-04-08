@@ -105,8 +105,11 @@ setUpInicial() {
 # --------------------------------------------------
 instalarHB_core() {
     echo ">> Instalando hiperblas-core"
-    cd "$relativeDir/hiperblas-core"
+    #cd "$relativeDir/hiperblas-core"
+    pushd "$relativeDir/hiperblas-core"
     ./instalarHB.sh
+    popd
+
     return
     #
     # limpar builds antigos
@@ -130,11 +133,6 @@ instalarPyHB() {
     cd "$relativeDir/pyhiperblas"
 
 
-    export HIPERBLAS_PREFIX="$HOME/local"
-
-    export C_INCLUDE_PATH="$HIPERBLAS_PREFIX/include:$C_INCLUDE_PATH"
-    export LIBRARY_PATH="$HIPERBLAS_PREFIX/lib:$LIBRARY_PATH"
-    export LD_LIBRARY_PATH="$HIPERBLAS_PREFIX/lib:$LD_LIBRARY_PATH"
 
     python3 -m pip install --user -e . --break-system-packages
 }
@@ -199,6 +197,13 @@ main() {
 
     cdWork=$1
     setUpInicial
+
+
+    export    HIPERBLAS_PREFIX="$HOME/local"
+    export      C_INCLUDE_PATH="$HIPERBLAS_PREFIX/include:$C_INCLUDE_PATH"
+    export  CPLUS_INCLUDE_PATH="$HIPERBLAS_PREFIX/include:$C_INCLUDE_PATH"
+    export        LIBRARY_PATH="$HIPERBLAS_PREFIX/lib:$LIBRARY_PATH"
+    export     LD_LIBRARY_PATH="$HIPERBLAS_PREFIX/lib:$LD_LIBRARY_PATH"
 
     cd $cdWork
     read -p ">> Aguardando um Enter para instalar .......... hiperblas-core"
