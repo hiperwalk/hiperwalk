@@ -11,6 +11,12 @@ try:
 except ModuleNotFoundError:
     pass
 
+try:
+    import cupyx.scipy.sparse as cpss
+    import cupy as cp
+except ModuleNotFoundError:
+    pass
+
 class QuantumWalk(ABC):
     """
     Abstract class for Quantum Walks.
@@ -467,14 +473,20 @@ class QuantumWalk(ABC):
                 self._sim_vec = self._sim_mat @ self._sim_vec
             return
 
-        for i in range(step):
-            # swap
-            self._vec, self._aux = self._aux, self._vec
-            self._sim_vec, self._sim_aux = self._sim_aux, self._sim_vec
+        if hpc == 'cpu':
+            for i in range(step):
+                # swap
+                self._vec, self._aux = self._aux, self._vec
+                self._sim_vec, self._sim_aux = self._sim_aux, self._sim_vec
 
-            hpb.sparse_matvec_mul(self._sim_mat,
-                                  self._sim_aux, #in
-                                  self._sim_vec) #out
+                hpb.sparse_matvec_mul(self._sim_mat,
+                                      self._sim_aux, #in
+                                      self._sim_vec) #out
+            return
+
+        if hpc == 'gpu':
+            for i in range(step):
+                self._sim_vec = self._sim_mat @ self._sim_vec
 
     def simulate(self, range=None, state=None):
         r"""
@@ -618,16 +630,18 @@ class QuantumWalk(ABC):
 
         dtype = state.dtype
         #########################################################
-        self._sim_vec = state.copy()
-        self._sim_mat = self.get_evolution()
 
-        try:
-            self._sim_mat.nnz
-        except:
-            warn("HPC dense matrix multiplication not implemented")
-            hpc = None
+        if hpc is None:
+            self._sim_vec = state.copy()
+            self._sim_mat = self.get_evolution()
 
-        if hpc is not None:
+            try:
+                self._sim_mat.nnz
+            except:
+                warn("HPC dense matrix multiplication not implemented")
+                hpc = None
+
+        elif hpc == 'cpu':
             hpb_dtype = (hpb.FLOAT
                          if np.issubdtype(dtype, np.floating)
                          else hpb.COMPLEX)
@@ -647,6 +661,11 @@ class QuantumWalk(ABC):
                                                   hpb_dtype)
             hpb.smatrix_connect(self._sim_mat, self._evolution)
             hpb.move_sparse_matrix_device(self._sim_mat)
+        elif hpc == 'gpu':
+            self._sim_mat = self._evolution # copy address from cupy
+            self._sim_vec = cp.array(state)
+        else:
+            raise ValueError("Invalid hpc option: " + str(hpc))
 
         # number of states to save
         num_states = 1 + (end - 1 - start) // step
@@ -667,8 +686,10 @@ class QuantumWalk(ABC):
             self._simulate_step(step, hpc)
             if hpc is None:
                 saved_states[state_index] = self._sim_vec.copy()
-            else:
+            elif hpc == 'cpu':
                 saved_states[state_index] = self._vec.copy()
+            elif hpc == 'gpu':
+                saved_states[state_index] = self._sim_vec.get()
             state_index += 1
 
         self._sim_vec = None

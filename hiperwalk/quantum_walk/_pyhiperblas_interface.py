@@ -59,7 +59,7 @@ def set_hpc(hpc):
 
         __hpc_type = new_hpc
 
-        if not __engine_initiated and __hpc_type is not None:
+        if __hpc_type == 0 and not __engine_initiated:
             hiperblas_imported = True
             try:
                 hpb.init_engine(__hpc_type, 0)

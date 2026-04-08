@@ -822,13 +822,15 @@ class Coined(QuantumWalk):
         S = self.get_shift()
         C = self.get_coin()
 
-        if get_hpc() is None:
+        hpc = get_hpc()
+
+        if hpc is None:
             U = S @ C # cria novos os arrays
 
             #TODO: is this necessary? Why U.data is not contiguous?
             U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
             U.indptr = np.ascontiguousarray(U.indptr, dtype=np.int64)
-        else:
+        elif hpc == 'cpu':
             U = C.copy()
             #TODO: is this necessary? Why U.data is not contiguous?
             U.indices = np.ascontiguousarray(U.indices, dtype=np.int64)
@@ -850,6 +852,14 @@ class Coined(QuantumWalk):
             hpb.move_sparse_matrix_device(hpb_U)
 
             hpb.permute_sparse_matrix(hpb_S, hpb_C, hpb_U)
+        elif hpc == 'gpu':
+            import cupyx.scipy.sparse as cpss
+
+            S = cpss.csr_matrix(S.astype(bool))
+            C = cpss.csr_matrix(C)
+            U = S@C
+        else:
+            raise ValueError("Invalid hpc option: " + str(hpc))
 
         self._evolution = U
         return U
