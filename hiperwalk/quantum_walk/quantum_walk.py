@@ -646,6 +646,7 @@ class QuantumWalk(ABC):
                          if np.issubdtype(dtype, np.floating)
                          else hpb.COMPLEX)
 
+            self._sim_vec = state.copy()
             self._vec = self._sim_vec
             self._sim_vec = hpb.vector_new(self.hilb_dim, hpb_dtype)
             hpb.vector_connect(self._sim_vec, self._vec)
