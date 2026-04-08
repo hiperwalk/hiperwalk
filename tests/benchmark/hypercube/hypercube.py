@@ -6,10 +6,10 @@ import hiperwalk as hpw
 dim = int(sys.argv[1])
 coin = sys.argv[2]
 uniform = bool(int(sys.argv[3]))
-hpc = bool(int(sys.argv[4]))
+hpc = sys.argv[4]
 
-if hpc:
-    hpw.set_hpc('cpu')
+if hpc != "none":
+    hpw.set_hpc(hpc)
 
 start = perf_counter()
 g = hpw.Hypercube(dim)

@@ -1,12 +1,14 @@
 coins=("G" "F")
+hpcs=("none" "cpu" "gpu")
 touch output.txt
 rm output.txt
 
-for ((dim=4; dim<=20; dim++)); do
+for ((dim=4; dim<=19; dim++)); do
 	for j in "${!coins[@]}"; do
 		coin=${coins[$j]}
 		for ((state=0; state<=1; state++)); do
-			for ((hpc=0; hpc<=1; hpc++)); do
+			for k in "${!hpcs[@]}"; do
+				hpc=${hpcs[$k]}
 				if [ $state -eq 0 ]; then
 					echo $dim, $coin, 'ket0', $hpc
 					echo $dim, $coin, 'ket0', $hpc >> output.txt
