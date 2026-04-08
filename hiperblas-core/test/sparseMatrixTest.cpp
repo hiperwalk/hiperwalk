@@ -18,13 +18,6 @@ public:
     
     SparseMatrixFixture() {
         idx = 0;
-	/*
-        string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
-        plugin_name = "/mnt/c/Users/bidu/OneDrive/aLncc/passeiosQuantHiago/Bhiperblas-core-old/libhiperblas-cpu-bridge.so";
-        plugin_name = "/home/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
-        plugin_name = "/prj/prjedlg/bidu/hiperblas/lib/libhiperblas-cpu-bridge.so";
-        plugin_name = "/prj/cenapadrjsd/eduardo.garcia2/hiperblas/lib/libhiperblas-cpu-bridge.so";
-	*/
 
         const char *home = getenv("HOME");
         char  *plugin_name  = (char*) malloc ( 1024 *sizeof(char));
@@ -72,72 +65,39 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     int n = 16;
  
 //initial state = [ 0.000  0.000  0.000  0.000  0.000  0.000  0.500 -0.500 -0.500  0.500  0.000  0.000  0.000  0.000  0 .000  0.000];  state.l2Norm= 1.0
+    float initial_state_List [] = {0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.500, -0.500, -0.500, 0.500, 0.000,  0.000,  0.000,  0.000,  0.000,  0.000}; 
     vector_t  * inV = bridgeManager.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
-    int i; for (i = 0; i < inV->len; i++) { inV->value.f[i] = 0.; }
-    i=6; inV->value.f[i] =  0.500; i=7; inV->value.f[i] = -0.500;
-    i=8; inV->value.f[i] = -0.500; i=9; inV->value.f[i] =  0.500;
- //   a->extra=a->value.f;
+    int i; for (i = 0; i < inV->len; i++) { inV->value.f[i] = initial_state_List[i]; }
     printf("bd, em TEST_F, vetor  entrada \n");
     print_vectorT(inV);
 
-//v_->extra [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
+//first output vector [0:15]: -0.50 0.00 0.00 0.50 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.00 0.50 0.00 0.00 -0.50, L2Norm = 1.000000
+    float firt_output_List [] = { -0.50, 0.00, 0.00, 0.50, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.50, 0.00, 0.00, -0.50};
     vector_t  * referenceOut = bridgeManager.bridges[idx].vector_new (n, T_FLOAT, 1, NULL );
-    for (i = 0; i < referenceOut->len; i++) { referenceOut->value.f[i] = 0.; }
-    i=0;  referenceOut->value.f[i] = -0.500;  i=3; referenceOut->value.f[i] =  0.500;
-    i=12; referenceOut->value.f[i] =  0.500; i=15; referenceOut->value.f[i] = -0.500;
-    //printf("bd, em TEST_F, vetor  saida, apos uma iteracao:\n");
-    //print_vectorT(referenceOut);
+    for (i = 0; i < referenceOut->len; i++) { referenceOut->value.f[i] = firt_output_List [i]; }
+    printf("bd, em TEST_F, first output:\n");
+    print_vectorT(referenceOut);
 
 //U.indptr    =  [ 0  4  6  8 12 14 16 17 18 19 20 22 24 28 30 32 36]
+    int row_ptr_List[]={0,  4,  6,  8, 12, 14, 16, 17, 18, 19, 20, 22, 24, 28, 30, 32, 36};
+    int row_ptr_ListLen=int(sizeof(row_ptr_List)/sizeof(row_ptr_List[0]));
     smatrix_t * csrM = bridgeManager.bridges[idx].smatrix_new(n, n, T_FLOAT);
-    csrM->nnz=36;
-    csrM->row_ptr = (long int*) malloc((n+1)*sizeof(long int)) ;
-    i=0;
-    csrM->row_ptr[i++]=0;   csrM->row_ptr[i++]=4;   csrM->row_ptr[i++]=6;   csrM->row_ptr[i++]=8;
-    csrM->row_ptr[i++]=12;  csrM->row_ptr[i++]=14;  csrM->row_ptr[i++]=16;  csrM->row_ptr[i++]=17;
-    csrM->row_ptr[i++]=18;  csrM->row_ptr[i++]=19;  csrM->row_ptr[i++]=20;  csrM->row_ptr[i++]=22;
-    csrM->row_ptr[i++]=24;  csrM->row_ptr[i++]=28;  csrM->row_ptr[i++]=30;  csrM->row_ptr[i++]=32;
-    csrM->row_ptr[i++]=36;
+    csrM->nnz=row_ptr_List[row_ptr_ListLen-1];
+    csrM->row_ptr = (long int*) malloc(row_ptr_ListLen*sizeof(long int)) ;
+    for (i = 0; i < row_ptr_ListLen; i++) { csrM->row_ptr[i]= row_ptr_List[i]; }
+
 //U.indices   =  [ 6  7  8  9 10 11  4  5  6  7  8  9 13 14  1  2  0  3 12 15 13 14  1  2  6  7  8  9 10 11  4  5  6  7  8  9]
+    int col_idx_List[]={6,  7,  8,  9, 10, 11,  4,  5,  6,  7,  8,  9, 13, 14,  1,  2,  0,  3, 12, 15, 13, 14,  1,  2,  6,  7,  8,  9, 10, 11,  4,  5,  6,  7,  8,  9};
+    int col_idx_ListLen=int(sizeof(col_idx_List)/sizeof(col_idx_List[0]));
     csrM->col_idx = (long int*) malloc((csrM->nnz)*sizeof(long int)) ;
-    i=0;
-    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
-    csrM->col_idx[i++]=10;  csrM->col_idx[i++]=11; 
-    csrM->col_idx[i++]=4;   csrM->col_idx[i++]=5;
-    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
-    csrM->col_idx[i++]=13;  csrM->col_idx[i++]=14;
-    csrM->col_idx[i++]=1;   csrM->col_idx[i++]=2;
-    csrM->col_idx[i++]=0;
-    csrM->col_idx[i++]=3;
-    csrM->col_idx[i++]=12;
-    csrM->col_idx[i++]=15;
-    csrM->col_idx[i++]=13;  csrM->col_idx[i++]=14;
-    csrM->col_idx[i++]=1;   csrM->col_idx[i++]=2;
-    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
-    csrM->col_idx[i++]=10;  csrM->col_idx[i++]=11; 
-    csrM->col_idx[i++]=4;   csrM->col_idx[i++]=5;
-    csrM->col_idx[i++]=6;   csrM->col_idx[i++]=7;   csrM->col_idx[i++]=8;   csrM->col_idx[i++]=9;
+    for (i = 0; i < col_idx_ListLen; i++) { csrM->col_idx[i]= col_idx_List[i]; }
+
 
 //U.data      =  [ 0.5  0.5  0.5 -0.5  1.   0.   1.   0.   0.5  0.5 -0.5  0.5  1.   0.   1.   0.   1.   1.   1.   1.   0.   1.   0.   1.   0.5 -0.5  0.5  0.5  0.   1.   0.   1.  -0.5  0.5  0.5  0.5]
+     float values_List[]  =  { 0.5,  0.5,  0.5, -0.5,  1.,   0.,   1.,   0.,   0.5,  0.5, -0.5,  0.5,  1.,   0.,   1.,   0.,   1.,   1.,   1.,   1.,   0.,   1.,   0.,   1.,   0.5, -0.5,  0.5,  0.5,  0.,   1.,   0.,   1.,  -0.5,  0.5,  0.5,  0.5};
+    int values_ListLen=int(sizeof(values_List)/sizeof(values_List[0]));
     csrM->values= (double*) malloc((csrM->nnz)*sizeof(double)) ;
-    i=0;
-    csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;
-    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
-    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
-    csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;   csrM->values[i++]=0.5;
-    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
-    csrM->values[i++]=1.0;   csrM->values[i++]=0.0; 
-
-    csrM->values[i++]=1.0; 
-    csrM->values[i++]=1.0; 
-    csrM->values[i++]=1.0; 
-    csrM->values[i++]=1.0; 
-    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
-    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
-    csrM->values[i++]=0.5;   csrM->values[i++]=-0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;
-    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
-    csrM->values[i++]=0.0;   csrM->values[i++]=1.0; 
-    csrM->values[i++]=-0.5;  csrM->values[i++]=0.5;   csrM->values[i++]=0.5;   csrM->values[i++]=0.5;
+    for (i = 0; i < values_ListLen; i++) { csrM->values[i]= values_List[i]; }
     printf("bd, em TEST_F, matriz U \n");
     print_smatrix(csrM);
 
@@ -169,7 +129,6 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
         vector_t  * tmpV;
         tmpV = outV; outV = inV; inV = tmpV;
     }
-     
 
        printf("bd, em TEST_F, before call matvec_mul3\n");
        matvec_mul3(&bridgeManager, idx, (void **) in3RefObj, NULL);

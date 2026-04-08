@@ -24,8 +24,8 @@ add_compile_options(
     -O3
     -g3
     -ggdb
+    -Wall
 )
-#-Wall
 
 # =====================================================
 # RPATH – elimina LD_LIBRARY_PATH
@@ -44,7 +44,6 @@ find_package(Threads REQUIRED)
 find_package(OpenMP REQUIRED)
 
 # GoogleTest é opcional (só para testes)
-##find_package(GTest QUIET)
 find_package(GTest REQUIRED)
 
 # =====================================================
@@ -55,7 +54,6 @@ set(SRC_DIR  ${PROJECT_SOURCE_DIR}/src)
 set(INC_DIR  ${PROJECT_SOURCE_DIR}/include)
 set(TEST_DIR ${PROJECT_SOURCE_DIR}/test)
 
-#include_directories(${INC_DIR} ${HOME}/local/include)
 include_directories(${INC_DIR})
 
 # =====================================================
@@ -127,9 +125,8 @@ if(GTest_FOUND)
                 hiperblas-core
                 GTest::gtest
                 GTest::gtest_main
-                Threads::Threads
-                OpenMP::OpenMP_C
         )
+
 
         add_test(NAME ${test_name} COMMAND ${test_name})
 
