@@ -158,32 +158,32 @@ experimentosIniciais() {
 
     comandoD='python3 examples/coined/diagonal-gridHB.py | grep "state_index\|_simul_vec_\|500\|new" || true'
 
-    echo $comandoA
-    echo $comandoB
-    echo $comandoC
-    echo $comandoD
+    echo "exp 1:" $comandoA
+    echo "exp 2:" $comandoB
+    echo "exp 3:" $comandoC
+    echo "exp 4:" $comandoD
 
     echo Os 4 programas acima usam os mesmos dados: diagonal-grid, n = 3
-    read -p ">> Enter para rodar experimento"
+    read -p ">> Enter para continuar"
 
-    echo ">> Teste libhiperblas-core.so"
+    echo ">> Teste em C++ usando libhiperblas-core.so"
     echo $comandoA
-    read -p ">> Enter para rodar experimento"
+    read -p ">> Enter para rodar experimento 1"
     bash -c "$comandoA"
 
     echo ">> Teste Python usando libhiperblas-core.so"
     echo $comandoB
-    read -p ">> Enter para rodar experimento"
+    read -p ">> Enter para rodar experimento 2"
     bash -c "$comandoB"
 
     echo ">> Exemplo HiperWalk SEM libhiperblas-core.so"
     echo $comandoC
-    read -p ">> Enter para rodar experimento"
+    read -p ">> Enter para rodar experimento 3"
     bash -c "$comandoC"
 
     echo ">> Exemplo HiperWalk COM libhiperblas-core.so"
     echo $comandoD
-    read -p ">> Enter para rodar experimento"
+    read -p ">> Enter para rodar experimento 4"
     bash -c "$comandoD"
 }
 
@@ -195,6 +195,7 @@ main() {
 
     #experimentosIniciais; return;
 
+    experimentosIniciais; return
     cdWork=$1
     setUpInicial
 
