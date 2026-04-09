@@ -13,16 +13,16 @@ extern "C" {
     
 #define new_str(i) (char *) malloc( sizeof(char)*(i))
 
-void print_smatrix(const smatrix_t* matrix); //BD em duvida
-void print_vectorT(vector_t *v_) ; // BD dez25
+void print_smatrix(const smatrix_t* matrix); //HB em duvida
+void print_vectorT(vector_t *v_) ; // HB dez25
 
  void delete_object_array(object_t ** in, int len);
  void delete_object(object_t * in);
  object_t ** convertToObject(vector_t * a, vector_t * b);
  object_t ** convertToObject3(vector_t * a, matrix_t * b);
- object_t ** convertToObject3BD(matrix_t * m, vector_t * vI, vector_t * vO);
+ object_t ** convertToObject3HB(matrix_t * m, vector_t * vI, vector_t * vO);
  object_t ** convertToObject4(vector_t * a, smatrix_t * b);
- object_t ** convertToObject4BD(smatrix_t * m, vector_t * vI, vector_t * vO);
+ object_t ** convertToObject4HB(smatrix_t * m, vector_t * vI, vector_t * vO);
  object_t ** convertToObject2(int n, vector_t * a);
  object_t ** convertMatMatToObject(matrix_t * a, matrix_t * b);
  object_t ** convertScaVecToObject(double s, vector_t * a);

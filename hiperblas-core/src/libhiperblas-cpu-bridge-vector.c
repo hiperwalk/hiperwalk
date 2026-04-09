@@ -5,7 +5,7 @@
 // vector_new (n, T_FLOAT, 1, NULL ); // new vector at Dev
 
 vector_t *vector_new(int len, data_type type, int initialize, void *data) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); // _NAME__);
+    printf("HB, em %s: %s\n", __FILE__, __func__); // _NAME__);
     
 // chatGPT em 18.11.2025, bidu
     vector_t *ret     = malloc(sizeof(vector_t));
@@ -41,7 +41,7 @@ vector_t *vector_new(int len, data_type type, int initialize, void *data) {
         case T_FLOAT:
             bytes = len * sizeof(double);
             //ret->value.f = malloc( len * sizeof(double));
-            ret->value.f = calloc( len, sizeof(double)); // BD, 26.march
+            ret->value.f = calloc( len, sizeof(double)); // HB, 26.march
    //         printf(" +++++++++++++ len = %d \n", len);
   //           for (int i = 0; i < len; i++) { ret->value.f[i]=1.0; }
             if (!ret->value.f) { free(ret); return NULL; }
@@ -71,7 +71,7 @@ vector_t *vector_new(int len, data_type type, int initialize, void *data) {
 void vector_delete(vector_t *v)
 {
 // chatGPT em 18.11.2025, bidu
-    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), only the instance of struct vector_t\n", __FILE__); // _NAME__);
+    printf("HB, ATENCAO, em %s: void vector_delete( vector_t * v ), only the instance of struct vector_t\n", __FILE__); // _NAME__);
     if (v !=NULL ) free(v); 
     return;
 
@@ -146,7 +146,7 @@ vector_t * vector_new00( int len, data_type type, int initialize, void * data ) 
     return ret;
 }
 void vector_delete00( vector_t * v ) {
-    printf("BD, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE__); // _NAME__);
+    printf("HB, ATENCAO, em %s: void vector_delete( vector_t * v ), NO FREE! {\n", __FILE__); // _NAME__);
     return;
     if (v != NULL) {
         if (v->value.f != NULL && v->externalData == 0) {

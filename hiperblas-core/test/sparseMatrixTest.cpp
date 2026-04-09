@@ -10,13 +10,13 @@
 
 using namespace std;
 
-class SparseMatrixFixture : public ::testing::Test {
+class SparseMatrixHBFixture : public ::testing::Test {
 protected:
 public:
     bridge_manager_t bridgeManager;
     int idx;
     
-    SparseMatrixFixture() {
+    SparseMatrixHBFixture() {
         idx = 0;
 
         const char *home = getenv("HOME");
@@ -48,16 +48,16 @@ public:
         
     }
 
-    ~SparseMatrixFixture() {
+    ~SparseMatrixHBFixture() {
         // cleanup any pending stuff, but no exceptions allowed
     }
 
 };
 
 
-TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
+TEST_F(SparseMatrixHBFixture, matvec_mul3_WithSparseMatrixHBFloat) {
 
-    printf("\nbd, inicio de TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {\n");
+    printf("\nbd, inicio de TEST_F(SparseMatrixHBFixture, matvec_mul3_WithSparseMatrixHBFloat) {\n");
     printf("\nbd, ./examples/coined/diagonal-grid.py data) {\n");
     printf("\nbd, diagonal-gridStencil, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
 
@@ -107,7 +107,7 @@ TEST_F(SparseMatrixFixture, matvec_mul3_WithSparseMatrixFloat) {
     bridgeManager.bridges[idx].vecreqdev (outV);
     print_vectorT(outV);
 
-    object_t ** in3RefObj = convertToObject4BD(csrM, inV, outV ); // pack a 3 references at an object 
+    object_t ** in3RefObj = convertToObject4HB(csrM, inV, outV ); // pack a 3 references at an object 
 								
     for (int state_index=1; state_index<=2; state_index++){
 

@@ -12,7 +12,7 @@ void load_function(bridge_manager_t *manager, void* (**function_ptr)(), char* fu
     *function_ptr = externalFunction;
     char *result = dlerror();
     if (result) {
-        printf("\nBD, em libhiperblas.c, void load_function: Cannot find init in %s: %s\n", function_name, result);
+        printf("\nHB, em libhiperblas.c, void load_function: Cannot find init in %s: %s\n", function_name, result);
     }
 }
 
@@ -142,10 +142,10 @@ void load_long_function(bridge_manager_t *manager, long (**function_ptr)(), char
 void load_plugin(bridge_manager_t *manager, char* library_name, int index) {
     setvbuf(stdout, NULL, _IONBF, 0);  // Desativa buffer do stdout
 
-    printf("BD, em %s, %s \n", __FILE__, __func__);
-    printf("BD, so library name: %s, \n", library_name );
+    printf("HB, em %s, %s \n", __FILE__, __func__);
+    printf("HB, so library name: %s, \n", library_name );
 
-    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW| RTLD_GLOBAL); //BD | RTLD_GLOBAL
+    manager->bridges[index].plugin_handle = dlopen(library_name, RTLD_NOW| RTLD_GLOBAL); //HB | RTLD_GLOBAL
     if (!manager->bridges[index].plugin_handle) {
             printf("Cannot load %s: %s", library_name, dlerror());
         }

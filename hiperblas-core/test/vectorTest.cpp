@@ -9,19 +9,19 @@
 
 using namespace std;
 
-class NeblinaCoreFixture : public ::testing::Test {
+class HiperBlasCoreFixture : public ::testing::Test {
 protected:
 public:
     bridge_manager_t m;
     int idx;
 
-    NeblinaCoreFixture() {
+    HiperBlasCoreFixture() {
         //string plugin_name = "/usr/local/lib64/libhiperblas-cpu-bridge.so";
 
         idx = 0;
         const char *home = getenv("HOME");
         char  *plugin_name  = (char*) malloc ( 1024 *sizeof(char));
-        snprintf(plugin_name, 1024, "%s%s", home,"/hiperblas/lib/libhiperblas-cpu-bridge.so");
+        snprintf(plugin_name, 1024, "%s%s", home,"/local/lib/libhiperblas-cpu-bridge.so");
         printf("plugin_name = %s\n", plugin_name);
 
         //load_plugin(&m, const_cast<char *>(plugin_name.c_str()), idx);
@@ -50,13 +50,13 @@ public:
         
     }
 
-    ~NeblinaCoreFixture() {
+    ~HiperBlasCoreFixture() {
         // cleanup any pending stuff, but no exceptions allowed
     }
 
 };
 
-TEST_F(NeblinaCoreFixture, vec_add) {
+TEST_F(HiperBlasCoreFixture, vec_add) {
 
     int n = 3;
 
@@ -87,7 +87,7 @@ TEST_F(NeblinaCoreFixture, vec_add) {
 
 }
 
-// TEST_F(NeblinaCoreFixture, vec_len) {
+// TEST_F(HiperBlasCoreFixture, vec_len) {
 
 //     int n = 3;
 
@@ -107,7 +107,7 @@ TEST_F(NeblinaCoreFixture, vec_add) {
 
 // }
 
-TEST_F(NeblinaCoreFixture, vec_add_complex) {
+TEST_F(HiperBlasCoreFixture, vec_add_complex) {
 
     int n = 3;
 
@@ -144,7 +144,7 @@ TEST_F(NeblinaCoreFixture, vec_add_complex) {
 }
 
 /*
-TEST_F(NeblinaCoreFixture, vec_sub) {
+TEST_F(HiperBlasCoreFixture, vec_sub) {
 
     int n = 3;
 
@@ -173,7 +173,7 @@ TEST_F(NeblinaCoreFixture, vec_sub) {
 
 }
 
-TEST_F(NeblinaCoreFixture, vec_sub_WithComplex) {
+TEST_F(HiperBlasCoreFixture, vec_sub_WithComplex) {
 
     int n = 3;
 
@@ -210,7 +210,7 @@ TEST_F(NeblinaCoreFixture, vec_sub_WithComplex) {
 }
 
 
-TEST_F(NeblinaCoreFixture, scalar_vec) {
+TEST_F(HiperBlasCoreFixture, scalar_vec) {
 
     int n = 3;
     
@@ -236,7 +236,7 @@ TEST_F(NeblinaCoreFixture, scalar_vec) {
     m.bridges[idx].vector_delete(r);
 }
 
-TEST_F(NeblinaCoreFixture, complex_scalar_float_vec) {
+TEST_F(HiperBlasCoreFixture, complex_scalar_float_vec) {
 
     int n = 3;
     
@@ -263,10 +263,10 @@ TEST_F(NeblinaCoreFixture, complex_scalar_float_vec) {
     m.bridges[idx].vector_delete(r);
 }
 
-TEST_F(NeblinaCoreFixture, complex_scalar_complex_vec) {
+TEST_F(HiperBlasCoreFixture, complex_scalar_complex_vec) {
 
     int n = 3;
-    
+   /
     complex_t * scalar = m.bridges[idx].complex_new(2.0, 2.0);
     vector_t * a = m.bridges[idx].vector_new(n, T_COMPLEX, 1, NULL );
     
@@ -292,7 +292,7 @@ TEST_F(NeblinaCoreFixture, complex_scalar_complex_vec) {
     m.bridges[idx].vector_delete(r);
 }
 
-TEST_F(NeblinaCoreFixture, float_scalar_complex_vec) {
+TEST_F(HiperBlasCoreFixture, float_scalar_complex_vec) {
 
     int n = 3;
     
@@ -320,7 +320,7 @@ TEST_F(NeblinaCoreFixture, float_scalar_complex_vec) {
     m.bridges[idx].vector_delete(r);
 }
 
-TEST_F(NeblinaCoreFixture, vec_prod_WithFloat) {
+TEST_F(HiperBlasCoreFixture, vec_prod_WithFloat) {
 
     int n = 3;
 
@@ -349,7 +349,7 @@ TEST_F(NeblinaCoreFixture, vec_prod_WithFloat) {
 
 }
 
-TEST_F(NeblinaCoreFixture, vec_prod_WithComplex) {
+TEST_F(HiperBlasCoreFixture, vec_prod_WithComplex) {
 
     int n = 3;
 
@@ -381,7 +381,7 @@ TEST_F(NeblinaCoreFixture, vec_prod_WithComplex) {
 
 }
 
-TEST_F(NeblinaCoreFixture, vec_conj) {
+TEST_F(HiperBlasCoreFixture, vec_conj) {
 
     int n = 3;
 
@@ -409,7 +409,7 @@ TEST_F(NeblinaCoreFixture, vec_conj) {
 
 }
 
-TEST_F(NeblinaCoreFixture, vec_add_off) {
+TEST_F(HiperBlasCoreFixture, vec_add_off) {
 
     int n = 4;
 
@@ -435,7 +435,7 @@ TEST_F(NeblinaCoreFixture, vec_add_off) {
 
 }
 
-TEST_F(NeblinaCoreFixture, vec_sum) {
+TEST_F(HiperBlasCoreFixture, vec_sum) {
 
     int n = 4;
 
@@ -463,7 +463,7 @@ TEST_F(NeblinaCoreFixture, vec_sum) {
 
 }
 
-TEST_F(NeblinaCoreFixture, addVectorC) {
+TEST_F(HiperBlasCoreFixture, addVectorC) {
 
     int n = 3;
 
@@ -495,7 +495,7 @@ TEST_F(NeblinaCoreFixture, addVectorC) {
     m.bridges[idx].vector_delete(r);
 }
 
-TEST_F(NeblinaCoreFixture, subVector) {
+TEST_F(HiperBlasCoreFixture, subVector) {
 
     int n = 3;
 

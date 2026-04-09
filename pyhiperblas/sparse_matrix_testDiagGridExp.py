@@ -13,8 +13,8 @@ def vector_normL2_one (n_):
 
     
 def main():
-    print("BD, hiperwalk/examples/coined/diagonal-grid.py data) {\n");
-    print("BD, diagonal-grid, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
+    print("HB, hiperwalk/examples/coined/diagonal-grid.py data) {\n");
+    print("HB, diagonal-grid, dim=3, Grover coin, numArcs = 16, nnz = 36 ) {\n");
 
     np.set_printoptions(linewidth=200)
     hb.init_engine(hb.CPU,0)

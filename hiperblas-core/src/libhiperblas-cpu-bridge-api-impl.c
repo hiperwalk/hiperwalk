@@ -232,7 +232,7 @@ int matrix_get_complex_imag_index(int ncol, int i, int j){
 }
 
 void* matMulFloat(  double* m1, double* m2, int nrows, int ncols, int ncol_m1 ) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     double * out = (double *) malloc( nrows * ncols * sizeof(double) );
     #pragma omp parallel for collapse(2)
     for (int i=0; i<nrows; i++) {
@@ -344,7 +344,7 @@ void matSquare( void* * outLin, void* * idxOutLin,
 }
 
 void matVecMul3(  double* mat, double* vecIn, double* vecOut, int ncols, int nrows ) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
         double sum = 0;
@@ -364,7 +364,7 @@ void matVecMul3(  double* mat, double* vecIn, double* vecOut, int ncols, int nro
 }
 
 void* matVecMul300(  double* mat, double* vecIn, int ncols, int nrows ) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     double * out = (double *) malloc( nrows * sizeof(double) );
     #pragma omp parallel for
     for (int i=0; i<nrows; i++) {
@@ -385,7 +385,7 @@ void* matVecMul300(  double* mat, double* vecIn, int ncols, int nrows ) {
 }
 
 void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     U->row_ptr[0] = 0; // First row starts at index 0
     for (int i = 0; i < S->nrow; i++) {
         int permuted_row = S->col_idx[i];  // Get the row index in C
@@ -395,7 +395,7 @@ void computeRowptrU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 #include <omp.h>
 void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
 {
     int k=0;
     if (C->type == T_COMPLEX ) {
@@ -433,7 +433,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 }
 
  void * permuteSparseMatrix( void * S_, void *C_, void *U_){
-      printf("BD, em %s: %s\n", __FILE__, __func__); 
+      printf("HB, em %s: %s\n", __FILE__, __func__); 
       smatrix_t* S = (smatrix_t*) S_;
       smatrix_t* C = (smatrix_t*) C_;
       smatrix_t* U = (smatrix_t*) U_;
@@ -444,7 +444,7 @@ void computeU(const smatrix_t* S, const smatrix_t* C, smatrix_t* U) {
 
 //[Hiago] 
 void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
     if (!m_values) { fprintf(stderr, "Error: Matrix values (m_values) is NULL in sparseVecMul.\n"); return ; }
@@ -463,20 +463,20 @@ void sparseVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, 
         for (int j = row_ptr[row]; j < row_ptr[row + 1]; j++) {
             int col = col_idx[j];
             double prod = values[j] * vec_in[col];
- //           printf("BD, sum += values[%2d] * vec_in[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, col, sum, values[j], vec_in[col], sum+prod);
+ //           printf("HB, sum += values[%2d] * vec_in[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, col, sum, values[j], vec_in[col], sum+prod);
             sum+=prod;
         }
         vec_out[row] = sum;
-//        printf("BD,                vec_out[%2d]          =  %8.4f\n", row, sum);
+//        printf("HB,                vec_out[%2d]          =  %8.4f\n", row, sum);
 	    
     }
-    //printf("BD, em final de sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {\n");
+    //printf("HB, em final de sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {\n");
     //  printf("\n%s, linha %d \n", __FILE__, __LINE__ ); exit(128+13);
     return ;
 }
 
 void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {
-    printf("BD, em %s: %s\n", __FILE__, __func__); 
+    printf("HB, em %s: %s\n", __FILE__, __func__); 
     if (!vecIn_) { fprintf(stderr, "Error: Input vector (vecIn_) is NULL in sparseVecMul.\n"); return ; }
     if (!vecOut_) { fprintf(stderr, "Error: Input vector (vecOut_) is NULL in sparseVecMul.\n"); return ; }
 
@@ -523,17 +523,17 @@ void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_ro
   //              double bV = v->value.f[ 2 * S->col_idx[j] + 1 ];  // Usar col, não k
                 double aP = aS * aV - bS * bV;
                 double bP = aS * bV + bS * aV;
-//            printf("BD, aSum += valuesR[%2d] * vec_inR[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, k, aSum, values[2*j], vec_in[2*k], aSum+aP);
- //           printf("BD, bSum += valuesI[%2d] * vec_inI[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, k, aSum, values[2*j+1], vec_in[2*k+1], bSum+bP);
+//            printf("HB, aSum += valuesR[%2d] * vec_inR[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, k, aSum, values[2*j], vec_in[2*k], aSum+aP);
+ //           printf("HB, bSum += valuesI[%2d] * vec_inI[%2d], %8.4f +=  %8.4f * %8.4f = %8.4f\n", j, k, aSum, values[2*j+1], vec_in[2*k+1], bSum+bP);
                 aSum += aP; bSum += bP;
                 k++;
             }
             vec_Out[2 * row]     = aSum;
             vec_Out[2 * row + 1] = bSum;
-  //      printf("BD,                vec_outR[%2d]          =  %8.4f\n", row, aSum);
-   //     printf("BD,                vec_outI[%2d]          =  %8.4f\n", row, bSum);
+  //      printf("HB,                vec_outR[%2d]          =  %8.4f\n", row, aSum);
+   //     printf("HB,                vec_outI[%2d]          =  %8.4f\n", row, bSum);
         }
-    //printf("BD, em final de sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {\n");
+    //printf("HB, em final de sparseVecMul(void* v, void* m_values, void* m_row_ptr, void* m_col_idx, int m_nrows, int nnz) {\n");
     //  printf("\n%s, linha %d \n", __FILE__, __LINE__ ); exit(128+13);
     // Initialize output vector to zero to avoid undefined behavior
     //exit(128+33);
@@ -546,7 +546,7 @@ void sparseComplexVecMul(void* vecIn_, void* vecOut_, void* m_values, void* m_ro
 void* matVecMul3Complex(  double* mat, double* vec,  double* out, int ncols, int nrows ) {
     
     // printf("matVecMul3Complex 1 ---------\n");
-    // BDjan26 double * out = (double *) malloc( 2 * nrows * sizeof(double) );
+    // HBjan26 double * out = (double *) malloc( 2 * nrows * sizeof(double) );
     // printf("matVecMul3Complex 2\n");
     
     #pragma omp parallel for
