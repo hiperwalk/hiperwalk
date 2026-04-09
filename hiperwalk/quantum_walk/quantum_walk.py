@@ -693,7 +693,7 @@ class QuantumWalk(ABC):
             if  hbi.get_hpc() == 'cpu' :
                 self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
 
-            if  state_index < 10 :  saved_states[state_index] = self._simul_vec_out.copy()
+            if  state_index <= num_states :  saved_states[state_index] = self._simul_vec_out.copy()
 
             self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
             state_index += 1

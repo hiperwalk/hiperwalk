@@ -4,6 +4,7 @@ import networkx as nx
 
 import time
 import sys
+import os
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
 
@@ -32,6 +33,8 @@ from warnings import warn
 def main():
 
     hpw.set_hpc(myHPC_option)
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
+    print( f"{nome:14s}, " f"dim = {myDim:4d}, " f"numStep = {endStep - startStep:4d}, " f"{str(coinT):>8s}, " f"algebra = {algebra:>10s}, " f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s} ")
     inicioG = time.perf_counter()
     K_N = nx.complete_graph(N)
     A = nx.adjacency_matrix(K_N)+np.eye(N)
@@ -54,7 +57,6 @@ def main():
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
     U = qw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
-    import os
     nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     nome = os.path.basename(__file__)  # Apenas o nome do arquivo
     print(

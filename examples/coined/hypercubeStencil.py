@@ -52,7 +52,6 @@ def main():
     print(f"Iteracoes: Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
-
     U = qw.get_evolution(); num_arcs=U.shape[0];  densidade=U.nnz/(num_arcs*num_arcs)
     print(
     f"{nome:14s}, "

@@ -5,9 +5,9 @@ import numpy as np
 
 import time
 import sys
+import os
 #sys.stdout.reconfigure(line_buffering=False, write_through=False)
 sys.stdout.reconfigure(line_buffering=True)
-
 
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION="cpu"
 aDim=3; aNumSteps=3; aCoin="F"; aHPCoPTION=None
@@ -16,7 +16,7 @@ aDim=3; aNumSteps=3; aCoin="G"; aHPCoPTION="cpu"
 aNumSteps=15
 aDim=20
 
-dim          =aDim        # 10
+myDim        =aDim        # 10
 myCoin       =aCoin       # "G" Grover para Real e  "F"  Fourier para Complex
 myHPC_option =aHPCoPTION  # None   "cpu"    "gpu"
 myNumSteps   =aNumSteps
@@ -29,19 +29,21 @@ aRange=(startStep,endStep,step)
 
 from warnings import warn
 def main():
-
     np.set_printoptions(linewidth=320, threshold=40)
     hpw.set_hpc(myHPC_option)
+    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
+    print( f"{nome:14s}, " f"dim = {myDim:4d}, " f"numStep = {endStep - startStep:4d}, " f"{str(coinT):>8s}, " f"algebra = {algebra:>10s}, " f"OMP_NUM_THREADS = {os.getenv('OMP_NUM_THREADS') or 'ND':>3s} ")
+
 
     inicioG = time.perf_counter()
-    grid = hpw.Grid(dim, diagonal=True, periodic=False)
+    grid = hpw.Grid(myDim, diagonal=True, periodic=False)
     fimG    = time.perf_counter()
 
     inicioC = time.perf_counter()
     dtqw = hpw.Coined(grid, shift='persistent', coin=myCoin)
     fimC = time.perf_counter()
 
-    center = np.array([dim // 2, dim // 2])
+    center = np.array([myDim // 2, myDim // 2])
     psi0 = dtqw.state([[0.5, (center, center + (1, 1))],
                    [-0.5, (center, center + (1, -1))],
                    [-0.5, (center, center + (-1, 1))],
@@ -56,11 +58,9 @@ def main():
     print(f"Tempo total      decorrido: {fimS - inicioG:.6f} segundos", file=sys.stderr)
 
     U = dtqw.get_evolution(); num_arcs=U.shape[0]; densidade=U.nnz/(num_arcs*num_arcs)
-    import os
-    nome=os.path.splitext(os.path.basename(__file__))[0] # sem extensão
     print(
     f"{nome:14s}, "
-    f"dim = {dim:4d}, "
+    f"dim = {myDim:4d}, "
     f"numStep = {endStep - startStep:4d}, "
     f"{coinT}, "
     f"numArcs = {num_arcs:10d}, "
