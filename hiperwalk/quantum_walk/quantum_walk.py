@@ -486,18 +486,21 @@ class QuantumWalk(ABC):
             # TODO: check if intermediate states are being freed
             is_sparse = scipy.sparse.issparse(self._evolution)
             for i in range(step):
-
-                #BDjan26
+                print("bd, em def _simulate_step, i =", i)
                 self._simul_vec = hbi.multiply_matrix_vector( self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out, is_sparse)
 
-                #hb.sparse_matvec_mul(self._hb_simul_mat, self._hb_simul_vec_in, self._hb_simul_vec_out)
-           #     if i < step - 1 :
-           #        self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
+                if i < step - 1 :
+                   self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
+                   print(" ++++++++, em em def _simulate_step, self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in")
         else:
             for i in range(step):
+                print("bd, em def _simulate_step, i =", i)
+                print("bd, em def _simulate_step, self._simul_vec_in  =", self._simul_vec_in)
                 self._simul_vec_out[:] = self._simul_mat @ self._simul_vec_in
+                print("bd, em def _simulate_step, self._simul_vec_out  =", self._simul_vec_out)
                 if i < step - 1 :
                    self._simul_vec_in,    self._simul_vec_out    = self._simul_vec_out,    self._simul_vec_in
+                   print(" ++++++++, em em def _simulate_step, self._simul_vec_in,    self._simul_vec_out    = self._simul_vec_out,    self._simul_vec_in")
         return
 
     def _save_simul_vec(self, hpc, continue_simulation):
@@ -609,6 +612,9 @@ class QuantumWalk(ABC):
         ############################################
         ### Check if simulation was set properly ###
         ############################################
+
+        print("range_ = ", range_)
+        print("state = ", state)
         if range_ is None:
             raise ValueError(
                 "``range_` not specified`. "
@@ -631,6 +637,9 @@ class QuantumWalk(ABC):
         ### simulate implemantation ###
         ###############################
 
+        hpc = hbi.get_hpc()
+        self._prepare_engine(state, hpc);
+
         aRange = np.array(QuantumWalk._range_to_tuple(range_))
         if not all(isinstance(e, (int, np.integer)) for e in range_):
             raise ValueError("`range` has non-int entry.")
@@ -640,7 +649,6 @@ class QuantumWalk(ABC):
 
         start, end, step = aRange
         print( f"bd, start={start}, end={end}, step={step}")
-        hpc = hbi.get_hpc()
 
         #########################################################
         # autoconversion of matrix and vector types
@@ -661,7 +669,6 @@ class QuantumWalk(ABC):
         #########################################################
 
         np.set_printoptions(linewidth=320, threshold=40) 
-        self._prepare_engine(state, hpc);
         #np.set_printoptions(precision=3, suppress=True)
         np.set_printoptions( formatter={ 'float_kind': lambda x: f"{x:6.3f}", 'complex_kind': lambda x: f"{x.real:6.3f}{x.imag:+6.3f}j" })
 
@@ -679,6 +686,7 @@ class QuantumWalk(ABC):
             saved_states[0] = state.copy()
             state_index += 1
 
+        print( f"bd, em simulate, start={start}, end={end}, step={step}")
         # simulate walk / apply evolution operator
         if start > 0:
             self._simulate_step(start - step, hpc)
@@ -688,15 +696,19 @@ class QuantumWalk(ABC):
             print("bd, em def simulate,                     state_index = ", state_index) 
             self._simulate_step(step, hpc)
             if state_index < 4 or state_index > num_states - 3:
-                print("bd, self._simul_vec_in ", self._simul_vec_in,  end=", "); print(" self._simul_vec_in.l2Norm=", np.linalg.norm(self._simul_vec_in )); 
-                print("bd, self._simul_vec_out", self._simul_vec_out, end=", "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out )); 
-            if  hbi.get_hpc() == 'cpu' :
-                self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
+                print("bd, em def simulate, self._simul_vec_in ", self._simul_vec_in,  end=", "); print(" self._simul_vec_in.l2Norm=", np.linalg.norm(self._simul_vec_in )); 
+                print("bd, em def simulate, self._simul_vec_out", self._simul_vec_out, end=", "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out )); 
 
-            if  state_index <= num_states :  saved_states[state_index] = self._simul_vec_out.copy()
+            if  state_index < 10 :  saved_states[state_index] = self._simul_vec_out.copy()
 
-            self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+            if start > 0 and state_index < num_states-1 :
+               if  hbi.get_hpc() == 'cpu' :
+                  self._hb_simul_vec_in, self._hb_simul_vec_out = self._hb_simul_vec_out, self._hb_simul_vec_in
+               print(" ++++++++++++++++ self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in ")
+               self._simul_vec_in, self._simul_vec_out = self._simul_vec_out, self._simul_vec_in
+
             state_index += 1
+        print("bd, em def simulate, LAST OUTPUT ", self._simul_vec_out, end=", "); print("self._simul_vec_out.l2Norm=", np.linalg.norm(self._simul_vec_out )); 
         fimS    = time.perf_counter()
         print(f"WhileIt  : Tempo decorrido: {fimS - inicioS:.6f} segundos", file=sys.stderr)
         return saved_states
